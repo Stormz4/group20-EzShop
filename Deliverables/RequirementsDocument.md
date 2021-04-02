@@ -1,10 +1,13 @@
 # Requirements Document 
 
-Authors:
+Authors: 
+- Mattia Lisciandrello
 
 Date:
 
-Version:
+| Version | Changes |
+| ----------------- |:-----------|
+| 1 | Added stakeholders and context diagram/interfaces. |
 
 # Contents
 
@@ -39,14 +42,43 @@ EZShop is a software application to:
 # Stakeholders
 
 
-| Stakeholder name  | Description | 
-| ----------------- |:-----------:|
-|   Stakeholder x..     |             | 
+| Stakeholder name  | Description |
+| -----------------|:-----------:|
+| Buyer | Shop that pays for the system. |
+| Software Engineers | Engineers who will produce & design the software and the documentation. |
+| Analyst | Who will produce the requirement document. |
+| User | Who uses the system. It includes different user profiles. |
+| Cashier (profile 1) | Cashier who uses the software. Manages sales. |
+| Customer (profile 2) | Is affected indirectly through the cashier. |
+| Warehouse worker (profile 3) | Manages the inventory through the software. |
+| Accountant (profile 4) | Handles the accounting through the software. |
+| Customer manager (profile 5) | Manages the customers. In most shops it could be the Cashier. |
+| Maintainers | Who will repair the software eventually. It could be part of the staff or external. |
+| Administrator | Who manages the software (IT, Security, DB). |
+| Marketing people | People who sell the software to shops. |
+| Product | Involved indirectly and managed by the software. |
+| Cash Register (???) | The software involves the cash register since they're part of the output. |
 
 # Context Diagram and interfaces
 
 ## Context Diagram
 \<Define here Context diagram using UML use case diagram>
+```plantuml
+@startuml
+left to right direction
+
+rectangle System{
+	usecase "EZshop" as Shop
+}
+
+Cashier --  Shop
+Product --  Shop
+WarehouseWorker --  Shop
+Accountant --  Shop
+Shop -- CreditCardSystem
+Shop -- CashRegister
+@enduml
+```
 
 \<actors are a subset of stakeholders>
 
@@ -56,8 +88,13 @@ EZShop is a software application to:
 \<GUIs will be described graphically in a separate document>
 
 | Actor | Logical Interface | Physical Interface  |
-| ------------- |:-------------:| -----:|
-|   Actor x..     |  |  |
+| -------------|:-------------:|:-----:|
+| Cashier | GUI | Screen, Keyboard, Mouse |
+| Product | Bar code | Bar code reader |
+| Cash register | GUI | Screen, Keyboard, Printer |
+| Credit card system | Credit card | Credit card reader |
+| Warehouse worker | GUI | Screen, Keyboard, Mouse |
+| Accountant | GUI | Screen, Keyboard, Mouse |
 
 # Stories and personas
 \<A Persona is a realistic impersonation of an actor. Define here a few personas and describe in plain text how a persona interacts with the system>
