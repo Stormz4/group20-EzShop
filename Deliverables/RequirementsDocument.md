@@ -2,6 +2,9 @@
 
 Authors: 
 - Mattia Lisciandrello
+- Christian Casalini s281823
+- Palmucci Leonardo s288126
+- Dario Lanfranco s287524
 
 Date:
 
@@ -38,9 +41,7 @@ EZShop is a software application to:
 * manage customers
 * support accounting
 
-
 # Stakeholders
-
 
 | Stakeholder name  | Description |
 | -----------------|:-----------:|
@@ -50,14 +51,15 @@ EZShop is a software application to:
 | User | Who uses the system. It includes different user profiles. |
 | Cashier (profile 1) | Cashier who uses the software. Manages sales. |
 | Customer (profile 2) | Is affected indirectly through the cashier. |
-| Warehouse worker (profile 3) | Manages the inventory through the software. |
+| Warehouse director (profile 3) |Manages inventory and orders through the software. |
 | Accountant (profile 4) | Handles the accounting through the software. |
 | Customer manager (profile 5) | Manages the customers. In most shops it could be the Cashier. |
 | Maintainers | Who will repair the software eventually. It could be part of the staff or external. |
-| Administrator | Who manages the software (IT, Security, DB). |
+| IT administrator | Who manages the software (Security, DB). |
+| Shop director | Director of the shop. Manages the catalogue of products. |
 | Marketing people | People who sell the software to shops. |
 | Product | Involved indirectly and managed by the software. |
-| Cash Register (???) | The software involves the cash register since they're part of the output. |
+| Cash Register | The software involves the cash register since they're part of the output. |
 
 # Context Diagram and interfaces
 
@@ -73,8 +75,9 @@ rectangle System{
 
 Cashier --  Shop
 Product --  Shop
-WarehouseWorker --  Shop
+WarehouseDirector --  Shop
 Accountant --  Shop
+ShopDirector -- Shop
 Shop -- CreditCardSystem
 Shop -- CashRegister
 @enduml
@@ -91,10 +94,11 @@ Shop -- CashRegister
 | -------------|:-------------:|:-----:|
 | Cashier | GUI | Screen, Keyboard, Mouse |
 | Product | Bar code | Bar code reader |
-| Cash register | GUI | Screen, Keyboard, Printer |
+| Cash register | GUI, API | Screen, Keyboard, Printer |
 | Credit card system | Credit card | Credit card reader |
-| Warehouse worker | GUI | Screen, Keyboard, Mouse |
+| Warehouse director | GUI | Screen, Keyboard, Mouse |
 | Accountant | GUI | Screen, Keyboard, Mouse |
+| Shop director | GUI | Screen, Keyboard, Mouse | 
 
 # Stories and personas
 \<A Persona is a realistic impersonation of an actor. Define here a few personas and describe in plain text how a persona interacts with the system>
@@ -114,9 +118,53 @@ Shop -- CashRegister
 
 | ID        | Description  |
 | ------------- |:-------------:| 
-|  FR1     |  |
-|  FR2     |   |
-| FRx..  | | 
+|  FR1     |Handle sells |
+|  FR1.1   |Register payment  |
+|  FR1.2   |Update inventory |
+|  FR1.3   |Send receipt to accounting |
+|  FR1.4   |Handle discounts |
+|  FR1.5   |Handle fidelty card |
+|  FR1.6   |Scan product |
+|  FR1.7   |Communicate with cash register |
+|  FR1.8   |Read credit card | 
+| | |
+|  FR2     |Handle inventory |
+|  FR2.1   |Add product  |
+|  FR2.2   |Remove product  |
+|  FR2.3   |Update quantity of products  |
+|  FR2.4   |Update price (to buy) of products |
+|  FR2.5   |Handle thresholds | 
+|  FR2.6   |Show products |
+|  FR2.7   |Manage order |
+|  FR2.7.1 |Add order  |
+|  FR2.7.2 |Remove order |
+|  FR2.7.3 |Modify order  |
+|  FR2.7.4 |Show orders |
+| | |
+|  FR3     |Handle catalogue |
+|  FR3.1   |Update price (to sell) of products |
+|  FR3.2   |Add product  |
+|  FR3.3   |Remove product  |
+|  FR3.4   |Show products |
+| | |
+|  FR4     |Handle customers | 
+|  FR4.1   |Add fidelty card  |
+|  FR4.2   |Remove fidelty card |
+|  FR4.3   |Handle card points  |
+|  FR4.4   |Show all fidelty cards |
+| | |
+|  FR5     |Support accounting |
+|  FR5.1   |Update finance |
+|  FR5.2   |Show statistics |
+|  FR5.2.1 |Show sells in a timeframe |
+|  FR5.2.2 |Show best selling products |
+|  FR5.2.3 |Show money spent |
+|  FR5.2.4 |Show money acquired |
+| | |
+
+FR1.5 means that fidelty card of a user must be updated. Is directly related to FR4.
+FR2.5 means that if products go below certain threshold, the director is notified.
+
 
 ## Non Functional Requirements
 
