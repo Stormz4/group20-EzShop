@@ -161,10 +161,17 @@ Shop -- CashRegister
 |  FR5.2.3 |Show money spent |
 |  FR5.2.4 |Show money acquired |
 | | |
+|  FR6     |Handle accounts |
+|  FR6.1   |Add account |
+|  FR6.2   |Remove account|
+|  FR6.3   |Update account|
+|  FR6.4   |Login |
+|  FR6.5   |Logout |
 
 FR1.5 means that fidelty card of a user must be updated. Is directly related to FR4.
 FR2.5 means that if products go below certain threshold, the director is notified.
 
+(P.S.: Manage order is needed?)
 
 ## Non Functional Requirements
 
@@ -172,14 +179,14 @@ FR2.5 means that if products go below certain threshold, the director is notifie
 
 | ID        | Type (efficiency, reliability, ..)           | Description  | Refers to |
 | ------------- |:-------------:| :-----:| -----:|
-|  NFR1     |   |  | |
-|  NFR2     | |  | |
-|  NFR3     | | | |
-| NFRx .. | | | | 
-
+|  NFR1     | Usability   | Application should be used with no specific training for the users  | All FR|
+|  NFR2     | Performance | All functions should complete in less than 0.5s  |All FR |
+|  NFR3     | Localisation | Decimal numbers use . (dot) as decimal separator  | All FR |
+| NFR4 | Privacy | The data of one customer should not be accessible to users other than users who handle fidelty cards. | All FR | 
+| NFR5 | Availability | At least 95% | All FR |
+| Domain | // | Currency is Euro | All FR |
 
 # Use case diagram and use cases
-
 
 ## Use case diagram
 \<define here UML Use case diagram UCD summarizing all use cases, and their relationships>
