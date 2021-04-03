@@ -125,8 +125,12 @@ Shop -- CashRegister
 |  FR1.4   |Handle discounts |
 |  FR1.5   |Handle fidelty card |
 |  FR1.6   |Scan product |
-|  FR1.7   |Communicate with cash register |
+|  FR1.7   |Add the product to a list of buyings |
 |  FR1.8   |Read credit card | 
+|  FR1.9   |Handle cash register |
+|  FR1.9.1 |Print receipt |
+|  FR1.9.2 |Open the cash register  |
+|  FR1.9.3 |Send data to cash register  |
 | | |
 |  FR2     |Handle inventory |
 |  FR2.1   |Add product  |
@@ -134,7 +138,7 @@ Shop -- CashRegister
 |  FR2.3   |Update quantity of products  |
 |  FR2.4   |Update price (to buy) of products |
 |  FR2.5   |Handle thresholds | 
-|  FR2.6   |Show products |
+|  FR2.6   |Show products (inventory) |
 |  FR2.7   |Manage order |
 |  FR2.7.1 |Add order  |
 |  FR2.7.2 |Remove order |
@@ -145,21 +149,26 @@ Shop -- CashRegister
 |  FR3.1   |Update price (to sell) of products |
 |  FR3.2   |Add product  |
 |  FR3.3   |Remove product  |
-|  FR3.4   |Show products |
+|  FR3.4   |Show products (catalogue) |
 | | |
 |  FR4     |Handle customers | 
 |  FR4.1   |Add fidelty card  |
 |  FR4.2   |Remove fidelty card |
 |  FR4.3   |Handle card points  |
-|  FR4.4   |Show all fidelty cards |
+|  FR4.3.1 |Add points |
+|  FR4.3.2 |Remove points | 
+|  FR4.4   |Show all fidelty cards & cards point |
 | | |
 |  FR5     |Support accounting |
 |  FR5.1   |Update finance |
 |  FR5.2   |Show statistics |
 |  FR5.2.1 |Show sells in a timeframe |
 |  FR5.2.2 |Show best selling products |
-|  FR5.2.3 |Show money spent |
-|  FR5.2.4 |Show money acquired |
+|  FR5.2.3 |Show balance sheet|
+|  FR5.3   |Show financial statement |
+|  FR5.3.1 |Show balance sheet |
+|  FR5.3.2 |Show cash flow |
+|  FR5.3.3 |Show income statement |
 | | |
 |  FR6     |Handle accounts |
 |  FR6.1   |Add account |
@@ -169,9 +178,13 @@ Shop -- CashRegister
 |  FR6.5   |Logout |
 
 FR1.5 means that fidelty card of a user must be updated. Is directly related to FR4.
+In FR1.6, whenever you scan a product, you add it to the list of products the customer is buying.
+
 FR2.5 means that if products go below certain threshold, the director is notified.
 
-(P.S.: Manage order is needed?)
+FR.4: fidelty are managed totally by the shop. The customer can choose to get subscribe/unsubscribe and he will be given a card. He will just decide to use or not to use the points, which will be involved in giving discounts to the customer. If he wants to check how many points does he have, he has to get in contact with the shop by himself/with the cashier.
+
+(P.S.: FR5.3 , FR5.3.X are needed?)
 
 ## Non Functional Requirements
 
