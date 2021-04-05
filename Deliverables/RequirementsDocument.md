@@ -155,9 +155,9 @@ Shop -- CashRegister
 |  FR4.1   |Add fidelty card  |
 |  FR4.2   |Remove fidelty card |
 |  FR4.3   |Handle card points  |
-|  FR4.3.1 |Add points |
-|  FR4.3.2 |Remove points | 
-|  FR4.4   |Show all fidelty cards & cards point |
+|  FR4.3.1 |Add card points |
+|  FR4.3.2 |Remove card points | 
+|  FR4.4   |Show all fidelty cards & cards points |
 | | |
 |  FR5     |Support accounting |
 |  FR5.1   |Update finance |
@@ -239,6 +239,113 @@ FR.4: fidelty are managed totally by the shop. The customer can choose to get su
 
 ### Use case 2, UC2
 ..
+
+## Handle catalogue
+
+### Use case x, UCx - Update price (to sell) of products
+| Actors Involved        | Shop director |
+| ------------- |:-------------:| 
+|  Precondition     | Account shop director must exist & authenticated |  
+|  Post condition     | Price of a product updated |
+|  Nominal Scenario     | Shop director selects a product ; The shop director modifies the price of the product in the catalogue ; The application updates the price |
+|  Variants     |  The catalogue is empty: no product will be shown |
+
+### Use case x, UCx - Add product
+| Actors Involved        | Shop director |
+| ------------- |:-------------:| 
+|  Precondition     | Account shop director must exist & authenticated ; a product must be present in the inventory |  
+|  Post condition     | One or more products are added in the catalogue|
+|  Nominal Scenario     | Shop director selects to add a product ; Shop director selects a product from the inventory ; The application assigns a new ID to the product and is added to the catalogue |
+|  Variants     | A product can be added only once in a catalogue: each product has an unique ID.  |
+
+### Use case x, UCx - Remove product
+| Actors Involved        | Shop director |
+| ------------- |:-------------:| 
+|  Precondition     | Account shop director must exist & authenticated ; the product(s) must be in the catalogue |  
+|  Post condition     | One or more products are removed from the catalogue |
+|  Nominal Scenario     | Shop director selects to remove a product ; Shop director chooses to remove one or more products present in the catalogue ; The application removes the product(s) from the catalogue|
+|  Variants     | The catalogue is empty: no product will be shown|
+
+## Handle customers
+
+Actors could be Cashier or other worker in charge to handle the customers.
+We'll consider the Cashier as the actos.
+
+### Use case x, UCx - Add fidelty card
+| Actors Involved        | Cashier|
+| ------------- |:-------------:| 
+|  Precondition     | Account cashier must exist & authenticated|  
+|  Post condition     |A fidelty card is added to the database and is given to the customer |
+|  Nominal Scenario     | Cashier selects to add a fidelty card; the cashier is prompted with forms to add the customer data ; The application assigns a new ID to the card in the database |
+|  Variants     | A customer can have at most one fidelty card active: each fidelty card has an unique ID, along with the customer SSN.  |
+
+### Use case x, UCx - Remove fidelty card
+| Actors Involved        | Cashier|
+| ------------- |:-------------:| 
+|  Precondition     | Account cashier must exist & authenticated ; the fidelty card must exist |  
+|  Post condition     |A fidelty card is removed from the database and is retired from the customer |
+|  Nominal Scenario     | Cashier selects to remove a fidelty card; the cashier chooses to remove one or more fidelty card  ; The application removes the card(s) from the database |
+|  Variants     | There are no fidelty cards: no card will be shown. |
+
+### Use case x, UCx - Add card points
+| Actors Involved        | Cashier |
+| ------------- |:-------------:| 
+|  Precondition     | Account cashier must exist & authenticated; the fidelty card must exist |  
+|  Post condition     | Points are added to the card|
+|  Nominal Scenario     | Cashier selects to add points to a fidelty card; the cashier chooses the amount to add  ; The application updates the card points |
+|  Variants     | There are no fidelty cards: no card will be shown. |
+
+### Use case x, UCx - Remove card points
+| Actors Involved        | Cashier |
+| ------------- |:-------------:| 
+|  Precondition     | Account cashier must exist & authenticated; the fidelty card must exist |  
+|  Post condition     | Points are removed from the card|
+|  Nominal Scenario     | Cashier selects to remove points from a fidelty card; the cashier chooses the amount to remove ; The application updates the card points |
+|  Variants     | There are no fidelty cards: no card will be shown. |
+
+## Handle accounts
+
+In these use cases, the actor is an user from the shop.
+
+### Use case x, UCx - Add account
+| Actors Involved        | User  |
+| ------------- |:-------------:| 
+|  Precondition     | User doesn't have an account yet |  
+|  Post condition     | Account is added to the system |
+|  Nominal Scenario     | User creates a new account and inserts his data |
+|  Variants     | A user can have only one account, this is checked through the email. |
+
+### Use case x, UCx - Remove account
+| Actors Involved        | User |
+| ------------- |:-------------:| 
+|  Precondition     | Account user must exist |  
+|  Post condition     |Account user is removed from the system|
+|  Nominal Scenario     | User deletes his account|
+|  Variants     | - |
+
+### Use case x, UCx - Update account
+| Actors Involved        | User |
+| ------------- |:-------------:| 
+|  Precondition     | Account user must exist |  
+|  Post condition     | Account user's info are modified |
+|  Nominal Scenario     | User updates his account and modifies the fields he desires|
+|  Variants     | - | 
+### Use case x, UCx - Login
+| Actors Involved        | User |
+| ------------- |:-------------:| 
+|  Precondition     | Account user must exist & must not be authenticated |  
+|  Post condition     | Account user is authenticated |
+|  Nominal Scenario     | User makes the login and inserts his email and password |
+|  Variants     | Email/password are wrong; an error is printed on the screen |
+
+### Use case x, UCx - Logout
+| Actors Involved        | User |
+| ------------- |:-------------:| 
+|  Precondition     | Account user must exist & must be authenticated  |  
+|  Post condition     | User is not authenticated anymore | 
+|  Nominal Scenario     | User makes the logout |
+|  Variants     | - |
+
 
 ### Use case x, UCx
 ..
