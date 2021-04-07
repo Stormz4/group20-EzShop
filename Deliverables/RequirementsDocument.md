@@ -161,14 +161,31 @@ Shop -- CashRegister
 | | |
 |  FR5     |Support accounting |
 |  FR5.1   |Update finance |
-|  FR5.2   |Show statistics |
-|  FR5.2.1 |Show sells in a timeframe |
-|  FR5.2.2 |Show best selling products |
-|  FR5.2.3 |Show balance sheet|
-|  FR5.3   |Show financial statement |
-|  FR5.3.1 |Show balance sheet |
-|  FR5.3.2 |Show cash flow |
-|  FR5.3.3 |Show income statement |
+|  FR5.1.0   |Add receipt | //ONLY automatically made by the cash register!
+|  FR5.1.1   |Add active invoice | // usually automatically made by cash register!
+|  FR5.1.2   |Add passive invoice | // usually automatically made by supplier cash register: My inventory manager order a product --> the supplier will give him a (passive) invoice
+|  FR5.1.3   |Show receipts |
+|  FR5.1.4   |Show active invoices |
+|  FR5.1.5   |Show passive invoices |
+|  FR5.1.6   |Modify uncommitted active invoice | //not yet sent to Agenzia delle Entrate
+|  FR5.1.7   |Modify uncommitted passive invoice | //not yet sent to Agenzia delle Entrate
+|  FR5.1.8   |Add credit note | //if wrong invoice committed --> correct with a negative-import credit note
+|  FR5.2 | Show inventory | //inventory needed to do the annual summary: on 31/12 every shop must declare what there is in the warehouse
+|  FR5.3   |Show statistics |
+|  FR5.3.1 |Show revenue in a timeframe |
+|  FR5.3.2 |Show best selling products |
+|  FR5.3.3 |Show best suppliers |
+|  FR5.3.4 |Show best customers | //only if we are suppliers for other shops!
+|  FR5.3.5 |Show balance sheet|
+|  FR5.3.6 |Show cash flow |
+|  FR5.3.7 |Show document tipology graph | //if documents (e.g. invoices) are passive/active 
+|  FR5.3.8 |Show costs graph | //to show a pie graph of percentage of our costs with our suppliers
+|  FR5.3.9 |Show revenues graph | //to show a pie graph of percentage of our revenues with our SHOP-customers
+|  FR5.4 | Show banking data |
+|  FR5.5 | Show timetable |
+|  FR5.5.1 | Show shop deadlines timetable | //(="scadenziario del nostro negozio") //only if we allow customers to pay late
+|  FR5.5.2 | Show suppliers deadlines timetable | //(="scadenziario dei fornitori")
+|  FR5.6   | Show financial statement | //used to see for what shop's revenues could be used: Are they enough to pay suppliers/debts and also to do new investments?
 | | |
 |  FR6     |Handle accounts |
 |  FR6.1   |Add account |
@@ -198,6 +215,7 @@ FR.4: fidelty are managed totally by the shop. The customer can choose to get su
 | NFR4 | Privacy | The data of one customer should not be accessible to users other than users who handle fidelty cards. | All FR | 
 | NFR5 | Availability | At least 95% | All FR |
 | Domain | // | Currency is Euro | All FR |
+| NFR? | Usability | Insert video-tutorial for using the software for support the accounting | FR5 |
 
 # Use case diagram and use cases
 
@@ -344,6 +362,195 @@ In these use cases, the actor is an user from the shop.
 |  Precondition     | Account user must exist & must be authenticated  |  
 |  Post condition     | User is not authenticated anymore | 
 |  Nominal Scenario     | User makes the logout |
+|  Variants     | - |
+
+## Support accounting
+
+In these use cases, the actor is an accountant, or a generic user from the shop acting as the accountant, managing the simplified accounting of the shop (hypothesis: annual revenue below 700'000€).
+
+### Use case x, UCx - Add active invoice
+| Actors Involved        | Accountant |
+| ------------- |:-------------:| 
+|  Precondition     | Accountant account must exist & must be authenticated |  
+|  Post condition     | An active invoice has been added to the system | 
+|  Nominal Scenario     | Accountant adds an active invoice to the list of invoices of the system |
+|  Variants     | - |
+
+### Use case x, UCx - Add passive invoice
+| Actors Involved        | Accountant |
+| ------------- |:-------------:| 
+|  Precondition     | Accountant account must exist & must be authenticated |  
+|  Post condition     | A passive invoice has been added to the system | 
+|  Nominal Scenario     | Accountant adds a passive invoice to the list of invoices of the system |
+|  Variants     | - |
+
+### Use case x, UCx - Show receipts
+| Actors Involved        | Accountant |
+| ------------- |:-------------:| 
+|  Precondition     | Accountant account must exist & must be authenticated |  
+|  Post condition     | The list of receipts is showed on the screen, sorted by Date | 
+|  Nominal Scenario     | Accountant shows the sorted list of receipts of the shop |
+|  Variants     | - |
+
+### Use case x, UCx - Show active invoices
+| Actors Involved        | Accountant |
+| ------------- |:-------------:| 
+|  Precondition     | Accountant account must exist & must be authenticated |  
+|  Post condition     | The list of active invoices is showed on the screen, sorted by Date | 
+|  Nominal Scenario     | Accountant shows the sorted list of active invoices of the shop |
+|  Variants     | - |
+
+### Use case x, UCx - Show passive invoices
+| Actors Involved        | Accountant |
+| ------------- |:-------------:| 
+|  Precondition     | Accountant account must exist & must be authenticated |  
+|  Post condition     | The list of passive invoices is showed on the screen, sorted by Date | 
+|  Nominal Scenario     | Accountant shows the sorted list of passive invoices of the shop |
+|  Variants     | - |
+
+### Use case x, UCx - Modify uncommitted active invoice
+| Actors Involved        | Accountant |
+| ------------- |:-------------:| 
+|  Precondition     | Accountant account must exist & must be authenticated; Wrong or uncompleted active invoice has been inserted in the system but not yet sent to Agenzia delle Entrate informatic system |  
+|  Post condition     | The active invoice has been modified  | 
+|  Nominal Scenario     | Accountant modifies an uncommitted active invoice in order to complete or correct it for commitment |
+|  Variants     | - |
+
+### Use case x, UCx - Modify uncommitted passive invoice
+| Actors Involved        | Accountant |
+| ------------- |:-------------:| 
+|  Precondition     | Accountant account must exist & must be authenticated; Wrong or uncompleted passive invoice has been inserted in the system but not yet sent to Agenzia delle Entrate informatic system |  
+|  Post condition     | The passive invoice has been modified  | 
+|  Nominal Scenario     | Accountant modifies an uncommitted passive invoice in order to complete or correct it for commitment |
+|  Variants     | - |
+
+### Use case x, UCx - Add credit note
+| Actors Involved        | Accountant |
+| ------------- |:-------------:| 
+|  Precondition     | Accountant account must exist & must be authenticated; Wrong or uncompleted invoice has been inserted in the system and already sent to Agenzia delle Entrate informatic system |  
+|  Post condition     | A credit note with a negative-import value has been inserted | 
+|  Nominal Scenario     | Accountant adds a credit note with a negative value in order to correct an already committed wrong invoice |
+|  Variants     | - |
+
+### Use case x, UCx - Show inventory
+| Actors Involved        | Accountant |
+| ------------- |:-------------:| 
+|  Precondition     | Accountant account must exist & must be authenticated |  
+|  Post condition     | The inventory table is showed on the screen, sorted by product ID | 
+|  Nominal Scenario     | Accountant shows the list of products and their quantities still present in the inventory in order to declare them at the end of the year (31/12) |
+|  Variants     | - |
+
+### Use case x, UCx - Show revenue in a timeframe
+| Actors Involved        | Accountant |
+| ------------- |:-------------:| 
+|  Precondition     | Accountant account must exist & must be authenticated |  
+|  Post condition     | The revenue of the shop relative to a specific timeframe is showed on the screen | 
+|  Nominal Scenario     | Accountant selects a specific timeframe and shows the shop's revenue in that time period |
+|  Variants     | - |
+
+### Use case x, UCx - Show best selling products
+| Actors Involved        | Accountant |
+| ------------- |:-------------:| 
+|  Precondition     | Accountant account must exist & must be authenticated |  
+|  Post condition     | The top 5 best selling products of the shop is showed on the screen, sorted by ranking | 
+|  Nominal Scenario     | Accountant shows the shop's top 5 of best selling products |
+|  Variants     | - |
+
+### Use case x, UCx - Show best suppliers
+| Actors Involved        | Accountant |
+| ------------- |:-------------:| 
+|  Precondition     | Accountant account must exist & must be authenticated |  
+|  Post condition     | The top 5 best suppliers of the shop is showed on the screen, sorted by ranking | 
+|  Nominal Scenario     | Accountant shows the shop's top 5 of best customers, according to their purchases |
+|  Variants     | - |
+
+
+### Use case x, UCx - Show best customers
+| Actors Involved        | Accountant |
+| ------------- |:-------------:| 
+|  Precondition     | Accountant account must exist & must be authenticated |  
+|  Post condition     | The top 5 best customers of the shop is showed on the screen, sorted by ranking | 
+|  Nominal Scenario     | Accountant shows the shop's top 5 of best suppliers, according to the total revenue obtained from their products |
+|  Variants     | - |
+
+### Use case x, UCx - Show balance sheet
+| Actors Involved        | Accountant |
+| ------------- |:-------------:| 
+|  Precondition     | Accountant account must exist & must be authenticated |  
+|  Post condition     | The current balance sheet of the shop is showed on the screen | 
+|  Nominal Scenario     | Accountant shows the shop's current balance |
+|  Variants     | - |
+
+### Use case x, UCx - Show cash flow
+| Actors Involved        | Accountant |
+| ------------- |:-------------:| 
+|  Precondition     | Accountant account must exist & must be authenticated |  
+|  Post condition     | The cash flow of the shop is showed on the screen | 
+|  Nominal Scenario     | Accountant shows the shop's cash flow |
+|  Variants     | - |
+
+### Use case x, UCx - Show document tipology graph
+| Actors Involved        | Accountant |
+| ------------- |:-------------:| 
+|  Precondition     | Accountant account must exist & must be authenticated |  
+|  Post condition     | A graph of documents is showed on the screen | 
+|  Nominal Scenario     | Accountant displays a graph showing the tipology of the documents (e.g. active invoices, passive invoices) contained in the database |
+|  Variants     | - |
+
+### Use case x, UCx - Show document tipology graph
+| Actors Involved        | Accountant |
+| ------------- |:-------------:| 
+|  Precondition     | Accountant account must exist & must be authenticated |  
+|  Post condition     | A graph of documents is showed on the screen | 
+|  Nominal Scenario     | Accountant displays a pie graph showing the tipology of the documents (e.g. active invoices, passive invoices) contained in the database |
+|  Variants     | - |
+
+### Use case x, UCx - Show costs graph
+| Actors Involved        | Accountant |
+| ------------- |:-------------:| 
+|  Precondition     | Accountant account must exist & must be authenticated |  
+|  Post condition     | A graph of costs relative to shop's suppliers is showed on the screen | 
+|  Nominal Scenario     | Accountant displays a pie graph showing the percentage of shop's costs relative to its suppliers |
+|  Variants     | - |
+
+### Use case x, UCx - Show revenues graph
+| Actors Involved        | Accountant |
+| ------------- |:-------------:| 
+|  Precondition     | Accountant account must exist & must be authenticated |  
+|  Post condition     | A graph of revenues relative to shop's customers is showed on the screen | 
+|  Nominal Scenario     | Accountant displays a pie graph showing the percentage of shop's revenues relative to its customers |
+|  Variants     | - |
+
+### Use case x, UCx - Show banking data
+| Actors Involved        | Accountant |
+| ------------- |:-------------:| 
+|  Precondition     | Accountant account must exist & must be authenticated |  
+|  Post condition     | Banking data of the shop are showed on the screen | 
+|  Nominal Scenario     | Accountant shows shop's banking data, taken from the informatic system of shop's bank, in order to use them when it has to manage invoices or other operations |
+|  Variants     | - |
+
+### Use case x, UCx - Show shop deadlines timetable
+| Actors Involved        | Accountant |
+| ------------- |:-------------:| 
+|  Precondition     | Accountant account must exist & must be authenticated |  
+|  Post condition     | Shop deadlines timetable is showed on the screen | 
+|  Nominal Scenario     | Accountant shows shop's deadlines timetable in order to see if there are customers that have to pay for some products yet |
+|  Variants     | - |
+
+### Use case x, UCx - Show suppliers deadlines timetable
+| Actors Involved        | Accountant |
+| ------------- |:-------------:| 
+|  Precondition     | Accountant account must exist & must be authenticated |  
+|  Post condition     | Suppliers deadlines timetable is showed on the screen | 
+|  Nominal Scenario     | Accountant shows suppliers' deadlines timetable in order to see if the shop has to pay for some supplies yet |
+|  Variants     | - |
+
+### Use case x, UCx - Show financial statement
+| Actors Involved        | Accountant |
+| ------------- |:-------------:| 
+|  Precondition     | Accountant account must exist & must be authenticated |  
+|  Post condition     | Shop's financial statement is showed on the screen | 
+|  Nominal Scenario     | Accountant shows the financial statement of the shop in order to see for what shop's revenues could be used |
 |  Variants     | - |
 
 
