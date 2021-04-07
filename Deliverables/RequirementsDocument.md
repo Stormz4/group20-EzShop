@@ -148,12 +148,14 @@ Shop -- CashRegister
 |  FR2.7.2 |Remove order |
 |  FR2.7.3 |Modify order  |
 |  FR2.7.4 |Show orders |
+|  FR2.8   |Search a product in the inventory |
 | | |
 |  FR3     |Handle catalogue |
 |  FR3.1   |Update price (to sell) of products |
 |  FR3.2   |Add product  |
 |  FR3.3   |Remove product  |
 |  FR3.4   |Show products (catalogue) |
+|  FR3.5   |Search a product in the catalogue |
 | | |
 |  FR4     |Handle customers | 
 |  FR4.1   |Add fidelty card  |
@@ -162,35 +164,26 @@ Shop -- CashRegister
 |  FR4.3.1 |Add card points |
 |  FR4.3.2 |Remove card points | 
 |  FR4.4   |Show all fidelty cards & cards points |
+|  FR4.5   |Search a customer |
 | | |
 |  FR5     |Support accounting |
 |  FR5.1   |Update finance |
-|  FR5.1.0   |Add receipt | //ONLY automatically made by the cash register!
-|  FR5.1.1   |Add active invoice | // usually automatically made by cash register!
-|  FR5.1.2   |Add passive invoice | // usually automatically made by supplier cash register: My inventory manager order a product --> the supplier will give him a (passive) invoice
-|  FR5.1.6   |Modify uncommitted active invoice | //not yet sent to Agenzia delle Entrate
-|  FR5.1.7   |Modify uncommitted passive invoice | //not yet sent to Agenzia delle Entrate
-|  FR5.1.8   |Add credit note | //if wrong invoice committed --> correct with a negative-import credit note
-|  FR2 | Show accounting data |
+|  FR5.1.1   |Add invoice | 
+|  FR5.1.2   |Modify uncommitted invoice | //not yet sent to Agenzia delle Entrate
+|  FR5.1.3   |Add credit note | //if wrong invoice committed --> correct with a negative-import credit note
+|  FR5.2 | Show accounting data |
 |  FR5.2.1   |Show receipts |
-|  FR5.2.2   |Show active invoices |
-|  FR5.2.3   |Show passive invoices |
+|  FR5.2.2   |Show invoices |
 |  FR5.3   |Show statistics |
 |  FR5.3.1 |Show revenue in a timeframe |
 |  FR5.3.2 |Show best selling products |
-|  FR5.3.3 |Show best suppliers |
-|  FR5.3.4 |Show best customers | //only if we are suppliers for other shops!
-|  FR5.3.5 |Show balance sheet|
-|  FR5.3.6 |Show cash flow |
-|  FR5.3.7 |Show document tipology graph | //if documents (e.g. invoices) are passive/active 
-|  FR5.3.8 |Show costs graph | //to show a pie graph of percentage of our costs with our suppliers
-|  FR5.3.9 |Show revenues graph | //to show a pie graph of percentage of our revenues with our SHOP-customers
+|  FR5.3.3 |Show suppliers |
+|  FR5.3.4 |Show balance sheet|
+|  FR5.3.5 |Show cash flow |
 |  FR5.4 | Show banking data |
-|  FR5.5 | Show deadlines timetable |
-|  FR5.5.1 | Show shop deadlines timetable | //(="scadenziario del nostro negozio") //only if we allow customers to pay late
-|  FR5.5.2 | Show suppliers deadlines timetable | //(="scadenziario dei fornitori")
+|  FR5.5 | Show suppliers deadlines timetable |
 |  FR5.6   | Show financial statement | //used to see for what shop's revenues could be used: Are they enough to pay suppliers/debts and also to do new investments?
-|  FR5.7 | Show inventory | //inventory needed to do the annual summary: on 31/12 every shop must declare what there is in the warehouse
+|  FR5.7 | Show products (inventory) | //inventory needed to do the annual summary: on 31/12 every shop must declare what there is in the warehouse. Accountant must be able to access to the inventory
 | | |
 |  FR6     |Handle accounts |
 |  FR6.1   |Add account |
@@ -198,6 +191,8 @@ Shop -- CashRegister
 |  FR6.3   |Update account|
 |  FR6.4   |Login |
 |  FR6.5   |Logout |
+|  FR7     |Manage rights | //Authorize access to functions to specific actors according to access rights
+
 
 FR1.5 means that fidelty card of a user must be updated. Is directly related to FR4.
 In FR1.6, whenever you scan a product, you add it to the list of products the customer is buying.
@@ -268,7 +263,7 @@ FR.4: fidelty are managed totally by the shop. The customer can choose to get su
 ### Use case x, UCx - Update price (to sell) of products
 | Actors Involved        | Shop director |
 | ------------- |:-------------:| 
-|  Precondition     | Account shop director must exist & authenticated |  
+|  Precondition     | Account shop director must exist & authenticated ; the catalogue contains at least one product |  
 |  Post condition     | Price of a product updated |
 |  Nominal Scenario     | Shop director selects a product ; The shop director modifies the price of the product in the catalogue ; The application updates the price |
 |  Variants     |  The catalogue is empty: no product will be shown |
@@ -276,23 +271,24 @@ FR.4: fidelty are managed totally by the shop. The customer can choose to get su
 ### Use case x, UCx - Add product
 | Actors Involved        | Shop director |
 | ------------- |:-------------:| 
-|  Precondition     | Account shop director must exist & authenticated ; a product must be present in the inventory |  
+|  Precondition     | Account shop director must exist & authenticated |  
 |  Post condition     | One or more products are added in the catalogue|
-|  Nominal Scenario     | Shop director selects to add a product ; Shop director selects a product from the inventory ; The application assigns a new ID to the product and is added to the catalogue |
-|  Variants     | A product can be added only once in a catalogue: each product has an unique ID.  |
+|  Nominal Scenario     | Shop director selects to add a product ; Shop director selects a product from the inventory ; The application assigns the inventory ID to the product and is added to the catalogue |
+|  Variants     | A product can be added only once in a catalogue: each product has an unique ID; a error message is printed.|
+|  Variants     | Catalogue doesn't exist; the application creates a catalogue and the product is added |
 
 ### Use case x, UCx - Remove product
 | Actors Involved        | Shop director |
 | ------------- |:-------------:| 
-|  Precondition     | Account shop director must exist & authenticated ; the product(s) must be in the catalogue |  
+|  Precondition     | Account shop director must exist & authenticated ; the catalogue contains at least one product |  
 |  Post condition     | One or more products are removed from the catalogue |
 |  Nominal Scenario     | Shop director selects to remove a product ; Shop director chooses to remove one or more products present in the catalogue ; The application removes the product(s) from the catalogue|
-|  Variants     | The catalogue is empty: no product will be shown|
+|  Variants     |The catalogue is empty: no product will be shown|
 
 ## Handle customers
 
 Actors could be Cashier or other worker in charge to handle the customers.
-We'll consider the Cashier as the actos.
+We'll consider the Cashier as the actor.
 
 ### Use case x, UCx - Add fidelty card
 | Actors Involved        | Cashier|
