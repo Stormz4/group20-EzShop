@@ -174,12 +174,12 @@ Shop -- CashRegister
 |  FR5.2 | Show accounting data |
 |  FR5.2.1   |Show receipts |
 |  FR5.2.2   |Show invoices |
+|  FR5.2.3 |Show suppliers |
 |  FR5.3   |Show statistics |
 |  FR5.3.1 |Show revenue in a timeframe |
 |  FR5.3.2 |Show best selling products |
-|  FR5.3.3 |Show suppliers |
-|  FR5.3.4 |Show balance sheet|
-|  FR5.3.5 |Show cash flow |
+|  FR5.3.3 |Show balance sheet|
+|  FR5.3.4 |Show cash flow |
 |  FR5.4 | Show banking data |
 |  FR5.5 | Show suppliers deadlines timetable |
 |  FR5.6   | Show financial statement | //used to see for what shop's revenues could be used: Are they enough to pay suppliers/debts and also to do new investments?
@@ -201,8 +201,6 @@ FR2.5 means that if products go below certain threshold, the director is notifie
 
 FR.4: fidelty are managed totally by the shop. The customer can choose to get subscribe/unsubscribe and he will be given a card. He will just decide to use or not to use the points, which will be involved in giving discounts to the customer. If he wants to check how many points does he have, he has to get in contact with the shop by himself/with the cashier.
 
-(P.S.: FR5.3 , FR5.3.X are needed?)
-
 ## Non Functional Requirements
 
 \<Describe constraints on functional requirements>
@@ -210,12 +208,12 @@ FR.4: fidelty are managed totally by the shop. The customer can choose to get su
 | ID        | Type (efficiency, reliability, ..)           | Description  | Refers to |
 | ------------- |:-------------:| :-----:| -----:|
 |  NFR1     | Usability   | Application should be used with no specific training for the users  | All FR|
-|  NFR2     | Performance | All functions should complete in less than 0.5s  |All FR |
-|  NFR3     | Localisation | Decimal numbers use . (dot) as decimal separator  | All FR |
-| NFR4 | Privacy | The data of one customer should not be accessible to users other than users who handle fidelty cards. | All FR | 
-| NFR5 | Availability | At least 95% | All FR |
+| NFR2 | Usability | Insert video-tutorial for using the software for support the accounting | FR5 |
+|  NFR3     | Performance | All functions should complete in less than 0.5s  |All FR |
+|  NFR4     | Localisation | Decimal numbers use . (dot) as decimal separator  | All FR |
+| NFR5 | Privacy | The data of one customer should not be accessible to users other than users who handle fidelty cards. | All FR | 
+| NFR6 | Availability | At least 95% | All FR |
 | Domain | // | Currency is Euro | All FR |
-| NFR? | Usability | Insert video-tutorial for using the software for support the accounting | FR5 |
 
 # Use case diagram and use cases
 
@@ -369,63 +367,70 @@ In these use cases, the actor is an user from the shop.
 
 In these use cases, the actor is an accountant, or a generic user from the shop acting as the accountant, managing the simplified accounting of the shop (hypothesis: annual revenue below 700'000€) taking data from Agenzia delle Entrate informatic system.
 
-### Use case x, UCx - Update finance
+### Use case x, UCx - Add invoice
 | Actors Involved        | Accountant |
 | ------------- |:-------------:| 
 |  Precondition     | Accountant account must exist & must be authenticated; Shop's account must exist in Agenzia delle Entrate system |  
-|  Post condition     | Finances has been updated | 
-|  Nominal Scenario     | UCx-x: Accountant adds an active invoice to the list of invoices of the system, ... |
+|  Post condition     | New invoice has been added to the system | 
+|  Nominal Scenario     | 1. Accountant selects "New invoice"  
+						  2. Software asks to user if a new active or passive invoice has to be added
+						  3. Accountant choose the passive option
+						  4. Software gives to user a form to fill out
+						  5. Accountant fills the form with the new invoice data
+						  6. Accountant confirms |
+|  Variants     | - Accountant choose the new active invoice option |
+
+### Use case x, UCx - Modify uncommitted invoice
+| Actors Involved        | Accountant |
+| ------------- |:-------------:| 
+|  Precondition     | Accountant account must exist & must be authenticated;  Shop's account must exist in Agenzia delle Entrate system;  Uncommitted invoice must exist |  
+|  Post condition     | Uncommitted invoice has been updated | 
+|  Nominal Scenario     | 1. Software shows all the uncommitted invoices (invoices not yet sent to Agenzia delle Entrate system)
+						  2. Accountant chooses one of them and selects the "Modify" option
+						  3. Software provides the selected invoice form
+						  4. Accounant modifies the form with new data
+						  5. Accountant confirms |
 |  Variants     | - |
 
-### Use case x, UCx - Show accounting data
+### Use case x, UCx - Add credit note
 | Actors Involved        | Accountant |
 | ------------- |:-------------:| 
-|  Precondition     | Accountant account must exist & must be authenticated; Shop's account must exist in Agenzia delle Entrate system |  
-|  Post condition     | Accounting data are sorted and showed on the screen | 
-|  Nominal Scenario     | UCx-x: Accountant shows the sorted list of receipts of the shop, taken from Agenzia delle Entrate System, .... |
-|  Variants     | UCx-x: There are no receipts: no receipt will be shown, ... |
+|  Precondition     | Accountant account must exist & must be authenticated; Shop's account must exist in Agenzia delle Entrate system; At least one wrong invoice is present in the system |  
+|  Post condition     | New credit note is added to the system to compensate wrong invoices | 
+|  Nominal Scenario     | 1. Accountant selects "New credit note"  
+						  2. Software gives to user a form to fill out
+						  3. Accountant fills the form with the new credit note data (negative import value)
+						  4. Accountant confirms |
+|  Variants     | - |
 
 ### Use case x, UCx - Show statistics
 | Actors Involved        | Accountant |
 | ------------- |:-------------:| 
 |  Precondition     | Accountant account must exist & must be authenticated; Shop's account must exist in Agenzia delle Entrate system |  
-|  Post condition     | Statistic are shown on screen in a diagram or graph | 
-|  Nominal Scenario     | UCx-x: Accountant selects a specific timeframe and shows the shop's revenue in that time period, ... |
-|  Variants     | UCx-x: There are no revenues in that timeframe: no revenue will be shown, ... |
-
-### Use case x, UCx - Show banking data
-| Actors Involved        | Accountant |
-| ------------- |:-------------:| 
-|  Precondition     | Accountant account must exist & must be authenticated; Shop's account must exist in banking system |  
-|  Post condition     | Banking data of the shop are showed on the screen | 
-|  Nominal Scenario     | Accountant shows shop's banking data, taken from the informatic system of shop's bank, in order to use them when it has to manage invoices or other operations |
+|  Post condition     | Statistics are shown on screen in a table, in a diagram or a graph | 
+|  Nominal Scenario     | Accountant selects a specific timeframe and shows the shop's revenue in that time period |
 |  Variants     | - |
 
-### Use case x, UCx - Show deadlines timetable
-| Actors Involved        | Accountant |
+##### Scenario x.1 
+
+| Scenario |  Show revenue in a timeframe |
 | ------------- |:-------------:| 
-|  Precondition     | Accountant account must exist & must be authenticated; Shop's account must exist in Agenzia delle Entrate system |  
-|  Post condition     | Deadlines timetable is showed on the screen | 
-|  Nominal Scenario     | UCx-x: Accountant shows shop's deadlines timetable in order to see if there are customers that have to pay for some products yet, UCx-x ... |
-|  Variants     | UCx-x: There are no deadlines to be satisfied: no deadline will be shown |
+|  Precondition     | Enough data must exist in a specific timeframe |
+|  Post condition     | Revenues in a specific timeframe are shown on the screen |
+| Step#        | Description  |
+|  1     |  User selects a specific timeframe |  
+|  2     |  System searches the revenues of that timeframe |
+|  3    |  System displays the found revenues |
 
-### Use case x, UCx - Show financial statement
-| Actors Involved        | Accountant |
+##### Scenario x.2 
+
+| Scenario |  Show best selling products |
 | ------------- |:-------------:| 
-|  Precondition     | Accountant account must exist & must be authenticated; Shop's account must exist in Agenzia delle Entrate system |  
-|  Post condition     | Shop's financial statement is showed on the screen | 
-|  Nominal Scenario     | Accountant shows the financial statement of the shop in order to see for what shop's revenues could be used |
-|  Variants     | - |
-
-
-### Use case x, UCx - Show inventory
-| Actors Involved        | Accountant |
-| ------------- |:-------------:| 
-|  Precondition     | Accountant account must exist & must be authenticated |  
-|  Post condition     | The inventory table is showed on the screen, sorted by product ID | 
-|  Nominal Scenario     | UCx-x: Accountant shows the list of products and their quantities still present in the inventory in order to declare them at the end of the year (31/12) |
-|  Variants     | UCx-x: There are no products in the inventory: no products will be shown |
-
+|  Precondition     | At least one product must exist in catalogue |
+|  Post condition     | Top 5 best selling products is shown on screen |
+| Step#        | Description  | 
+|  1     |  System searches the best 5 selling products of all time |
+|  2    |  System displays the found products (could be less than 5) |
 
 
 ### Use case x, UCx
