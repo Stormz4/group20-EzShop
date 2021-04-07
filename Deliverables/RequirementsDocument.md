@@ -54,9 +54,9 @@ EZShop is a software application to:
 | Warehouse director (profile 3) |Manages inventory and orders through the software. |
 | Accountant (profile 4) | Handles the accounting through the software. |
 | Customer manager (profile 5) | Manages the customers. In most shops it could be the Cashier. |
-| Maintainers | Who will repair the software eventually. It could be part of the staff or external. |
+| Shop director (profile 6) | Director of the shop. Manages the catalogue of products. |
 | IT administrator | Who manages the software (Security, DB). |
-| Shop director | Director of the shop. Manages the catalogue of products. |
+| Maintainers | Who will repair the software eventually. It could be part of the staff or external. |
 | Marketing people | People who sell the software to shops. |
 | Product | Involved indirectly and managed by the software. |
 | Cash Register | The software involves the cash register since they're part of the output. |
@@ -73,6 +73,10 @@ rectangle System{
 	usecase "EZshop" as Shop
 }
 
+User <|-- Cashier
+User <|-- WarehouseDirector
+User <|-- Accountant
+User <|-- ShopDirector
 Cashier --  Shop
 Product --  Shop
 WarehouseDirector --  Shop
