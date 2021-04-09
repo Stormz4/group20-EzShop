@@ -479,7 +479,7 @@ In addition, the actor should be able to place new orders.
 |  Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
 |  Post condition 	| A list of products, filtered and sorted as desired, is shown |
 |  Nominal Scenario | Warehouse Manager accesses stock's section of the software, where he can look at the complete list of products sorted by ID (default sort) |
-|  Variants         |  - A different sorting criteria is selected<br/>-  Products are filtered writing something in the search bar |
+|  Variants         |  - A different sorting criteria is selected<br/>-  Products are filtered writing something in the search bar or using filters (e.g. date, supplier, ...) |
 
 #
 ## Manage orders
@@ -496,14 +496,34 @@ In addition, the actor should be able to place new orders.
 | --------------- 	| ---------------------------------------- |
 |  Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
 |  Post condition 	| A new order has been placed |
-|  Nominal Scenario | 1. Warehouse Manager clicks on 'New Order' icon<br/>2. The software presents the view for placing a new order<br/>3. Warehouse Manager selects products, as well as the desired quantity, and fills in other necessary infos<br/>&ensp;(3.1) Software asks for confirmation<br/>&ensp;(3.2) Warehouse Manager gives confirmation<br/> 4. The software places the order |
+|  Nominal Scenario | 1. Warehouse Manager clicks on 'New Order' icon<br/>2. The software presents the view for placing a new order<br/>3. Warehouse Manager selects products, as well as the desired quantity, and fills in other necessary infos<br/>&ensp;(3.1) Software asks for confirmation<br/>&ensp;(3.2) Warehouse Manager gives confirmation<br/> 4. The software places the order and assigns to it an incremental and unique ID |
 |  Variants         | - Before completing the operation, the Warehouse Manager decides to discard it<br/>- The order cannot be placed for some reason |
 
+### Use case x, UCx - Cancel existing order
+| Actors Involved 	| 			Warehouse Manager              |
+| --------------- 	| ---------------------------------------- |
+|  Precondition     | 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists
+|  Post condition   | Target product has been removed from the inventory|
+|  Nominal Scenario | 1. Warehouse Manager looks for the order using the search bar<br/>2. The software presents a list of matching orders<br/>3. Warehouse Manager selects the target order<br/>4. Warehouse Manager clicks "Remove" button<br/>&ensp;(4.1) Software asks for confirmation<br/>&ensp;(4.2) Warehouse Manager gives confirmation<br/>5. Order is canceled |
+|  Variants         | - Target order does not exist<br/>- It is too late to cancel the order (e.g. it has already been completed) |
 
-|  FR_2.7.1 |Add order  |
-|  FR_2.7.2 |Remove order |
-|  FR_2.7.3 |Modify order  |
-|  FR_2.7.4 |Show orders |
+### Use case x, UCx - Edit existing order
+| Actors Involved 	| 			Warehouse Manager              |
+| --------------- 	| ---------------------------------------- |
+|  Precondition     | 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists
+|  Post condition   | Target product has been removed from the inventory|
+|  Nominal Scenario | 1. Warehouse Manager looks for the order using the search bar<br/>2. The software presents a list of matching orders<br/>3. Warehouse Manager selects the target order<br/>4. Warehouse Manager clicks "Edit" button<br/>5. Warehouse Manager makes desired changes to the order and, when done, clicks "Apply" button<br/>&ensp;(5.1) Software asks for confirmation<br/>&ensp;(5.2) Warehouse Manager gives confirmation<br/>6. Order is canceled |
+|  Variants         | - Target order does not exist<br/>- It is too late to edit the order (e.g. it has already been completed) |
+
+### Use case x, UCx - Show orders
+| Actors Involved 	| 			Warehouse Manager              |
+| --------------- 	| ---------------------------------------- |
+|  Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
+|  Post condition 	| A list of orders, filtered and sorted as desired, is shown |
+|  Nominal Scenario | Warehouse Manager accesses orders section of the software, where he can look at the complete list of orders sorted by ID (default sort) |
+|  Variants         |  - A different sorting criteria is selected<br/>-  Orders are filtered writing something in the search bar or using filters (e.g. date, supplier, ...) |
+
+
 |  FR_2.8   |Search a product in the inventory |
 
 
