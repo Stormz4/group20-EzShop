@@ -266,94 +266,38 @@ HandleSells --> CreditCardSystem
 \<next describe here each use case in the UCD>
 
 
-| FR_1     | Handle sells |
-| FR_1.1   | Register payment  |
-| FR_1.2   | Update inventory |
-| FR_1.3   | Send receipt to accounting |
-| FR_1.4   | Handle discounts |
-| FR_1.5   | Handle fidelty card |
-| FR_1.6   | Scan product |
-| FR_1.7   | Add the product to a list of buyings |
-| FR_1.8   | Read credit card | 
-| FR_1.9   | Handle cash register |
-| FR_1.9.1 | Print receipt |
-| FR_1.9.2 | Open the cash register  |
-| FR_1.9.3 | Send data to cash register  |
-
 ##  Handle sells
 
-### Scenario 1.1
-| Actors Involved   | Cash register |
-| ----------------- |-------------- |
-|  Precondition     | Receipt has been printed |
-|  Post condition   | Balance is updated |
-|  Nominal Scenario | The Cash Register sends the receipt to the accounting; Accounting updates the balance and manages the receipt (see FR 5) |
-
-### Scenario 1.2, UC1
-| Actors Involved   | Cash register |
-| ----------------- |-------------- |
-|  Precondition     | Receipt has been printed (successful transaction) |  
-|  Post condition   | Inventory is updated |
-|  Nominal Scenario | The Cash Register sends the list of the products to the Warehouse Manager; The Warehouse manager removes the products from the inventory |
-
-
-### Use case 1.1, UC1
-| Actors Involved   | Cashier, Product |
+### Use case 1.1, UC1 - Add Product to the List of Product to buy
+| Actors Involved   | Cashier, Product, Fidelty Card |
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier is already authenticated<br/> 2. Product has a valid Bar Code<br/> |
-|  Post condition   | 1. The list of products to buy is ready<br/> 2. The total amount to pay is displayed<br/>|
-|  Nominal Scenario | 1. For every product in the customer's cart:<br/> 1.1. The Cashier scans the product using the Bar Code Reader<br/> 1.2 The Application recognizes the product <br/> 1.3 The Application searches the Product in the Catalogue <br/> 1.4 The Application retrieves the price of the Product<br/> 1.5 The Application displays the price of the Product and the new partial amount to pay on the Cashier GUI<br/> 2. At the end, the final list of products and the total amount to pay is displayed on the the Cashier GUI|
+|  Post condition   | 1. The list of products to buy is ready<br/> 2. The total amount to pay is computed and displayed<br/>|
+|  Nominal Scenario | 1. For every product in the customer's cart:<br/> 1.1. The Cashier scans the product using the Bar Code Reader<br/> 1.2 The Application recognizes the Product <br/> 1.3 The Application searches the Product in the Catalogue <br/> 1.4 The Application searches if a discount should be applied to the Product <br/> 1.5 If a Fidelty Card has been scanned, the Application searches if a discount should be applied to the Product for those who have a Fidelty Card <br/> 1.6 The Application retrieves the price of the Product and applies the discount if needed<br/> 1.7 The Application displays the price of the Product and the new partial amount to pay on the Cashier GUI<br/> 2. At the end, the final list of products and the total amount to pay is displayed on the the Cashier GUI|
 |  Variants      	| The Bar Code is valid, but the Bar Code Reader cannot read it correctly: the Cashier inputs the Bar Code to the Cashier GUI<br/> The Customer does not want to buy a Product anymore: the Cashier removes it from the list using the Cashier GUI |
 
-### Scenario 1.2, UC1
+### Use case 1.2, UC1 - Authentification of a Fidelty Card
 | Actors Involved   | Cashier, Fidelty Card |
 | ----------------- | ------------- |
-|  Precondition     | 1. Cashier is already authenticated<br/> 2. Fidelty Card has a valid Bar Code |
-|  Post condition   | The Fidelty Card is recognized |
-|  Nominal Scenario | \<Textual description of actions executed by the UC> |
-|  Variants     	| \<other executions, ex in case of errors> |
+|  Precondition     | 1. Cashier is already authenticated<br/> 2. Fidelty Card has a valid Bar Code<br/> 3. This scenario can occur at any time during Use Case 1.1|
+|  Post condition   | The Fidelty Card is recognized and the amount to pay is updated|
+|  Nominal Scenario | 1. The Cashier scans the Fidelty Card using the Bar Code Reader<br/> 2. The Application recognizes the Fidelty Card <br/> 3. The Application searches, for every scanned Product so far, if a discount should be applied for those who have a Fidelty Card<br/> 4. The Application updates the amount to pay according to the results of the previous step|
+|  Variants     	| The Bar Code is valid, but the Bar Code Reader cannot read it correctly: the Cashier inputs the Bar Code to the Cashier GUI |
 
-### Use case 1.4, UC1
-| Actors Involved   |  				|
+### Use case 1.3, UC1 - Handle a Payment via Credit Card
+| Actors Involved   | Cashier, Cash Register, Credit Card System |
 | ----------------- | ------------- |
-|  Precondition     | \<Boolean expression, must evaluate to true before the UC can start> |  
-|  Post condition   | \<Boolean expression, must evaluate to true after UC is finished> |
-|  Nominal Scenario | \<Textual description of actions executed by the UC> |
-|  Variants     	| \<other executions, ex in case of errors> |
+|  Precondition     | 1. Cashier is already authenticated<br/> 2. Customer has a valid Credit Card<br/> 3. The list of products to buy is known<br/> 4. The total amount of pay is known|
+|  Post condition   | The Customer has successfully paid <br/> The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
+|  Nominal Scenario | 1. The Credit Card System shows the amount to pay<br/> 2. The Credit Card system receives the Customer's Credit Card and recognizes it<br/> 3. The Credit Card System bypasses the Application and automatically interacts with the Payment Gateway <br/> 4. After that the transaction has terminated successfully, the Credit Card System notifies the Application <br/> 5. The Application asks the Cash Register to print the receipt <br/> 6. The Cash Register prints the receipt <br/> 7. The Application sends the invoice to the Accounting <br/> 8. For each Product in the list: remove it from the Inventory|
+|  Variants     	| The Credit Card System is not able to recognize the Card: retry to recognize it<br/> Transaction does not terminate successfully: the Credit Card System notifies the Application and displays an error message: restart from step 2|
 
-### Use case 1.5, UC1
-| Actors Involved   |  				|
+### Scenario 1.4, UC1 - Handle a Payment via Cash
+| Actors Involved   | Cashier, Cash Register |
 | ----------------- | ------------- |
-|  Precondition     | \<Boolean expression, must evaluate to true before the UC can start> |
-|  Post condition   | \<Boolean expression, must evaluate to true after UC is finished> |
-|  Nominal Scenario | \<Textual description of actions executed by the UC> |
-|  Variants     	| \<other executions, ex in case of errors> |
-
-##### Scenario 1.1 
-
-\<describe here scenarios instances of UC1>
-
-\<a scenario is a sequence of steps that corresponds to a particular execution of one use case>
-
-\<a scenario is a more formal description of a story>
-
-\<only relevant scenarios should be described>
-
-| Scenario 1.1 		| 				|
-| ----------------- | ------------- |
-| Precondition     	| \<Boolean expression, must evaluate to true before the scenario can start> |
-| Post condition   	| \<Boolean expression, must evaluate to true after scenario is finished> |
-| Step#        		| Description 	|
-| 1     			| 			  	|
-| 2     			|			  	|
-| ...     			| 			  	|
-
-##### Scenario 1.2
-
-##### Scenario 1.x
-
-### Use case 2, UC2
-..
+|  Precondition     | 1. Cashier is already authenticated<br/> 2. The Customer has successfully paid by cash<br/> 3. The list of products to buy is known<br/> 4. The total amount of pay is known|
+|  Post condition   | The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
+|  Nominal Scenario | 1. The Cashier tells the Application that the Customer has successfully paid by cash<br/> 2. The Application opens the Cash Register and asks to print the receipt<br/>3. The Cash Register prints the receipt <br/> 4. The Application sends the invoice to the Accounting <br/> 5. For each Product in the list: remove it from the Inventory|
 
 ## Handle catalogue
 
