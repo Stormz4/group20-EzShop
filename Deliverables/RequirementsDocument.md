@@ -9,7 +9,7 @@ Authors:
 Date:
 
 | Version | Changes |
-| ----------------- |:-----------|
+| ------- |---------|
 | 1 | Added stakeholders and context diagram/interfaces. |
 
 # Contents
@@ -44,7 +44,7 @@ EZShop is a software application to:
 # Stakeholders
 
 | Stakeholder name  | Description |
-| -----------------|:-----------:|
+| ----------------- | ----------- |
 | Buyer | Shop that pays for the system. |
 | Software Engineers | Engineers who will produce & design the software and the documentation. |
 | Analyst | Who will produce the requirement document. |
@@ -94,15 +94,15 @@ Shop -- CashRegister
 
 \<GUIs will be described graphically in a separate document>
 
-| Actor | Logical Interface | Physical Interface  |
-| -------------|:-------------:|:-----:|
-| Cashier | GUI | Screen, Keyboard, Mouse |
-| Product | Bar code | Bar code reader |
-| Cash register | GUI, API | Screen, Keyboard, Printer |
-| Credit card system | Credit card | Credit card reader |
-| Warehouse director | GUI | Screen, Keyboard, Mouse |
-| Accountant | GUI | Screen, Keyboard, Mouse |
-| Shop director | GUI | Screen, Keyboard, Mouse |
+| Actor 				| Logical Interface | Physical Interface  |
+| --------------------- | -----------------	| ------------------- |
+| Cashier 				| GUI 				| Screen, Keyboard, Mouse |
+| Product 				| Bar code 			| Bar code reader |
+| Cash register 		| GUI, API 			| Screen, Keyboard, Printer |
+| Credit card system 	| Credit card 		| Credit card reader |
+| Warehouse director 	| GUI 				| Screen, Keyboard, Mouse |
+| Accountant 			| GUI 				| Screen, Keyboard, Mouse |
+| Shop director 		| GUI 				| Screen, Keyboard, Mouse |
 
 # Stories and personas
 \<A Persona is a realistic impersonation of an actor. Define here a few personas and describe in plain text how a persona interacts with the system>
@@ -120,80 +120,80 @@ Shop -- CashRegister
 
 \<they match to high level use cases>
 
-| ID        | Description  |
-| ------------- |:-------------:|
-|  FR_1     |Handle sells |
-|  FR_1.1   |Register payment  |
-|  FR_1.2   |Update inventory |
-|  FR_1.3   |Send receipt to accounting |
-|  FR_1.4   |Handle discounts |
-|  FR_1.5   |Handle fidelty card |
-|  FR_1.6   |Scan product |
-|  FR_1.7   |Add the product to a list of buyings |
-|  FR_1.8   |Read credit card |
-|  FR_1.9   |Handle cash register |
-|  FR_1.9.1 |Print receipt |
-|  FR_1.9.2 |Open the cash register  |
-|  FR_1.9.3 |Send data to cash register  |
-| | |
-|  FR_2     |Handle warehouse |
-|  FR_2.1   |Handle inventory |
-|  FR_2.1.1 |Add product  |
-|  FR_2.1.2 |Remove product  |
-|  FR_2.1.3 |Update products quantity |
-|  FR_2.1.4 |Update products purchase price |
-|  FR_2.1.5 |Filter products |
-|  FR_2.5   |Handle thresholds |
-|  FR_2.6   |Show products (inventory) |
-|  FR_2.7   |Manage order |
-|  FR_2.7.1 |Add order  |
-|  FR_2.7.2 |Remove order |
-|  FR_2.7.3 |Modify order  |
-|  FR_2.7.4 |Show orders |
-|  FR_2.7.5 |Filter orders |
-| | |
-|  FR_3     |Handle catalogue |
-|  FR_3.1   |Update price (to sell) of products |
-|  FR_3.2   |Add product  |
-|  FR_3.3   |Remove product  |
-|  FR_3.4   |Show products (catalogue) |
-|  FR_3.5   |Search a product in the catalogue |
-| | |
-|  FR_4     |Handle customers |
-|  FR_4.1   |Add fidelty card  |
-|  FR_4.2   |Remove fidelty card |
-|  FR_4.3   |Handle card points  |
-|  FR_4.3.1 |Add card points |
-|  FR_4.3.2 |Remove card points |
-|  FR_4.4   |Show all fidelty cards & cards points |
-|  FR_4.5   |Search a customer |
-| | |
-|  FR_5     |Support accounting |
-|  FR_5.1   |Update finance |
-|  FR_5.1.1   |Add invoice |
-|  FR_5.1.2   |Modify uncommitted invoice | //not yet sent to Agenzia delle Entrate
-|  FR_5.1.3   |Add credit note | //if wrong invoice committed --> correct with a negative-import credit note
-|  FR_5.2 | Show accounting data |
-|  FR_5.2.1   |Show receipts |
-|  FR_5.2.2   |Show invoices |
-|  FR_5.2.3 |Show suppliers |
-|  FR_5.3   |Show statistics |
-|  FR_5.3.1 |Show revenue in a timeframe |
-|  FR_5.3.2 |Show best selling products |
-|  FR_5.3.3 |Show balance sheet|
-|  FR_5.3.4 |Show cash flow |
-|  FR_5.4 | Show banking data |
-|  FR_5.5 | Show suppliers deadlines timetable |
-|  FR_5.6   | Show financial statement | //used to see for what shop's revenues could be used: Are they enough to pay suppliers/debts and also to do new investments?
-|  FR_5.7 | Show products (inventory) | //inventory needed to do the annual summary: on 31/12 every shop must declare what there is in the warehouse. Accountant must be able to access to the inventory
-| | |
-|  FR_6     |Handle accounts |
-|  FR_6.1   |Add account |
-|  FR_6.2   |Remove account|
-|  FR_6.3   |Update account|
-|  FR_6.4   |Login |
-|  FR_6.5   |Logout |
-|  FR_7     |Manage rights | //Authorize access to functions to specific actors according to access rights
+| ID       		| Description  |
+| ------------- | ------------ |
+|  FR_1     	| Handle sells |
+|  FR_1.1   	| Register payment |
+|  FR_1.2   	| Update inventory |
+|  FR_1.3   	| Send receipt to accounting |
+|  FR_1.4   	| Handle discounts |
+|  FR_1.5   	| Handle fidelty card |
+|  FR_1.6   	| Scan product |
+|  FR_1.7   	| Add the product to a list of buyings |
+|  FR_1.8   	| Read credit card |
+|  FR_1.9   	| Handle cash register |
+|  FR_1.9.1 	| Print receipt |
+|  FR_1.9.2 	| Open the cash register  |
+|  FR_1.9.3 	| Send data to cash register  |
+||
+|  FR_2     	| Handle warehouse |
+|  FR_2.1   	| Handle inventory |
+|  FR_2.1.1 	| Add product |
+|  FR_2.1.2 	| Remove product |
+|  FR_2.1.3 	| Update products quantity |
+|  FR_2.1.4 	| Update products purchase price |
+|  FR_2.1.5 	| Filter products |
+|  FR_2.5   	| Handle thresholds |
+|  FR_2.6   	| Show products (inventory) |
+|  FR_2.7   	| Manage order |
+|  FR_2.7.1 	| Add order |
+|  FR_2.7.2 	| Remove order |
+|  FR_2.7.3 	| Modify order |
+|  FR_2.7.4 	| Show orders |
+|  FR_2.7.5 	| Filter orders |
+||
+|  FR_3     	| Handle catalogue |
+|  FR_3.1   	| Update price (to sell) of products |
+|  FR_3.2   	| Add product |
+|  FR_3.3   	| Remove product  |
+|  FR_3.4   	| Show products (catalogue) |
+|  FR_3.5   	| Search a product in the catalogue |
+||
+|  FR_4     	| Handle customers |
+|  FR_4.1   	| Add fidelty card |
+|  FR_4.2   	| Remove fidelty card |
+|  FR_4.3   	| Handle card points |
+|  FR_4.3.1 	| Add card points |
+|  FR_4.3.2 	| Remove card points |
+|  FR_4.4   	| Show all fidelty cards & cards points |
+|  FR_4.5   	| Search a customer |
+||
+|  FR_5     	| Support accounting |
+|  FR_5.1   	| Update finance |
+|  FR_5.1.1   	| Add invoice |
+|  FR_5.1.2   	| Modify uncommitted invoice | //not yet sent to Agenzia delle Entrate
+|  FR_5.1.3   	| Add credit note | //if wrong invoice committed --> correct with a negative-import credit note
+|  FR_5.2 		| Show accounting data |
+|  FR_5.2.1   	| Show receipts |
+|  FR_5.2.2   	| Show invoices |
+|  FR_5.2.3 	| Show suppliers |
+|  FR_5.3   	| Show statistics |
+|  FR_5.3.1 	| Show revenue in a timeframe |
+|  FR_5.3.2 	| Show best selling products |
+|  FR_5.3.3 	| Show balance sheet|
+|  FR_5.3.4 	| Show cash flow |
+|  FR_5.4 		| Show banking data |
+|  FR_5.5 		| Show suppliers deadlines timetable |
+|  FR_5.6   	| Show financial statement | //used to see for what shop's revenues could be used: Are they enough to pay suppliers/debts and also to do new investments?
+|  FR_5.7 		| Show products (inventory) | //inventory needed to do the annual summary: on 31/12 every shop must declare what there is in the warehouse. Accountant must be able to access to the inventory
+||
+|  FR_6     	| Handle accounts |
+|  FR_6.1   	| Add account |
+|  FR_6.2   	| Remove account|
+|  FR_6.3   	| Update account|
+|  FR_6.4   	| Login |
+|  FR_6.5   	| Logout |
+|  FR_7     	| Manage rights | //Authorize access to functions to specific actors according to access rights
 
 
 FR_1.5 means that fidelty card of a user must be updated and it is directly related to FR__4.
@@ -201,21 +201,21 @@ In FR_1.6, whenever you scan a product, you add it to the list of products the c
 
 FR_2.5 means that if products go below certain threshold, the director is notified.
 
-FR_.4: fidelty are managed totally by the shop. The customer can choose to get subscribe/unsubscribe and he will be given a card. He will just decide to use or not to use the points, which will be involved in giving discounts to the customer. If he wants to check how many points does he have, he has to get in contact with the shop by himself/with the cashier.
+FR_4: fidelty are managed totally by the shop. The customer can choose to get subscribe/unsubscribe and he will be given a card. He will just decide to use or not to use the points, which will be involved in giving discounts to the customer. If he wants to check how many points does he have, he has to get in contact with the shop by himself/with the cashier.
 
 ## Non Functional Requirements
 
 \<Describe constraints on functional requirements>
 
-| ID        | Type (efficiency, reliability, ..)           | Description  | Refers to |
-| ------------- |:-------------:| :-----:| -----:|
-|  NFR_1     | Usability   | Application should be used with no specific training for the users  | All FR|
-| NFR_2 | Usability | Insert video-tutorial for using the software for support the accounting | FR_5 |
-|  NFR_3     | Performance | All functions should complete in less than 0.5s  |All FR |
-|  NFR_4     | Localisation | Decimal numbers use . (dot) as decimal separator  | All FR |
-| NFR_5 | Privacy | The data of one customer should not be accessible to users other than users who handle fidelty cards. | All FR |
-| NFR_6 | Availability | At least 95% | All FR |
-| Domain | // | Currency is Euro | All FR |
+| ID        | Type (efficiency, reliability, ..)    | 								Description  									| Refers to |
+| --------- | -------------------------------------	| ----------------------------------------------------------------------------- | --------- |
+| NFR_1     | Usability   	| Application should be used with no specific training for the users 									| All FR |
+| NFR_2 	| Usability 	| Insert video-tutorial for using the software for support the accounting								| FR_5 	 |
+| NFR_3     | Performance 	| All functions should complete in less than 0.5s 														| All FR |
+| NFR_4     | Localisation 	| Decimal numbers use . (dot) as decimal separator  													| All FR |
+| NFR_5 	| Privacy 		| The data of one customer should not be accessible to users other than users who handle fidelty cards. | All FR |
+| NFR_6 	| Availability 	| At least 95% 																							| All FR |
+| Domain 	| // 			| Currency is Euro 																						| All FR |
 
 # Use case diagram and use cases
 
@@ -244,14 +244,14 @@ FR_.4: fidelty are managed totally by the shop. The customer can choose to get s
 
 ### Scenario 1.1
 | Actors Involved        |Cash register |
-| ------------- |:-------------:| 
+| ------------- |-------------| 
 |  Precondition     | Receipt has been printed
 |  Post condition     | Balance is updated |
 |  Nominal Scenario     | The Cash Register sends the receipt to the accounting; Accounting updates the balance and manages the receipt (see FR 5) |
 
 ### Scenario 1.2, UC1
 | Actors Involved        |Cash register|
-| ------------- |:-------------:| 
+| ------------- |-------------| 
 |  Precondition     | Receipt has been printed (successful transaction) |  
 |  Post condition     | Inventory is updated |
 |  Nominal Scenario | The Cash Register sends the list of the products to the Warehouse Manager; The Warehouse manager removes the products from the inventory |
@@ -259,7 +259,7 @@ FR_.4: fidelty are managed totally by the shop. The customer can choose to get s
 
 ### Use case 1.2, UC1
 | Actors Involved        |  |
-| ------------- |:-------------:| 
+| ------------- |-------------| 
 |  Precondition     | \<Boolean expression, must evaluate to true before the UC can start> |  
 |  Post condition     | \<Boolean expression, must evaluate to true after UC is finished> |
 |  Nominal Scenario     | \<Textual description of actions executed by the UC> |
@@ -267,7 +267,7 @@ FR_.4: fidelty are managed totally by the shop. The customer can choose to get s
 
 ### Use case 1.3, UC1
 | Actors Involved        |  |
-| ------------- |:-------------:| 
+| ------------- |-------------| 
 |  Precondition     | \<Boolean expression, must evaluate to true before the UC can start> |  
 |  Post condition     | \<Boolean expression, must evaluate to true after UC is finished> |
 |  Nominal Scenario     | \<Textual description of actions executed by the UC> |
@@ -275,7 +275,7 @@ FR_.4: fidelty are managed totally by the shop. The customer can choose to get s
 
 ### Use case 1.4, UC1
 | Actors Involved        |  |
-| ------------- |:-------------:| 
+| ------------- |-------------| 
 |  Precondition     | \<Boolean expression, must evaluate to true before the UC can start> |  
 |  Post condition     | \<Boolean expression, must evaluate to true after UC is finished> |
 |  Nominal Scenario     | \<Textual description of actions executed by the UC> |
@@ -283,7 +283,7 @@ FR_.4: fidelty are managed totally by the shop. The customer can choose to get s
 
 ### Use case 1.5, UC1
 | Actors Involved        |  |
-| ------------- |:-------------:|
+| ------------- |-------------|
 |  Precondition     | \<Boolean expression, must evaluate to true before the UC can start> |
 |  Post condition     | \<Boolean expression, must evaluate to true after UC is finished> |
 |  Nominal Scenario     | \<Textual description of actions executed by the UC> |
@@ -300,7 +300,7 @@ FR_.4: fidelty are managed totally by the shop. The customer can choose to get s
 \<only relevant scenarios should be described>
 
 | Scenario 1.1 | |
-| ------------- |:-------------:|
+| ------------- |-------------|
 |  Precondition     | \<Boolean expression, must evaluate to true before the scenario can start> |
 |  Post condition     | \<Boolean expression, must evaluate to true after scenario is finished> |
 | Step#        | Description  |
@@ -319,7 +319,7 @@ FR_.4: fidelty are managed totally by the shop. The customer can choose to get s
 
 ### Use case x, UCx - Update price (to sell) of products
 | Actors Involved        | Shop director |
-| ------------- |:-------------:|
+| ------------- |-------------|
 |  Precondition     | Account shop director must exist & authenticated ; the catalogue contains at least one product |
 |  Post condition     | Price of a product updated |
 |  Nominal Scenario     | Shop director selects a product ; The shop director modifies the price of the product in the catalogue ; The application updates the price |
@@ -327,7 +327,7 @@ FR_.4: fidelty are managed totally by the shop. The customer can choose to get s
 
 ### Use case x, UCx - Add product
 | Actors Involved        | Shop director |
-| ------------- |:-------------:|
+| ------------- |-------------|
 |  Precondition     | Account shop director must exist & authenticated |
 |  Post condition     | One or more products are added in the catalogue|
 |  Nominal Scenario     | Shop director selects to add a product ; Shop director selects a product from the inventory ; The application assigns the inventory ID to the product and is added to the catalogue |
@@ -336,7 +336,7 @@ FR_.4: fidelty are managed totally by the shop. The customer can choose to get s
 
 ### Use case x, UCx - Remove product
 | Actors Involved        | Shop director |
-| ------------- |:-------------:|
+| ------------- |-------------|
 |  Precondition     | Account shop director must exist & authenticated ; the catalogue contains at least one product |
 |  Post condition     | One or more products are removed from the catalogue |
 |  Nominal Scenario     | Shop director selects to remove a product ; Shop director chooses to remove one or more products present in the catalogue ; The application removes the product(s) from the catalogue|
@@ -349,7 +349,7 @@ We'll consider the Cashier as the actor.
 
 ### Use case x, UCx - Add fidelty card
 | Actors Involved        | Cashier|
-| ------------- |:-------------:|
+| ------------- |-------------|
 |  Precondition     | Account cashier must exist & authenticated|
 |  Post condition     |A fidelty card is added to the database and is given to the customer |
 |  Nominal Scenario     | Cashier selects to add a fidelty card; the cashier is prompted with forms to add the customer data ; The application assigns a new ID to the card in the database |
@@ -357,7 +357,7 @@ We'll consider the Cashier as the actor.
 
 ### Use case x, UCx - Remove fidelty card
 | Actors Involved        | Cashier|
-| ------------- |:-------------:|
+| ------------- |-------------|
 |  Precondition     | Account cashier must exist & authenticated ; the fidelty card must exist |
 |  Post condition     |A fidelty card is removed from the database and is retired from the customer |
 |  Nominal Scenario     | Cashier selects to remove a fidelty card; the cashier chooses to remove one or more fidelty card  ; The application removes the card(s) from the database |
@@ -365,7 +365,7 @@ We'll consider the Cashier as the actor.
 
 ### Use case x, UCx - Add card points
 | Actors Involved        | Cashier |
-| ------------- |:-------------:|
+| ------------- |-------------|
 |  Precondition     | Account cashier must exist & authenticated; the fidelty card must exist |
 |  Post condition     | Points are added to the card|
 |  Nominal Scenario     | Cashier selects to add points to a fidelty card; the cashier chooses the amount to add  ; The application updates the card points |
@@ -373,7 +373,7 @@ We'll consider the Cashier as the actor.
 
 ### Use case x, UCx - Remove card points
 | Actors Involved        | Cashier |
-| ------------- |:-------------:|
+| ------------- |-------------|
 |  Precondition     | Account cashier must exist & authenticated; the fidelty card must exist |
 |  Post condition     | Points are removed from the card|
 |  Nominal Scenario     | Cashier selects to remove points from a fidelty card; the cashier chooses the amount to remove ; The application updates the card points |
@@ -385,7 +385,7 @@ In these use cases, the actor is an user from the shop.
 
 ### Use case x, UCx - Add account
 | Actors Involved        | User  |
-| ------------- |:-------------:|
+| ------------- |-------------|
 |  Precondition     | User doesn't have an account yet |
 |  Post condition     | Account is added to the system |
 |  Nominal Scenario     | User creates a new account and inserts his data |
@@ -393,7 +393,7 @@ In these use cases, the actor is an user from the shop.
 
 ### Use case x, UCx - Remove account
 | Actors Involved        | User |
-| ------------- |:-------------:|
+| ------------- |-------------|
 |  Precondition     | Account user must exist |
 |  Post condition     |Account user is removed from the system|
 |  Nominal Scenario     | User deletes his account|
@@ -401,14 +401,14 @@ In these use cases, the actor is an user from the shop.
 
 ### Use case x, UCx - Update account
 | Actors Involved        | User |
-| ------------- |:-------------:|
+| ------------- |-------------|
 |  Precondition     | Account user must exist |
 |  Post condition     | Account user's info are modified |
 |  Nominal Scenario     | User updates his account and modifies the fields he desires|
 |  Variants     | - |
 ### Use case x, UCx - Login
 | Actors Involved        | User |
-| ------------- |:-------------:|
+| ------------- |-------------|
 |  Precondition     | Account user must exist & must not be authenticated |
 |  Post condition     | Account user is authenticated |
 |  Nominal Scenario     | User makes the login and inserts his email and password |
@@ -416,7 +416,7 @@ In these use cases, the actor is an user from the shop.
 
 ### Use case x, UCx - Logout
 | Actors Involved        | User |
-| ------------- |:-------------:|
+| ------------- |-------------|
 |  Precondition     | Account user must exist & must be authenticated  |
 |  Post condition     | User is not authenticated anymore |
 |  Nominal Scenario     | User makes the logout |
@@ -436,7 +436,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 
 ### Use case x, UCx - Modify uncommitted invoice
 | Actors Involved        | Accountant |
-| ------------- |:-------------:|
+| ------------- |-------------|
 |  Precondition     | Accountant account must exist & must be authenticated;  Shop's account must exist in Agenzia delle Entrate system;  Uncommitted invoice must exist |
 |  Post condition     | Uncommitted invoice has been updated |
 |  Nominal Scenario     | 1. Software shows all the uncommitted invoices (invoices not yet sent to Agenzia delle Entrate system)<br/>2. Accountant chooses one of them and selects the "Modify" option<br/>3. Software provides the selected invoice form<br/>4. Accounant modifies the form with new data<br/>5. Accountant confirms |
@@ -444,7 +444,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 
 ### Use case x, UCx - Add credit note
 | Actors Involved        | Accountant |
-| ------------- |:-------------:|
+| ------------- |-------------|
 |  Precondition     | Accountant account must exist & must be authenticated; Shop's account must exist in Agenzia delle Entrate system; At least one wrong invoice is present in the system |
 |  Post condition     | New credit note is added to the system to compensate wrong invoices |
 |  Nominal Scenario     | 1. Accountant selects "New credit note"<br/>2. Software gives to user a form to fill out<br/>3. Accountant fills the form with the new credit note data (negative import value)<br/>4. Accountant confirms |
@@ -452,7 +452,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 
 ### Use case x, UCx - Show statistics
 | Actors Involved        | Accountant |
-| ------------- |:-------------:|
+| ------------- |-------------|
 |  Precondition     | Accountant account must exist & must be authenticated; Shop's account must exist in Agenzia delle Entrate system |
 |  Post condition     | Statistics are shown on screen in a table, in a diagram or a graph |
 |  Nominal Scenario     | Accountant selects a specific timeframe and shows the shop's revenue in that time period |
@@ -461,7 +461,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 ##### Scenario x.1 
 
 | Scenario |  Show revenue in a timeframe |
-| ------------- |:-------------:|
+| ------------- |-------------|
 |  Precondition     | Enough data must exist in a specific timeframe |
 |  Post condition     | Revenues in a specific timeframe are shown on the screen |
 | Step#        | Description  |
@@ -472,7 +472,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 ##### Scenario x.2 
 
 | Scenario |  Show best selling products |
-| ------------- |:-------------:|
+| ------------- |-------------|
 |  Precondition     | At least one product must exist in catalogue |
 |  Post condition     | Top 5 best selling products is shown on screen |
 | Step#        | Description  |
