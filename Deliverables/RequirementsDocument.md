@@ -55,11 +55,12 @@ EZShop is a software application to:
 | Accountant (profile 4) | Handles the accounting through the software. |
 | Customer manager (profile 5) | Manages the customers. In most shops it could be the Cashier. |
 | Shop director (profile 6) | Director of the shop. Manages the catalogue of products. |
-| IT administrator | Who manages the software (Security, DB). |
+| IT administrator (profile 7) | Who manages the software (Security/Accounts, DB). |
 | Maintainers | Who will repair the software eventually. It could be part of the staff or external. |
 | Marketing people | People who sell the software to shops. |
 | Product | Involved indirectly and managed by the software. |
 | Cash Register | The software involves the cash register since they're part of the output. |
+| Fidelty card | Fidely card associated with a customer. |
 
 # Context Diagram and interfaces
 
@@ -67,7 +68,6 @@ EZShop is a software application to:
 \<Define here Context diagram using UML use case diagram>
 ```plantuml
 @startuml
-left to right direction
 
 rectangle System{
 	usecase "EZshop" as Shop
@@ -77,11 +77,10 @@ User <|-- Cashier
 User <|-- WarehouseDirector
 User <|-- Accountant
 User <|-- ShopDirector
-Cashier --  Shop
+User <|-- ITAdministrator
+User -- Shop
+FideltyCard -- Shop
 Product --  Shop
-WarehouseDirector --  Shop
-Accountant --  Shop
-ShopDirector -- Shop
 Shop -- CreditCardSystem
 Shop -- CashRegister
 @enduml
@@ -99,10 +98,11 @@ Shop -- CashRegister
 | Cashier 				| GUI 				| Screen, Keyboard, Mouse |
 | Product 				| Bar code 			| Bar code reader |
 | Cash register 		| GUI, API 			| Screen, Keyboard, Printer |
-| Credit card system 	| Credit card 		| Credit card reader |
+| Credit card system 	| Web services		| Internet, POS |
 | Warehouse director 	| GUI 				| Screen, Keyboard, Mouse |
 | Accountant 			| GUI 				| Screen, Keyboard, Mouse |
 | Shop director 		| GUI 				| Screen, Keyboard, Mouse |
+| Fidelty card 			| Bar code 			| Bar code reader | 
 
 # Stories and personas
 \<A Persona is a realistic impersonation of an actor. Define here a few personas and describe in plain text how a persona interacts with the system>
@@ -135,6 +135,7 @@ Shop -- CashRegister
 |  FR_1.9.1 	| Print receipt |
 |  FR_1.9.2 	| Open the cash register  |
 |  FR_1.9.3 	| Send data to cash register  |
+|  FR_1.10      | Register an invoice (active) | 
 ||
 |  FR_2     	| Handle warehouse |
 |  FR_2.1   	| Handle inventory |
@@ -153,11 +154,11 @@ Shop -- CashRegister
 |  FR_2.7.5 	| Filter orders |
 ||
 |  FR_3     	| Handle catalogue |
-|  FR_3.1   	| Update price (to sell) of products |
+|  FR_3.1   	| Update products selling price |
 |  FR_3.2   	| Add product |
 |  FR_3.3   	| Remove product  |
 |  FR_3.4   	| Show products (catalogue) |
-|  FR_3.5   	| Search a product in the catalogue |
+|  FR_3.5   	| Filter products (catalogue) |
 ||
 |  FR_4     	| Handle customers |
 |  FR_4.1   	| Add fidelty card |
@@ -170,34 +171,35 @@ Shop -- CashRegister
 ||
 |  FR_5     	| Support accounting |
 |  FR_5.1   	| Update finance |
-|  FR_5.1.1   	| Add invoice |
+|  FR_5.1.1   	| Add invoice (passive) |
 |  FR_5.1.2   	| Modify uncommitted invoice | //not yet sent to Agenzia delle Entrate
 |  FR_5.1.3   	| Add credit note | //if wrong invoice committed --> correct with a negative-import credit note
 |  FR_5.2 		| Show accounting data |
-|  FR_5.2.1   	| Show receipts |
-|  FR_5.2.2   	| Show invoices |
-|  FR_5.2.3 	| Show suppliers |
+|  FR_5.2.1   	| Show invoices |
+|  FR_5.2.2 	| Show suppliers |
+|  FR_5.2.3 	| Show balance sheet |
+|  FR_5.2.4 	| Show cash flow (income & expenses) |
 |  FR_5.3   	| Show statistics |
 |  FR_5.3.1 	| Show revenue in a timeframe |
 |  FR_5.3.2 	| Show best selling products |
-|  FR_5.3.3 	| Show balance sheet|
-|  FR_5.3.4 	| Show cash flow |
 |  FR_5.4 		| Show banking data |
 |  FR_5.5 		| Show suppliers deadlines timetable |
 |  FR_5.6   	| Show financial statement | //used to see for what shop's revenues could be used: Are they enough to pay suppliers/debts and also to do new investments?
-|  FR_5.7 		| Show products (inventory) | //inventory needed to do the annual summary: on 31/12 every shop must declare what there is in the warehouse. Accountant must be able to access to the inventory
 ||
 |  FR_6     	| Handle accounts |
 |  FR_6.1   	| Add account |
 |  FR_6.2   	| Remove account|
 |  FR_6.3   	| Update account|
-|  FR_6.4   	| Login |
-|  FR_6.5   	| Logout |
-|  FR_7     	| Manage rights | //Authorize access to functions to specific actors according to access rights
+|  FR_6.4    	| Modify privileges | //Authorize access to functions to specific actors according to access rights
+|  FR_7			| Authentication |
+|  FR_7.1		| Login |
+|  FR_7.2		| Logout |
 
 
 FR_1.5 means that fidelty card of a user must be updated and it is directly related to FR__4.
 In FR_1.6, whenever you scan a product, you add it to the list of products the customer is buying.
+
+FR_2 contains both inventory and orders: we identify it as warehouse.
 
 FR_2.5 means that if products go below certain threshold, the director is notified.
 
@@ -209,18 +211,56 @@ FR_4: fidelty are managed totally by the shop. The customer can choose to get su
 
 | ID        |     Type 	    | 								Description  															| Refers to |
 | --------- | ------------- | ----------------------------------------------------------------------------------------------------- | --------- |
-| NFR_1     | Usability   	| Application should be used with no specific training for the users 									| All FR 	|
-| NFR_2 	| Usability 	| Insert video-tutorial for using the software for support the accounting								| FR_5 	 	|
-| NFR_3     | Performance 	| All functions should complete in less than 0.5s 														| All FR 	|
-| NFR_4     | Localisation 	| Decimal numbers use . (dot) as decimal separator  													| All FR 	|
-| NFR_5 	| Privacy 		| The data of one customer should not be accessible to users other than users who handle fidelty cards. | All FR 	|
-| NFR_6 	| Availability 	| At least 95% 																							| All FR 	|
-| Domain 	| // 			| Currency is Euro 																						| All FR 	|
+| NFR_1     | Usability   	| User should learn how to use the software within 30 minutes of training 									| All FR 	|
+| NFR_2     | Efficiency	| All functions should complete in less than 0.5s 														| All FR 	|
+| NFR_3     | Localisation 	| Decimal numbers use . (dot) as decimal separator  													| All FR 	|
+| NFR_4 	| Privacy 		| The data of one customer should not be accessible to users other than users who handle fidelty cards. | All FR 	|
+| NFR_5 	| Availability 	| At least 95% 																							| All FR 	|
+| NFR_6     | Security      | User should have access only to functions and resources which they require 							| All FR |
+| Domain 	| // 			| Currency is Euro  																						| All FR 	|
 
 # Use case diagram and use cases
 
 ## Use case diagram
 \<define here UML Use case diagram UCD summarizing all use cases, and their relationships>
+
+```plantuml
+@startuml
+usecase Authentication
+usecase HandleSells
+usecase HandleCustomer
+usecase HandleCatalogue
+usecase HandleWarehouse
+usecase SupportAccounting
+usecase HandleAccounts
+
+
+User <|-- Cashier
+User <|-- WarehouseDirector
+User <|-- Accountant
+User <|-- ShopDirector
+User <|-- ITAdministrator
+
+User --> Authentication
+Cashier --> HandleSells
+Cashier --> HandleCustomer
+ShopDirector --> HandleCatalogue
+WarehouseDirector --> HandleWarehouse
+Accountant --> SupportAccounting
+
+
+ITAdministrator --> HandleAccounts
+
+HandleSells --> Product
+HandleWarehouse --> Product
+HandleCatalogue --> Product
+HandleSells ..> HandleWarehouse : include
+
+HandleCustomer --> FideltyCard
+HandleSells --> CashRegister
+HandleSells --> CreditCardSystem
+@enduml
+```
 
 
 \<next describe here each use case in the UCD>
@@ -352,7 +392,7 @@ We'll consider the Cashier as the actor.
 | ----------------- | ------------- |
 |  Precondition     | Account cashier must exist & authenticated|
 |  Post condition   | A fidelty card is added to the database and is given to the customer |
-|  Nominal Scenario | Cashier selects to add a fidelty card; the cashier is prompted with forms to add the customer data ; The application assigns a new ID to the card in the database |
+|  Nominal Scenario | Cashier selects to add a fidelty card; the cashier is prompted with forms to add the customer data ; The application assigns a new ID to the card in the database ; A paper containing a barcode is issued to the customer |
 |  Variants     	| A customer can have at most one fidelty card active: each fidelty card has an unique ID, along with the customer SSN.  |
 
 ### Use case x, UCx - Remove fidelty card
@@ -384,7 +424,7 @@ We'll consider the Cashier as the actor.
 In these use cases, the actor is an user from the shop.
 
 ### Use case x, UCx - Add account
-| Actors Involved   | User		|
+| Actors Involved   | ITAdministrator	|
 | ----------------- | --------- |
 |  Precondition     | User doesn't have an account yet |
 |  Post condition   | Account is added to the system |
@@ -392,7 +432,7 @@ In these use cases, the actor is an user from the shop.
 |  Variants     	| A user can have only one account, this is checked through the email. |
 
 ### Use case x, UCx - Remove account
-| Actors Involved   | User		|
+| Actors Involved   | ITAdministrator	|
 | ----------------- | --------- |
 |  Precondition     | Account user must exist |
 |  Post condition   | Account user is removed from the system|
@@ -400,12 +440,17 @@ In these use cases, the actor is an user from the shop.
 |  Variants     	| - |
 
 ### Use case x, UCx - Update account
-| Actors Involved   | User		|
+| Actors Involved   | ITAdministrator	|
 | ----------------- | --------- |
 |  Precondition     | Account user must exist |
 |  Post condition   | Account user's info are modified |
 |  Nominal Scenario | User updates his account and modifies the fields he desires|
 |  Variants     	| - |
+
+
+### Use case x, UCx - Modify privileges
+
+## Authentication
 
 ### Use case x, UCx - Login
 | Actors Involved   | User		|
@@ -611,6 +656,24 @@ In addition, the actor should be able to place new orders.
 \<must be consistent with Context diagram>
 
 # Deployment Diagram 
+
+```plantuml
+@startuml
+node UserPC
+
+artifact EZShopApplication
+node EZShopServer
+artifact EZShopBackend
+
+node PaymentSystem
+
+
+UserPC "*"<.. EZShopApplication  : deploy
+UserPC -- EZShopServer : internet link
+EZShopServer <.. EZShopBackend : deploy
+UserPC --"*" PaymentSystem : internet  link
+@enduml
+```
 
 \<describe here deployment diagram >
 
