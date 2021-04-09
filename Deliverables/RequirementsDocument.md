@@ -297,19 +297,19 @@ HandleSells --> CreditCardSystem
 |  Nominal Scenario | The Cash Register sends the list of the products to the Warehouse Manager; The Warehouse manager removes the products from the inventory |
 
 
-### Use case 1.2, UC1
-| Actors Involved   |			    |
+### Use case 1.1, UC1
+| Actors Involved   | Cashier, Product |
 | ----------------- | ------------- |
-|  Precondition     | \<Boolean expression, must evaluate to true before the UC can start> |  
-|  Post condition   | \<Boolean expression, must evaluate to true after UC is finished> |
-|  Nominal Scenario | \<Textual description of actions executed by the UC> |
-|  Variants     	| \<other executions, ex in case of errors> |
+|  Precondition     | 1. Cashier is already authenticated<br/> 2. Product has a valid Bar Code<br/> |
+|  Post condition   | 1. The list of products to buy is ready<br/> 2. The total amount to pay is displayed<br/>|
+|  Nominal Scenario | 1. For every product in the customer's cart:<br/> 1.1. The Cashier scans the product using the Bar Code Reader<br/> 1.2 The Application recognizes the product <br/> 1.3 The Application searches the Product in the Catalogue <br/> 1.4 The Application retrieves the price of the Product<br/> 1.5 The Application displays the price of the Product and the new partial amount to pay on the Cashier GUI<br/> 2. At the end, the final list of products and the total amount to pay is displayed on the the Cashier GUI|
+|  Variants      	| The Bar Code is valid, but the Bar Code Reader cannot read it correctly: the Cashier inputs the Bar Code to the Cashier GUI<br/> The Customer does not want to buy a Product anymore: the Cashier removes it from the list using the Cashier GUI |
 
-### Use case 1.3, UC1
-| Actors Involved   |  				|
+### Scenario 1.2, UC1
+| Actors Involved   | Cashier, Fidelty Card |
 | ----------------- | ------------- |
-|  Precondition     | \<Boolean expression, must evaluate to true before the UC can start> |  
-|  Post condition   | \<Boolean expression, must evaluate to true after UC is finished> |
+|  Precondition     | 1. Cashier is already authenticated<br/> 2. Fidelty Card has a valid Bar Code |
+|  Post condition   | The Fidelty Card is recognized |
 |  Nominal Scenario | \<Textual description of actions executed by the UC> |
 |  Variants     	| \<other executions, ex in case of errors> |
 
