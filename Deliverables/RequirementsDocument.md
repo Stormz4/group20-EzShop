@@ -224,7 +224,64 @@ FR_.4: fidelty are managed totally by the shop. The customer can choose to get s
 
 
 \<next describe here each use case in the UCD>
-### Use case 1, UC1
+
+
+|  FR1     |Handle sells |
+|  FR1.1   |Register payment  |
+|  FR1.2   |Update inventory |
+|  FR1.3   |Send receipt to accounting |
+|  FR1.4   |Handle discounts |
+|  FR1.5   |Handle fidelty card |
+|  FR1.6   |Scan product |
+|  FR1.7   |Add the product to a list of buyings |
+|  FR1.8   |Read credit card | 
+|  FR1.9   |Handle cash register |
+|  FR1.9.1 |Print receipt |
+|  FR1.9.2 |Open the cash register  |
+|  FR1.9.3 |Send data to cash register  |
+
+##  Handle sells
+
+### Scenario 1.1
+| Actors Involved        |Cash register |
+| ------------- |:-------------:| 
+|  Precondition     | Receipt has been printed
+|  Post condition     | Balance is updated |
+|  Nominal Scenario     | The Cash Register sends the receipt to the accounting; Accounting updates the balance and manages the receipt (see FR 5) |
+
+### Scenario 1.2, UC1
+| Actors Involved        |Cash register|
+| ------------- |:-------------:| 
+|  Precondition     | Receipt has been printed (successful transaction) |  
+|  Post condition     | Inventory is updated |
+|  Nominal Scenario | The Cash Register sends the list of the products to the Warehouse Manager; The Warehouse manager removes the products from the inventory |
+
+
+### Use case 1.2, UC1
+| Actors Involved        |  |
+| ------------- |:-------------:| 
+|  Precondition     | \<Boolean expression, must evaluate to true before the UC can start> |  
+|  Post condition     | \<Boolean expression, must evaluate to true after UC is finished> |
+|  Nominal Scenario     | \<Textual description of actions executed by the UC> |
+|  Variants     | \<other executions, ex in case of errors> |
+
+### Use case 1.3, UC1
+| Actors Involved        |  |
+| ------------- |:-------------:| 
+|  Precondition     | \<Boolean expression, must evaluate to true before the UC can start> |  
+|  Post condition     | \<Boolean expression, must evaluate to true after UC is finished> |
+|  Nominal Scenario     | \<Textual description of actions executed by the UC> |
+|  Variants     | \<other executions, ex in case of errors> |
+
+### Use case 1.4, UC1
+| Actors Involved        |  |
+| ------------- |:-------------:| 
+|  Precondition     | \<Boolean expression, must evaluate to true before the UC can start> |  
+|  Post condition     | \<Boolean expression, must evaluate to true after UC is finished> |
+|  Nominal Scenario     | \<Textual description of actions executed by the UC> |
+|  Variants     | \<other executions, ex in case of errors> |
+
+### Use case 1.5, UC1
 | Actors Involved        |  |
 | ------------- |:-------------:|
 |  Precondition     | \<Boolean expression, must evaluate to true before the UC can start> |
