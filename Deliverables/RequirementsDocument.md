@@ -142,6 +142,7 @@ Shop -- CashRegister
 |  FR_2.1.2 |Remove product  |
 |  FR_2.1.3 |Update products quantity |
 |  FR_2.1.4 |Update products purchase price |
+|  FR_2.1.5 |Filter products |
 |  FR_2.5   |Handle thresholds |
 |  FR_2.6   |Show products (inventory) |
 |  FR_2.7   |Manage order |
@@ -149,7 +150,7 @@ Shop -- CashRegister
 |  FR_2.7.2 |Remove order |
 |  FR_2.7.3 |Modify order  |
 |  FR_2.7.4 |Show orders |
-|  FR_2.8   |Search a product in the inventory |
+|  FR_2.7.5 |Filter orders |
 | | |
 |  FR_3     |Handle catalogue |
 |  FR_3.1   |Update price (to sell) of products |
@@ -481,6 +482,14 @@ In addition, the actor should be able to place new orders.
 |  Nominal Scenario | Warehouse Manager accesses stock's section of the software, where he can look at the complete list of products sorted by ID (default sort) |
 |  Variants         |  - A different sorting criteria is selected<br/>-  Products are filtered writing something in the search bar or using filters (e.g. date, supplier, ...) |
 
+### Use case x, UCx - Filter products
+| Actors Involved 	| 			Warehouse Manager              |
+| --------------- 	| ---------------------------------------- |
+|  Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
+|  Post condition 	| A list of products, filtered and sorted as desired, is shown |
+|  Nominal Scenario | Warehouse Manager writes inside the search bar or uses some other filter:<br/>&ensp;- quantity<br/>&ensp;- supplier<br/>&ensp;- purchase price |
+|  Variants         |  -  |
+
 #
 ## Manage orders
 ### Use case x, UCx - Place new order
@@ -523,8 +532,13 @@ In addition, the actor should be able to place new orders.
 |  Nominal Scenario | Warehouse Manager accesses orders section of the software, where he can look at the complete list of orders sorted by ID (default sort) |
 |  Variants         |  - A different sorting criteria is selected<br/>-  Orders are filtered writing something in the search bar or using filters (e.g. date, supplier, ...) |
 
-
-|  FR_2.8   |Search a product in the inventory |
+### Use case x, UCx - Filter orders
+| Actors Involved 	| 			Warehouse Manager              |
+| --------------- 	| ---------------------------------------- |
+|  Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
+|  Post condition 	| A list of orders, filtered and sorted as desired, is shown |
+|  Nominal Scenario | Warehouse Manager writes inside the search bar or uses some other filter:<br/>&ensp;- order total amount<br/>&ensp;- supplier<br/>&ensp;- order's date |
+|  Variants         |  -  |
 
 
 # Glossary
