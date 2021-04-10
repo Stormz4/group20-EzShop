@@ -144,14 +144,14 @@ Shop -- CashRegister
 |  FR_2.1.3 	| Update products quantity |
 |  FR_2.1.4 	| Update products purchase price |
 |  FR_2.1.5 	| Filter products |
-|  FR_2.5   	| Handle thresholds |
-|  FR_2.6   	| Show products (inventory) |
-|  FR_2.7   	| Manage order |
-|  FR_2.7.1 	| Add order |
-|  FR_2.7.2 	| Remove order |
-|  FR_2.7.3 	| Modify order |
-|  FR_2.7.4 	| Show orders |
-|  FR_2.7.5 	| Filter orders |
+|  FR_2.1.6   	| Handle thresholds |
+|  FR_2.1.7   	| Show products (inventory) |
+|  FR_2.2   	| Manage order |
+|  FR_2.2.1 	| Add order |
+|  FR_2.2.2 	| Remove order |
+|  FR_2.2.3 	| Modify order |
+|  FR_2.2.4 	| Show orders |
+|  FR_2.2.5 	| Filter orders |
 ||
 |  FR_3     	| Handle catalogue |
 |  FR_3.1   	| Update products selling price |
@@ -266,7 +266,78 @@ HandleSales --> CashRegister
 HandleSales --> CreditCardSystem
 @enduml
 ```
+### Use Case diagram: Handle sales
 
+### Use Case diagram: Handle warehouse
+
+### Use Case diagram: Handle catalogue
+
+```plantuml
+@startuml
+
+:ShopDirector: --> (Handle catalogue)
+(Handle catalogue) ..> (Update price to sell of products) : include
+(Handle catalogue) ..> (Add product) : include
+(Handle catalogue) ..> (Remove product) : include
+
+@enduml
+```
+
+### Use Case diagram: Handle customers
+
+```plantuml
+@startuml
+
+:ShopDirector: --> (Handle customers)
+(Handle customers) ..> (Add fidelty card) : include
+(Handle customers) ..> (Remove fidelty card) : include
+(Handle customers) ..> (Add card points) : include
+(Handle customers) ..> (Remove card points) : include
+
+@enduml
+```
+
+### Use Case diagram: Support accounting
+
+```plantuml
+@startuml
+'Support accounting part
+
+:Accountant: --> (Support accounting)
+(Support accounting) ..> (Add passive invoice) : include
+(Support accounting) ..> (Add credit note) : include
+(Support accounting) ..> (Show statistics) : include
+(Support accounting) ..> (Show suppliers deadlines  timetable) : include
+
+(Show statistics) ..> (Show revenue and expenses in a timeframe) :include
+(Show statistics) ..> (Show best selling products) :include
+
+@enduml
+```
+
+### Use Case diagram: Handle accounts
+
+```plantuml
+@startum
+:ITAdministrator: --> (Handle accounts)
+(Handle accounts) ..> (Add account) : include
+(Handle accounts) ..> (Remove account) : include
+(Handle accounts) ..> (Update account) : include
+(Handle accounts) ..> (Modify privileges) : include
+
+@enduml
+```
+
+### Use Case diagram: Authentication
+
+```plantuml
+@startum
+
+:User: --> (Logout)
+:User: --> (Login)
+
+@enduml
+```
 
 \<next describe here each use case in the UCD>
 
@@ -278,7 +349,7 @@ HandleSales --> CreditCardSystem
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier is already authenticated<br/> 2. Product has a valid Bar Code<br/> |
 |  Post condition   | 1. The list of products to buy is ready<br/> 2. The total amount to pay is computed and displayed<br/>|
-|  Nominal Scenario | 1. For every product in the customer's cart:<br/> 1.1. The Cashier scans the product using the Bar Code Reader<br/> 1.2 The Application recognizes the Product //.......c'è già 1.3????<br/> 1.3 The Application searches the Product in the Catalogue <br/> 1.4 The Application searches if a discount should be applied to the Product <br/> 1.5 If a Fidelty Card has been scanned, the Application searches if a discount should be applied to the Product for those who have a Fidelty Card <br/> 1.6 The Application retrieves the price of the Product and applies the discount if needed<br/> 1.7 The Application displays the price of the Product and the new partial amount to pay on the Cashier GUI<br/> 2. At the end, the final list of products and the total amount to pay is displayed on the Cashier GUI|
+|  Nominal Scenario | 1. For every product in the customer's cart:<br/> 1.1. The Cashier scans the product using the Bar Code Reader<br/> 1.2 The code is readed correctly <br/> 1.3 The Application searches the Product in the Catalogue <br/> 1.4 The Application searches if a discount should be applied to the Product <br/> 1.5 If a Fidelty Card has been scanned, the Application searches if a discount should be applied to the Product for those who have a Fidelty Card <br/> 1.6 The Application retrieves the price of the Product and applies the discount if needed<br/> 1.7 The Application displays the price of the Product and the new partial amount to pay on the Cashier GUI<br/> 2. At the end, the final list of products and the total amount to pay is displayed on the Cashier GUI|
 |  Variants      	| - The Bar Code is valid, but the Bar Code Reader cannot read it correctly: the Cashier inputs the Bar Code to the Cashier GUI<br/> - The Customer does not want to buy a Product anymore: the Cashier removes it from the list using the Cashier GUI |
 
 ### Use case 1.2, UC1 - Authentication of a Fidelty Card
@@ -481,62 +552,6 @@ We'll consider the Cashier as the actor.
 |  Nominal Scenario | 1. Cashier selects to remove points from a fidelty card <br> 2. Software chooses a list of fidelty cards <br> 3. Cashier selects one <br> 4. Cashier chooses the amount to remove <br> 5. Cashier confirms  |
 |  Variants     	| - There are no fidelty cards: no card will be shown |
 
-## Handle accounts
-
-### Use case x, UCx - Add account
-| Actors Involved   | ITAdministrator	|
-| ----------------- | --------- |
-|  Precondition     | User doesn't have an account yet |
-|  Post condition   | Account user is added to the system |
-|  Nominal Scenario | 1. ITAdministrator selects "create a new account" </br> 2. Software shows forms to insert the user data <br> 3. ITAdministrator inserts the user data</br>4. ITAdministrator confirms |
-|  Variants     	| - A user can have only one account: SSNs must be unique |
-
-### Use case x, UCx - Remove account
-| Actors Involved   | ITAdministrator	|
-| ----------------- | --------- |
-|  Precondition     | Account user must exist |
-|  Post condition   | Account user is removed from the system|
-|  Nominal Scenario | 1. ITAdministrator selects "delete an account" </br> 2. Software shows a list of accounts <br> 3. ITAdministrator chooses one of them <br> 4. ITAdministrator confirms  |
-|  Variants     	| - |
-
-
-### Use case x, UCx - Update account
-| Actors Involved   | ITAdministrator	|
-| ----------------- | --------- |
-|  Precondition     | Account user must exist |
-|  Post condition   | Account user's info are modified |
-|  Nominal Scenario | 1. ITAdministrator selects "update an account" </br> 2. Software shows a list of accounts <br> 3. ITAdministrator chooses one of them <br> 4. Software shows forms to insert the user data <br> 5. ITAdministrator inserts the user data</br>6. ITAdministrator confirms|
-|  Variants     	| - |
-
-### Use case x, UCx - Modify privileges
-
-| Actors Involved   | ITAdministrator	|
-| ----------------- | --------- |
-|  Precondition     | Account user must exist |
-|  Post condition   | Account user's privileges are modified |
-|  Nominal Scenario | 1. ITAdministrator selects "update privileges of an account" </br> 2. Software shows a list of accounts <br> 3. ITAdministrator chooses one of them <br> 4. Software shows the current privileges and forms to insert new ones <br> 5. ITAdministrator chooses the privileges </br>6. ITAdministrator confirms|
-|  Variants     	| - |
-
-## Authentication
-
-In these use cases, the actor is an user from the shop.
-
-### Use case x, UCx - Login
-| Actors Involved   | User		|
-| ----------------- | --------- |
-|  Precondition     | Account user must exist & must not be authenticated |
-|  Post condition   | Account user is authenticated |
-|  Nominal Scenario | 1. User selects "login" <br> 2. Software show forms to insert email and password <br> 3. User inserts his email and password |
-|  Variants     	| - Email/password are wrong; an error is printed on the screen |
-
-### Use case x, UCx - Logout
-| Actors Involved   | User		|
-| ----------------- | --------- |
-|  Precondition     | Account user must exist & must be authenticated  |
-|  Post condition   | User is not authenticated anymore |
-|  Nominal Scenario | 1. User selects logout |
-|  Variants     	| - |
-
 ## Support accounting
 
 In these use cases, the actor is an accountant, or a generic user from the shop acting as the accountant, managing the simplified accounting of the shop (hypothesis: annual revenue below 700'000€) taking data from Agenzia delle Entrate informatic system.
@@ -595,28 +610,61 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 |  Nominal Scenario | 1. Application displays deadlines distinguishing them by suppliers and sorting them by date  |
 |  Variants     	| - All deadlines have been satisfied: an "Up to date with payments" message is displayed<br/>- One or more deadlines are expired: an alert message is generated  |
 
-### Use Case diagram: Support Accounting part
-```plantuml
-@startuml
-'Support accounting part
-usecase (EZShop)
-(EZShop) ..> (Add passive invoice) :<<include>>
-(EZShop) ..> (Add credit note) :<<include>>
-(EZShop) ..> (Show statistics) :<<include>>
-(EZShop) ..> (Show suppliers deadlines timetable) :<<include>>
+## Handle accounts
 
-:Accountant: --> (Add passive invoice)
-:Accountant: --> (Add credit note)
-:Accountant: --> (Show statistics)
+### Use case x, UCx - Add account
+| Actors Involved   | ITAdministrator	|
+| ----------------- | --------- |
+|  Precondition     | User doesn't have an account yet |
+|  Post condition   | Account user is added to the system |
+|  Nominal Scenario | 1. ITAdministrator selects "create a new account" </br> 2. Software shows forms to insert the user data <br> 3. ITAdministrator inserts the user data</br>4. ITAdministrator confirms |
+|  Variants     	| - A user can have only one account: SSNs must be unique |
 
-(Show statistics) ..> (Show revenue and expenses in a timeframe) :<<include>>
-(Show statistics) ..> (Show best selling products) :<<include>>
+### Use case x, UCx - Remove account
+| Actors Involved   | ITAdministrator	|
+| ----------------- | --------- |
+|  Precondition     | Account user must exist |
+|  Post condition   | Account user is removed from the system|
+|  Nominal Scenario | 1. ITAdministrator selects "delete an account" </br> 2. Software shows a list of accounts <br> 3. ITAdministrator chooses one of them <br> 4. ITAdministrator confirms  |
+|  Variants     	| - |
 
-:Accountant: --> (Show suppliers deadlines timetable)
 
-@enduml
-```
+### Use case x, UCx - Update account
+| Actors Involved   | ITAdministrator	|
+| ----------------- | --------- |
+|  Precondition     | Account user must exist |
+|  Post condition   | Account user's info are modified |
+|  Nominal Scenario | 1. ITAdministrator selects "update an account" </br> 2. Software shows a list of accounts <br> 3. ITAdministrator chooses one of them <br> 4. Software shows forms to insert the user data <br> 5. ITAdministrator inserts the user data</br>6. ITAdministrator confirms|
+|  Variants     	| - |
 
+### Use case x, UCx - Modify privileges
+
+| Actors Involved   | ITAdministrator	|
+| ----------------- | --------- |
+|  Precondition     | Account user must exist |
+|  Post condition   | Account user's privileges are modified |
+|  Nominal Scenario | 1. ITAdministrator selects "update privileges of an account" </br> 2. Software shows a list of accounts <br> 3. ITAdministrator chooses one of them <br> 4. Software shows the current privileges and forms to insert new ones <br> 5. ITAdministrator chooses the privileges </br>6. ITAdministrator confirms|
+|  Variants     	| - |
+
+## Authentication
+
+In these use cases, the actor is an user from the shop.
+
+### Use case x, UCx - Login
+| Actors Involved   | User		|
+| ----------------- | --------- |
+|  Precondition     | Account user must exist & must not be authenticated |
+|  Post condition   | Account user is authenticated |
+|  Nominal Scenario | 1. User selects "login" <br> 2. Software show forms to insert email and password <br> 3. User inserts his email and password |
+|  Variants     	| - Email/password are wrong; an error is printed on the screen |
+
+### Use case x, UCx - Logout
+| Actors Involved   | User		|
+| ----------------- | --------- |
+|  Precondition     | Account user must exist & must be authenticated  |
+|  Post condition   | User is not authenticated anymore |
+|  Nominal Scenario | 1. User selects logout |
+|  Variants     	| - |
 
 # Glossary
 
