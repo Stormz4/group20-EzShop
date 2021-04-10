@@ -61,8 +61,8 @@ data/*
 .scala_dependencies
 .worksheet
 
-#VScode .css settings
-.vscode
+#VScode
+**/.vscode
 
 # Uncomment this line if you wish to ignore the project description file.
 # Typically, this file would be tracked if it contains build/dependency configurations:
