@@ -10,7 +10,7 @@ Date: 10/04/2021
 
 | Version | Changes |
 | ------- |---------|
-| 5 | - Modified use cases and scenarios;<br/>- Added accounting UseCase diagram;<br/>- Minor fixes |
+| 6 | - Modified & added use cases and scenarios;<br/>- Minor fixes |
 
 # Contents
 
@@ -318,7 +318,7 @@ HandleSales --> CreditCardSystem
 ### Use Case diagram: Handle accounts
 
 ```plantuml
-@startum
+@startuml
 :ITAdministrator: --> (Handle accounts)
 (Handle accounts) ..> (Add account) : include
 (Handle accounts) ..> (Remove account) : include
@@ -331,7 +331,7 @@ HandleSales --> CreditCardSystem
 ### Use Case diagram: Authentication
 
 ```plantuml
-@startum
+@startuml
 
 :User: --> (Logout)
 :User: --> (Login)
