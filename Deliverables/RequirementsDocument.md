@@ -1,7 +1,7 @@
 # Requirements Document 
 
 Authors: 
-- Mattia Lisciandrello
+- Mattia Lisciandrello s286329
 - Christian Casalini s281823
 - Palmucci Leonardo s288126
 - Dario Lanfranco s287524
@@ -10,7 +10,7 @@ Date: 10/04/2021
 
 | Version | Changes |
 | ------- |---------|
-| 4 | Modified use cases diagrams, interfaces for actors, use cases. |
+| 5 | - Modified use cases and scenarios;<br/>- Added accounting UseCase diagram;<br/>- Minor fixes |
 
 # Contents
 
@@ -172,15 +172,13 @@ Shop -- CashRegister
 |  FR_5     	| Support accounting |
 |  FR_5.1   	| Update finance |
 |  FR_5.1.1   	| Add invoice (passive) |
-|  FR_5.1.2   	| Modify uncommitted invoice | //not yet sent to Agenzia delle Entrate
 |  FR_5.1.3   	| Add credit note | //if wrong invoice committed --> correct with a negative-import credit note
 |  FR_5.2 		| Show accounting data |
 |  FR_5.2.1   	| Show invoices |
 |  FR_5.2.2 	| Show suppliers |
 |  FR_5.2.3 	| Show balance sheet |
-|  FR_5.2.4 	| Show cash flow (income & expenses) |
 |  FR_5.3   	| Show statistics |
-|  FR_5.3.1 	| Show revenue in a timeframe |
+|  FR_5.3.1 	| Show revenue and expenses in a timeframe |
 |  FR_5.3.2 	| Show best selling products |
 |  FR_5.4 		| Show banking data |
 |  FR_5.5 		| Show suppliers deadlines timetable |
@@ -280,16 +278,16 @@ HandleSales --> CreditCardSystem
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier is already authenticated<br/> 2. Product has a valid Bar Code<br/> |
 |  Post condition   | 1. The list of products to buy is ready<br/> 2. The total amount to pay is computed and displayed<br/>|
-|  Nominal Scenario | 1. For every product in the customer's cart:<br/> 1.1. The Cashier scans the product using the Bar Code Reader<br/> 1.2 The Application recognizes the Product <br/> 1.3 The Application searches the Product in the Catalogue <br/> 1.4 The Application searches if a discount should be applied to the Product <br/> 1.5 If a Fidelty Card has been scanned, the Application searches if a discount should be applied to the Product for those who have a Fidelty Card <br/> 1.6 The Application retrieves the price of the Product and applies the discount if needed<br/> 1.7 The Application displays the price of the Product and the new partial amount to pay on the Cashier GUI<br/> 2. At the end, the final list of products and the total amount to pay is displayed on the the Cashier GUI|
-|  Variants      	| The Bar Code is valid, but the Bar Code Reader cannot read it correctly: the Cashier inputs the Bar Code to the Cashier GUI<br/> The Customer does not want to buy a Product anymore: the Cashier removes it from the list using the Cashier GUI |
+|  Nominal Scenario | 1. For every product in the customer's cart:<br/> 1.1. The Cashier scans the product using the Bar Code Reader<br/> 1.2 The Application recognizes the Product //.......c'è già 1.3????<br/> 1.3 The Application searches the Product in the Catalogue <br/> 1.4 The Application searches if a discount should be applied to the Product <br/> 1.5 If a Fidelty Card has been scanned, the Application searches if a discount should be applied to the Product for those who have a Fidelty Card <br/> 1.6 The Application retrieves the price of the Product and applies the discount if needed<br/> 1.7 The Application displays the price of the Product and the new partial amount to pay on the Cashier GUI<br/> 2. At the end, the final list of products and the total amount to pay is displayed on the Cashier GUI|
+|  Variants      	| - The Bar Code is valid, but the Bar Code Reader cannot read it correctly: the Cashier inputs the Bar Code to the Cashier GUI<br/> - The Customer does not want to buy a Product anymore: the Cashier removes it from the list using the Cashier GUI |
 
-### Use case 1.2, UC1 - Authentification of a Fidelty Card
+### Use case 1.2, UC1 - Authentication of a Fidelty Card
 | Actors Involved   | Cashier, Fidelty Card |
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier is already authenticated<br/> 2. Fidelty Card has a valid Bar Code<br/> 3. This scenario can occur at any time during Use Case 1.1|
 |  Post condition   | The Fidelty Card is recognized and the amount to pay is updated|
 |  Nominal Scenario | 1. The Cashier scans the Fidelty Card using the Bar Code Reader<br/> 2. The Application recognizes the Fidelty Card <br/> 3. The Application searches, for every scanned Product so far, if a discount should be applied for those who have a Fidelty Card<br/> 4. The Application updates the amount to pay according to the results of the previous step|
-|  Variants     	| The Bar Code is valid, but the Bar Code Reader cannot read it correctly: the Cashier inputs the Bar Code to the Cashier GUI |
+|  Variants     	| - The Bar Code is valid, but the Bar Code Reader cannot read it correctly: the Cashier inputs the Bar Code to the Cashier GUI |
 
 ### Use case 1.3, UC1 - Handle a Payment via Credit Card
 | Actors Involved   | Cashier, Cash Register, Credit Card System |
@@ -297,15 +295,15 @@ HandleSales --> CreditCardSystem
 |  Precondition     | 1. Cashier is already authenticated<br/> 2. Customer has a valid Credit Card<br/> 3. The list of products to buy is known<br/> 4. The total amount of pay is known|
 |  Post condition   | The Customer has successfully paid <br/> The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
 |  Nominal Scenario | 1. The Credit Card System shows the amount to pay<br/> 2. The Credit Card system receives the Customer's Credit Card and recognizes it<br/> 3. The Credit Card System bypasses the Application and automatically interacts with the Payment Gateway <br/> 4. After that the transaction has terminated successfully, the Credit Card System notifies the Application <br/> 5. The Application asks the Cash Register to print the receipt <br/> 6. The Cash Register prints the receipt <br/> 7. The Application sends the invoice to the Accounting <br/> 8. For each Product in the list: remove it from the Inventory|
-|  Variants     	| The Credit Card System is not able to recognize the Card: retry to recognize it<br/> Transaction does not terminate successfully: the Credit Card System notifies the Application and displays an error message: restart from step 2|
+|  Variants     	| - The Credit Card System is not able to recognize the Card: retry to recognize it<br/> - Transaction does not terminate successfully: the Credit Card System notifies the Application and displays an error message: restart from step 2|
 
-### Scenario 1.4, UC1 - Handle a Payment via Cash
+### Use Case 1.4, UC1 - Handle a Payment via Cash
 | Actors Involved   | Cashier, Cash Register |
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier is already authenticated<br/> 2. The Customer has successfully paid by cash<br/> 3. The list of products to buy is known<br/> 4. The total amount of pay is known|
 |  Post condition   | The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
 |  Nominal Scenario | 1. The Cashier tells the Application that the Customer has successfully paid by cash<br/> 2. The Application opens the Cash Register and asks to print the receipt<br/>3. The Cash Register prints the receipt <br/> 4. The Application sends the invoice to the Accounting <br/> 5. For each Product in the list: remove it from the Inventory|
-
+|  Variants     	| - |
 
 ## Handle inventory
 In these use cases, the actor is the Warehouse Manager or another user with an account with the privileges required to manage the inventory. The actor can inspect the inventory, add new items to it, and update or remove the existing ones.
@@ -316,7 +314,7 @@ In addition, the actor should be able to place new orders.
 | ----------------- | ---------------------------------------- |
 | Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
 | Post condition    | Inventory contains a new product		   |
-| Nominal Scenario  | 1. Warehouse Manager clicks on 'New Product' icon<br/>2. The software presents a form to fill in with product's infos<br/>3. Warehouse Manager fills in the form<br/>4. The software assigns to the product an incremental and unique ID |
+| Nominal Scenario  | 1. Warehouse Manager clicks on 'New Product' icon<br/>2. The software presents a form to fill in with product's information<br/>3. Warehouse Manager fills in the form<br/>4. The software assigns to the product an incremental and unique ID |
 | Variants          | - Before completing the operation, the Warehouse Manager decides to discard it<br/>- The product cannot be added because one or more compulsory fields have not been filled in |
 
 ### Use case x, UCx - Remove product from the inventory
@@ -418,17 +416,17 @@ In addition, the actor should be able to place new orders.
 | Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
 | Post condition 	| A list of orders, filtered and sorted as desired, is shown |
 | Nominal Scenario  | Warehouse Manager writes inside the search bar or uses some other filter:<br/>&ensp;- order total amount<br/>&ensp;- supplier<br/>&ensp;- order's date |
-| Variants          |  -  |
+|  Variants     	| - |
 
 ## Handle catalogue
 
 ### Use case x, UCx - Update price (to sell) of products
 | Actors Involved	| Shop director |
 | -----------------	| ------------- |
-|  Precondition     | Account shop director must exist & authenticated ; the catalogue contains at least one product |
+|  Precondition     | Account shop director must exist & authenticated; the catalogue contains at least one product |
 |  Post condition   | Price of a product updated |
 |  Nominal Scenario | 1. Shop director selects "update a product" <br> 2. Software shows a list of products present in the catalogue <br> 3. Shop director selects a product <br> 4. Shop director modifies the price of the product in the catalogue <br> 5. Shop director confirms|
-|  Variants     	| The catalogue is empty: no product will be shown |
+|  Variants     	| - The catalogue is empty: no product will be shown |
 
 ### Use case x, UCx - Add product
 | Actors Involved	| Shop director |
@@ -436,8 +434,7 @@ In addition, the actor should be able to place new orders.
 |  Precondition     | Account shop director must exist & authenticated |
 |  Post condition   | One or more products are added in the catalogue |
 |  Nominal Scenario |1. Shop director selects "add a product in the catalogue" <br> 2. Software shows a list of products present in the inventory <br> 3. Shop director one or more selects a product and inserts the price to sell for each <br> 4. Shop director confirms <br> 5. The application assigns the inventory ID to the product |
-|  Variants     	| A product can be added only once in a catalogue: each product has an unique ID; an error message is printed.|
-|  Variants     	| Catalogue doesn't exist; the application creates a catalogue and the product is added |
+|  Variants     	| - A product can be added only once in a catalogue: each product has an unique ID; an error message is printed.<br/>- Catalogue doesn't exist; the application creates a catalogue and the product is added |
 
 ### Use case x, UCx - Remove product
 | Actors Involved	| Shop director |
@@ -445,7 +442,7 @@ In addition, the actor should be able to place new orders.
 |  Precondition     | Account shop director must exist & authenticated ; the catalogue contains at least one product |
 |  Post condition   | One or more products are removed from the catalogue |
 |  Nominal Scenario | 1. Shop director selects "remove a product" <br> 2. Software shows a list of products present in the catalogue <br> 3. Shop director selects one or more products <br> 4. Shop director confirms|
-|  Variants     	| The catalogue is empty: no product will be shown|
+|  Variants     	| - The catalogue is empty: no product will be shown|
 
 ## Handle customers
 
@@ -455,34 +452,34 @@ We'll consider the Cashier as the actor.
 ### Use case x, UCx - Add fidelty card
 | Actors Involved   | Cashier		|
 | ----------------- | ------------- |
-|  Precondition     | Account cashier must exist & authenticated|
+|  Precondition     | 1. Account cashier must exist<br/>2. Cashier is authenticated|
 |  Post condition   | A fidelty card is added to the database and is given to the customer |
 |  Nominal Scenario | 1. Cashier selects to add a fidelty card <br> 2. Software shows forms to add the customer data <br> 3. Cashier inserts the customer data <br> 4. Cashier confirms <br> 5. The application assigns a new ID to the card in the database <br> 6. A paper containing a barcode is issued to the customer |
-|  Variants     	| A customer can have at most one fidelty card active: each fidelty card has an unique ID, along with the customer SSN.  |
+|  Variants     	| - A customer can have at most one fidelty card active: each fidelty card has an unique ID, along with the customer SSN |
 
 ### Use case x, UCx - Remove fidelty card
 | Actors Involved   | Cashier		|
 | ----------------- | ------------- |
-|  Precondition     | Account cashier must exist & authenticated ; the fidelty card must exist |
+|  Precondition     |  1. Account cashier must exist<br/>2. Cashier is  authenticated<br/>3. The fidelty card must exist |
 |  Post condition   | One or more fidelty cards are removed from the database |
 |  Nominal Scenario | 1. Cashier selects to remove a fidelty card <br> 2. Software shows a list of fidelty cards <br> 3. Cashier chooses to remove one or more fidelty card <br> 4. Cashier confirms |
-|  Variants     	| There are no fidelty cards: no card will be shown. |
+|  Variants     	| - There are no fidelty cards: no card will be shown |
 
 ### Use case x, UCx - Add card points
 | Actors Involved   | Cashier		|
 | ----------------- | ------------- |
-|  Precondition     | Account cashier must exist & authenticated; the fidelty card must exist |
+|  Precondition     | 1. Account cashier must exist<br/>2. Cashier is  authenticated<br/>3. The fidelty card must exist |
 |  Post condition   | Card points are added to the card|
 |  Nominal Scenario | 1. Cashier selects to add points to a fidelty card <br> 2. Software chooses a list of fidelty cards <br> 3. Cashier selects one <br> 4. Cashier chooses the amount to add <br> 5. Cashier confirms |
-|  Variants     	| There are no fidelty cards: no card will be shown. |
+|  Variants     	| - There are no fidelty cards: no card will be shown |
 
 ### Use case x, UCx - Remove card points
 | Actors Involved   | Cashier		|
 | ----------------- | ------------- |
-|  Precondition     | Account cashier must exist & authenticated; the fidelty card must exist |
+|  Precondition     | 1. Account cashier must exist<br/>2. Cashier is  authenticated<br/>3. The fidelty card must exist |
 |  Post condition   | Points are removed from the card|
 |  Nominal Scenario | 1. Cashier selects to remove points from a fidelty card <br> 2. Software chooses a list of fidelty cards <br> 3. Cashier selects one <br> 4. Cashier chooses the amount to remove <br> 5. Cashier confirms  |
-|  Variants     	| There are no fidelty cards: no card will be shown. |
+|  Variants     	| - There are no fidelty cards: no card will be shown |
 
 ## Handle accounts
 
@@ -492,7 +489,7 @@ We'll consider the Cashier as the actor.
 |  Precondition     | User doesn't have an account yet |
 |  Post condition   | Account user is added to the system |
 |  Nominal Scenario | 1. ITAdministrator selects "create a new account" </br> 2. Software shows forms to insert the user data <br> 3. ITAdministrator inserts the user data</br>4. ITAdministrator confirms |
-|  Variants     	| A user can have only one account: SSNs must be unique. |
+|  Variants     	| - A user can have only one account: SSNs must be unique |
 
 ### Use case x, UCx - Remove account
 | Actors Involved   | ITAdministrator	|
@@ -501,6 +498,7 @@ We'll consider the Cashier as the actor.
 |  Post condition   | Account user is removed from the system|
 |  Nominal Scenario | 1. ITAdministrator selects "delete an account" </br> 2. Software shows a list of accounts <br> 3. ITAdministrator chooses one of them <br> 4. ITAdministrator confirms  |
 |  Variants     	| - |
+
 
 ### Use case x, UCx - Update account
 | Actors Involved   | ITAdministrator	|
@@ -529,7 +527,7 @@ In these use cases, the actor is an user from the shop.
 |  Precondition     | Account user must exist & must not be authenticated |
 |  Post condition   | Account user is authenticated |
 |  Nominal Scenario | 1. User selects "login" <br> 2. Software show forms to insert email and password <br> 3. User inserts his email and password |
-|  Variants     	| Email/password are wrong; an error is printed on the screen |
+|  Variants     	| - Email/password are wrong; an error is printed on the screen |
 
 ### Use case x, UCx - Logout
 | Actors Involved   | User		|
@@ -543,60 +541,81 @@ In these use cases, the actor is an user from the shop.
 
 In these use cases, the actor is an accountant, or a generic user from the shop acting as the accountant, managing the simplified accounting of the shop (hypothesis: annual revenue below 700'000€) taking data from Agenzia delle Entrate informatic system.
 
-### Use case x, UCx - Add invoice
+### Use case x, UCx - Add invoice (passive)
 | Actors Involved   | Accountant  |
 | ----------------- | ----------- |
-|  Precondition     | Accountant account must exist & must be authenticated; Shop's account must exist in Agenzia delle Entrate system |
+|  Precondition     | 1. Accountant account must exist<br/>2. Accountant must be authenticated|
 |  Post condition   | New invoice has been added to the system |
-|  Nominal Scenario | 1. Accountant selects "New invoice"<br/>2. Software asks to user if a new active or passive invoice has to be added<br/>3. Accountant choose the passive option<br/>4. Software gives to user a form to fill out<br/>5. Accountant fills the form with the new invoice data<br/>6. Accountant confirms |
-|  Variants     	| - Accountant choose the new active invoice option |
-
-### Use case x, UCx - Modify uncommitted invoice
-| Actors Involved   | Accountant  |
-| ----------------- | ----------- |
-|  Precondition     | Accountant account must exist & must be authenticated;  Shop's account must exist in Agenzia delle Entrate system;  Uncommitted invoice must exist |
-|  Post condition   | Uncommitted invoice has been updated |
-|  Nominal Scenario | 1. Software shows all the uncommitted invoices (invoices not yet sent to Agenzia delle Entrate system)<br/>2. Accountant chooses one of them and selects the "Modify" option<br/>3. Software provides the selected invoice form<br/>4. Accounant modifies the form with new data<br/>5. Accountant confirms |
-|  Variants     	| - |
+|  Nominal Scenario | 1. Accountant selects "New invoice"<br/>2. Software gives to user a form to fill out<br/>5. Accountant fills the form with the new invoice data<br/>6. Accountant confirms |
+|  Variants     	| - Accountant want to abort the operation without submit the new invoice addition: accountant click on 'Cancel' icon |
 
 ### Use case x, UCx - Add credit note
 | Actors Involved   | Accountant  |
 | ----------------- | ----------- |
-|  Precondition     | Accountant account must exist & must be authenticated; Shop's account must exist in Agenzia delle Entrate system; At least one wrong invoice is present in the system |
+|  Precondition     | 1. Accountant account must exist<br/>2. Accountant must be authenticated<br/>3. At least one incorrectly added invoice is present in the system |
 |  Post condition   | New credit note is added to the system to compensate wrong invoices |
 |  Nominal Scenario | 1. Accountant selects "New credit note"<br/>2. Software gives to user a form to fill out<br/>3. Accountant fills the form with the new credit note data (negative import value)<br/>4. Accountant confirms |
 |  Variants     	| - |
 
+
 ### Use case x, UCx - Show statistics
 | Actors Involved   | Accountant  |
 | ----------------- | ----------- |
-|  Precondition     | Accountant account must exist & must be authenticated; Shop's account must exist in Agenzia delle Entrate system |
-|  Post condition   | Statistics are shown on screen in a table, in a diagram or a graph |
-|  Nominal Scenario | Accountant selects a specific timeframe and shows the shop's revenue in that time period |
-|  Variants     	| - |
+|  Precondition     | 1. Accountant account must exist<br/>2. Accountant must be authenticated |
+|  Post condition   | Statistics are shown on screen by means of a table, a diagram or a graph |
+|  Nominal Scenario | Accountant selects a specific timeframe and shows the shop's revenue and expenses in that time period |
+|  Variants     	| - Accountant decide to make application displaying the best selling products|
 
 ##### Scenario x.1 
 
-| Scenario 			| Show revenue in a timeframe |
+| Scenario 			| Show revenue and expenses in a timeframe |
 | ----------------- | --------------------------- |
 | Precondition     	| Enough data must exist in a specific timeframe |
-| Post condition   	| Revenues in a specific timeframe are shown on the screen |
+| Post condition   	| Revenues and expenses in a specific timeframe are shown on the screen |
 | Step#        		| Description  |
 | 1     			| User selects a specific timeframe |
-| 2     			| System searches the revenues of that timeframe |
-| 3    				| System displays the found revenues |
+| 2     			| System searches both revenues and expenses of that timeframe |
+| 3    				| System displays found revenues and expenses and shows a diagram about those data |
 
 ##### Scenario x.2 
 
 | Scenario 			| Show best selling products  |
 | ----------------- | --------------------------- |
 | Precondition      | At least one product must exist in catalogue |
-| Post condition    | Top 5 best selling products is shown on screen |
+| Post condition    | The Top 5 best selling products list is shown on screen |
 | Step#          	| Description  |
-| 1 			    | System searches the best 5 selling products of all time |
-| 2				    | System displays the found products (could be less than 5) |
+| 1 			    | System searches the best 5 selling products of all time (products which lead to the highest revenues considering the whole shop history) |
+| 2				    | System displays the found products (could be less than 5) and shows a graph about those data |
 
+### Use case x, UCx - Show suppliers deadlines timetable
+| Actors Involved   | Accountant  |
+| ----------------- | ----------- |
+|  Precondition     | 1. Accountant account must exist<br/>2. Accountant must be authenticated<br/>3. The Shop has got at least one supplier<br/>4. Suppliers deadline timetable is generated from invoices data |
+|  Post condition   | A list of deadlines are shown on screen |
+|  Nominal Scenario | 1. Application displays deadlines distinguishing them by suppliers and sorting them by date  |
+|  Variants     	| - All deadlines have been satisfied: an "Up to date with payments" message is displayed<br/>- One or more deadlines are expired: an alert message is generated  |
 
+### Use Case diagram: Support Accounting part
+```plantuml
+@startuml
+'Support accounting part
+usecase (EZShop)
+(EZShop) ..> (Add passive invoice) :<<include>>
+(EZShop) ..> (Add credit note) :<<include>>
+(EZShop) ..> (Show statistics) :<<include>>
+(EZShop) ..> (Show suppliers deadlines timetable) :<<include>>
+
+:Accountant: --> (Add passive invoice)
+:Accountant: --> (Add credit note)
+:Accountant: --> (Show statistics)
+
+(Show statistics) ..> (Show revenue and expenses in a timeframe) :<<include>>
+(Show statistics) ..> (Show best selling products) :<<include>>
+
+:Accountant: --> (Show suppliers deadlines timetable)
+
+@enduml
+```
 
 
 # Glossary
