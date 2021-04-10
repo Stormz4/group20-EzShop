@@ -6,11 +6,11 @@ Authors:
 - Palmucci Leonardo s288126
 - Dario Lanfranco s287524
 
-Date:
+Date: 10/04/2021
 
 | Version | Changes |
 | ------- |---------|
-| 1 | Added stakeholders and context diagram/interfaces. |
+| 4 | Modified use cases diagrams, interfaces for actors, use cases. |
 
 # Contents
 
@@ -97,8 +97,8 @@ Shop -- CashRegister
 | --------------------- | -----------------	| ------------------- |
 | Cashier 				| GUI 				| Screen, Keyboard, Mouse |
 | Product 				| Bar code 			| Bar code reader |
-| Cash register 		| GUI, API 			| Screen, Keyboard, Printer |
-| Credit card system 	| Web services		| Internet, POS |
+| Cash register 		| GUI, API ([Cash Register API](https://developers.mypos.eu/en/doc/in_person_payments/v1_0/356-cash-register-remote-api))			| Screen, Keyboard, Printer |
+| Credit card system 	| Web services ([Payment API](https://developers.mypos.eu/en/doc/in_person_payments/v1_0/243-payment-api))		| Internet, POS |
 | Warehouse director 	| GUI 				| Screen, Keyboard, Mouse |
 | Accountant 			| GUI 				| Screen, Keyboard, Mouse |
 | Shop director 		| GUI 				| Screen, Keyboard, Mouse |
@@ -122,7 +122,7 @@ Shop -- CashRegister
 
 | ID       		| Description  |
 | ------------- | ------------ |
-|  FR_1     	| Handle sells |
+|  FR_1     	| Handle sales |
 |  FR_1.1   	| Register payment |
 |  FR_1.2   	| Update inventory |
 |  FR_1.3   	| Send receipt to accounting |
@@ -227,7 +227,7 @@ FR_4: fidelty are managed totally by the shop. The customer can choose to get su
 ```plantuml
 @startuml
 usecase Authentication
-usecase HandleSells
+usecase HandleSales
 usecase HandleCustomer
 usecase HandleCatalogue
 usecase HandleWarehouse
@@ -242,7 +242,7 @@ User <|-- ShopDirector
 User <|-- ITAdministrator
 
 User --> Authentication
-Cashier --> HandleSells
+Cashier --> HandleSales
 Cashier --> HandleCustomer
 ShopDirector --> HandleCatalogue
 WarehouseDirector --> HandleWarehouse
@@ -251,14 +251,21 @@ Accountant --> SupportAccounting
 
 ITAdministrator --> HandleAccounts
 
-HandleSells --> Product
+HandleSales --> Product
 HandleWarehouse --> Product
 HandleCatalogue --> Product
-HandleSells ..> HandleWarehouse : include
+HandleSales ..> HandleWarehouse : include
+
+Authentication <.. HandleSales : include
+Authentication <.. HandleCustomer : include
+Authentication <.. HandleCatalogue : include
+Authentication <.. HandleWarehouse : include
+Authentication <.. HandleAccounts : include
+Authentication <.. SupportAccounting : include
 
 HandleCustomer --> FideltyCard
-HandleSells --> CashRegister
-HandleSells --> CreditCardSystem
+HandleSales --> CashRegister
+HandleSales --> CreditCardSystem
 @enduml
 ```
 
@@ -266,7 +273,7 @@ HandleSells --> CreditCardSystem
 \<next describe here each use case in the UCD>
 
 
-##  Handle sells
+##  Handle sales
 
 ### Use case 1.1, UC1 - Add Product to the List of Product to buy
 | Actors Involved   | Cashier, Product, Fidelty Card |
@@ -299,181 +306,7 @@ HandleSells --> CreditCardSystem
 |  Post condition   | The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
 |  Nominal Scenario | 1. The Cashier tells the Application that the Customer has successfully paid by cash<br/> 2. The Application opens the Cash Register and asks to print the receipt<br/>3. The Cash Register prints the receipt <br/> 4. The Application sends the invoice to the Accounting <br/> 5. For each Product in the list: remove it from the Inventory|
 
-## Handle catalogue
 
-### Use case x, UCx - Update price (to sell) of products
-| Actors Involved	| Shop director |
-| -----------------	| ------------- |
-|  Precondition     | Account shop director must exist & authenticated ; the catalogue contains at least one product |
-|  Post condition   | Price of a product updated |
-|  Nominal Scenario | Shop director selects a product ; The shop director modifies the price of the product in the catalogue ; The application updates the price |
-|  Variants     	| The catalogue is empty: no product will be shown |
-
-### Use case x, UCx - Add product
-| Actors Involved	| Shop director |
-| -----------------	| ------------- |
-|  Precondition     | Account shop director must exist & authenticated |
-|  Post condition   | One or more products are added in the catalogue |
-|  Nominal Scenario | Shop director selects to add a product ; Shop director selects a product from the inventory ; The application assigns the inventory ID to the product and is added to the catalogue |
-|  Variants     	| A product can be added only once in a catalogue: each product has an unique ID; an error message is printed.|
-|  Variants     	| Catalogue doesn't exist; the application creates a catalogue and the product is added |
-
-### Use case x, UCx - Remove product
-| Actors Involved	| Shop director |
-| -----------------	| ------------- |
-|  Precondition     | Account shop director must exist & authenticated ; the catalogue contains at least one product |
-|  Post condition   | One or more products are removed from the catalogue |
-|  Nominal Scenario | Shop director selects to remove a product ; Shop director chooses to remove one or more products present in the catalogue ; The application removes the product(s) from the catalogue|
-|  Variants     	| The catalogue is empty: no product will be shown|
-
-## Handle customers
-
-Actors could be Cashier or other worker in charge to handle the customers.
-We'll consider the Cashier as the actor.
-
-### Use case x, UCx - Add fidelty card
-| Actors Involved   | Cashier		|
-| ----------------- | ------------- |
-|  Precondition     | Account cashier must exist & authenticated|
-|  Post condition   | A fidelty card is added to the database and is given to the customer |
-|  Nominal Scenario | Cashier selects to add a fidelty card; the cashier is prompted with forms to add the customer data ; The application assigns a new ID to the card in the database ; A paper containing a barcode is issued to the customer |
-|  Variants     	| A customer can have at most one fidelty card active: each fidelty card has an unique ID, along with the customer SSN.  |
-
-### Use case x, UCx - Remove fidelty card
-| Actors Involved   | Cashier		|
-| ----------------- | ------------- |
-|  Precondition     | Account cashier must exist & authenticated ; the fidelty card must exist |
-|  Post condition   | A fidelty card is removed from the database and is retired from the customer |
-|  Nominal Scenario | Cashier selects to remove a fidelty card; the cashier chooses to remove one or more fidelty card  ; The application removes the card(s) from the database |
-|  Variants     	| There are no fidelty cards: no card will be shown. |
-
-### Use case x, UCx - Add card points
-| Actors Involved   | Cashier		|
-| ----------------- | ------------- |
-|  Precondition     | Account cashier must exist & authenticated; the fidelty card must exist |
-|  Post condition   | Points are added to the card|
-|  Nominal Scenario | Cashier selects to add points to a fidelty card; the cashier chooses the amount to add  ; The application updates the card points |
-|  Variants     	| There are no fidelty cards: no card will be shown. |
-
-### Use case x, UCx - Remove card points
-| Actors Involved   | Cashier		|
-| ----------------- | ------------- |
-|  Precondition     | Account cashier must exist & authenticated; the fidelty card must exist |
-|  Post condition   | Points are removed from the card|
-|  Nominal Scenario | Cashier selects to remove points from a fidelty card; the cashier chooses the amount to remove ; The application updates the card points |
-|  Variants     	| There are no fidelty cards: no card will be shown. |
-
-## Handle accounts
-
-In these use cases, the actor is an user from the shop.
-
-### Use case x, UCx - Add account
-| Actors Involved   | ITAdministrator	|
-| ----------------- | --------- |
-|  Precondition     | User doesn't have an account yet |
-|  Post condition   | Account is added to the system |
-|  Nominal Scenario | User creates a new account and inserts his data |
-|  Variants     	| A user can have only one account, this is checked through the email. |
-
-### Use case x, UCx - Remove account
-| Actors Involved   | ITAdministrator	|
-| ----------------- | --------- |
-|  Precondition     | Account user must exist |
-|  Post condition   | Account user is removed from the system|
-|  Nominal Scenario | User deletes his account|
-|  Variants     	| - |
-
-### Use case x, UCx - Update account
-| Actors Involved   | ITAdministrator	|
-| ----------------- | --------- |
-|  Precondition     | Account user must exist |
-|  Post condition   | Account user's info are modified |
-|  Nominal Scenario | User updates his account and modifies the fields he desires|
-|  Variants     	| - |
-
-
-### Use case x, UCx - Modify privileges
-
-## Authentication
-
-### Use case x, UCx - Login
-| Actors Involved   | User		|
-| ----------------- | --------- |
-|  Precondition     | Account user must exist & must not be authenticated |
-|  Post condition   | Account user is authenticated |
-|  Nominal Scenario | User makes the login and inserts his email and password |
-|  Variants     	| Email/password are wrong; an error is printed on the screen |
-
-### Use case x, UCx - Logout
-| Actors Involved   | User		|
-| ----------------- | --------- |
-|  Precondition     | Account user must exist & must be authenticated  |
-|  Post condition   | User is not authenticated anymore |
-|  Nominal Scenario | User makes the logout |
-|  Variants     	| - |
-
-## Support accounting
-
-In these use cases, the actor is an accountant, or a generic user from the shop acting as the accountant, managing the simplified accounting of the shop (hypothesis: annual revenue below 700'000€) taking data from Agenzia delle Entrate informatic system.
-
-### Use case x, UCx - Add invoice
-| Actors Involved   | Accountant  |
-| ----------------- | ----------- |
-|  Precondition     | Accountant account must exist & must be authenticated; Shop's account must exist in Agenzia delle Entrate system |
-|  Post condition   | New invoice has been added to the system |
-|  Nominal Scenario | 1. Accountant selects "New invoice"<br/>2. Software asks to user if a new active or passive invoice has to be added<br/>3. Accountant choose the passive option<br/>4. Software gives to user a form to fill out<br/>5. Accountant fills the form with the new invoice data<br/>6. Accountant confirms |
-|  Variants     	| - Accountant choose the new active invoice option |
-
-### Use case x, UCx - Modify uncommitted invoice
-| Actors Involved   | Accountant  |
-| ----------------- | ----------- |
-|  Precondition     | Accountant account must exist & must be authenticated;  Shop's account must exist in Agenzia delle Entrate system;  Uncommitted invoice must exist |
-|  Post condition   | Uncommitted invoice has been updated |
-|  Nominal Scenario | 1. Software shows all the uncommitted invoices (invoices not yet sent to Agenzia delle Entrate system)<br/>2. Accountant chooses one of them and selects the "Modify" option<br/>3. Software provides the selected invoice form<br/>4. Accounant modifies the form with new data<br/>5. Accountant confirms |
-|  Variants     	| - |
-
-### Use case x, UCx - Add credit note
-| Actors Involved   | Accountant  |
-| ----------------- | ----------- |
-|  Precondition     | Accountant account must exist & must be authenticated; Shop's account must exist in Agenzia delle Entrate system; At least one wrong invoice is present in the system |
-|  Post condition   | New credit note is added to the system to compensate wrong invoices |
-|  Nominal Scenario | 1. Accountant selects "New credit note"<br/>2. Software gives to user a form to fill out<br/>3. Accountant fills the form with the new credit note data (negative import value)<br/>4. Accountant confirms |
-|  Variants     	| - |
-
-### Use case x, UCx - Show statistics
-| Actors Involved   | Accountant  |
-| ----------------- | ----------- |
-|  Precondition     | Accountant account must exist & must be authenticated; Shop's account must exist in Agenzia delle Entrate system |
-|  Post condition   | Statistics are shown on screen in a table, in a diagram or a graph |
-|  Nominal Scenario | Accountant selects a specific timeframe and shows the shop's revenue in that time period |
-|  Variants     	| - |
-
-##### Scenario x.1 
-
-| Scenario 			| Show revenue in a timeframe |
-| ----------------- | --------------------------- |
-| Precondition     	| Enough data must exist in a specific timeframe |
-| Post condition   	| Revenues in a specific timeframe are shown on the screen |
-| Step#        		| Description  |
-| 1     			| User selects a specific timeframe |
-| 2     			| System searches the revenues of that timeframe |
-| 3    				| System displays the found revenues |
-
-##### Scenario x.2 
-
-| Scenario 			| Show best selling products  |
-| ----------------- | --------------------------- |
-| Precondition      | At least one product must exist in catalogue |
-| Post condition    | Top 5 best selling products is shown on screen |
-| Step#          	| Description  |
-| 1 			    | System searches the best 5 selling products of all time |
-| 2				    | System displays the found products (could be less than 5) |
-
-
-### Use case x, UCx
-..
-
-#
 ## Handle inventory
 In these use cases, the actor is the Warehouse Manager or another user with an account with the privileges required to manage the inventory. The actor can inspect the inventory, add new items to it, and update or remove the existing ones.
 In addition, the actor should be able to place new orders.
@@ -586,6 +419,184 @@ In addition, the actor should be able to place new orders.
 | Post condition 	| A list of orders, filtered and sorted as desired, is shown |
 | Nominal Scenario  | Warehouse Manager writes inside the search bar or uses some other filter:<br/>&ensp;- order total amount<br/>&ensp;- supplier<br/>&ensp;- order's date |
 | Variants          |  -  |
+
+## Handle catalogue
+
+### Use case x, UCx - Update price (to sell) of products
+| Actors Involved	| Shop director |
+| -----------------	| ------------- |
+|  Precondition     | Account shop director must exist & authenticated ; the catalogue contains at least one product |
+|  Post condition   | Price of a product updated |
+|  Nominal Scenario | 1. Shop director selects "update a product" <br> 2. Software shows a list of products present in the catalogue <br> 3. Shop director selects a product <br> 4. Shop director modifies the price of the product in the catalogue <br> 5. Shop director confirms|
+|  Variants     	| The catalogue is empty: no product will be shown |
+
+### Use case x, UCx - Add product
+| Actors Involved	| Shop director |
+| -----------------	| ------------- |
+|  Precondition     | Account shop director must exist & authenticated |
+|  Post condition   | One or more products are added in the catalogue |
+|  Nominal Scenario |1. Shop director selects "add a product in the catalogue" <br> 2. Software shows a list of products present in the inventory <br> 3. Shop director one or more selects a product and inserts the price to sell for each <br> 4. Shop director confirms <br> 5. The application assigns the inventory ID to the product |
+|  Variants     	| A product can be added only once in a catalogue: each product has an unique ID; an error message is printed.|
+|  Variants     	| Catalogue doesn't exist; the application creates a catalogue and the product is added |
+
+### Use case x, UCx - Remove product
+| Actors Involved	| Shop director |
+| -----------------	| ------------- |
+|  Precondition     | Account shop director must exist & authenticated ; the catalogue contains at least one product |
+|  Post condition   | One or more products are removed from the catalogue |
+|  Nominal Scenario | 1. Shop director selects "remove a product" <br> 2. Software shows a list of products present in the catalogue <br> 3. Shop director selects one or more products <br> 4. Shop director confirms|
+|  Variants     	| The catalogue is empty: no product will be shown|
+
+## Handle customers
+
+Actors could be Cashier or other worker in charge to handle the customers.
+We'll consider the Cashier as the actor.
+
+### Use case x, UCx - Add fidelty card
+| Actors Involved   | Cashier		|
+| ----------------- | ------------- |
+|  Precondition     | Account cashier must exist & authenticated|
+|  Post condition   | A fidelty card is added to the database and is given to the customer |
+|  Nominal Scenario | 1. Cashier selects to add a fidelty card <br> 2. Software shows forms to add the customer data <br> 3. Cashier inserts the customer data <br> 4. Cashier confirms <br> 5. The application assigns a new ID to the card in the database <br> 6. A paper containing a barcode is issued to the customer |
+|  Variants     	| A customer can have at most one fidelty card active: each fidelty card has an unique ID, along with the customer SSN.  |
+
+### Use case x, UCx - Remove fidelty card
+| Actors Involved   | Cashier		|
+| ----------------- | ------------- |
+|  Precondition     | Account cashier must exist & authenticated ; the fidelty card must exist |
+|  Post condition   | One or more fidelty cards are removed from the database |
+|  Nominal Scenario | 1. Cashier selects to remove a fidelty card <br> 2. Software shows a list of fidelty cards <br> 3. Cashier chooses to remove one or more fidelty card <br> 4. Cashier confirms |
+|  Variants     	| There are no fidelty cards: no card will be shown. |
+
+### Use case x, UCx - Add card points
+| Actors Involved   | Cashier		|
+| ----------------- | ------------- |
+|  Precondition     | Account cashier must exist & authenticated; the fidelty card must exist |
+|  Post condition   | Card points are added to the card|
+|  Nominal Scenario | 1. Cashier selects to add points to a fidelty card <br> 2. Software chooses a list of fidelty cards <br> 3. Cashier selects one <br> 4. Cashier chooses the amount to add <br> 5. Cashier confirms |
+|  Variants     	| There are no fidelty cards: no card will be shown. |
+
+### Use case x, UCx - Remove card points
+| Actors Involved   | Cashier		|
+| ----------------- | ------------- |
+|  Precondition     | Account cashier must exist & authenticated; the fidelty card must exist |
+|  Post condition   | Points are removed from the card|
+|  Nominal Scenario | 1. Cashier selects to remove points from a fidelty card <br> 2. Software chooses a list of fidelty cards <br> 3. Cashier selects one <br> 4. Cashier chooses the amount to remove <br> 5. Cashier confirms  |
+|  Variants     	| There are no fidelty cards: no card will be shown. |
+
+## Handle accounts
+
+### Use case x, UCx - Add account
+| Actors Involved   | ITAdministrator	|
+| ----------------- | --------- |
+|  Precondition     | User doesn't have an account yet |
+|  Post condition   | Account user is added to the system |
+|  Nominal Scenario | 1. ITAdministrator selects "create a new account" </br> 2. Software shows forms to insert the user data <br> 3. ITAdministrator inserts the user data</br>4. ITAdministrator confirms |
+|  Variants     	| A user can have only one account: SSNs must be unique. |
+
+### Use case x, UCx - Remove account
+| Actors Involved   | ITAdministrator	|
+| ----------------- | --------- |
+|  Precondition     | Account user must exist |
+|  Post condition   | Account user is removed from the system|
+|  Nominal Scenario | 1. ITAdministrator selects "delete an account" </br> 2. Software shows a list of accounts <br> 3. ITAdministrator chooses one of them <br> 4. ITAdministrator confirms  |
+|  Variants     	| - |
+
+### Use case x, UCx - Update account
+| Actors Involved   | ITAdministrator	|
+| ----------------- | --------- |
+|  Precondition     | Account user must exist |
+|  Post condition   | Account user's info are modified |
+|  Nominal Scenario | 1. ITAdministrator selects "update an account" </br> 2. Software shows a list of accounts <br> 3. ITAdministrator chooses one of them <br> 4. Software shows forms to insert the user data <br> 5. ITAdministrator inserts the user data</br>6. ITAdministrator confirms|
+|  Variants     	| - |
+
+### Use case x, UCx - Modify privileges
+
+| Actors Involved   | ITAdministrator	|
+| ----------------- | --------- |
+|  Precondition     | Account user must exist |
+|  Post condition   | Account user's privileges are modified |
+|  Nominal Scenario | 1. ITAdministrator selects "update privileges of an account" </br> 2. Software shows a list of accounts <br> 3. ITAdministrator chooses one of them <br> 4. Software shows the current privileges and forms to insert new ones <br> 5. ITAdministrator chooses the privileges </br>6. ITAdministrator confirms|
+|  Variants     	| - |
+
+## Authentication
+
+In these use cases, the actor is an user from the shop.
+
+### Use case x, UCx - Login
+| Actors Involved   | User		|
+| ----------------- | --------- |
+|  Precondition     | Account user must exist & must not be authenticated |
+|  Post condition   | Account user is authenticated |
+|  Nominal Scenario | 1. User selects "login" <br> 2. Software show forms to insert email and password <br> 3. User inserts his email and password |
+|  Variants     	| Email/password are wrong; an error is printed on the screen |
+
+### Use case x, UCx - Logout
+| Actors Involved   | User		|
+| ----------------- | --------- |
+|  Precondition     | Account user must exist & must be authenticated  |
+|  Post condition   | User is not authenticated anymore |
+|  Nominal Scenario | 1. User selects logout |
+|  Variants     	| - |
+
+## Support accounting
+
+In these use cases, the actor is an accountant, or a generic user from the shop acting as the accountant, managing the simplified accounting of the shop (hypothesis: annual revenue below 700'000€) taking data from Agenzia delle Entrate informatic system.
+
+### Use case x, UCx - Add invoice
+| Actors Involved   | Accountant  |
+| ----------------- | ----------- |
+|  Precondition     | Accountant account must exist & must be authenticated; Shop's account must exist in Agenzia delle Entrate system |
+|  Post condition   | New invoice has been added to the system |
+|  Nominal Scenario | 1. Accountant selects "New invoice"<br/>2. Software asks to user if a new active or passive invoice has to be added<br/>3. Accountant choose the passive option<br/>4. Software gives to user a form to fill out<br/>5. Accountant fills the form with the new invoice data<br/>6. Accountant confirms |
+|  Variants     	| - Accountant choose the new active invoice option |
+
+### Use case x, UCx - Modify uncommitted invoice
+| Actors Involved   | Accountant  |
+| ----------------- | ----------- |
+|  Precondition     | Accountant account must exist & must be authenticated;  Shop's account must exist in Agenzia delle Entrate system;  Uncommitted invoice must exist |
+|  Post condition   | Uncommitted invoice has been updated |
+|  Nominal Scenario | 1. Software shows all the uncommitted invoices (invoices not yet sent to Agenzia delle Entrate system)<br/>2. Accountant chooses one of them and selects the "Modify" option<br/>3. Software provides the selected invoice form<br/>4. Accounant modifies the form with new data<br/>5. Accountant confirms |
+|  Variants     	| - |
+
+### Use case x, UCx - Add credit note
+| Actors Involved   | Accountant  |
+| ----------------- | ----------- |
+|  Precondition     | Accountant account must exist & must be authenticated; Shop's account must exist in Agenzia delle Entrate system; At least one wrong invoice is present in the system |
+|  Post condition   | New credit note is added to the system to compensate wrong invoices |
+|  Nominal Scenario | 1. Accountant selects "New credit note"<br/>2. Software gives to user a form to fill out<br/>3. Accountant fills the form with the new credit note data (negative import value)<br/>4. Accountant confirms |
+|  Variants     	| - |
+
+### Use case x, UCx - Show statistics
+| Actors Involved   | Accountant  |
+| ----------------- | ----------- |
+|  Precondition     | Accountant account must exist & must be authenticated; Shop's account must exist in Agenzia delle Entrate system |
+|  Post condition   | Statistics are shown on screen in a table, in a diagram or a graph |
+|  Nominal Scenario | Accountant selects a specific timeframe and shows the shop's revenue in that time period |
+|  Variants     	| - |
+
+##### Scenario x.1 
+
+| Scenario 			| Show revenue in a timeframe |
+| ----------------- | --------------------------- |
+| Precondition     	| Enough data must exist in a specific timeframe |
+| Post condition   	| Revenues in a specific timeframe are shown on the screen |
+| Step#        		| Description  |
+| 1     			| User selects a specific timeframe |
+| 2     			| System searches the revenues of that timeframe |
+| 3    				| System displays the found revenues |
+
+##### Scenario x.2 
+
+| Scenario 			| Show best selling products  |
+| ----------------- | --------------------------- |
+| Precondition      | At least one product must exist in catalogue |
+| Post condition    | Top 5 best selling products is shown on screen |
+| Step#          	| Description  |
+| 1 			    | System searches the best 5 selling products of all time |
+| 2				    | System displays the found products (could be less than 5) |
+
+
 
 
 # Glossary
