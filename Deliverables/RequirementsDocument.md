@@ -52,8 +52,8 @@ EZShop is a software application to:
 | Cashier (profile 1) | Cashier who uses the software. Manages sales. |
 | Customer (profile 2) | Is affected indirectly through the cashier. |
 | Warehouse manager (profile 3) | Manages inventory and orders through the software. |
-| Accountant (profile 4) | Handles the accounting through the software. |
-| Customer manager (profile 5) | Manages the customers. In most shops it could be the Cashier. |
+| Accountant (profile 4) | Manages the accounting through the software. |
+| Customers manager (profile 5) | Manages the customers. In most shops it could be the Cashier. |
 | Shop director (profile 6) | Director of the shop. Manages the catalogue of products. |
 | IT administrator (profile 7) | Who manages the software (Security/Accounts, DB). |
 | Maintainers | Who will repair the software eventually. It could be part of the staff or external. |
@@ -122,12 +122,12 @@ Shop -- CashRegister
 
 | ID       		| Description  |
 | ------------- | ------------ |
-|  FR_1     	| Handle sales |
+|  FR_1     	| Sales management |
 |  FR_1.1   	| Register payment |
 |  FR_1.2   	| Update inventory |
 |  FR_1.3   	| Send receipt to accounting |
-|  FR_1.4   	| Handle discounts |
-|  FR_1.5   	| Handle fidelity card |
+|  FR_1.4   	| Discounts management |
+|  FR_1.5   	| Fidelity cards management |
 |  FR_1.6   	| Scan product |
 |  FR_1.7   	| Add the product to a list of buyings |
 |  FR_1.8   	| Read credit card |
@@ -152,17 +152,17 @@ Shop -- CashRegister
 |  FR_2.2.4 	| Show orders |
 |  FR_2.2.5 	| Filter orders |
 ||
-|  FR_3     	| Handle catalogue |
+|  FR_3     	| Catalogue management |
 |  FR_3.1   	| Update products selling price |
 |  FR_3.2   	| Add product |
 |  FR_3.3   	| Remove product  |
 |  FR_3.4   	| Show products (catalogue) |
 |  FR_3.5   	| Filter products (catalogue) |
 ||
-|  FR_4     	| Handle customers |
+|  FR_4     	| Customers management |
 |  FR_4.1   	| Add fidelity card |
 |  FR_4.2   	| Remove fidelity card |
-|  FR_4.3   	| Handle card points |
+|  FR_4.3   	| Manage card points |
 |  FR_4.3.1 	| Add card points |
 |  FR_4.3.2 	| Remove card points |
 |  FR_4.4   	| Show all fidelity cards & cards points |
@@ -183,7 +183,7 @@ Shop -- CashRegister
 |  FR_5.5 		| Show suppliers deadlines timetable |
 |  FR_5.6   	| Show financial statement | //used to see for what shop's revenues could be used: Are they enough to pay suppliers/debts and also to do new investments?
 ||
-|  FR_6     	| Handle accounts |
+|  FR_6     	| Accounts management |
 |  FR_6.1   	| Add account |
 |  FR_6.2   	| Remove account|
 |  FR_6.3   	| Update account|
@@ -215,7 +215,7 @@ Fidelity cards are managed totally by the shop. The customer can choose to get s
 | NFR_1     | Usability   	| User should learn how to use the software within 30 minutes of training 								| All FR 	|
 | NFR_2     | Efficiency	| All functions should complete in less than 0.5s 														| All FR 	|
 | NFR_3     | Localisation 	| Decimal numbers use . (dot) as decimal separator  													| All FR 	|
-| NFR_4 	| Privacy 		| The data of one customer should not be accessible to users other than users who handle fidelity cards. | All FR 	|
+| NFR_4 	| Privacy 		| Customers data should not be accessible to users other than the ones who manage fidelity cards.       | All FR 	|
 | NFR_5 	| Availability 	| At least 95% 																							| All FR 	|
 | NFR_6     | Security      | User should have access only to functions and resources which they require 							| All FR 	|
 | Domain 	| // 			| Currency is Euro  																					| All FR 	|
@@ -228,12 +228,12 @@ Fidelity cards are managed totally by the shop. The customer can choose to get s
 ```plantuml
 @startuml
 usecase Authentication
-usecase HandleSales
-usecase HandleCustomer
-usecase HandleCatalogue
+usecase SalesManagement
+usecase CustomersManagement
+usecase CatalogueManagement
 usecase WarehouseManagement
 usecase SupportAccounting
-usecase HandleAccounts
+usecase AccountsManagement
 
 
 User <|-- Cashier
@@ -243,40 +243,40 @@ User <|-- ShopDirector
 User <|-- ITAdministrator
 
 User --> Authentication
-Cashier --> HandleSales
-Cashier --> HandleCustomer
-ShopDirector --> HandleCatalogue
+Cashier --> SalesManagement
+Cashier --> CustomersManagement
+ShopDirector --> CatalogueManagement
 WarehouseDirector --> WarehouseManagement
 Accountant --> SupportAccounting
 
 
-ITAdministrator --> HandleAccounts
+ITAdministrator --> AccountsManagement
 
-HandleSales --> Product
+SalesManagement --> Product
 WarehouseManagement --> Product
-HandleCatalogue --> Product
-HandleSales ..> WarehouseManagement : include
+CatalogueManagement --> Product
+SalesManagement ..> WarehouseManagement : include
 
-Authentication <.. HandleSales : include
-Authentication <.. HandleCustomer : include
-Authentication <.. HandleCatalogue : include
+Authentication <.. SalesManagement : include
+Authentication <.. CustomersManagement : include
+Authentication <.. CatalogueManagement : include
 Authentication <.. WarehouseManagement : include
-Authentication <.. HandleAccounts : include
+Authentication <.. AccountsManagement : include
 Authentication <.. SupportAccounting : include
 
-HandleCustomer --> FidelityCard
-HandleSales --> CashRegister
-HandleSales --> CreditCardSystem
+CustomersManagement --> FidelityCard
+SalesManagement --> CashRegister
+SalesManagement --> CreditCardSystem
 @enduml
 ```
-### Use Case diagram: Handle sales
+### Use Case diagram: Sales management
 
 ### Use Case diagram: Warehouse management
 ```plantuml
 @startuml
 :WarehouseManager:     --> (Warehouse management)
-(Warehouse management) ..> (Inventory management)
-(Warehouse management) ..> (Order management)
+(Warehouse management) ..> (Inventory management) : include
+(Warehouse management) ..> (Order management) : include
 (Inventory management) ..> (Add product) : include
 (Inventory management) ..> (Remove product) : include
 (Inventory management) ..> (Update product) : include
@@ -303,29 +303,29 @@ HandleSales --> CreditCardSystem
 @enduml
 ```
 
-### Use Case diagram: Handle catalogue
+### Use Case diagram: Catalogue management
 
 ```plantuml
 @startuml
 
-:ShopDirector: --> (Handle catalogue)
-(Handle catalogue) ..> (Update price to sell of products) : include
-(Handle catalogue) ..> (Add product) : include
-(Handle catalogue) ..> (Remove product) : include
+:ShopDirector: --> (Catalogue management)
+(Catalogue management) ..> (Update price to sell of products) : include
+(Catalogue management) ..> (Add product) : include
+(Catalogue management) ..> (Remove product) : include
 
 @enduml
 ```
 
-### Use Case diagram: Handle customers
+### Use Case diagram: Customers management
 
 ```plantuml
 @startuml
 
-:ShopDirector: --> (Handle customers)
-(Handle customers) ..> (Add fidelity card) : include
-(Handle customers) ..> (Remove fidelity card) : include
-(Handle customers) ..> (Add card points) : include
-(Handle customers) ..> (Remove card points) : include
+:ShopDirector: --> (Customers management)
+(Customers management) ..> (Add fidelity card) : include
+(Customers management) ..> (Remove fidelity card) : include
+(Customers management) ..> (Add card points) : include
+(Customers management) ..> (Remove card points) : include
 
 @enduml
 ```
@@ -348,15 +348,15 @@ HandleSales --> CreditCardSystem
 @enduml
 ```
 
-### Use Case diagram: Handle accounts
+### Use Case diagram: Accounts management
 
 ```plantuml
 @startuml
-:ITAdministrator: --> (Handle accounts)
-(Handle accounts) ..> (Add account) : include
-(Handle accounts) ..> (Remove account) : include
-(Handle accounts) ..> (Update account) : include
-(Handle accounts) ..> (Modify privileges) : include
+:ITAdministrator: --> (Accounts management)
+(Accounts management) ..> (Add account) : include
+(Accounts management) ..> (Remove account) : include
+(Accounts management) ..> (Update account) : include
+(Accounts management) ..> (Modify privileges) : include
 
 @enduml
 ```
@@ -375,7 +375,7 @@ HandleSales --> CreditCardSystem
 \<next describe here each use case in the UCD>
 
 
-##  Handle sales
+##  Sales management
 
 ### Use case 1.1, UC1 - Add Product to the List of Product to buy
 | Actors Involved   | Cashier, Product, Fidelity Card |
@@ -397,16 +397,16 @@ HandleSales --> CreditCardSystem
 | Actors Involved   | Cashier, Cash Register, Credit Card System |
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier is already authenticated<br/> 2. Customer has a valid Credit Card<br/> 3. The list of products to buy is known<br/> 4. The total amount of pay is known|
-|  Post condition   | The Customer has successfully paid <br/> The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
-|  Nominal Scenario | 1. The Credit Card System shows the amount to pay<br/> 2. The Credit Card system receives the Customer's Credit Card and recognizes it<br/> 3. The Credit Card System bypasses the Application and automatically interacts with the Payment Gateway <br/> 4. After that the transaction has terminated successfully, the Credit Card System notifies the Application <br/> 5. The Application asks the Cash Register to print the receipt <br/> 6. The Cash Register prints the receipt <br/> 7. The Application sends the invoice to the Accounting <br/> 8. For each Product in the list: remove it from the Inventory|
+|  Post condition   | The customer has successfully paid <br/> The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
+|  Nominal Scenario | 1. The Credit Card System shows the amount to pay<br/> 2. The Credit Card system receives the customer's Credit Card and recognizes it<br/> 3. The Credit Card System bypasses the Application and automatically interacts with the Payment Gateway <br/> 4. After that the transaction has terminated successfully, the Credit Card System notifies the Application <br/> 5. The Application asks the Cash Register to print the receipt <br/> 6. The Cash Register prints the receipt <br/> 7. The Application sends the invoice to the Accounting <br/> 8. For each Product in the list: remove it from the Inventory|
 |  Variants     	| - The Credit Card System is not able to recognize the Card: retry to recognize it<br/> - Transaction does not terminate successfully: the Credit Card System notifies the Application and displays an error message: restart from step 2|
 
 ### Use Case 1.4, UC1 - Handle a Payment via Cash
 | Actors Involved   | Cashier, Cash Register |
 | ----------------- | ------------- |
-|  Precondition     | 1. Cashier is already authenticated<br/> 2. The Customer has successfully paid by cash<br/> 3. The list of products to buy is known<br/> 4. The total amount of pay is known|
+|  Precondition     | 1. Cashier is already authenticated<br/> 2. The customer has successfully paid by cash<br/> 3. The list of products to buy is known<br/> 4. The total amount of pay is known|
 |  Post condition   | The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
-|  Nominal Scenario | 1. The Cashier tells the Application that the Customer has successfully paid by cash<br/> 2. The Application opens the Cash Register and asks to print the receipt<br/>3. The Cash Register prints the receipt <br/> 4. The Application sends the invoice to the Accounting <br/> 5. For each Product in the list: remove it from the Inventory|
+|  Nominal Scenario | 1. The Cashier tells the Application that the customer has successfully paid by cash<br/> 2. The Application opens the Cash Register and asks to print the receipt<br/>3. The Cash Register prints the receipt <br/> 4. The Application sends the invoice to the Accounting <br/> 5. For each Product in the list: remove it from the Inventory|
 |  Variants     	| - |
 
 ## Inventory management
@@ -514,7 +514,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Nominal Scenario  | Warehouse Manager writes inside the search bar or uses some other filter:<br/>&ensp;- order total amount<br/>&ensp;- supplier<br/>&ensp;- order's date |
 |  Variants     	| - |
 
-## Handle catalogue
+## Catalogue management
 
 ### Use case x, UCx - Update price (to sell) of products
 | Actors Involved	| Shop director |
@@ -540,9 +540,9 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 |  Nominal Scenario | 1. Shop director selects "remove a product" <br> 2. Software shows a list of products present in the catalogue <br> 3. Shop director selects one or more products <br> 4. Shop director confirms|
 |  Variants     	| - The catalogue is empty: no product will be shown|
 
-## Handle customers
+## Customers management
 
-Actors could be Cashier or other worker in charge to handle the customers.
+Actors could be Cashier or other worker in charge to manage the customers.
 We'll consider the Cashier as the actor.
 
 ### Use case x, UCx - Add fidelity card
@@ -635,7 +635,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 |  Nominal Scenario | 1. Application displays deadlines distinguishing them by suppliers and sorting them by date  |
 |  Variants     	| - All deadlines have been satisfied: an "Up to date with payments" message is displayed<br/>- One or more deadlines are expired: an alert message is generated  |
 
-## Handle accounts
+## Accounts management
 
 ### Use case x, UCx - Add account
 | Actors Involved   | ITAdministrator	|
