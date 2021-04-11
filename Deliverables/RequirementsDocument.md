@@ -170,7 +170,7 @@ Shop -- CashRegister
 |  FR_4.3.1 	| Add card points |
 |  FR_4.3.2 	| Remove card points |
 |  FR_4.4   	| Show all fidelity cards & cards points |
-|  FR_4.5   	| Search a customer |
+|  FR_4.5   	| Search a fidelity card|
 ||
 |  FR_5     	| Support accounting |
 |  FR_5.1   	| Update finance |
@@ -326,6 +326,8 @@ SalesManagement --> CreditCardSystem
 (Catalogue management) ..> (Update price to sell of products) : include
 (Catalogue management) ..> (Add product) : include
 (Catalogue management) ..> (Remove product) : include
+(Catalogue management) ..> (Show products in the catalogue) : include
+(Catalogue management) ..> (Filter products in the catalogue) : include
 
 @enduml
 ```
@@ -340,6 +342,8 @@ SalesManagement --> CreditCardSystem
 (Customers management) ..> (Remove fidelity card) : include
 (Customers management) ..> (Add card points) : include
 (Customers management) ..> (Remove card points) : include
+(Customers management) ..> (Show all fidelity cards & cards points) : include
+(Customers management) ..> (Search a customer) : include
 
 @enduml
 ```
@@ -535,7 +539,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 ### Use case x, UCx - Update price (to sell) of products
 | Actors Involved	| Shop director |
 | -----------------	| ------------- |
-|  Precondition     | Account shop director must exist & authenticated; the catalogue contains at least one product |
+|  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. The catalogue contains at least one product |
 |  Post condition   | Price of a product updated |
 |  Nominal Scenario | 1. Shop director selects "update a product" <br> 2. Software shows a list of products present in the catalogue <br> 3. Shop director selects a product <br> 4. Shop director modifies the price of the product in the catalogue <br> 5. Shop director confirms|
 |  Variants     	| - The catalogue is empty: no product will be shown |
@@ -543,7 +547,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 ### Use case x, UCx - Add product
 | Actors Involved	| Shop director |
 | -----------------	| ------------- |
-|  Precondition     | Account shop director must exist & authenticated |
+|  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated |
 |  Post condition   | One or more products are added in the catalogue |
 |  Nominal Scenario |1. Shop director selects "add a product in the catalogue" <br> 2. Software shows a list of products present in the inventory <br> 3. Shop director one or more selects a product and inserts the price to sell for each <br> 4. Shop director confirms <br> 5. The application assigns the inventory ID to the product |
 |  Variants     	| - A product can be added only once in a catalogue: each product has an unique ID; an error message is printed.<br/>- Catalogue doesn't exist; the application creates a catalogue and the product is added |
@@ -551,10 +555,26 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 ### Use case x, UCx - Remove product
 | Actors Involved	| Shop director |
 | -----------------	| ------------- |
-|  Precondition     | Account shop director must exist & authenticated ; the catalogue contains at least one product |
+|  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. The catalogue contains at least one product |
 |  Post condition   | One or more products are removed from the catalogue |
 |  Nominal Scenario | 1. Shop director selects "remove a product" <br> 2. Software shows a list of products present in the catalogue <br> 3. Shop director selects one or more products <br> 4. Shop director confirms|
 |  Variants     	| - The catalogue is empty: no product will be shown|
+
+### Use case x, UCx - Show products (catalogue)
+| Actors Involved 	| 			Shop director           |
+| ----------------- | ---------------------------------------- |
+| Precondition   	| 1. Shop director has an account<br/>2. Shop director is authenticated<br/>3. Inventory exists |
+| Post condition 	| Software shows a list of products present in the catalogue, sorted by ID |
+| Nominal Scenario  | 1. Shop director selects "show products in the catalogue"|
+| Variants          |  - A different sorting criteria is selected<br/>-  Products are filtered writing something in the search bar or using filters (e.g. date, supplier, ...) |
+
+### Use case x, UCx - Filter products (catalogue)
+| Actors Involved 	| 			Shop director               |
+| ----------------- | ---------------------------------------- |
+| Precondition   	| 1. Shop director has an account<br/>2. Shop director is authenticated<br/>3. Inventory exists |
+| Post condition 	| A list of products, filtered and sorted as desired, is shown |
+| Nominal Scenario  | Warehouse Manager writes inside the search bar or uses some other filter:<br/>&ensp;- type of product<br/>&ensp;- selling price|
+| Variants          |  -  |
 
 ## Customers management
 
@@ -592,6 +612,22 @@ We'll consider the Cashier as the actor.
 |  Post condition   | Points are removed from the card|
 |  Nominal Scenario | 1. Cashier selects to remove points from a fidelity card <br> 2. Software chooses a list of fidelity cards <br> 3. Cashier selects one <br> 4. Cashier chooses the amount to remove <br> 5. Cashier confirms  |
 |  Variants     	| - There are no fidelity cards: no card will be shown |
+
+### Use case x, UCx - Show all fidelity cards & cards points
+| Actors Involved 	| 			Cashier       |
+| ----------------- | ---------------------------------------- |
+| Precondition   	| 1. Cashier has an account<br/>2. Cashier is authenticated<br/>3. At least one fidelity card exists|
+| Post condition 	| Software shows a list of fidelity cards, sorted by ID |
+| Nominal Scenario  | 1. Cashier selects "show all fidelity cards & cards points"|
+| Variants          | Fidelity cards are filtered writing something in the search bar  |
+
+### Use case x, UCx - Search a fidelity card
+| Actors Involved 	| 			Shop director           |
+| ----------------- | ---------------------------------------- |
+| Precondition   	|  1. Cashier has an account<br/>2. Cashier is authenticated<br/>3. At least one fidelity card exists |
+| Post condition 	| Software shows the fidelity card related to a customer |
+| Nominal Scenario  | 1. Cashier selects "show all fidelity cards & cards points" <br> 2. Cashier writes data regarding a fidelity card in the search bar (ID, SSN, name, surname)|
+| Variants          | |
 
 ## Support accounting
 
