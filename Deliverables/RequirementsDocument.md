@@ -343,7 +343,7 @@ SalesManagement --> CreditCardSystem
 (Customers management) ..> (Add card points) : include
 (Customers management) ..> (Remove card points) : include
 (Customers management) ..> (Show all fidelity cards & cards points) : include
-(Customers management) ..> (Search a customer) : include
+(Customers management) ..> (Search a fidelity card) : include
 
 @enduml
 ```
