@@ -215,6 +215,7 @@ FR_4: fidelty are managed totally by the shop. The customer can choose to get su
 | NFR_4 	| Privacy 		| The data of one customer should not be accessible to users other than users who handle fidelty cards. | All FR 	|
 | NFR_5 	| Availability 	| At least 95% 																							| All FR 	|
 | NFR_6     | Security      | User should have access only to functions and resources which they require 							| All FR |
+| NFR_7		| Privacy		| Customer credit cards must not be stored in the system													| FR_1 |
 | Domain 	| // 			| Currency is Euro  																						| All FR 	|
 | Aggiungi NFR:|non salvare dati carta di credito |!!!!|!!!!|
 
@@ -344,6 +345,8 @@ HandleSales --> CreditCardSystem
 
 
 ##  Handle sales
+
+[Vanno modificati i functional requirement!]
 
 ### Use case 1.1, UC1 - Add Product to the List of Product to buy
 | Actors Involved   | Cashier, Product, Fidelty Card |
