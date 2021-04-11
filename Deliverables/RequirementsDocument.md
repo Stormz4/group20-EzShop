@@ -123,19 +123,23 @@ Shop -- CashRegister
 | ID       		| Description  |
 | ------------- | ------------ |
 |  FR_1     	| Sales management |
-|  FR_1.1   	| Register payment |
-|  FR_1.2   	| Update inventory |
-|  FR_1.3   	| Send receipt to accounting |
-|  FR_1.4   	| Discounts management |
-|  FR_1.5   	| Fidelity cards management |
-|  FR_1.6   	| Scan product |
-|  FR_1.7   	| Add the product to a list of buyings |
-|  FR_1.8   	| Read credit card |
-|  FR_1.9   	| Handle cash register |
-|  FR_1.9.1 	| Print receipt |
-|  FR_1.9.2 	| Open the cash register  |
-|  FR_1.9.3 	| Send data to cash register  |
-|  FR_1.10      | Register an invoice (active) | 
+|  FR_1.1   	| Provide Shopping Cart and Total Amount |
+|  FR_1.1.1	| Scan product |
+|  FR_1.1.2	| Search Product Price in the Catalogue |
+|  FR_1.1.3	| Apply Discounts (for any Customer) |
+|  FR_1.1.4	| Compute Total Amount |
+|  FR_1.2	| Authentication of Fidelity Card |
+|  FR_1.2.1	| Scan Fidelity Card |
+|  FR_1.2.2	| Validate Fidelity Card |
+|  FR_1.2.3	| Apply Discounts (for Customers with a Fidelity Card) |
+|  FR_1.3	| Handle Payment (Cash or via Credit Card) |
+|  FR_1.3.1	| Scan Credit Card (via Credit Card System) |
+|  FR_1.3.2	| Send money through Payment Gateway |
+|  FR_1.3.3	| Notify if Payment was successful or not |
+|  FR_1.3.4	| Open the Cash Register (after successful Payment)|
+|  FR_1.3.5	| Print the Receipt (after successful Payment)|
+|  FR_1.3.6	| Send Active Invoice to Accounting (after successful Payment)|
+|  FR_1.3.7	| Remove Shopping Cart elements from the Inventory (after successful Payment)|
 ||
 |  FR_2     	| Warehouse management |
 |  FR_2.1   	| Inventory management |
@@ -270,6 +274,16 @@ SalesManagement --> CreditCardSystem
 @enduml
 ```
 ### Use Case diagram: Sales management
+'''plantuml
+@startuml
+:Cashier:     --> (Sales Management)
+(Sales Management) ..> (Provide Shopping Cart and Total Amount) : include
+(Provide Shopping Cart and Total Amount) ..> (Authenticate Fidelity Card) : include
+(Sales Management) ..> (Handle Payment) : include
+(Handle Payment) <.. (Handle Payment via Cash) : extends
+(Handle Payment) <.. (Handle Payment via Credit Card) : extends
+@enduml
+'''
 
 ### Use Case diagram: Warehouse management
 ```plantuml
@@ -379,8 +393,8 @@ SalesManagement --> CreditCardSystem
 
 [Vanno modificati i functional requirement!]
 
-### Use case 1.1, UC1 - Add Product to the List of Product to buy
-| Actors Involved   | Cashier, Product, Fidelity Card |
+### Use case 1.1, UC1 - Provide Shopping Cart and Total Amount
+| Actors Involved   | Cashier |
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier is already authenticated<br/> 2. Product has a valid Bar Code<br/> |
 |  Post condition   | 1. The list of products to buy is ready<br/> 2. The total amount to pay is computed and displayed<br/>|
@@ -388,7 +402,7 @@ SalesManagement --> CreditCardSystem
 |  Variants      	| - The Bar Code is valid, but the Bar Code Reader cannot read it correctly: the Cashier inputs the Bar Code to the Cashier GUI<br/> - The Customer does not want to buy a Product anymore: the Cashier removes it from the list using the Cashier GUI |
 
 ### Use case 1.2, UC1 - Authentication of a Fidelity Card
-| Actors Involved   | Cashier, Fidelity Card |
+| Actors Involved   | Cashier |
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier is already authenticated<br/> 2. Fidelity Card has a valid Bar Code<br/> 3. This scenario can occur at any time during Use Case 1.1|
 |  Post condition   | The Fidelity Card is recognized and the amount to pay is updated|
@@ -400,7 +414,7 @@ SalesManagement --> CreditCardSystem
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier is already authenticated<br/> 2. Customer has a valid Credit Card<br/> 3. The list of products to buy is known<br/> 4. The total amount of pay is known|
 |  Post condition   | The customer has successfully paid <br/> The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
-|  Nominal Scenario | 1. The Credit Card System shows the amount to pay<br/> 2. The Credit Card system receives the customer's Credit Card and recognizes it<br/> 3. The Credit Card System bypasses the Application and automatically interacts with the Payment Gateway <br/> 4. After that the transaction has terminated successfully, the Credit Card System notifies the Application <br/> 5. The Application asks the Cash Register to print the receipt <br/> 6. The Cash Register prints the receipt <br/> 7. The Application sends the invoice to the Accounting <br/> 8. For each Product in the list: remove it from the Inventory|
+|  Nominal Scenario | 1. The Credit Card System shows the amount to pay<br/> 2. The Credit Card system receives the customer's Credit Card and recognizes it<br/> 3. The Credit Card System bypasses the Application and automatically interacts with the Payment Gateway <br/> 4. After that the transaction has terminated successfully, the Credit Card System notifies the Application <br/> 5. The Application opens the Cash Register and asks to print the receipt <br/> 6. The Cash Register prints the receipt <br/> 7. The Application sends the invoice to the Accounting <br/> 8. For each Product in the list: remove it from the Inventory|
 |  Variants     	| - The Credit Card System is not able to recognize the Card: retry to recognize it<br/> - Transaction does not terminate successfully: the Credit Card System notifies the Application and displays an error message: restart from step 2|
 
 ### Use Case 1.4, UC1 - Handle a Payment via Cash
