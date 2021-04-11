@@ -4,7 +4,7 @@ Authors:
 - Mattia Lisciandrello s286329
 - Christian Casalini s281823
 - Palmucci Leonardo s288126
-- Dario Lanfranco s287524
+- Dario Lanfranco s287524 
 
 Date: 10/04/2021
 
@@ -51,16 +51,16 @@ EZShop is a software application to:
 | User | Who uses the system. It includes different user profiles. |
 | Cashier (profile 1) | Cashier who uses the software. Manages sales. |
 | Customer (profile 2) | Is affected indirectly through the cashier. |
-| Warehouse director (profile 3) |Manages inventory and orders through the software. |
-| Accountant (profile 4) | Handles the accounting through the software. |
-| Customer manager (profile 5) | Manages the customers. In most shops it could be the Cashier. |
+| Warehouse manager (profile 3) | Manages inventory and orders through the software. |
+| Accountant (profile 4) | Manages the accounting through the software. |
+| Customers manager (profile 5) | Manages the customers. In most shops it could be the Cashier. |
 | Shop director (profile 6) | Director of the shop. Manages the catalogue of products. |
 | IT administrator (profile 7) | Who manages the software (Security/Accounts, DB). |
 | Maintainers | Who will repair the software eventually. It could be part of the staff or external. |
 | Marketing people | People who sell the software to shops. |
 | Product | Involved indirectly and managed by the software. |
 | Cash Register | The software involves the cash register since they're part of the output. |
-| Fidelty card | Fidely card associated with a customer. |
+| Fidelity card | Fidely card associated with a customer. |
 
 # Context Diagram and interfaces
 
@@ -79,7 +79,7 @@ User <|-- Accountant
 User <|-- ShopDirector
 User <|-- ITAdministrator
 User -- Shop
-FideltyCard -- Shop
+FidelityCard -- Shop
 Product --  Shop
 Shop -- CreditCardSystem
 Shop -- CashRegister
@@ -99,10 +99,10 @@ Shop -- CashRegister
 | Product 				| Bar code 			| Bar code reader |
 | Cash register 		| GUI, API ([Cash Register API](https://developers.mypos.eu/en/doc/in_person_payments/v1_0/356-cash-register-remote-api))			| Screen, Keyboard, Printer |
 | Credit card system 	| Web services ([Payment API](https://developers.mypos.eu/en/doc/in_person_payments/v1_0/243-payment-api))		| Internet, POS |
-| Warehouse director 	| GUI 				| Screen, Keyboard, Mouse |
+| Warehouse manager 	| GUI 				| Screen, Keyboard, Mouse |
 | Accountant 			| GUI 				| Screen, Keyboard, Mouse |
 | Shop director 		| GUI 				| Screen, Keyboard, Mouse |
-| Fidelty card 			| Bar code 			| Bar code reader | 
+| Fidelity card 		| Bar code 			| Bar code reader | 
 
 # Stories and personas
 \<A Persona is a realistic impersonation of an actor. Define here a few personas and describe in plain text how a persona interacts with the system>
@@ -122,12 +122,12 @@ Shop -- CashRegister
 
 | ID       		| Description  |
 | ------------- | ------------ |
-|  FR_1     	| Handle sales |
+|  FR_1     	| Sales management |
 |  FR_1.1   	| Register payment |
 |  FR_1.2   	| Update inventory |
 |  FR_1.3   	| Send receipt to accounting |
-|  FR_1.4   	| Handle discounts |
-|  FR_1.5   	| Handle fidelty card |
+|  FR_1.4   	| Discounts management |
+|  FR_1.5   	| Fidelity cards management |
 |  FR_1.6   	| Scan product |
 |  FR_1.7   	| Add the product to a list of buyings |
 |  FR_1.8   	| Read credit card |
@@ -137,15 +137,14 @@ Shop -- CashRegister
 |  FR_1.9.3 	| Send data to cash register  |
 |  FR_1.10      | Register an invoice (active) | 
 ||
-|  FR_2     	| Handle warehouse |
-|  FR_2.1   	| Handle inventory |
+|  FR_2     	| Warehouse management |
+|  FR_2.1   	| Inventory management |
 |  FR_2.1.1 	| Add product |
 |  FR_2.1.2 	| Remove product |
-|  FR_2.1.3 	| Update products quantity |
-|  FR_2.1.4 	| Update products purchase price |
-|  FR_2.1.5 	| Filter products |
-|  FR_2.1.6   	| Handle thresholds |
-|  FR_2.1.7   	| Show products (inventory) |
+|  FR_2.1.3 	| Update product |
+|  FR_2.1.4 	| Filter products |
+|  FR_2.1.5   	| Manage Low Stock Thresholds |
+|  FR_2.1.6   	| Show products (inventory) |
 |  FR_2.2   	| Manage order |
 |  FR_2.2.1 	| Add order |
 |  FR_2.2.2 	| Remove order |
@@ -153,20 +152,20 @@ Shop -- CashRegister
 |  FR_2.2.4 	| Show orders |
 |  FR_2.2.5 	| Filter orders |
 ||
-|  FR_3     	| Handle catalogue |
+|  FR_3     	| Catalogue management |
 |  FR_3.1   	| Update products selling price |
 |  FR_3.2   	| Add product |
 |  FR_3.3   	| Remove product  |
 |  FR_3.4   	| Show products (catalogue) |
 |  FR_3.5   	| Filter products (catalogue) |
 ||
-|  FR_4     	| Handle customers |
-|  FR_4.1   	| Add fidelty card |
-|  FR_4.2   	| Remove fidelty card |
-|  FR_4.3   	| Handle card points |
+|  FR_4     	| Customers management |
+|  FR_4.1   	| Add fidelity card |
+|  FR_4.2   	| Remove fidelity card |
+|  FR_4.3   	| Manage card points |
 |  FR_4.3.1 	| Add card points |
 |  FR_4.3.2 	| Remove card points |
-|  FR_4.4   	| Show all fidelty cards & cards points |
+|  FR_4.4   	| Show all fidelity cards & cards points |
 |  FR_4.5   	| Search a customer |
 ||
 |  FR_5     	| Support accounting |
@@ -184,7 +183,7 @@ Shop -- CashRegister
 |  FR_5.5 		| Show suppliers deadlines timetable |
 |  FR_5.6   	| Show financial statement | //used to see for what shop's revenues could be used: Are they enough to pay suppliers/debts and also to do new investments?
 ||
-|  FR_6     	| Handle accounts |
+|  FR_6     	| Accounts management |
 |  FR_6.1   	| Add account |
 |  FR_6.2   	| Remove account|
 |  FR_6.3   	| Update account|
@@ -194,14 +193,18 @@ Shop -- CashRegister
 |  FR_7.2		| Logout |
 
 
-FR_1.5 means that fidelty card of a user must be updated and it is directly related to FR__4.
+FR_1.5
+It means that fidelity card of a user must be updated and it is directly related to FR_4.
 In FR_1.6, whenever you scan a product, you add it to the list of products the customer is buying.
 
-FR_2 contains both inventory and orders: we identify it as warehouse.
+FR_2 
+Inventory management is focused solely on the actual items being held within a warehouse. Warehouse management, in contrast, is more concerned with the “journey” of individual items as they flow through the warehouse.
 
-FR_2.5 means that if products go below certain threshold, the director is notified.
+FR_2.1.5
+Allow to set, update or remove Low Stock Thresholds so that an alert is generated if a product's quantity goes below the desired threshold.
 
-FR_4: fidelty are managed totally by the shop. The customer can choose to get subscribe/unsubscribe and he will be given a card. He will just decide to use or not to use the points, which will be involved in giving discounts to the customer. If he wants to check how many points does he have, he has to get in contact with the shop by himself/with the cashier.
+FR_4
+Fidelity cards are managed totally by the shop. The customer can choose to get subscribe/unsubscribe and he will be given a card. He will just decide to use or not to use the points, which will be involved in giving discounts to the customer. If he wants to check how many points does he have, he has to get in contact with the shop by himself/with the cashier.
 
 ## Non Functional Requirements
 
@@ -209,15 +212,13 @@ FR_4: fidelty are managed totally by the shop. The customer can choose to get su
 
 | ID        |     Type 	    | 								Description  															| Refers to |
 | --------- | ------------- | ----------------------------------------------------------------------------------------------------- | --------- |
-| NFR_1     | Usability   	| User should learn how to use the software within 30 minutes of training 									| All FR 	|
+| NFR_1     | Usability   	| User should learn how to use the software within 30 minutes of training 								| All FR 	|
 | NFR_2     | Efficiency	| All functions should complete in less than 0.5s 														| All FR 	|
 | NFR_3     | Localisation 	| Decimal numbers use . (dot) as decimal separator  													| All FR 	|
-| NFR_4 	| Privacy 		| The data of one customer should not be accessible to users other than users who handle fidelty cards. | All FR 	|
+| NFR_4 	| Privacy 		| Customers data should not be accessible to users other than the ones who manage fidelity cards.       | All FR 	|
 | NFR_5 	| Availability 	| At least 95% 																							| All FR 	|
-| NFR_6     | Security      | User should have access only to functions and resources which they require 							| All FR |
-| NFR_7		| Privacy		| Customer credit cards must not be stored in the system													| FR_1 |
-| Domain 	| // 			| Currency is Euro  																						| All FR 	|
-| Aggiungi NFR:|non salvare dati carta di credito |!!!!|!!!!|
+| NFR_6     | Security      | User should have access only to functions and resources which they require 							| All FR 	|
+| Domain 	| // 			| Currency is Euro  																					| All FR 	|
 
 # Use case diagram and use cases
 
@@ -227,12 +228,12 @@ FR_4: fidelty are managed totally by the shop. The customer can choose to get su
 ```plantuml
 @startuml
 usecase Authentication
-usecase HandleSales
-usecase HandleCustomer
-usecase HandleCatalogue
-usecase HandleWarehouse
+usecase SalesManagement
+usecase CustomersManagement
+usecase CatalogueManagement
+usecase WarehouseManagement
 usecase SupportAccounting
-usecase HandleAccounts
+usecase AccountsManagement
 
 
 User <|-- Cashier
@@ -242,59 +243,89 @@ User <|-- ShopDirector
 User <|-- ITAdministrator
 
 User --> Authentication
-Cashier --> HandleSales
-Cashier --> HandleCustomer
-ShopDirector --> HandleCatalogue
-WarehouseDirector --> HandleWarehouse
+Cashier --> SalesManagement
+Cashier --> CustomersManagement
+ShopDirector --> CatalogueManagement
+WarehouseDirector --> WarehouseManagement
 Accountant --> SupportAccounting
 
 
-ITAdministrator --> HandleAccounts
+ITAdministrator --> AccountsManagement
 
-HandleSales --> Product
-HandleWarehouse --> Product
-HandleCatalogue --> Product
-HandleSales ..> HandleWarehouse : include
+SalesManagement --> Product
+WarehouseManagement --> Product
+CatalogueManagement --> Product
+SalesManagement ..> WarehouseManagement : include
 
-Authentication <.. HandleSales : include
-Authentication <.. HandleCustomer : include
-Authentication <.. HandleCatalogue : include
-Authentication <.. HandleWarehouse : include
-Authentication <.. HandleAccounts : include
+Authentication <.. SalesManagement : include
+Authentication <.. CustomersManagement : include
+Authentication <.. CatalogueManagement : include
+Authentication <.. WarehouseManagement : include
+Authentication <.. AccountsManagement : include
 Authentication <.. SupportAccounting : include
 
-HandleCustomer --> FideltyCard
-HandleSales --> CashRegister
-HandleSales --> CreditCardSystem
+CustomersManagement --> FidelityCard
+SalesManagement --> CashRegister
+SalesManagement --> CreditCardSystem
 @enduml
 ```
-### Use Case diagram: Handle sales
+### Use Case diagram: Sales management
 
-### Use Case diagram: Handle warehouse
+### Use Case diagram: Warehouse management
+```plantuml
+@startuml
+:WarehouseManager:     --> (Warehouse management)
+(Warehouse management) ..> (Inventory management) : include
+(Warehouse management) ..> (Order management) : include
+(Inventory management) ..> (Add product) : include
+(Inventory management) ..> (Remove product) : include
+(Inventory management) ..> (Update product) : include
+' (Update product)       ..> (Stock level) : include
+' (Update product)       ..> (Purchase price) : include
+' (Update product)       ..> (Description) : include
+(Inventory management) ..> (Show products) : include
+(Inventory management) ..> (Filter products) : include
+' (Filter products)      ..> (Name) : by
+' (Filter products)      ..> (Supplier) : by
+' (Filter products)      ..> (Brand) : by
+' (Filter products)      ..> (Price) : by
+(Inventory management) ..> (Manage Low Stock Thresholds) : include
+(Order management)     ..> (Place new order) : include
+(Order management)     ..> (Cancel order) : include
+(Order management)     ..> (Edit order) : include
+(Order management)     ..> (Show orders) : include
+(Order management)     ..> (Filter orders) : include
+' (Filter orders)        ..> (Date) : by
+' (Filter orders)        ..> (Supplier) : by
+' (Filter orders)        ..> (Amount) : by
 
-### Use Case diagram: Handle catalogue
+
+@enduml
+```
+
+### Use Case diagram: Catalogue management
 
 ```plantuml
 @startuml
 
-:ShopDirector: --> (Handle catalogue)
-(Handle catalogue) ..> (Update price to sell of products) : include
-(Handle catalogue) ..> (Add product) : include
-(Handle catalogue) ..> (Remove product) : include
+:ShopDirector: --> (Catalogue management)
+(Catalogue management) ..> (Update price to sell of products) : include
+(Catalogue management) ..> (Add product) : include
+(Catalogue management) ..> (Remove product) : include
 
 @enduml
 ```
 
-### Use Case diagram: Handle customers
+### Use Case diagram: Customers management
 
 ```plantuml
 @startuml
 
-:ShopDirector: --> (Handle customers)
-(Handle customers) ..> (Add fidelty card) : include
-(Handle customers) ..> (Remove fidelty card) : include
-(Handle customers) ..> (Add card points) : include
-(Handle customers) ..> (Remove card points) : include
+:ShopDirector: --> (Customers management)
+(Customers management) ..> (Add fidelity card) : include
+(Customers management) ..> (Remove fidelity card) : include
+(Customers management) ..> (Add card points) : include
+(Customers management) ..> (Remove card points) : include
 
 @enduml
 ```
@@ -317,15 +348,15 @@ HandleSales --> CreditCardSystem
 @enduml
 ```
 
-### Use Case diagram: Handle accounts
+### Use Case diagram: Accounts management
 
 ```plantuml
 @startuml
-:ITAdministrator: --> (Handle accounts)
-(Handle accounts) ..> (Add account) : include
-(Handle accounts) ..> (Remove account) : include
-(Handle accounts) ..> (Update account) : include
-(Handle accounts) ..> (Modify privileges) : include
+:ITAdministrator: --> (Accounts management)
+(Accounts management) ..> (Add account) : include
+(Accounts management) ..> (Remove account) : include
+(Accounts management) ..> (Update account) : include
+(Accounts management) ..> (Modify privileges) : include
 
 @enduml
 ```
@@ -344,47 +375,47 @@ HandleSales --> CreditCardSystem
 \<next describe here each use case in the UCD>
 
 
-##  Handle sales
+##  Sales management
 
 [Vanno modificati i functional requirement!]
 
 ### Use case 1.1, UC1 - Add Product to the List of Product to buy
-| Actors Involved   | Cashier, Product, Fidelty Card |
+| Actors Involved   | Cashier, Product, Fidelity Card |
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier is already authenticated<br/> 2. Product has a valid Bar Code<br/> |
 |  Post condition   | 1. The list of products to buy is ready<br/> 2. The total amount to pay is computed and displayed<br/>|
-|  Nominal Scenario | 1. For every product in the customer's cart:<br/> 1.1. The Cashier scans the product using the Bar Code Reader<br/> 1.2 The code is readed correctly <br/> 1.3 The Application searches the Product in the Catalogue <br/> 1.4 The Application searches if a discount should be applied to the Product <br/> 1.5 If a Fidelty Card has been scanned, the Application searches if a discount should be applied to the Product for those who have a Fidelty Card <br/> 1.6 The Application retrieves the price of the Product and applies the discount if needed<br/> 1.7 The Application displays the price of the Product and the new partial amount to pay on the Cashier GUI<br/> 2. At the end, the final list of products and the total amount to pay is displayed on the Cashier GUI|
+|  Nominal Scenario | 1. For every product in the customer's cart:<br/> 1.1. The Cashier scans the product using the Bar Code Reader<br/> 1.2 The code is readed correctly <br/> 1.3 The Application searches the Product in the Catalogue <br/> 1.4 The Application searches if a discount should be applied to the Product <br/> 1.5 If a Fidelity Card has been scanned, the Application searches if a discount should be applied to the Product for those who have a Fidelity Card <br/> 1.6 The Application retrieves the price of the Product and applies the discount if needed<br/> 1.7 The Application displays the price of the Product and the new partial amount to pay on the Cashier GUI<br/> 2. At the end, the final list of products and the total amount to pay is displayed on the Cashier GUI|
 |  Variants      	| - The Bar Code is valid, but the Bar Code Reader cannot read it correctly: the Cashier inputs the Bar Code to the Cashier GUI<br/> - The Customer does not want to buy a Product anymore: the Cashier removes it from the list using the Cashier GUI |
 
-### Use case 1.2, UC1 - Authentication of a Fidelty Card
-| Actors Involved   | Cashier, Fidelty Card |
+### Use case 1.2, UC1 - Authentication of a Fidelity Card
+| Actors Involved   | Cashier, Fidelity Card |
 | ----------------- | ------------- |
-|  Precondition     | 1. Cashier is already authenticated<br/> 2. Fidelty Card has a valid Bar Code<br/> 3. This scenario can occur at any time during Use Case 1.1|
-|  Post condition   | The Fidelty Card is recognized and the amount to pay is updated|
-|  Nominal Scenario | 1. The Cashier scans the Fidelty Card using the Bar Code Reader<br/> 2. The Application recognizes the Fidelty Card <br/> 3. The Application searches, for every scanned Product so far, if a discount should be applied for those who have a Fidelty Card<br/> 4. The Application updates the amount to pay according to the results of the previous step|
+|  Precondition     | 1. Cashier is already authenticated<br/> 2. Fidelity Card has a valid Bar Code<br/> 3. This scenario can occur at any time during Use Case 1.1|
+|  Post condition   | The Fidelity Card is recognized and the amount to pay is updated|
+|  Nominal Scenario | 1. The Cashier scans the Fidelity Card using the Bar Code Reader<br/> 2. The Application recognizes the Fidelity Card <br/> 3. The Application searches, for every scanned Product so far, if a discount should be applied for those who have a Fidelity Card<br/> 4. The Application updates the amount to pay according to the results of the previous step|
 |  Variants     	| - The Bar Code is valid, but the Bar Code Reader cannot read it correctly: the Cashier inputs the Bar Code to the Cashier GUI |
 
 ### Use case 1.3, UC1 - Handle a Payment via Credit Card
 | Actors Involved   | Cashier, Cash Register, Credit Card System |
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier is already authenticated<br/> 2. Customer has a valid Credit Card<br/> 3. The list of products to buy is known<br/> 4. The total amount of pay is known|
-|  Post condition   | The Customer has successfully paid <br/> The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
-|  Nominal Scenario | 1. The Credit Card System shows the amount to pay<br/> 2. The Credit Card system receives the Customer's Credit Card and recognizes it<br/> 3. The Credit Card System bypasses the Application and automatically interacts with the Payment Gateway <br/> 4. After that the transaction has terminated successfully, the Credit Card System notifies the Application <br/> 5. The Application asks the Cash Register to print the receipt <br/> 6. The Cash Register prints the receipt <br/> 7. The Application sends the invoice to the Accounting <br/> 8. For each Product in the list: remove it from the Inventory|
+|  Post condition   | The customer has successfully paid <br/> The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
+|  Nominal Scenario | 1. The Credit Card System shows the amount to pay<br/> 2. The Credit Card system receives the customer's Credit Card and recognizes it<br/> 3. The Credit Card System bypasses the Application and automatically interacts with the Payment Gateway <br/> 4. After that the transaction has terminated successfully, the Credit Card System notifies the Application <br/> 5. The Application asks the Cash Register to print the receipt <br/> 6. The Cash Register prints the receipt <br/> 7. The Application sends the invoice to the Accounting <br/> 8. For each Product in the list: remove it from the Inventory|
 |  Variants     	| - The Credit Card System is not able to recognize the Card: retry to recognize it<br/> - Transaction does not terminate successfully: the Credit Card System notifies the Application and displays an error message: restart from step 2|
 
 ### Use Case 1.4, UC1 - Handle a Payment via Cash
 | Actors Involved   | Cashier, Cash Register |
 | ----------------- | ------------- |
-|  Precondition     | 1. Cashier is already authenticated<br/> 2. The Customer has successfully paid by cash<br/> 3. The list of products to buy is known<br/> 4. The total amount of pay is known|
+|  Precondition     | 1. Cashier is already authenticated<br/> 2. The customer has successfully paid by cash<br/> 3. The list of products to buy is known<br/> 4. The total amount of pay is known|
 |  Post condition   | The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
-|  Nominal Scenario | 1. The Cashier tells the Application that the Customer has successfully paid by cash<br/> 2. The Application opens the Cash Register and asks to print the receipt<br/>3. The Cash Register prints the receipt <br/> 4. The Application sends the invoice to the Accounting <br/> 5. For each Product in the list: remove it from the Inventory|
+|  Nominal Scenario | 1. The Cashier tells the Application that the customer has successfully paid by cash<br/> 2. The Application opens the Cash Register and asks to print the receipt<br/>3. The Cash Register prints the receipt <br/> 4. The Application sends the invoice to the Accounting <br/> 5. For each Product in the list: remove it from the Inventory|
 |  Variants     	| - |
 
-## Handle inventory
+## Inventory management
 In these use cases, the actor is the Warehouse Manager or another user with an account with the privileges required to manage the inventory. The actor can inspect the inventory, add new items to it, and update or remove the existing ones.
-In addition, the actor should be able to place new orders.
+In addition, the actor should be able to place new orders, and to cancel or edit the existing ones.
 
-### Use case x, UCx - Add product to the inventory
+### Use case x, UCx - Add product to inventory
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
 | Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
@@ -392,7 +423,7 @@ In addition, the actor should be able to place new orders.
 | Nominal Scenario  | 1. Warehouse Manager clicks on 'New Product' icon<br/>2. The software presents a form to fill in with product's information<br/>3. Warehouse Manager fills in the form<br/>4. The software assigns to the product an incremental and unique ID |
 | Variants          | - Before completing the operation, the Warehouse Manager decides to discard it<br/>- The product cannot be added because one or more compulsory fields have not been filled in |
 
-### Use case x, UCx - Remove product from the inventory
+### Use case x, UCx - Remove product from inventory
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
 | Precondition      | 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists<br/>4. The account has the necessary privileges to modify the inventory |
@@ -400,32 +431,24 @@ In addition, the actor should be able to place new orders.
 | Nominal Scenario  | 1. Warehouse Manager looks for the product using the search bar<br/>2. The software presents a list of matching products<br/>3. Warehouse Manager selects the target product<br/>4. Warehouse Manager clicks "Remove" button<br/>&ensp;(4.1) Software asks for confirmation<br/>&ensp;(4.2) Warehouse Manager confirms<br/>5. Software removes the product from the inventory |
 | Variants          | - Target product does not exist in the inventory<br/>- Product is removed in another way:<br/>&ensp;* right-clicking on product<br/>&ensp;* select "Remove" from context menu |
 
-### Use case x, UCx - Update products quantity
+### Use case x, UCx - Update product
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
 | Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
 | Post condition 	| Target product's quantity has been updated |
-| Nominal Scenario  | 1. Warehouse Manager searches for the product using the search bar<br/>2. The software presents a list of matching products<br/>3. Warehouse Manager selects the target product<br/>4. Warehouse Manager clicks "Edit" button<br/>5. Software presents the interface from which product's properties (like quantity and price) can be modified<br/>6. Warehouse Manager updates quantity |
+| Nominal Scenario  | 1. Warehouse Manager searches for the product using the search bar<br/>2. The software presents a list of matching products<br/>3. Warehouse Manager selects the target product<br/>4. Warehouse Manager clicks "Edit" button<br/>5. Software presents the interface from which product's properties (like quantity and price) can be modified<br/>6. Warehouse Manager edits one or more properties<br/>&ensp;(6.1) Software asks for confirmation<br/>&ensp;(6.2) Warehouse Manager confirms<br/>7. Software applies the update |
 | Variants          | - Target product does not exist in the inventory<br/> |
 
-### Use case x, UCx - Update products purchase price
+
+### Use case x, UCx - Manage Low Stock Threshold
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
 | Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
-| Post condition 	| Target product's purchase price has been updated |
-| Nominal Scenario  | 1. Warehouse Manager searches for the product using the search bar<br/>2. The software presents a list of matching products<br/>3. Warehouse Manager selects the target product<br/>4. Warehouse Manager clicks "Edit" button<br/>5. Software presents the interface from which product's properties can be modified<br/>6. Warehouse Manager updates quantity |
+| Post condition 	| A new threshold has been setted or an existing one has been updated or removed |
+| Nominal Scenario  | 1. Warehouse Manager searches for the product using the search bar<br/>2. The software presents a list of matching products<br/>3. Warehouse Manager selects the target product<br/>4. Warehouse Manager clicks "Edit" button<br/>5. Software presents the interface from which product's properties can be modified<br/>6. Warehouse Manager sets, updates or removes the low stock threshold |
 | Variants          | - Target product does not exist in the inventory<br/> |
 
-
-### Use case x, UCx - Handle quantity thresholds
-| Actors Involved 	| 			Warehouse Manager              |
-| ----------------- | ---------------------------------------- |
-| Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
-| Post condition 	| A new threshold has been setted or an existing one has been removed |
-| Nominal Scenario  | 1. Warehouse Manager searches for the product using the search bar<br/>2. The software presents a list of matching products<br/>3. Warehouse Manager selects the target product<br/>4. Warehouse Manager clicks "Edit" button<br/>5. Software presents the interface from which product's properties can be modified<br/>6. Warehouse Manager sets, updates or removes threshold for alert generation |
-| Variants          | - Target product does not exist in the inventory<br/> |
-
-[//]: # (TODO: write SET, UPDATE and REMOVE scenarios) 
+[//]: # (TODO: write SET, UPDATE and REMOVE scenarios?) 
 
 ### Use case x, UCx - Show products
 | Actors Involved 	| 			Warehouse Manager              |
@@ -493,7 +516,7 @@ In addition, the actor should be able to place new orders.
 | Nominal Scenario  | Warehouse Manager writes inside the search bar or uses some other filter:<br/>&ensp;- order total amount<br/>&ensp;- supplier<br/>&ensp;- order's date |
 |  Variants     	| - |
 
-## Handle catalogue
+## Catalogue management
 
 ### Use case x, UCx - Update price (to sell) of products
 | Actors Involved	| Shop director |
@@ -519,42 +542,42 @@ In addition, the actor should be able to place new orders.
 |  Nominal Scenario | 1. Shop director selects "remove a product" <br> 2. Software shows a list of products present in the catalogue <br> 3. Shop director selects one or more products <br> 4. Shop director confirms|
 |  Variants     	| - The catalogue is empty: no product will be shown|
 
-## Handle customers
+## Customers management
 
-Actors could be Cashier or other worker in charge to handle the customers.
+Actors could be Cashier or other worker in charge to manage the customers.
 We'll consider the Cashier as the actor.
 
-### Use case x, UCx - Add fidelty card
+### Use case x, UCx - Add fidelity card
 | Actors Involved   | Cashier		|
 | ----------------- | ------------- |
 |  Precondition     | 1. Account cashier must exist<br/>2. Cashier is authenticated|
-|  Post condition   | A fidelty card is added to the database and is given to the customer |
-|  Nominal Scenario | 1. Cashier selects to add a fidelty card <br> 2. Software shows forms to add the customer data <br> 3. Cashier inserts the customer data <br> 4. Cashier confirms <br> 5. The application assigns a new ID to the card in the database <br> 6. A paper containing a barcode is issued to the customer |
-|  Variants     	| - A customer can have at most one fidelty card active: each fidelty card has an unique ID, along with the customer SSN |
+|  Post condition   | A fidelity card is added to the database and is given to the customer |
+|  Nominal Scenario | 1. Cashier selects to add a fidelity card <br> 2. Software shows forms to add the customer data <br> 3. Cashier inserts the customer data <br> 4. Cashier confirms <br> 5. The application assigns a new ID to the card in the database <br> 6. A paper containing a barcode is issued to the customer |
+|  Variants     	| - A customer can have at most one fidelity card active: each fidelity card has an unique ID, along with the customer SSN |
 
-### Use case x, UCx - Remove fidelty card
+### Use case x, UCx - Remove fidelity card
 | Actors Involved   | Cashier		|
 | ----------------- | ------------- |
-|  Precondition     |  1. Account cashier must exist<br/>2. Cashier is  authenticated<br/>3. The fidelty card must exist |
-|  Post condition   | One or more fidelty cards are removed from the database |
-|  Nominal Scenario | 1. Cashier selects to remove a fidelty card <br> 2. Software shows a list of fidelty cards <br> 3. Cashier chooses to remove one or more fidelty card <br> 4. Cashier confirms |
-|  Variants     	| - There are no fidelty cards: no card will be shown |
+|  Precondition     |  1. Account cashier must exist<br/>2. Cashier is  authenticated<br/>3. The fidelity card must exist |
+|  Post condition   | One or more fidelity cards are removed from the database |
+|  Nominal Scenario | 1. Cashier selects to remove a fidelity card <br> 2. Software shows a list of fidelity cards <br> 3. Cashier chooses to remove one or more fidelity card <br> 4. Cashier confirms |
+|  Variants     	| - There are no fidelity cards: no card will be shown |
 
 ### Use case x, UCx - Add card points
 | Actors Involved   | Cashier		|
 | ----------------- | ------------- |
-|  Precondition     | 1. Account cashier must exist<br/>2. Cashier is  authenticated<br/>3. The fidelty card must exist |
+|  Precondition     | 1. Account cashier must exist<br/>2. Cashier is  authenticated<br/>3. The fidelity card must exist |
 |  Post condition   | Card points are added to the card|
-|  Nominal Scenario | 1. Cashier selects to add points to a fidelty card <br> 2. Software chooses a list of fidelty cards <br> 3. Cashier selects one <br> 4. Cashier chooses the amount to add <br> 5. Cashier confirms |
-|  Variants     	| - There are no fidelty cards: no card will be shown |
+|  Nominal Scenario | 1. Cashier selects to add points to a fidelity card <br> 2. Software chooses a list of fidelity cards <br> 3. Cashier selects one <br> 4. Cashier chooses the amount to add <br> 5. Cashier confirms |
+|  Variants     	| - There are no fidelity cards: no card will be shown |
 
 ### Use case x, UCx - Remove card points
 | Actors Involved   | Cashier		|
 | ----------------- | ------------- |
-|  Precondition     | 1. Account cashier must exist<br/>2. Cashier is  authenticated<br/>3. The fidelty card must exist |
+|  Precondition     | 1. Account cashier must exist<br/>2. Cashier is  authenticated<br/>3. The fidelity card must exist |
 |  Post condition   | Points are removed from the card|
-|  Nominal Scenario | 1. Cashier selects to remove points from a fidelty card <br> 2. Software chooses a list of fidelty cards <br> 3. Cashier selects one <br> 4. Cashier chooses the amount to remove <br> 5. Cashier confirms  |
-|  Variants     	| - There are no fidelty cards: no card will be shown |
+|  Nominal Scenario | 1. Cashier selects to remove points from a fidelity card <br> 2. Software chooses a list of fidelity cards <br> 3. Cashier selects one <br> 4. Cashier chooses the amount to remove <br> 5. Cashier confirms  |
+|  Variants     	| - There are no fidelity cards: no card will be shown |
 
 ## Support accounting
 
@@ -614,7 +637,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 |  Nominal Scenario | 1. Application displays deadlines distinguishing them by suppliers and sorting them by date  |
 |  Variants     	| - All deadlines have been satisfied: an "Up to date with payments" message is displayed<br/>- One or more deadlines are expired: an alert message is generated  |
 
-## Handle accounts
+## Accounts management
 
 ### Use case x, UCx - Add account
 | Actors Involved   | ITAdministrator	|
