@@ -4,7 +4,7 @@ Authors:
 - Mattia Lisciandrello s286329
 - Christian Casalini s281823
 - Palmucci Leonardo s288126
-- Dario Lanfranco s287524
+- Dario Lanfranco s287524 
 
 Date: 10/04/2021
 
@@ -51,7 +51,7 @@ EZShop is a software application to:
 | User | Who uses the system. It includes different user profiles. |
 | Cashier (profile 1) | Cashier who uses the software. Manages sales. |
 | Customer (profile 2) | Is affected indirectly through the cashier. |
-| Warehouse director (profile 3) |Manages inventory and orders through the software. |
+| Warehouse manager (profile 3) | Manages inventory and orders through the software. |
 | Accountant (profile 4) | Handles the accounting through the software. |
 | Customer manager (profile 5) | Manages the customers. In most shops it could be the Cashier. |
 | Shop director (profile 6) | Director of the shop. Manages the catalogue of products. |
@@ -99,10 +99,10 @@ Shop -- CashRegister
 | Product 				| Bar code 			| Bar code reader |
 | Cash register 		| GUI, API ([Cash Register API](https://developers.mypos.eu/en/doc/in_person_payments/v1_0/356-cash-register-remote-api))			| Screen, Keyboard, Printer |
 | Credit card system 	| Web services ([Payment API](https://developers.mypos.eu/en/doc/in_person_payments/v1_0/243-payment-api))		| Internet, POS |
-| Warehouse director 	| GUI 				| Screen, Keyboard, Mouse |
+| Warehouse manager 	| GUI 				| Screen, Keyboard, Mouse |
 | Accountant 			| GUI 				| Screen, Keyboard, Mouse |
 | Shop director 		| GUI 				| Screen, Keyboard, Mouse |
-| Fidelty card 			| Bar code 			| Bar code reader | 
+| Fidelity card 		| Bar code 			| Bar code reader | 
 
 # Stories and personas
 \<A Persona is a realistic impersonation of an actor. Define here a few personas and describe in plain text how a persona interacts with the system>
@@ -137,15 +137,14 @@ Shop -- CashRegister
 |  FR_1.9.3 	| Send data to cash register  |
 |  FR_1.10      | Register an invoice (active) | 
 ||
-|  FR_2     	| Handle warehouse |
-|  FR_2.1   	| Handle inventory |
+|  FR_2     	| Warehouse management |
+|  FR_2.1   	| Inventory management |
 |  FR_2.1.1 	| Add product |
 |  FR_2.1.2 	| Remove product |
-|  FR_2.1.3 	| Update products quantity |
-|  FR_2.1.4 	| Update products purchase price |
-|  FR_2.1.5 	| Filter products |
-|  FR_2.1.6   	| Handle thresholds |
-|  FR_2.1.7   	| Show products (inventory) |
+|  FR_2.1.3 	| Update product |
+|  FR_2.1.4 	| Filter products |
+|  FR_2.1.5   	| Manage Low Stock Thresholds |
+|  FR_2.1.6   	| Show products (inventory) |
 |  FR_2.2   	| Manage order |
 |  FR_2.2.1 	| Add order |
 |  FR_2.2.2 	| Remove order |
@@ -194,14 +193,18 @@ Shop -- CashRegister
 |  FR_7.2		| Logout |
 
 
-FR_1.5 means that fidelty card of a user must be updated and it is directly related to FR__4.
+FR_1.5
+It means that fidelty card of a user must be updated and it is directly related to FR__4.
 In FR_1.6, whenever you scan a product, you add it to the list of products the customer is buying.
 
-FR_2 contains both inventory and orders: we identify it as warehouse.
+FR_2 
+Inventory management is focused solely on the actual items being held within a warehouse. Warehouse management, in contrast, is more concerned with the “journey” of individual items as they flow through the warehouse.
 
-FR_2.5 means that if products go below certain threshold, the director is notified.
+FR_2.1.5
+Allow to set, update or remove Low Stock Thresholds so that an alert is generated if a product's quantity goes below the desired threshold.
 
-FR_4: fidelty are managed totally by the shop. The customer can choose to get subscribe/unsubscribe and he will be given a card. He will just decide to use or not to use the points, which will be involved in giving discounts to the customer. If he wants to check how many points does he have, he has to get in contact with the shop by himself/with the cashier.
+FR_4
+Fidelty cards are managed totally by the shop. The customer can choose to get subscribe/unsubscribe and he will be given a card. He will just decide to use or not to use the points, which will be involved in giving discounts to the customer. If he wants to check how many points does he have, he has to get in contact with the shop by himself/with the cashier.
 
 ## Non Functional Requirements
 
@@ -209,13 +212,13 @@ FR_4: fidelty are managed totally by the shop. The customer can choose to get su
 
 | ID        |     Type 	    | 								Description  															| Refers to |
 | --------- | ------------- | ----------------------------------------------------------------------------------------------------- | --------- |
-| NFR_1     | Usability   	| User should learn how to use the software within 30 minutes of training 									| All FR 	|
+| NFR_1     | Usability   	| User should learn how to use the software within 30 minutes of training 								| All FR 	|
 | NFR_2     | Efficiency	| All functions should complete in less than 0.5s 														| All FR 	|
 | NFR_3     | Localisation 	| Decimal numbers use . (dot) as decimal separator  													| All FR 	|
 | NFR_4 	| Privacy 		| The data of one customer should not be accessible to users other than users who handle fidelty cards. | All FR 	|
 | NFR_5 	| Availability 	| At least 95% 																							| All FR 	|
-| NFR_6     | Security      | User should have access only to functions and resources which they require 							| All FR |
-| Domain 	| // 			| Currency is Euro  																						| All FR 	|
+| NFR_6     | Security      | User should have access only to functions and resources which they require 							| All FR 	|
+| Domain 	| // 			| Currency is Euro  																					| All FR 	|
 
 # Use case diagram and use cases
 
@@ -228,7 +231,7 @@ usecase Authentication
 usecase HandleSales
 usecase HandleCustomer
 usecase HandleCatalogue
-usecase HandleWarehouse
+usecase WarehouseManagement
 usecase SupportAccounting
 usecase HandleAccounts
 
@@ -243,21 +246,21 @@ User --> Authentication
 Cashier --> HandleSales
 Cashier --> HandleCustomer
 ShopDirector --> HandleCatalogue
-WarehouseDirector --> HandleWarehouse
+WarehouseDirector --> WarehouseManagement
 Accountant --> SupportAccounting
 
 
 ITAdministrator --> HandleAccounts
 
 HandleSales --> Product
-HandleWarehouse --> Product
+WarehouseManagement --> Product
 HandleCatalogue --> Product
-HandleSales ..> HandleWarehouse : include
+HandleSales ..> WarehouseManagement : include
 
 Authentication <.. HandleSales : include
 Authentication <.. HandleCustomer : include
 Authentication <.. HandleCatalogue : include
-Authentication <.. HandleWarehouse : include
+Authentication <.. WarehouseManagement : include
 Authentication <.. HandleAccounts : include
 Authentication <.. SupportAccounting : include
 
@@ -268,7 +271,37 @@ HandleSales --> CreditCardSystem
 ```
 ### Use Case diagram: Handle sales
 
-### Use Case diagram: Handle warehouse
+### Use Case diagram: Warehouse management
+```plantuml
+@startuml
+:WarehouseManager:     --> (Warehouse management)
+(Warehouse management) ..> (Inventory management)
+(Warehouse management) ..> (Order management)
+(Inventory management) ..> (Add product) : include
+(Inventory management) ..> (Remove product) : include
+(Inventory management) ..> (Update product) : include
+' (Update product)       ..> (Stock level) : include
+' (Update product)       ..> (Purchase price) : include
+' (Update product)       ..> (Description) : include
+(Inventory management) ..> (Show products) : include
+(Inventory management) ..> (Filter products) : include
+' (Filter products)      ..> (Name) : by
+' (Filter products)      ..> (Supplier) : by
+' (Filter products)      ..> (Brand) : by
+' (Filter products)      ..> (Price) : by
+(Inventory management) ..> (Manage Low Stock Thresholds) : include
+(Order management)     ..> (Place new order) : include
+(Order management)     ..> (Cancel order) : include
+(Order management)     ..> (Edit order) : include
+(Order management)     ..> (Show orders) : include
+(Order management)     ..> (Filter orders) : include
+' (Filter orders)        ..> (Date) : by
+' (Filter orders)        ..> (Supplier) : by
+' (Filter orders)        ..> (Amount) : by
+
+
+@enduml
+```
 
 ### Use Case diagram: Handle catalogue
 
@@ -376,11 +409,11 @@ HandleSales --> CreditCardSystem
 |  Nominal Scenario | 1. The Cashier tells the Application that the Customer has successfully paid by cash<br/> 2. The Application opens the Cash Register and asks to print the receipt<br/>3. The Cash Register prints the receipt <br/> 4. The Application sends the invoice to the Accounting <br/> 5. For each Product in the list: remove it from the Inventory|
 |  Variants     	| - |
 
-## Handle inventory
+## Inventory management
 In these use cases, the actor is the Warehouse Manager or another user with an account with the privileges required to manage the inventory. The actor can inspect the inventory, add new items to it, and update or remove the existing ones.
-In addition, the actor should be able to place new orders.
+In addition, the actor should be able to place new orders, and to cancel or edit the existing ones.
 
-### Use case x, UCx - Add product to the inventory
+### Use case x, UCx - Add product to inventory
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
 | Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
@@ -388,7 +421,7 @@ In addition, the actor should be able to place new orders.
 | Nominal Scenario  | 1. Warehouse Manager clicks on 'New Product' icon<br/>2. The software presents a form to fill in with product's information<br/>3. Warehouse Manager fills in the form<br/>4. The software assigns to the product an incremental and unique ID |
 | Variants          | - Before completing the operation, the Warehouse Manager decides to discard it<br/>- The product cannot be added because one or more compulsory fields have not been filled in |
 
-### Use case x, UCx - Remove product from the inventory
+### Use case x, UCx - Remove product from inventory
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
 | Precondition      | 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists<br/>4. The account has the necessary privileges to modify the inventory |
@@ -396,32 +429,24 @@ In addition, the actor should be able to place new orders.
 | Nominal Scenario  | 1. Warehouse Manager looks for the product using the search bar<br/>2. The software presents a list of matching products<br/>3. Warehouse Manager selects the target product<br/>4. Warehouse Manager clicks "Remove" button<br/>&ensp;(4.1) Software asks for confirmation<br/>&ensp;(4.2) Warehouse Manager confirms<br/>5. Software removes the product from the inventory |
 | Variants          | - Target product does not exist in the inventory<br/>- Product is removed in another way:<br/>&ensp;* right-clicking on product<br/>&ensp;* select "Remove" from context menu |
 
-### Use case x, UCx - Update products quantity
+### Use case x, UCx - Update product
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
 | Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
 | Post condition 	| Target product's quantity has been updated |
-| Nominal Scenario  | 1. Warehouse Manager searches for the product using the search bar<br/>2. The software presents a list of matching products<br/>3. Warehouse Manager selects the target product<br/>4. Warehouse Manager clicks "Edit" button<br/>5. Software presents the interface from which product's properties (like quantity and price) can be modified<br/>6. Warehouse Manager updates quantity |
+| Nominal Scenario  | 1. Warehouse Manager searches for the product using the search bar<br/>2. The software presents a list of matching products<br/>3. Warehouse Manager selects the target product<br/>4. Warehouse Manager clicks "Edit" button<br/>5. Software presents the interface from which product's properties (like quantity and price) can be modified<br/>6. Warehouse Manager edits one or more properties<br/>&ensp;(6.1) Software asks for confirmation<br/>&ensp;(6.2) Warehouse Manager confirms<br/>7. Software applies the update |
 | Variants          | - Target product does not exist in the inventory<br/> |
 
-### Use case x, UCx - Update products purchase price
+
+### Use case x, UCx - Manage Low Stock Threshold
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
 | Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
-| Post condition 	| Target product's purchase price has been updated |
-| Nominal Scenario  | 1. Warehouse Manager searches for the product using the search bar<br/>2. The software presents a list of matching products<br/>3. Warehouse Manager selects the target product<br/>4. Warehouse Manager clicks "Edit" button<br/>5. Software presents the interface from which product's properties can be modified<br/>6. Warehouse Manager updates quantity |
+| Post condition 	| A new threshold has been setted or an existing one has been updated or removed |
+| Nominal Scenario  | 1. Warehouse Manager searches for the product using the search bar<br/>2. The software presents a list of matching products<br/>3. Warehouse Manager selects the target product<br/>4. Warehouse Manager clicks "Edit" button<br/>5. Software presents the interface from which product's properties can be modified<br/>6. Warehouse Manager sets, updates or removes the low stock threshold |
 | Variants          | - Target product does not exist in the inventory<br/> |
 
-
-### Use case x, UCx - Handle quantity thresholds
-| Actors Involved 	| 			Warehouse Manager              |
-| ----------------- | ---------------------------------------- |
-| Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
-| Post condition 	| A new threshold has been setted or an existing one has been removed |
-| Nominal Scenario  | 1. Warehouse Manager searches for the product using the search bar<br/>2. The software presents a list of matching products<br/>3. Warehouse Manager selects the target product<br/>4. Warehouse Manager clicks "Edit" button<br/>5. Software presents the interface from which product's properties can be modified<br/>6. Warehouse Manager sets, updates or removes threshold for alert generation |
-| Variants          | - Target product does not exist in the inventory<br/> |
-
-[//]: # (TODO: write SET, UPDATE and REMOVE scenarios) 
+[//]: # (TODO: write SET, UPDATE and REMOVE scenarios?) 
 
 ### Use case x, UCx - Show products
 | Actors Involved 	| 			Warehouse Manager              |
