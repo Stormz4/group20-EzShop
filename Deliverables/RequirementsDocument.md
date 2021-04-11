@@ -10,7 +10,7 @@ Date: 10/04/2021
 
 | Version | Changes |
 | ------- |---------|
-| 6 | - Modified & added use cases and scenarios;<br/>- Minor fixes |
+| 7 | Added glossary |
 
 # Contents
 
@@ -216,6 +216,7 @@ FR_4: fidelty are managed totally by the shop. The customer can choose to get su
 | NFR_5 	| Availability 	| At least 95% 																							| All FR 	|
 | NFR_6     | Security      | User should have access only to functions and resources which they require 							| All FR |
 | Domain 	| // 			| Currency is Euro  																						| All FR 	|
+| Aggiungi NFR:|non salvare dati carta di credito |!!!!|!!!!|
 
 # Use case diagram and use cases
 
@@ -672,10 +673,170 @@ In these use cases, the actor is an user from the shop.
 
 \<concepts are used consistently all over the document, ex in use cases, requirements etc>
 
+```plantuml
+@startuml
+skinparam classAttributeIconSize 0
+
+class EZShop {
+ +Name
+ +VAT number
+ +Address
+ +Email
+ +TelephoneNumber
+}
+
+class User {
+ +ID
+ +Account_name
+ +Account_pwd
+ +Email
+ +Name
+ +Surname
+ +Address
+ +TelephoneNumber
+ +IsAdministrator ??????
+}
+
+
+class Customer {
+ +ID
+ +Name
+ +Surname
+ +VAT number*
+ +Email
+ +Address
+}
+class Subscriber {
+ +IDFidelityCard
+}
+class FidelityCard{
+ +ID
+ +Points
+}
+class Purchase {
+ +IDPurchase
+ +Status: credit card or cash
+}
+class Product {
+ +ID
+ +Expire Date
+}
+class ProductDescriptor {
+ +ID
+ +Name
+ +Price
+ +Discount
+ +Description
+ +Brand
+}
+class Purchase {
+ 
+}
+class Transaction {
+ +ID
+ +Date
+ +Amount
+}
+class Order{
+ +ID
+ +Date
+ +Amount
+}
+class Supplier{
+ +ID
+ +Name
+ +VAT number
+ +Address
+ +Email
+ +TelephoneNumber
+}
+class Invoice {
+ +ID
+ +Date
+ +Amount
+ +VAT number 
+}
+class CashRegister{
+}
+
+class CreditCard{
+ +ID
+}
+
+class Receipt{
+ +ID
+}
+
+class ITAdministrator
+class Cashier
+class Product
+class ProductDescriptor
+class CashRegister
+class WarehouseManager
+class Accountant
+class ShopDirector
+class Customer
+class Subscriber
+class Purchase
+class CreditCard
+class Transaction
+Class Receipt
+Class Invoice
+Class CreditNote
+Class Supplier
+Class Order
+Class ActiveInvoice
+Class PassiveInvoice
+
+EZShop -- "*" User
+ITAdministrator -up-|> User
+Cashier -down-|> User
+WarehouseManager-up-|> User
+Accountant-up-|> User
+ShopDirector-up-|> User
+Subscriber --|> Customer
+CreditNote --|> Invoice
+ActiveInvoice -up-|> Invoice
+PassiveInvoice -up-|> Invoice
+
+
+
+EZShop -right- Catalogue
+EZShop -right- Inventory
+Inventory --"*" Product
+Catalogue --"*" ProductDescriptor
+Customer --"*" Purchase
+Purchase --"*" Product
+FidelityCard -left- Subscriber: +owns
+Product "*"-left- ProductDescriptor: +is described by
+Transaction -right-"0..1" CreditCard
+Customer --"*" CreditCard: +owns
+Purchase --"*" Transaction
+Transaction -- Receipt
+Cashier "*"--"*" CashRegister
+CashRegister --"*" Purchase
+Purchase --"*" ActiveInvoice
+Accountant --"*" PassiveInvoice: ??
+WarehouseManager --"*" Order: places ?????
+Order "*"-- Supplier: +from
+ShopDirector -- Catalogue: manages ??????
+Order "*"--"*" ProductDescriptor
+PassiveInvoice "*"-left- Order
+
+note "One purchase can have more than one\n transaction (e.g. if system refuses credit\n card at first attempt)" as N1
+N1 .. Transaction 
+note "There could be more than one\n invoice per purchase because\n it could be necessary to add a\n credit note to that purchase" as N2
+N2 .. Invoice
+
+@enduml
+```
+
 # System Design
 \<describe here system design>
 
 \<must be consistent with Context diagram>
+
+Not really meaningful in this case. Only software components are needed.
 
 # Deployment Diagram 
 
