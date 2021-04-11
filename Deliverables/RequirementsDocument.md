@@ -60,7 +60,7 @@ EZShop is a software application to:
 | Marketing people | People who sell the software to shops. |
 | Product | Involved indirectly and managed by the software. |
 | Cash Register | The software involves the cash register since they're part of the output. |
-| Fidelty card | Fidely card associated with a customer. |
+| Fidelity card | Fidely card associated with a customer. |
 
 # Context Diagram and interfaces
 
@@ -79,7 +79,7 @@ User <|-- Accountant
 User <|-- ShopDirector
 User <|-- ITAdministrator
 User -- Shop
-FideltyCard -- Shop
+FidelityCard -- Shop
 Product --  Shop
 Shop -- CreditCardSystem
 Shop -- CashRegister
@@ -127,7 +127,7 @@ Shop -- CashRegister
 |  FR_1.2   	| Update inventory |
 |  FR_1.3   	| Send receipt to accounting |
 |  FR_1.4   	| Handle discounts |
-|  FR_1.5   	| Handle fidelty card |
+|  FR_1.5   	| Handle fidelity card |
 |  FR_1.6   	| Scan product |
 |  FR_1.7   	| Add the product to a list of buyings |
 |  FR_1.8   	| Read credit card |
@@ -160,12 +160,12 @@ Shop -- CashRegister
 |  FR_3.5   	| Filter products (catalogue) |
 ||
 |  FR_4     	| Handle customers |
-|  FR_4.1   	| Add fidelty card |
-|  FR_4.2   	| Remove fidelty card |
+|  FR_4.1   	| Add fidelity card |
+|  FR_4.2   	| Remove fidelity card |
 |  FR_4.3   	| Handle card points |
 |  FR_4.3.1 	| Add card points |
 |  FR_4.3.2 	| Remove card points |
-|  FR_4.4   	| Show all fidelty cards & cards points |
+|  FR_4.4   	| Show all fidelity cards & cards points |
 |  FR_4.5   	| Search a customer |
 ||
 |  FR_5     	| Support accounting |
@@ -194,7 +194,7 @@ Shop -- CashRegister
 
 
 FR_1.5
-It means that fidelty card of a user must be updated and it is directly related to FR__4.
+It means that fidelity card of a user must be updated and it is directly related to FR_4.
 In FR_1.6, whenever you scan a product, you add it to the list of products the customer is buying.
 
 FR_2 
@@ -204,7 +204,7 @@ FR_2.1.5
 Allow to set, update or remove Low Stock Thresholds so that an alert is generated if a product's quantity goes below the desired threshold.
 
 FR_4
-Fidelty cards are managed totally by the shop. The customer can choose to get subscribe/unsubscribe and he will be given a card. He will just decide to use or not to use the points, which will be involved in giving discounts to the customer. If he wants to check how many points does he have, he has to get in contact with the shop by himself/with the cashier.
+Fidelity cards are managed totally by the shop. The customer can choose to get subscribe/unsubscribe and he will be given a card. He will just decide to use or not to use the points, which will be involved in giving discounts to the customer. If he wants to check how many points does he have, he has to get in contact with the shop by himself/with the cashier.
 
 ## Non Functional Requirements
 
@@ -215,7 +215,7 @@ Fidelty cards are managed totally by the shop. The customer can choose to get su
 | NFR_1     | Usability   	| User should learn how to use the software within 30 minutes of training 								| All FR 	|
 | NFR_2     | Efficiency	| All functions should complete in less than 0.5s 														| All FR 	|
 | NFR_3     | Localisation 	| Decimal numbers use . (dot) as decimal separator  													| All FR 	|
-| NFR_4 	| Privacy 		| The data of one customer should not be accessible to users other than users who handle fidelty cards. | All FR 	|
+| NFR_4 	| Privacy 		| The data of one customer should not be accessible to users other than users who handle fidelity cards. | All FR 	|
 | NFR_5 	| Availability 	| At least 95% 																							| All FR 	|
 | NFR_6     | Security      | User should have access only to functions and resources which they require 							| All FR 	|
 | Domain 	| // 			| Currency is Euro  																					| All FR 	|
@@ -264,7 +264,7 @@ Authentication <.. WarehouseManagement : include
 Authentication <.. HandleAccounts : include
 Authentication <.. SupportAccounting : include
 
-HandleCustomer --> FideltyCard
+HandleCustomer --> FidelityCard
 HandleSales --> CashRegister
 HandleSales --> CreditCardSystem
 @enduml
@@ -322,8 +322,8 @@ HandleSales --> CreditCardSystem
 @startuml
 
 :ShopDirector: --> (Handle customers)
-(Handle customers) ..> (Add fidelty card) : include
-(Handle customers) ..> (Remove fidelty card) : include
+(Handle customers) ..> (Add fidelity card) : include
+(Handle customers) ..> (Remove fidelity card) : include
 (Handle customers) ..> (Add card points) : include
 (Handle customers) ..> (Remove card points) : include
 
@@ -378,19 +378,19 @@ HandleSales --> CreditCardSystem
 ##  Handle sales
 
 ### Use case 1.1, UC1 - Add Product to the List of Product to buy
-| Actors Involved   | Cashier, Product, Fidelty Card |
+| Actors Involved   | Cashier, Product, Fidelity Card |
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier is already authenticated<br/> 2. Product has a valid Bar Code<br/> |
 |  Post condition   | 1. The list of products to buy is ready<br/> 2. The total amount to pay is computed and displayed<br/>|
-|  Nominal Scenario | 1. For every product in the customer's cart:<br/> 1.1. The Cashier scans the product using the Bar Code Reader<br/> 1.2 The code is readed correctly <br/> 1.3 The Application searches the Product in the Catalogue <br/> 1.4 The Application searches if a discount should be applied to the Product <br/> 1.5 If a Fidelty Card has been scanned, the Application searches if a discount should be applied to the Product for those who have a Fidelty Card <br/> 1.6 The Application retrieves the price of the Product and applies the discount if needed<br/> 1.7 The Application displays the price of the Product and the new partial amount to pay on the Cashier GUI<br/> 2. At the end, the final list of products and the total amount to pay is displayed on the Cashier GUI|
+|  Nominal Scenario | 1. For every product in the customer's cart:<br/> 1.1. The Cashier scans the product using the Bar Code Reader<br/> 1.2 The code is readed correctly <br/> 1.3 The Application searches the Product in the Catalogue <br/> 1.4 The Application searches if a discount should be applied to the Product <br/> 1.5 If a Fidelity Card has been scanned, the Application searches if a discount should be applied to the Product for those who have a Fidelity Card <br/> 1.6 The Application retrieves the price of the Product and applies the discount if needed<br/> 1.7 The Application displays the price of the Product and the new partial amount to pay on the Cashier GUI<br/> 2. At the end, the final list of products and the total amount to pay is displayed on the Cashier GUI|
 |  Variants      	| - The Bar Code is valid, but the Bar Code Reader cannot read it correctly: the Cashier inputs the Bar Code to the Cashier GUI<br/> - The Customer does not want to buy a Product anymore: the Cashier removes it from the list using the Cashier GUI |
 
-### Use case 1.2, UC1 - Authentication of a Fidelty Card
-| Actors Involved   | Cashier, Fidelty Card |
+### Use case 1.2, UC1 - Authentication of a Fidelity Card
+| Actors Involved   | Cashier, Fidelity Card |
 | ----------------- | ------------- |
-|  Precondition     | 1. Cashier is already authenticated<br/> 2. Fidelty Card has a valid Bar Code<br/> 3. This scenario can occur at any time during Use Case 1.1|
-|  Post condition   | The Fidelty Card is recognized and the amount to pay is updated|
-|  Nominal Scenario | 1. The Cashier scans the Fidelty Card using the Bar Code Reader<br/> 2. The Application recognizes the Fidelty Card <br/> 3. The Application searches, for every scanned Product so far, if a discount should be applied for those who have a Fidelty Card<br/> 4. The Application updates the amount to pay according to the results of the previous step|
+|  Precondition     | 1. Cashier is already authenticated<br/> 2. Fidelity Card has a valid Bar Code<br/> 3. This scenario can occur at any time during Use Case 1.1|
+|  Post condition   | The Fidelity Card is recognized and the amount to pay is updated|
+|  Nominal Scenario | 1. The Cashier scans the Fidelity Card using the Bar Code Reader<br/> 2. The Application recognizes the Fidelity Card <br/> 3. The Application searches, for every scanned Product so far, if a discount should be applied for those who have a Fidelity Card<br/> 4. The Application updates the amount to pay according to the results of the previous step|
 |  Variants     	| - The Bar Code is valid, but the Bar Code Reader cannot read it correctly: the Cashier inputs the Bar Code to the Cashier GUI |
 
 ### Use case 1.3, UC1 - Handle a Payment via Credit Card
@@ -545,37 +545,37 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 Actors could be Cashier or other worker in charge to handle the customers.
 We'll consider the Cashier as the actor.
 
-### Use case x, UCx - Add fidelty card
+### Use case x, UCx - Add fidelity card
 | Actors Involved   | Cashier		|
 | ----------------- | ------------- |
 |  Precondition     | 1. Account cashier must exist<br/>2. Cashier is authenticated|
-|  Post condition   | A fidelty card is added to the database and is given to the customer |
-|  Nominal Scenario | 1. Cashier selects to add a fidelty card <br> 2. Software shows forms to add the customer data <br> 3. Cashier inserts the customer data <br> 4. Cashier confirms <br> 5. The application assigns a new ID to the card in the database <br> 6. A paper containing a barcode is issued to the customer |
-|  Variants     	| - A customer can have at most one fidelty card active: each fidelty card has an unique ID, along with the customer SSN |
+|  Post condition   | A fidelity card is added to the database and is given to the customer |
+|  Nominal Scenario | 1. Cashier selects to add a fidelity card <br> 2. Software shows forms to add the customer data <br> 3. Cashier inserts the customer data <br> 4. Cashier confirms <br> 5. The application assigns a new ID to the card in the database <br> 6. A paper containing a barcode is issued to the customer |
+|  Variants     	| - A customer can have at most one fidelity card active: each fidelity card has an unique ID, along with the customer SSN |
 
-### Use case x, UCx - Remove fidelty card
+### Use case x, UCx - Remove fidelity card
 | Actors Involved   | Cashier		|
 | ----------------- | ------------- |
-|  Precondition     |  1. Account cashier must exist<br/>2. Cashier is  authenticated<br/>3. The fidelty card must exist |
-|  Post condition   | One or more fidelty cards are removed from the database |
-|  Nominal Scenario | 1. Cashier selects to remove a fidelty card <br> 2. Software shows a list of fidelty cards <br> 3. Cashier chooses to remove one or more fidelty card <br> 4. Cashier confirms |
-|  Variants     	| - There are no fidelty cards: no card will be shown |
+|  Precondition     |  1. Account cashier must exist<br/>2. Cashier is  authenticated<br/>3. The fidelity card must exist |
+|  Post condition   | One or more fidelity cards are removed from the database |
+|  Nominal Scenario | 1. Cashier selects to remove a fidelity card <br> 2. Software shows a list of fidelity cards <br> 3. Cashier chooses to remove one or more fidelity card <br> 4. Cashier confirms |
+|  Variants     	| - There are no fidelity cards: no card will be shown |
 
 ### Use case x, UCx - Add card points
 | Actors Involved   | Cashier		|
 | ----------------- | ------------- |
-|  Precondition     | 1. Account cashier must exist<br/>2. Cashier is  authenticated<br/>3. The fidelty card must exist |
+|  Precondition     | 1. Account cashier must exist<br/>2. Cashier is  authenticated<br/>3. The fidelity card must exist |
 |  Post condition   | Card points are added to the card|
-|  Nominal Scenario | 1. Cashier selects to add points to a fidelty card <br> 2. Software chooses a list of fidelty cards <br> 3. Cashier selects one <br> 4. Cashier chooses the amount to add <br> 5. Cashier confirms |
-|  Variants     	| - There are no fidelty cards: no card will be shown |
+|  Nominal Scenario | 1. Cashier selects to add points to a fidelity card <br> 2. Software chooses a list of fidelity cards <br> 3. Cashier selects one <br> 4. Cashier chooses the amount to add <br> 5. Cashier confirms |
+|  Variants     	| - There are no fidelity cards: no card will be shown |
 
 ### Use case x, UCx - Remove card points
 | Actors Involved   | Cashier		|
 | ----------------- | ------------- |
-|  Precondition     | 1. Account cashier must exist<br/>2. Cashier is  authenticated<br/>3. The fidelty card must exist |
+|  Precondition     | 1. Account cashier must exist<br/>2. Cashier is  authenticated<br/>3. The fidelity card must exist |
 |  Post condition   | Points are removed from the card|
-|  Nominal Scenario | 1. Cashier selects to remove points from a fidelty card <br> 2. Software chooses a list of fidelty cards <br> 3. Cashier selects one <br> 4. Cashier chooses the amount to remove <br> 5. Cashier confirms  |
-|  Variants     	| - There are no fidelty cards: no card will be shown |
+|  Nominal Scenario | 1. Cashier selects to remove points from a fidelity card <br> 2. Software chooses a list of fidelity cards <br> 3. Cashier selects one <br> 4. Cashier chooses the amount to remove <br> 5. Cashier confirms  |
+|  Variants     	| - There are no fidelity cards: no card will be shown |
 
 ## Support accounting
 
