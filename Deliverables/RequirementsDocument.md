@@ -475,13 +475,6 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 
 #
 ## Manage orders
-### Use case x, UCx - Place new order
-| Actors Involved 	| 			Warehouse Manager              |
-| ----------------- | ---------------------------------------- |
-| Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
-| Post condition 	| A new order has been placed |
-| Nominal Scenario  | 1. Warehouse Manager clicks on 'New Order' icon<br/>2. The software presents the view for placing a new order<br/>3. Warehouse Manager selects products, as well as the desired quantity, and fills in other necessary infos<br/>&ensp;(3.1) Software asks for confirmation<br/>&ensp;(3.2) Warehouse Manager gives confirmation<br/> 4. The software places the order |
-| Variants          | - Before completing the operation, the Warehouse Manager decides to discard it<br/>- The order cannot be placed for some reason |
 
 ### Use case x, UCx - Place new order
 | Actors Involved 	| 			Warehouse Manager              |
