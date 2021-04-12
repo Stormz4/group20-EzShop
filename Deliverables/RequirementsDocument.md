@@ -563,17 +563,17 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 ### Use case x, UCx - Show products (catalogue)
 | Actors Involved 	| 			Shop director           |
 | ----------------- | ---------------------------------------- |
-| Precondition   	| 1. Shop director has an account<br/>2. Shop director is authenticated<br/>3. Inventory exists |
+| Precondition   	| 1. Shop director has an account<br/>2. Shop director is authenticated<br/>3. Catalogue exists |
 | Post condition 	| Software shows a list of products present in the catalogue, sorted by ID |
 | Nominal Scenario  | 1. Shop director selects "show products in the catalogue"|
-| Variants          |  - A different sorting criteria is selected<br/>-  Products are filtered writing something in the search bar or using filters (e.g. date, supplier, ...) |
+| Variants          |  - A different sorting criteria is selected<br/>-  Products are filtered writing something in the search bar or using filters (type of product, selling price, ...) |
 
 ### Use case x, UCx - Filter products (catalogue)
 | Actors Involved 	| 			Shop director               |
 | ----------------- | ---------------------------------------- |
-| Precondition   	| 1. Shop director has an account<br/>2. Shop director is authenticated<br/>3. Inventory exists |
+| Precondition   	| 1. Shop director has an account<br/>2. Shop director is authenticated<br/>3. Catalogue exists |
 | Post condition 	| A list of products, filtered and sorted as desired, is shown |
-| Nominal Scenario  | Warehouse Manager writes inside the search bar or uses some other filter:<br/>&ensp;- type of product<br/>&ensp;- selling price|
+| Nominal Scenario  | Shop director rites inside the search bar or uses some other filter:<br/>&ensp;- type of product<br/>&ensp;- selling price|
 | Variants          |  -  |
 
 ## Customers management
