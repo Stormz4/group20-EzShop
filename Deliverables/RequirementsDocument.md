@@ -147,7 +147,6 @@ Shop -- CashRegister
 |  FR_2.1.1 	| Add product |
 |  FR_2.1.2 	| Remove product |
 |  FR_2.1.3 	| Update product |
-|  FR_2.1.4 	| Filter products |
 |  FR_2.1.5   	| Manage Low Stock Thresholds |
 |  FR_2.1.6   	| Show products (inventory) |
 |  FR_2.2   	| Manage order |
@@ -155,13 +154,12 @@ Shop -- CashRegister
 |  FR_2.2.2 	| Remove order |
 |  FR_2.2.3 	| Modify order |
 |  FR_2.2.4 	| Show orders |
-|  FR_2.2.5 	| Filter orders |
 ||
 |  FR_3     	| Catalogue management |
 |  FR_3.1   	| Update products selling price |
 |  FR_3.2   	| Add product |
 |  FR_3.3   	| Remove product  |
-|  FR_3.4   	| Show products (catalogue) |
+|  FR_3.4   	| Show products in the catalogue |
 ||
 |  FR_4     	| Customers management |
 |  FR_4.1   	| Add fidelity card |
@@ -296,7 +294,6 @@ SalesManagement --> CreditCardSystem
 ' (Update product)       ..> (Purchase price) : include
 ' (Update product)       ..> (Description) : include
 (Inventory management) ..> (Show products) : include
-(Inventory management) ..> (Filter products) : include
 ' (Filter products)      ..> (Name) : by
 ' (Filter products)      ..> (Supplier) : by
 ' (Filter products)      ..> (Brand) : by
@@ -306,7 +303,6 @@ SalesManagement --> CreditCardSystem
 (Order management)     ..> (Cancel order) : include
 (Order management)     ..> (Edit order) : include
 (Order management)     ..> (Show orders) : include
-(Order management)     ..> (Filter orders) : include
 ' (Filter orders)        ..> (Date) : by
 ' (Filter orders)        ..> (Supplier) : by
 ' (Filter orders)        ..> (Amount) : by
@@ -325,7 +321,6 @@ SalesManagement --> CreditCardSystem
 (Catalogue management) ..> (Add product) : include
 (Catalogue management) ..> (Remove product) : include
 (Catalogue management) ..> (Show products in the catalogue) : include
-(Catalogue management) ..> (Filter products in the catalogue) : include
 
 @enduml
 ```
@@ -338,8 +333,7 @@ SalesManagement --> CreditCardSystem
 :ShopDirector: --> (Customers management)
 (Customers management) ..> (Add fidelity card) : include
 (Customers management) ..> (Remove fidelity card) : include
-(Customers management) ..> (Show all fidelity cards & cards points) : include
-(Customers management) ..> (Search a fidelity card) : include
+(Customers management) ..> (Show fidelity cards & cards points) : include
 
 @enduml
 ```
@@ -391,9 +385,7 @@ SalesManagement --> CreditCardSystem
 
 ##  Sales management
 
-[Vanno modificati i functional requirement!]
-
-### Use case 1.1, UC1 - Provide Shopping Cart and Total Amount
+### Use case 1, UC1 - Provide Shopping Cart and Total Amount
 | Actors Involved   | Cashier |
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier is already authenticated<br/> 2. Product has a valid Bar Code<br/> |
@@ -401,7 +393,7 @@ SalesManagement --> CreditCardSystem
 |  Nominal Scenario | 1. For every product in the customer's cart:<br/> 1.1. The Cashier scans the product using the Bar Code Reader<br/> 1.2 The code is readed correctly <br/> 1.3 The Application searches the Product in the Catalogue <br/> 1.4 The Application searches if a discount should be applied to the Product <br/> 1.5 If a Fidelity Card has been scanned, the Application searches if a discount should be applied to the Product for those who have a Fidelity Card <br/> 1.6 The Application retrieves the price of the Product and applies the discount if needed<br/> 1.7 The Application displays the price of the Product and the new partial amount to pay on the Cashier GUI<br/> 2. At the end, the final list of products and the total amount to pay is displayed on the Cashier GUI|
 |  Variants      	| - The Bar Code is valid, but the Bar Code Reader cannot read it correctly: the Cashier inputs the Bar Code to the Cashier GUI<br/> - The Customer does not want to buy a Product anymore: the Cashier removes it from the list using the Cashier GUI |
 
-### Use case 1.2, UC1 - Authentication of a Fidelity Card
+### Use case 2, UC1 - Authentication of a Fidelity Card
 | Actors Involved   | Cashier |
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier is already authenticated<br/> 2. Fidelity Card has a valid Bar Code<br/> 3. This scenario can occur at any time during Use Case 1.1|
@@ -409,7 +401,7 @@ SalesManagement --> CreditCardSystem
 |  Nominal Scenario | 1. The Cashier scans the Fidelity Card using the Bar Code Reader<br/> 2. The Application recognizes the Fidelity Card <br/> 3. The Application searches, for every scanned Product so far, if a discount should be applied for those who have a Fidelity Card<br/> 4. The Application updates the amount to pay according to the results of the previous step|
 |  Variants     	| - The Bar Code is valid, but the Bar Code Reader cannot read it correctly: the Cashier inputs the Bar Code to the Cashier GUI |
 
-### Use case 1.3, UC1 - Handle a Payment via Credit Card
+### Use case 3, UC1 - Handle a Payment via Credit Card
 | Actors Involved   | Cashier, Cash Register, Credit Card System |
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier is already authenticated<br/> 2. Customer has a valid Credit Card<br/> 3. The list of products to buy is known<br/> 4. The total amount of pay is known|
@@ -417,7 +409,7 @@ SalesManagement --> CreditCardSystem
 |  Nominal Scenario | 1. The Credit Card System shows the amount to pay<br/> 2. The Credit Card system receives the customer's Credit Card and recognizes it<br/> 3. The Credit Card System bypasses the Application and automatically interacts with the Payment Gateway <br/> 4. After that the transaction has terminated successfully, the Credit Card System notifies the Application <br/> 5. The Application opens the Cash Register and asks to print the receipt <br/> 6. The Cash Register prints the receipt <br/> 7. The Application sends the invoice to the Accounting <br/> 8. For each Product in the list: remove it from the Inventory|
 |  Variants     	| - The Credit Card System is not able to recognize the Card: retry to recognize it<br/> - Transaction does not terminate successfully: the Credit Card System notifies the Application and displays an error message: restart from step 2|
 
-### Use Case 1.4, UC1 - Handle a Payment via Cash
+### Use Case 4, UC1 - Handle a Payment via Cash
 | Actors Involved   | Cashier, Cash Register |
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier is already authenticated<br/> 2. The customer has successfully paid by cash<br/> 3. The list of products to buy is known<br/> 4. The total amount of pay is known|
@@ -477,17 +469,9 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
 | Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
-| Post condition 	| A list of products, filtered and sorted as desired, is shown |
+| Post condition 	| Software shows a list of products, sorted by ID (default)|
 | Nominal Scenario  | Warehouse Manager accesses stock's section of the software, where he can look at the complete list of products sorted by ID (default sort) |
 | Variants          |  - A different sorting criteria is selected<br/>-  Products are filtered writing something in the search bar or using filters (e.g. date, supplier, ...) |
-
-### Use case x, UCx - Filter products
-| Actors Involved 	| 			Warehouse Manager              |
-| ----------------- | ---------------------------------------- |
-| Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
-| Post condition 	| A list of products, filtered and sorted as desired, is shown |
-| Nominal Scenario  | Warehouse Manager writes inside the search bar or uses some other filter:<br/>&ensp;- quantity<br/>&ensp;- supplier<br/>&ensp;- purchase price |
-| Variants          |  -  |
 
 #
 ## Manage orders
@@ -527,17 +511,9 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
 | Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
-| Post condition 	| A list of orders, filtered and sorted as desired, is shown |
+| Post condition 	| Software shows a list of orders, sorted by ID (default) |
 | Nominal Scenario  | Warehouse Manager accesses orders section of the software, where he can look at the complete list of orders sorted by ID (default sort) |
 | Variants          |  - A different sorting criteria is selected<br/>-  Orders are filtered writing something in the search bar or using filters (e.g. date, supplier, ...) |
-
-### Use case x, UCx - Filter orders
-| Actors Involved 	| 			Warehouse Manager              |
-| ----------------- | ---------------------------------------- |
-| Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
-| Post condition 	| A list of orders, filtered and sorted as desired, is shown |
-| Nominal Scenario  | Warehouse Manager writes inside the search bar or uses some other filter:<br/>&ensp;- order total amount<br/>&ensp;- supplier<br/>&ensp;- order's date |
-|  Variants     	| - |
 
 ## Catalogue management
 
@@ -565,11 +541,11 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 |  Nominal Scenario | 1. Shop director selects "remove a product" <br> 2. Software shows a list of products present in the catalogue <br> 3. Shop director selects one or more products <br> 4. Shop director confirms|
 |  Variants     	| - The catalogue is empty: no product will be shown|
 
-### Use case x, UCx - Show products
+### Use case x, UCx - Show products in the catalogue
 | Actors Involved 	| 			Shop director           |
 | ----------------- | ---------------------------------------- |
 | Precondition   	| 1. Shop director has an account<br/>2. Shop director is authenticated<br/>3. Catalogue exists |
-| Post condition 	| Software shows a list of products present in the catalogue, sorted by ID |
+| Post condition 	| Software shows a list of products present in the catalogue, sorted by ID (default) |
 | Nominal Scenario  | 1. Shop director selects "show products in the catalogue"|
 | Variants          |  - A different sorting criteria is selected<br/>-  Products are filtered writing something in the search bar or using filters (type of product, selling price, ...) |
 
@@ -600,7 +576,7 @@ We'll consider the Cashier as the actor.
 | Precondition   	| 1. Cashier has an account<br/>2. Cashier is authenticated<br/>3. At least one fidelity card exists|
 | Post condition 	| Software shows a list of fidelity cards, sorted by ID |
 | Nominal Scenario  | 1. Cashier selects "show all fidelity cards & cards points"|
-| Variants          | Fidelity cards are filtered writing something in the search bar  |
+| Variants          | Fidelity cards are filtered writing something in the search bar (SSN, name, surname, telephone, ID) |
 
 ## Support accounting
 
@@ -737,7 +713,7 @@ class EZShop {
 }
 
 class User {
- +ID
+ +SSN
  +Account_name
  +Account_pwd
  +Email
@@ -750,10 +726,10 @@ class User {
 
 
 class Customer {
- +ID
+ +SSN
  +Name
  +Surname
- +VAT number*
+ +Telephone
  +Email
  +Address
 }
@@ -762,6 +738,10 @@ class Subscriber {
 }
 class FidelityCard{
  +ID
+ +SSN
+ +Name
+ +Surname
+ +Telephone
  +Points
 }
 class Purchase {
