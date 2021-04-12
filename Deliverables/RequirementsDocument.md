@@ -656,7 +656,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 |  Precondition     | 1. Accountant account must exist<br/>2. Accountant must be authenticated |
 |  Post condition   | Statistics are shown on screen by means of a table, a diagram or a graph |
 |  Nominal Scenario | Accountant selects a specific timeframe and shows the shop's revenue and expenses in that time period |
-|  Variants     	| - Accountant decide to make application displaying the best selling products|
+|  Variants     	| - Accountant decide to make application displaying the best selling products |
 
 ##### Scenario x.1 
 
@@ -666,8 +666,9 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | Post condition   	| Revenues and expenses in a specific timeframe are shown on the screen |
 | Step#        		| Description  |
 | 1     			| User selects a specific timeframe |
-| 2     			| System searches both revenues and expenses of that timeframe |
-| 3    				| System displays found revenues and expenses and shows a diagram about those data |
+| 2     			| User selects a filter for the search results (e.g. by supplier, by product, etc.) |
+| 3     			| System searches both revenues and expenses of that timeframe which satisfy selected filters |
+| 4    				| System displays found revenues and expenses and shows a diagram about those data |
 
 ##### Scenario x.2 
 
@@ -676,15 +677,16 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | Precondition      | At least one product must exist in catalogue |
 | Post condition    | The Top 5 best selling products list is shown on screen |
 | Step#          	| Description  |
-| 1 			    | System searches the best 5 selling products of all time (products which lead to the highest revenues considering the whole shop history) |
-| 2				    | System displays the found products (could be less than 5) and shows a graph about those data |
+| 1     			| User selects a filter by supplier for the search results |
+| 2 			    | System searches the best 5 selling products of all time (products which lead to the highest revenues considering the whole shop history) which satisfy selected filter |
+| 3				    | System displays the found products (could be less than 5) and shows a graph about those data |
 
 ### Use case x, UCx - Show suppliers deadlines timetable
 | Actors Involved   | Accountant  |
 | ----------------- | ----------- |
 |  Precondition     | 1. Accountant account must exist<br/>2. Accountant must be authenticated<br/>3. The Shop has got at least one supplier<br/>4. Suppliers deadline timetable is generated from invoices data |
 |  Post condition   | A list of deadlines are shown on screen |
-|  Nominal Scenario | 1. Application displays deadlines distinguishing them by suppliers and sorting them by date  |
+|  Nominal Scenario | 1. User selects a filter by supplier for the search results <br/>2. Application displays deadlines distinguishing them by selected suppliers and sorting them by date  |
 |  Variants     	| - All deadlines have been satisfied: an "Up to date with payments" message is displayed<br/>- One or more deadlines are expired: an alert message is generated  |
 
 ## Accounts management
