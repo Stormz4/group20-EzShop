@@ -781,10 +781,10 @@ class Invoice {
  +VAT number 
 }
 class BalanceSheet{
-startDate
-endDate
-totExpenses
-totRevenue
++startDate
++endDate
++totExpenses
++totRevenue
 }
 class CashRegister{
  +ID
@@ -832,6 +832,7 @@ PassiveInvoice -up-|> Invoice
 
 Invoice "*" --* BalanceSheet
 Purchase "*" --* BalanceSheet
+Accountant -- "*" BalanceSheet : analyses >
 
 EZShop -right- Catalogue
 EZShop -right- Inventory
