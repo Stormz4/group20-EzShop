@@ -722,7 +722,7 @@ class Customer {
  +SSN
  +Name
  +Surname
- +Telephone
+ +TelephoneNumber
  +Email
  +Address
 }
@@ -734,7 +734,7 @@ class FidelityCard{
  +SSN
  +Name
  +Surname
- +Telephone
+ +TelephoneNumber
  +Points
 }
 class Purchase {
@@ -780,6 +780,12 @@ class Invoice {
  +Amount
  +VAT number 
 }
+class BalanceSheet{
+startDate
+endDate
+totExpenses
+totRevenue
+}
 class CashRegister{
  +ID
 }
@@ -824,7 +830,8 @@ CreditNote --|> Invoice
 ActiveInvoice -up-|> Invoice
 PassiveInvoice -up-|> Invoice
 
-
+Invoice "*" --* BalanceSheet
+Purchase "*" --* BalanceSheet
 
 EZShop -right- Catalogue
 EZShop -right- Inventory
