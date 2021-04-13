@@ -134,15 +134,13 @@ Shop -- CashRegister
 |  FR_1.2	| Handle Fidelity Card |
 |  FR_1.2.1	| Scan Fidelity Card |
 |  FR_1.2.2	| Authenticate Fidelity Card |
-|  FR_1.3	| Handle Transaction |
-|  FR_1.3.1	| Handle Payment (Cash) |
-|  FR_1.3.2	| Handle Payment (Credit Card) |
-|  FR_1.3.2.1	| Scan Credit Card (via Credit Card System) |
-|  FR_1.3.3	| Notify Payment result|
-|  FR_1.3.4	| Open the Cash Register|
-|  FR_1.3.5	| Print Receipt |
-|  FR_1.3.6	| Send Active Invoice to Accounting|
-|  FR_1.3.7	| Remove Shopping Cart elements from Inventory|
+|  FR_1.3	| Handle Payment (Cash or via Credit Card) |
+|  FR_1.3.1	| Scan Credit Card (via Credit Card System) |
+|  FR_1.3.2	| Notify Payment result|
+|  FR_1.3.3	| Open the Cash Register|
+|  FR_1.3.4	| Print Receipt |
+|  FR_1.3.5	| Send Transaction information to Accounting|
+|  FR_1.3.6	| Remove Shopping Cart elements from Inventory|
 ||
 |  FR_2     	| Warehouse management |
 |  FR_2.1   	| Inventory management |
@@ -198,9 +196,6 @@ Shop -- CashRegister
 |  FR_7			| Authentication |
 |  FR_7.1		| Login |
 |  FR_7.2		| Logout |
-
-FR_1.3
-A Transaction is composed of Payment + Inventory and Accounting Update.
 
 FR_2 
 Inventory management is focused solely on the actual items being held within a warehouse. Warehouse management, in contrast, is more related to the items movement.
@@ -284,8 +279,8 @@ SalesManagement --> CreditCardSystem
 (FR1.1 Provide Shopping Cart and Total Amount) ..> (FR1.2 Handle Fidelity Card) : include
 (FR1.2 Handle Fidelity Card) ..> (FR1.2.2 Authenticate Fidelity Card) : include
 (FR1 Sales Management) ..> (FR1.3 Handle Payment) : include
-(FR1.3 Handle Payment) <.. (FR1.3.1 Handle Payment via Cash) : extends
-(FR1.3 Handle Payment) <.. (FR1.3.2 Handle Payment via Credit Card) : extends
+(FR1.3 Handle Payment) <.. (Handle Payment via Cash) : extends
+(FR1.3 Handle Payment) <.. (Handle Payment via Credit Card) : extends
 @enduml
 '''
 
@@ -418,15 +413,15 @@ In these Use Cases, the actor is the Cashier that has to deal with Shopping Cart
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier is already authenticated<br/> 2. Customer has a valid Credit Card<br/> 3. The list of products to buy is known<br/> 4. The total amount of pay is known|
 |  Post condition   | The customer has successfully paid <br/> The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
-|  Nominal Scenario | 1. The Credit Card System shows the amount to pay<br/> 2. The Credit Card system receives the customer's Credit Card and recognizes it<br/> 3. The Credit Card System interacts with the Payment Gateway bypassing the Application<br/> 4. The Credit Card System notifies about the transaction result <br/> 5. The Cash Register is opened and prints the receipt <br/> 6. The invoice is sent to the Accounting <br/> 8. Each Product in the list is removed from the Inventory|
-|  Variants     	| - The Credit Card System is not able to recognize the Card: retry to recognize it<br/> - Transaction does not terminate successfully: the Credit Card System notifies the Application and displays an error message: restart from step 2|
+|  Nominal Scenario | 1. The Credit Card System shows the amount to pay<br/> 2. The Credit Card system receives the customer's Credit Card and recognizes it<br/> 3. The Credit Card System interacts with the Payment Gateway bypassing the Application<br/> 4. The Credit Card System notifies about the transaction result <br/> 5. The Cash Register is opened and prints the receipt <br/> 6. Transaction information is sent to the Accounting <br/> 7. Each Product in the list is removed from the Inventory|
+|  Variants     	| - The Credit Card System is not able to recognize the Card: retry to recognize it<br/> - Payment does not terminate successfully: the Credit Card System notifies the Application and displays an error message: restart from step 2|
 
 ### Use Case 1.4, UC1 - Handle a Payment via Cash
 | Actors Involved   | Cashier, Cash Register |
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier is already authenticated<br/> 2. The customer has successfully paid by cash<br/> 3. The list of products to buy is known<br/> 4. The total amount of pay is known|
 |  Post condition   | The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
-|  Nominal Scenario | 1. The Cashier notifies that the customer has successfully paid by cash<br/> 2. The Cash Register is opened and prints the receipt<br/> 3. The invoice is sent to the Accounting <br/> 5. Each Product in the list is removed from the Inventory|
+|  Nominal Scenario | 1. The Cashier notifies that the customer has successfully paid by cash<br/> 2. The Cash Register is opened and prints the receipt<br/> 3. Transaction information is sent to the Accounting <br/> 4. Each Product in the list is removed from the Inventory|
 |  Variants     	| - |
 
 ## Inventory management
