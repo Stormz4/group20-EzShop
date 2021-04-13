@@ -102,7 +102,8 @@ Shop -- CashRegister
 | Warehouse manager 	| GUI 				| Screen, Keyboard, Mouse |
 | Accountant 			| GUI 				| Screen, Keyboard, Mouse |
 | Shop director 		| GUI 				| Screen, Keyboard, Mouse |
-| Fidelity card 		| Bar code 			| Bar code reader | 
+| Fidelity card 		| Bar code 			| Bar code reader |
+| ITAdministrator| GUI | Screen, Keyboard, Mouse | 
 
 # Stories and personas
 \<A Persona is a realistic impersonation of an actor. Define here a few personas and describe in plain text how a persona interacts with the system>
@@ -255,13 +256,6 @@ SalesManagement --> Product
 WarehouseManagement --> Product
 CatalogueManagement --> Product
 SalesManagement ..> WarehouseManagement : include
-
-Authentication <.. SalesManagement : include
-Authentication <.. CustomersManagement : include
-Authentication <.. CatalogueManagement : include
-Authentication <.. WarehouseManagement : include
-Authentication <.. AccountsManagement : include
-Authentication <.. SupportAccounting : include
 
 CustomersManagement --> FidelityCard
 SalesManagement --> CashRegister
