@@ -573,7 +573,7 @@ We'll consider the Cashier as the actor.
 
 ## Support accounting
 
-In these use cases, the actor is an accountant, or a generic user from the shop acting as the accountant, managing the simplified accounting of the shop (hypothesis: annual revenue below 700'000€) taking data from Agenzia delle Entrate informatic system.
+In these use cases, the actor is an accountant, or a generic user from the shop having privileges of an accountant profile, managing the simplified accounting of the shop (hypothesis: annual revenue below 700'000€) taking data from Agenzia delle Entrate informatic system.
 
 ### Use case x, UCx - Add invoice (passive)
 | Actors Involved   | Accountant  |
@@ -748,6 +748,7 @@ class Product {
 class ProductDescriptor {
  +ID
  +Name
+ +Category
  +Price
  +Discount
  +Description
@@ -819,30 +820,29 @@ Class Order
 Class ActiveInvoice
 Class PassiveInvoice
 
-EZShop -- "*" User
+EZShop -down- "*" User
 ITAdministrator -up-|> User
-Cashier -down-|> User
+Cashier -up-|> User
 WarehouseManager-up-|> User
 Accountant-up-|> User
 ShopDirector-up-|> User
 Subscriber --|> Customer
 CreditNote --|> Invoice
-ActiveInvoice -up-|> Invoice
-PassiveInvoice -up-|> Invoice
+ActiveInvoice --|> Invoice
+PassiveInvoice --|> Invoice
 
 Invoice "*" --* BalanceSheet
 Purchase "*" --* BalanceSheet
 Accountant -- "*" BalanceSheet : analyses >
-
-EZShop -right- Catalogue
-EZShop -right- Inventory
+EZShop -- Catalogue
+EZShop -- Inventory
 Inventory --"*" Product
 Catalogue --"*" ProductDescriptor
 Customer --"*" Purchase
 Purchase --"*" Product
-FidelityCard -left- Subscriber: +owns <
-Product "*"-left- ProductDescriptor: +is described by
-Transaction -right-"0..1" CreditCard
+FidelityCard -- Subscriber: +owns <
+Product "*"-- ProductDescriptor: +is described by
+Transaction --"0..1" CreditCard
 Customer --"*" CreditCard: +owns >
 Purchase --"*" Transaction
 Transaction -- Receipt
@@ -854,7 +854,7 @@ WarehouseManager --"*" Order: places
 Order "*"-- Supplier: +from
 ShopDirector -- Catalogue: manages
 Order "*"--"*" Product
-PassiveInvoice "*"-left- Order
+PassiveInvoice "*"-- Order
 WarehouseManager -- Inventory: manages
 Cashier --"*" FidelityCard: manages
 ITAdministrator --"*" User: manages
@@ -863,6 +863,184 @@ note "One purchase can have more than one\n transaction (e.g. if system refuses 
 N1 .. Transaction 
 note "There could be more than one\n invoice per purchase because\n it could be necessary to add a\n credit note to that purchase" as N2
 N2 .. Invoice
+note "Single product\nto be sold.\nIt does not\nhave a unique ID." as N3
+N3 .right. Product
+@enduml
+```
+
+#[SECOND VERSION]
+```plantuml
+@startuml
+skinparam classAttributeIconSize 0
+
+class EZShop {
+ +Name
+ +VAT number
+ +Address
+ +Email
+ +TelephoneNumber
+}
+
+class User {
+ +SSN
+ +Account_name
+ +Account_pwd
+ +Email
+ +Name
+ +Surname
+ +Address
+ +TelephoneNumber
+ +PrivilegeLevel
+}
+
+
+class Customer {
+ +SSN
+ +Name
+ +Surname
+ +TelephoneNumber
+ +Email
+ +Address
+}
+class Subscriber {
+ +IDFidelityCard
+}
+class FidelityCard{
+ +ID
+ +SSN
+ +Name
+ +Surname
+ +TelephoneNumber
+ +Points
+}
+class Purchase {
+ +IDPurchase
+ +Status: credit card or cash
+}
+class Product {
+ +ID
+ +Expire Date
+}
+class ProductDescriptor {
+ +ID
+ +Name
+ +Category
+ +Price
+ +Discount
+ +Description
+ +Brand
+}
+class Purchase {
+ 
+}
+class Transaction {
+ +ID
+ +Date
+ +Amount
+}
+class Order{
+ +ID
+ +Date
+ +Amount
+}
+class Supplier{
+ +ID
+ +Name
+ +VAT number
+ +Address
+ +Email
+ +TelephoneNumber
+}
+class Invoice {
+ +ID
+ +Date
+ +Amount
+ +VAT number 
+}
+class BalanceSheet{
++startDate
++endDate
++totExpenses
++totRevenue
+}
+class CashRegister{
+ +ID
+}
+
+class CreditCard{
+ +ID
+}
+
+class Receipt{
+ +ID
+}
+
+class ITAdministrator
+class Cashier
+class Product
+class ProductDescriptor
+class CashRegister
+class WarehouseManager
+class Accountant
+class ShopDirector
+class Customer
+class Subscriber
+class Purchase
+class CreditCard
+class Transaction
+Class Receipt
+Class Invoice
+Class CreditNote
+Class Supplier
+Class Order
+Class ActiveInvoice
+Class PassiveInvoice
+
+EZShop -down- "*" User
+ITAdministrator -up-|> User
+Cashier -up-|> User
+WarehouseManager-up-|> User
+Accountant-up-|> User
+ShopDirector-up-|> User
+Subscriber --|> Customer
+CreditNote -up-|> Invoice
+ActiveInvoice -right-|> Invoice
+PassiveInvoice --|> Invoice
+
+EZShop -- Catalogue
+EZShop -- Inventory
+Inventory --"*" Product
+Catalogue --"*" ProductDescriptor
+Customer --"*" Purchase
+Purchase --"*" Product
+FidelityCard -- Subscriber: +owns <
+Product "*"-- ProductDescriptor: +is described by
+Transaction --"0..1" CreditCard
+Customer --"*" CreditCard: +owns >
+Purchase --"*" Transaction
+Transaction -- Receipt
+Cashier "*"--"*" CashRegister
+CashRegister --"*" Purchase
+Purchase --"*" ActiveInvoice
+Accountant --"*" PassiveInvoice: create
+WarehouseManager --"*" Order: places
+Order "*"-down- Supplier: +from
+ShopDirector -- Catalogue: manages
+Order "*"-right-"*" Product
+PassiveInvoice "*"-- Order
+WarehouseManager -- Inventory: manages
+Cashier -left-"*" FidelityCard: manages
+ITAdministrator --"*" User: manages
+Invoice "*" -up-* BalanceSheet
+Purchase "*" --* BalanceSheet
+Accountant -- "*" BalanceSheet : analyses >
+
+note "One purchase can have more than one\n transaction (e.g. if system refuses credit\n card at first attempt)" as N1
+N1 .. Transaction 
+note "There could be more than one\n invoice per purchase because\n it could be necessary to add a\n credit note to that purchase" as N2
+N2 .right. Invoice
+note "Single product\nto be sold.\nIt does not\nhave a unique ID." as N3
+N3 .left. Product
 @enduml
 ```
 
