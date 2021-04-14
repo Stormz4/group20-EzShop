@@ -97,7 +97,8 @@ Shop -- CashRegister
 | Warehouse manager 	| GUI 				| Screen, Keyboard, Mouse |
 | Accountant 			| GUI 				| Screen, Keyboard, Mouse |
 | Shop director 		| GUI 				| Screen, Keyboard, Mouse |
-| Fidelity card 		| Bar code 			| Bar code reader | 
+| Fidelity card 		| Bar code 			| Bar code reader |
+| ITAdministrator| GUI | Screen, Keyboard, Mouse | 
 
 # Stories and personas
 
@@ -140,7 +141,6 @@ Elisa, 32, has just opened a brand new store, where she can earn money from her 
 |  FR_2.1.1 	| Add product |
 |  FR_2.1.2 	| Remove product |
 |  FR_2.1.3 	| Update product |
-|  FR_2.1.4 	| Filter products |
 |  FR_2.1.5   	| Manage Low Stock Thresholds |
 |  FR_2.1.6   	| Show products (inventory) |
 |  FR_2.2   	| Manage order |
@@ -148,23 +148,17 @@ Elisa, 32, has just opened a brand new store, where she can earn money from her 
 |  FR_2.2.2 	| Remove order |
 |  FR_2.2.3 	| Modify order |
 |  FR_2.2.4 	| Show orders |
-|  FR_2.2.5 	| Filter orders |
 ||
 |  FR_3     	| Catalogue management |
 |  FR_3.1   	| Update products selling price |
 |  FR_3.2   	| Add product |
 |  FR_3.3   	| Remove product  |
-|  FR_3.4   	| Show products (catalogue) |
-|  FR_3.5   	| Filter products (catalogue) |
+|  FR_3.4   	| Show products in the catalogue |
 ||
 |  FR_4     	| Customers management |
 |  FR_4.1   	| Add fidelity card |
 |  FR_4.2   	| Remove fidelity card |
-|  FR_4.3   	| Manage card points |
-|  FR_4.3.1 	| Add card points |
-|  FR_4.3.2 	| Remove card points |
-|  FR_4.4   	| Show all fidelity cards & cards points |
-|  FR_4.5   	| Search a customer |
+|  FR_4.3    	| Show fidelity cards & cards points |
 ||
 |  FR_5     	| Support accounting |
 |  FR_5.1   	| Update finance |
@@ -209,6 +203,7 @@ Fidelity cards are managed totally by the shop. The customer can choose to get s
 | NFR_4 	| Privacy 		| Customers data should not be accessible to users other than the ones who manage fidelity cards.       | All FR 	|
 | NFR_5 	| Availability 	| At least 95% 																							| All FR 	|
 | NFR_6     | Security      | User should have access only to functions and resources which they require 							| All FR 	|
+|NFR_7|Privacy|Customer credit card data must not be stored in the system |FR1|
 | Domain 	| // 			| Currency is Euro  																					| All FR 	|
 
 # Use case diagram and use cases
@@ -246,20 +241,13 @@ WarehouseManagement --> Product
 CatalogueManagement --> Product
 SalesManagement ..> WarehouseManagement : include
 
-Authentication <.. SalesManagement : include
-Authentication <.. CustomersManagement : include
-Authentication <.. CatalogueManagement : include
-Authentication <.. WarehouseManagement : include
-Authentication <.. AccountsManagement : include
-Authentication <.. SupportAccounting : include
-
 CustomersManagement --> FidelityCard
 SalesManagement --> CashRegister
 SalesManagement --> CreditCardSystem
 @enduml
 ```
 ### Use Case diagram: Sales management
-'''plantuml
+```plantuml
 @startuml
 :Cashier:     --> (FR1 Sales Management)
 :Product:     <-- (FR1.1 Provide Shopping Cart and Total Amount)
@@ -271,7 +259,7 @@ SalesManagement --> CreditCardSystem
 (FR1.3 Handle Payment) <.. (Handle Payment via Cash) : extends
 (FR1.3 Handle Payment) <.. (Handle Payment via Credit Card) : extends
 @enduml
-'''
+```
 
 ### Use Case diagram: Warehouse management
 ```plantuml
@@ -286,7 +274,6 @@ SalesManagement --> CreditCardSystem
 ' (Update product)       ..> (Purchase price) : include
 ' (Update product)       ..> (Description) : include
 (Inventory management) ..> (Show products) : include
-(Inventory management) ..> (Filter products) : include
 ' (Filter products)      ..> (Name) : by
 ' (Filter products)      ..> (Supplier) : by
 ' (Filter products)      ..> (Brand) : by
@@ -296,7 +283,6 @@ SalesManagement --> CreditCardSystem
 (Order management)     ..> (Cancel order) : include
 (Order management)     ..> (Edit order) : include
 (Order management)     ..> (Show orders) : include
-(Order management)     ..> (Filter orders) : include
 ' (Filter orders)        ..> (Date) : by
 ' (Filter orders)        ..> (Supplier) : by
 ' (Filter orders)        ..> (Amount) : by
@@ -313,6 +299,7 @@ SalesManagement --> CreditCardSystem
 (Catalogue management) ..> (Update price to sell of products) : include
 (Catalogue management) ..> (Add product) : include
 (Catalogue management) ..> (Remove product) : include
+(Catalogue management) ..> (Show products in the catalogue) : include
 
 @enduml
 ```
@@ -325,8 +312,7 @@ SalesManagement --> CreditCardSystem
 :ShopDirector: --> (Customers management)
 (Customers management) ..> (Add fidelity card) : include
 (Customers management) ..> (Remove fidelity card) : include
-(Customers management) ..> (Add card points) : include
-(Customers management) ..> (Remove card points) : include
+(Customers management) ..> (Show fidelity cards & cards points) : include
 
 @enduml
 ```
@@ -393,7 +379,7 @@ In these Use Cases, the actor is the Cashier that has to deal with Shopping Cart
 |  Nominal Scenario | 1. The Cashier scans the Fidelity Card using the Bar Code Reader and recognizes it<br/> 2. For every scanned Product so far: if a discount for Fidelity Card owners is present, it is applied. <br/> 3. The Amount to pay is updated according to the results of the previous step|
 |  Variants     	| - The Bar Code is valid, but the Bar Code Reader cannot read it correctly: the Cashier inputs the Bar Code to the Cashier GUI |
 
-### Use case 1.3, UC1 - Handle a Payment via Credit Card
+### Use case 3, UC1 - Handle a Payment via Credit Card
 | Actors Involved   | Cashier, Cash Register, Credit Card System |
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier is already authenticated<br/> 2. Customer has a valid Credit Card<br/> 3. The list of products to buy is known<br/> 4. The total amount of pay is known|
@@ -401,13 +387,22 @@ In these Use Cases, the actor is the Cashier that has to deal with Shopping Cart
 |  Nominal Scenario | 1. The Credit Card System shows the amount to pay<br/> 2. The Credit Card system receives the customer's Credit Card and recognizes it<br/> 3. The Credit Card System interacts with the Payment Gateway bypassing the Application<br/> 4. The Credit Card System notifies about the transaction result <br/> 5. The Cash Register is opened and prints the receipt <br/> 6. Transaction information is sent to the Accounting <br/> 7. Each Product in the list is removed from the Inventory|
 |  Variants     	| - The Credit Card System is not able to recognize the Card: retry to recognize it<br/> - Payment does not terminate successfully: the Credit Card System notifies the Application and displays an error message: restart from step 2|
 
-### Use Case 1.4, UC1 - Handle a Payment via Cash
+### Use Case 4, UC1 - Handle a Payment via Cash
 | Actors Involved   | Cashier, Cash Register |
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier is already authenticated<br/> 2. The customer has successfully paid by cash<br/> 3. The list of products to buy is known<br/> 4. The total amount of pay is known|
 |  Post condition   | The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
 |  Nominal Scenario | 1. The Cashier notifies that the customer has successfully paid by cash<br/> 2. The Cash Register is opened and prints the receipt<br/> 3. Transaction information is sent to the Accounting <br/> 4. Each Product in the list is removed from the Inventory|
 |  Variants     	| - |
+
+
+### Use case x, UCx - Update card points !!!
+| Actors Involved   | Cashier		|
+| ----------------- | ------------- |
+|  Precondition     | 1. Account cashier must exist<br/>2. Cashier is  authenticated<br/>3. The fidelity card must exist |
+|  Post condition   | Points are updated on the card|
+|  Nominal Scenario | 1. Cashier selects to remove points from a fidelity card <br> 2. Software chooses a list of fidelity cards <br> 3. Cashier selects one <br> 4. Cashier chooses the amount to remove <br> 5. Cashier confirms  |
+|  Variants     	| - There are no fidelity cards: no card will be shown |
 
 ## Inventory management
 In these use cases, the actor is the Warehouse Manager or another user with an account with the privileges required to manage the inventory. The actor can inspect the inventory, add new items to it, and update or remove the existing ones.
@@ -452,29 +447,13 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
 | Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
-| Post condition 	| A list of products, filtered and sorted as desired, is shown |
+| Post condition 	| Software shows a list of products, sorted by ID (default)|
 | Nominal Scenario  | Warehouse Manager accesses stock's section of the software, where he can look at the complete list of products sorted by ID (default sort) |
 | Variants          |  - A different sorting criteria is selected<br/>-  Products are filtered writing something in the search bar or using filters (e.g. date, supplier, ...) |
-
-### Use case x, UCx - Filter products
-| Actors Involved 	| 			Warehouse Manager              |
-| ----------------- | ---------------------------------------- |
-| Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
-| Post condition 	| A list of products, filtered and sorted as desired, is shown |
-| Nominal Scenario  | Warehouse Manager writes inside the search bar or uses some other filter:<br/>&ensp;- quantity<br/>&ensp;- supplier<br/>&ensp;- purchase price |
-| Variants          |  -  |
 
 #
 
 ## Manage orders
-
-### Use case x, UCx - Place new order
-| Actors Involved 	| 			Warehouse Manager              |
-| ----------------- | ---------------------------------------- |
-| Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
-| Post condition 	| A new order has been placed |
-| Nominal Scenario  | 1. Warehouse Manager clicks on 'New Order' icon<br/>2. The software presents the view for placing a new order<br/>3. Warehouse Manager selects products, as well as the desired quantity, and fills in other necessary infos<br/>&ensp;(3.1) Software asks for confirmation<br/>&ensp;(3.2) Warehouse Manager gives confirmation<br/> 4. The software places the order |
-| Variants          | - Before completing the operation, the Warehouse Manager decides to discard it<br/>- The order cannot be placed for some reason |
 
 ### Use case x, UCx - Place new order
 | Actors Involved 	| 			Warehouse Manager              |
@@ -504,24 +483,16 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
 | Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
-| Post condition 	| A list of orders, filtered and sorted as desired, is shown |
+| Post condition 	| Software shows a list of orders, sorted by ID (default) |
 | Nominal Scenario  | Warehouse Manager accesses orders section of the software, where he can look at the complete list of orders sorted by ID (default sort) |
 | Variants          |  - A different sorting criteria is selected<br/>-  Orders are filtered writing something in the search bar or using filters (e.g. date, supplier, ...) |
 
-### Use case x, UCx - Filter orders
-| Actors Involved 	| 			Warehouse Manager              |
-| ----------------- | ---------------------------------------- |
-| Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
-| Post condition 	| A list of orders, filtered and sorted as desired, is shown |
-| Nominal Scenario  | Warehouse Manager writes inside the search bar or uses some other filter:<br/>&ensp;- order total amount<br/>&ensp;- supplier<br/>&ensp;- order's date |
-|  Variants     	| - |
-
 ## Catalogue management
 
-### Use case x, UCx - Update price (to sell) of products
+### Use case x, UCx - Update selling price of products
 | Actors Involved	| Shop director |
 | -----------------	| ------------- |
-|  Precondition     | Account shop director must exist & authenticated; the catalogue contains at least one product |
+|  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. The catalogue contains at least one product |
 |  Post condition   | Price of a product updated |
 |  Nominal Scenario | 1. Shop director selects "update a product" <br> 2. Software shows a list of products present in the catalogue <br> 3. Shop director selects a product <br> 4. Shop director modifies the price of the product in the catalogue <br> 5. Shop director confirms|
 |  Variants     	| - The catalogue is empty: no product will be shown |
@@ -529,7 +500,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 ### Use case x, UCx - Add product
 | Actors Involved	| Shop director |
 | -----------------	| ------------- |
-|  Precondition     | Account shop director must exist & authenticated |
+|  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated |
 |  Post condition   | One or more products are added in the catalogue |
 |  Nominal Scenario |1. Shop director selects "add a product in the catalogue" <br> 2. Software shows a list of products present in the inventory <br> 3. Shop director one or more selects a product and inserts the price to sell for each <br> 4. Shop director confirms <br> 5. The application assigns the inventory ID to the product |
 |  Variants     	| - A product can be added only once in a catalogue: each product has an unique ID; an error message is printed.<br/>- Catalogue doesn't exist; the application creates a catalogue and the product is added |
@@ -537,10 +508,18 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 ### Use case x, UCx - Remove product
 | Actors Involved	| Shop director |
 | -----------------	| ------------- |
-|  Precondition     | Account shop director must exist & authenticated ; the catalogue contains at least one product |
+|  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. The catalogue contains at least one product |
 |  Post condition   | One or more products are removed from the catalogue |
 |  Nominal Scenario | 1. Shop director selects "remove a product" <br> 2. Software shows a list of products present in the catalogue <br> 3. Shop director selects one or more products <br> 4. Shop director confirms|
 |  Variants     	| - The catalogue is empty: no product will be shown|
+
+### Use case x, UCx - Show products in the catalogue
+| Actors Involved 	| 			Shop director           |
+| ----------------- | ---------------------------------------- |
+| Precondition   	| 1. Shop director has an account<br/>2. Shop director is authenticated<br/>3. Catalogue exists |
+| Post condition 	| Software shows a list of products present in the catalogue, sorted by ID (default) |
+| Nominal Scenario  | 1. Shop director selects "show products in the catalogue"|
+| Variants          |  - A different sorting criteria is selected<br/>-  Products are filtered writing something in the search bar or using filters (type of product, selling price, ...) |
 
 ## Customers management
 
@@ -563,25 +542,17 @@ We'll consider the Cashier as the actor.
 |  Nominal Scenario | 1. Cashier selects to remove a fidelity card <br> 2. Software shows a list of fidelity cards <br> 3. Cashier chooses to remove one or more fidelity card <br> 4. Cashier confirms |
 |  Variants     	| - There are no fidelity cards: no card will be shown |
 
-### Use case x, UCx - Add card points
-| Actors Involved   | Cashier		|
-| ----------------- | ------------- |
-|  Precondition     | 1. Account cashier must exist<br/>2. Cashier is  authenticated<br/>3. The fidelity card must exist |
-|  Post condition   | Card points are added to the card|
-|  Nominal Scenario | 1. Cashier selects to add points to a fidelity card <br> 2. Software chooses a list of fidelity cards <br> 3. Cashier selects one <br> 4. Cashier chooses the amount to add <br> 5. Cashier confirms |
-|  Variants     	| - There are no fidelity cards: no card will be shown |
-
-### Use case x, UCx - Remove card points
-| Actors Involved   | Cashier		|
-| ----------------- | ------------- |
-|  Precondition     | 1. Account cashier must exist<br/>2. Cashier is  authenticated<br/>3. The fidelity card must exist |
-|  Post condition   | Points are removed from the card|
-|  Nominal Scenario | 1. Cashier selects to remove points from a fidelity card <br> 2. Software chooses a list of fidelity cards <br> 3. Cashier selects one <br> 4. Cashier chooses the amount to remove <br> 5. Cashier confirms  |
-|  Variants     	| - There are no fidelity cards: no card will be shown |
+### Use case x, UCx - Show fidelity cards & cards points
+| Actors Involved 	| 			Cashier       |
+| ----------------- | ---------------------------------------- |
+| Precondition   	| 1. Cashier has an account<br/>2. Cashier is authenticated<br/>3. At least one fidelity card exists|
+| Post condition 	| Software shows a list of fidelity cards, sorted by ID |
+| Nominal Scenario  | 1. Cashier selects "show all fidelity cards & cards points"|
+| Variants          | Fidelity cards are filtered writing something in the search bar (SSN, name, surname, telephone, ID) |
 
 ## Support accounting
 
-In these use cases, the actor is an accountant, or a generic user from the shop acting as the accountant, managing the simplified accounting of the shop (hypothesis: annual revenue below 700'000€) taking data from Agenzia delle Entrate informatic system.
+In these use cases, the actor is an accountant, or a generic user from the shop having privileges of an accountant profile, managing the simplified accounting of the shop (hypothesis: annual revenue below 700'000€) taking data from Agenzia delle Entrate informatic system.
 
 ### Use case x, UCx - Add invoice (passive)
 | Actors Involved   | Accountant  |
@@ -606,7 +577,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 |  Precondition     | 1. Accountant account must exist<br/>2. Accountant must be authenticated |
 |  Post condition   | Statistics are shown on screen by means of a table, a diagram or a graph |
 |  Nominal Scenario | Accountant selects a specific timeframe and shows the shop's revenue and expenses in that time period |
-|  Variants     	| - Accountant decide to make application displaying the best selling products|
+|  Variants     	| - Accountant decide to make application displaying the best selling products |
 
 #### Scenario x.1 
 
@@ -616,8 +587,9 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | Post condition   	| Revenues and expenses in a specific timeframe are shown on the screen |
 | Step#        		| Description  |
 | 1     			| User selects a specific timeframe |
-| 2     			| System searches both revenues and expenses of that timeframe |
-| 3    				| System displays found revenues and expenses and shows a diagram about those data |
+| 2     			| User selects a filter for the search results (e.g. by supplier, by product, etc.) |
+| 3     			| System searches both revenues and expenses of that timeframe which satisfy selected filters |
+| 4    				| System displays found revenues and expenses and shows a diagram about those data |
 
 #### Scenario x.2 
 
@@ -626,15 +598,16 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | Precondition      | At least one product must exist in catalogue |
 | Post condition    | The Top 5 best selling products list is shown on screen |
 | Step#          	| Description  |
-| 1 			    | System searches the best 5 selling products of all time (products which lead to the highest revenues considering the whole shop history) |
-| 2				    | System displays the found products (could be less than 5) and shows a graph about those data |
+| 1     			| User selects a filter by supplier for the search results |
+| 2 			    | System searches the best 5 selling products of all time (products which lead to the highest revenues considering the whole shop history) which satisfy selected filter |
+| 3				    | System displays the found products (could be less than 5) and shows a graph about those data |
 
 ### Use case x, UCx - Show suppliers deadlines timetable
 | Actors Involved   | Accountant  |
 | ----------------- | ----------- |
 |  Precondition     | 1. Accountant account must exist<br/>2. Accountant must be authenticated<br/>3. The Shop has got at least one supplier<br/>4. Suppliers deadline timetable is generated from invoices data |
 |  Post condition   | A list of deadlines are shown on screen |
-|  Nominal Scenario | 1. Application displays deadlines distinguishing them by suppliers and sorting them by date  |
+|  Nominal Scenario | 1. User selects a filter by supplier for the search results <br/>2. Application displays deadlines distinguishing them by selected suppliers and sorting them by date  |
 |  Variants     	| - All deadlines have been satisfied: an "Up to date with payments" message is displayed<br/>- One or more deadlines are expired: an alert message is generated  |
 
 ## Accounts management
@@ -708,7 +681,7 @@ class EZShop {
 }
 
 class User {
- +ID
+ +SSN
  +Account_name
  +Account_pwd
  +Email
@@ -716,15 +689,15 @@ class User {
  +Surname
  +Address
  +TelephoneNumber
- +IsAdministrator ??????
+ +PrivilegeLevel
 }
 
 
 class Customer {
- +ID
+ +SSN
  +Name
  +Surname
- +VAT number*
+ +TelephoneNumber
  +Email
  +Address
 }
@@ -733,6 +706,10 @@ class Subscriber {
 }
 class FidelityCard{
  +ID
+ +SSN
+ +Name
+ +Surname
+ +TelephoneNumber
  +Points
 }
 class Purchase {
@@ -746,6 +723,7 @@ class Product {
 class ProductDescriptor {
  +ID
  +Name
+ +Category
  +Price
  +Discount
  +Description
@@ -778,7 +756,14 @@ class Invoice {
  +Amount
  +VAT number 
 }
+class BalanceSheet{
++startDate
++endDate
++totExpenses
++totRevenue
+}
 class CashRegister{
+ +ID
 }
 
 class CreditCard{
@@ -810,44 +795,227 @@ Class Order
 Class ActiveInvoice
 Class PassiveInvoice
 
-EZShop -- "*" User
+EZShop -down- "*" User
 ITAdministrator -up-|> User
-Cashier -down-|> User
+Cashier -up-|> User
 WarehouseManager-up-|> User
 Accountant-up-|> User
 ShopDirector-up-|> User
 Subscriber --|> Customer
 CreditNote --|> Invoice
-ActiveInvoice -up-|> Invoice
-PassiveInvoice -up-|> Invoice
+ActiveInvoice --|> Invoice
+PassiveInvoice --|> Invoice
 
-EZShop -right- Catalogue
-EZShop -right- Inventory
+Invoice "*" --* BalanceSheet
+Purchase "*" --* BalanceSheet
+Accountant -- "*" BalanceSheet : analyses >
+EZShop -- Catalogue
+EZShop -- Inventory
 Inventory --"*" Product
 Catalogue --"*" ProductDescriptor
 Customer --"*" Purchase
 Purchase --"*" Product
-FidelityCard -left- Subscriber: +owns
-Product "*"-left- ProductDescriptor: +is described by
-Transaction -right-"0..1" CreditCard
-Customer --"*" CreditCard: +owns
+FidelityCard -- Subscriber: +owns <
+Product "*"-- ProductDescriptor: +is described by
+Transaction --"0..1" CreditCard
+Customer --"*" CreditCard: +owns >
 Purchase --"*" Transaction
 Transaction -- Receipt
 Cashier "*"--"*" CashRegister
 CashRegister --"*" Purchase
 Purchase --"*" ActiveInvoice
-Accountant --"*" PassiveInvoice: ??
-WarehouseManager --"*" Order: places ?????
+Accountant --"*" PassiveInvoice: create
+WarehouseManager --"*" Order: places
 Order "*"-- Supplier: +from
-ShopDirector -- Catalogue: manages ??????
-Order "*"--"*" ProductDescriptor
-PassiveInvoice "*"-left- Order
+ShopDirector -- Catalogue: manages
+Order "*"--"*" Product
+PassiveInvoice "*"-- Order
+WarehouseManager -- Inventory: manages
+Cashier --"*" FidelityCard: manages
+ITAdministrator --"*" User: manages
 
 note "One purchase can have more than one\n transaction (e.g. if system refuses credit\n card at first attempt)" as N1
 N1 .. Transaction 
 note "There could be more than one\n invoice per purchase because\n it could be necessary to add a\n credit note to that purchase" as N2
 N2 .. Invoice
+note "Single product\nto be sold.\nIt does not\nhave a unique ID." as N3
+N3 .right. Product
+@enduml
+```
 
+#[SECOND VERSION]
+```plantuml
+@startuml
+skinparam classAttributeIconSize 0
+
+class EZShop {
+ +Name
+ +VAT number
+ +Address
+ +Email
+ +TelephoneNumber
+}
+
+class User {
+ +SSN
+ +Account_name
+ +Account_pwd
+ +Email
+ +Name
+ +Surname
+ +Address
+ +TelephoneNumber
+ +PrivilegeLevel
+}
+
+
+class Customer {
+ +SSN
+ +Name
+ +Surname
+ +TelephoneNumber
+ +Email
+ +Address
+}
+class Subscriber {
+ +IDFidelityCard
+}
+class FidelityCard{
+ +ID
+ +SSN
+ +Name
+ +Surname
+ +TelephoneNumber
+ +Points
+}
+class Purchase {
+ +IDPurchase
+ +Status: credit card or cash
+}
+class Product {
+ +ID
+ +Expire Date
+}
+class ProductDescriptor {
+ +ID
+ +Name
+ +Category
+ +Price
+ +Discount
+ +Description
+ +Brand
+}
+class Purchase {
+ 
+}
+class Transaction {
+ +ID
+ +Date
+ +Amount
+}
+class Order{
+ +ID
+ +Date
+ +Amount
+}
+class Supplier{
+ +ID
+ +Name
+ +VAT number
+ +Address
+ +Email
+ +TelephoneNumber
+}
+class Invoice {
+ +ID
+ +Date
+ +Amount
+ +VAT number 
+}
+class BalanceSheet{
++startDate
++endDate
++totExpenses
++totRevenue
+}
+class CashRegister{
+ +ID
+}
+
+class CreditCard{
+ +ID
+}
+
+class Receipt{
+ +ID
+}
+
+class ITAdministrator
+class Cashier
+class Product
+class ProductDescriptor
+class CashRegister
+class WarehouseManager
+class Accountant
+class ShopDirector
+class Customer
+class Subscriber
+class Purchase
+class CreditCard
+class Transaction
+Class Receipt
+Class Invoice
+Class CreditNote
+Class Supplier
+Class Order
+Class ActiveInvoice
+Class PassiveInvoice
+
+EZShop -down- "*" User
+ITAdministrator -up-|> User
+Cashier -up-|> User
+WarehouseManager-up-|> User
+Accountant-up-|> User
+ShopDirector-up-|> User
+Subscriber --|> Customer
+CreditNote -up-|> Invoice
+ActiveInvoice -right-|> Invoice
+PassiveInvoice --|> Invoice
+
+EZShop -- Catalogue
+EZShop -- Inventory
+Inventory --"*" Product
+Catalogue --"*" ProductDescriptor
+Customer --"*" Purchase
+Purchase --"*" Product
+FidelityCard -- Subscriber: +owns <
+Product "*"-- ProductDescriptor: +is described by
+Transaction --"0..1" CreditCard
+Customer --"*" CreditCard: +owns >
+Purchase --"*" Transaction
+Transaction -- Receipt
+Cashier "*"--"*" CashRegister
+CashRegister --"*" Purchase
+Purchase --"*" ActiveInvoice
+Accountant --"*" PassiveInvoice: create
+WarehouseManager --"*" Order: places
+Order "*"-down- Supplier: +from
+ShopDirector -- Catalogue: manages
+Order "*"-right-"*" Product
+PassiveInvoice "*"-- Order
+WarehouseManager -- Inventory: manages
+Cashier -left-"*" FidelityCard: manages
+ITAdministrator --"*" User: manages
+Invoice "*" -up-* BalanceSheet
+Purchase "*" --* BalanceSheet
+Accountant -- "*" BalanceSheet : analyses >
+
+note "One purchase can have more than one\n transaction (e.g. if system refuses credit\n card at first attempt)" as N1
+N1 .. Transaction 
+note "There could be more than one\n invoice per purchase because\n it could be necessary to add a\n credit note to that purchase" as N2
+N2 .right. Invoice
+note "Single product\nto be sold.\nIt does not\nhave a unique ID." as N3
+N3 .left. Product
 @enduml
 ```
 
