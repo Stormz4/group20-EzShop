@@ -258,27 +258,32 @@ SalesManagement --> CreditCardSystem
 (FR_1 Sales Management) ..> (FR_1.3 Handle Payment) : include
 (FR_1.3 Handle Payment) <.. (Handle Payment via Cash) : extends
 (FR_1.3 Handle Payment) <.. (Handle Payment via Credit Card) : extends
+(FR_1.3 Handle Payment) --> CashRegister
+(Handle Payment via Credit Card) --> :CreditCardSystem:
 @enduml
 ```
 
 ### Use Case diagram: Warehouse management
+
+
 ```plantuml
 @startuml
-:WarehouseManager:     --> (Warehouse management)
-(Warehouse management) ..> (FR_2.1 Inventory management) : include
-(Warehouse management) ..> (FR_2.2 Order management) : include
-(Inventory management) ..> (FR_2.1.1 Add product) : include
-(Inventory management) ..> (FR_2.1.2 Remove product) : include
-(Inventory management) ..> (FR_2.1.3 Update product) : include
+:WarehouseManager:     --> (FR_2 Warehouse management)
+(FR_2 Warehouse management) ..> (FR_2.1 Inventory management) : include
+(FR_2 Warehouse management) ..> (FR_2.2 Order management) : include
+(FR_2.1 Inventory management) ..> (FR_2.1.1 Add product) : include
+(FR_2.1 Inventory management) ..> (FR_2.1.2 Remove product) : include
+(FR_2.1 Inventory management) ..> (FR_2.1.3 Update product) : include
+(FR_2.1 Inventory management) --> :Product: 
 ' (Update product)       ..> (Stock level) : include
 ' (Update product)       ..> (Purchase price) : include
 ' (Update product)       ..> (Description) : include
-(Inventory management) ..> (FR_2.1.5 Show products) : include
+(FR_2.1 Inventory management) ..> (FR_2.1.5 Show products) : include
 ' (Filter products)      ..> (Name) : by
 ' (Filter products)      ..> (Supplier) : by
 ' (Filter products)      ..> (Brand) : by
 ' (Filter products)      ..> (Price) : by
-(Inventory management) ..> (FR_2.1.4 Manage Low Stock Thresholds) : include
+(FR_2.1 Inventory management ) ..> (FR_2.1.4 Manage Low Stock Thresholds) : include
 (FR_2.2 Order management)     ..> (FR_2.2.1 Place new order) : include
 (FR_2.2 Order management)     ..> (FR_2.2.2 Cancel order) : include
 (FR_2.2 Order management)     ..> (FR_2.2.3 Edit order) : include
@@ -300,7 +305,7 @@ SalesManagement --> CreditCardSystem
 (FR_3 Catalogue management) ..> (FR_3.2 Add product) : include
 (FR_3 Catalogue management) ..> (FR_3.3 Remove product) : include
 (FR_3 Catalogue management) ..> (FR_3.4 Show products in the catalogue) : include
-
+(FR_3 Catalogue management) --> :Product: 
 @enduml
 ```
 
@@ -310,9 +315,10 @@ SalesManagement --> CreditCardSystem
 @startuml
 
 :ShopDirector: --> (FR_4 Customers management)
-(FR_4Customers management) ..> (FR_4.1 Add fidelity card) : include
-(FR_4Customers management) ..> (FR_4.2 Remove fidelity card) : include
-(FR_4Customers management) ..> (FR_4.3 Show fidelity cards & cards points) : include
+(FR_4 Customers management) ..> (FR_4.1 Add fidelity card) : include
+(FR_4 Customers management) ..> (FR_4.2 Remove fidelity card) : include
+(FR_4 Customers management) ..> (FR_4.3 Show fidelity cards & cards points) : include
+(FR_4 Customers management) --> :FidelityCard:
 
 @enduml
 ```
@@ -859,12 +865,9 @@ artifact EZShopApplication
 node EZShopServer
 artifact EZShopBackend
 
-node PaymentSystem
-
 UserPC "*"<.. EZShopApplication  : deploy
 UserPC -- EZShopServer : internet link
 EZShopServer <.. EZShopBackend : deploy
-UserPC --"*" PaymentSystem : internet  link
 @enduml
 ```
 
