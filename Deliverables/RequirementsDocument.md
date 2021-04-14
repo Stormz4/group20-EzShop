@@ -10,7 +10,7 @@ Date: 14/04/2021
 
 | Version | Changes |
 | ------- |---------|
-| 8 | Added Personas and Stories |
+| 9 | Modified use case diagrams and matched the FRs with the use cases|
 
 # Contents
 
@@ -141,12 +141,12 @@ Elisa, 32, has just opened a brand new store, where she can earn money from her 
 |  FR_2.1.1 	| Add product |
 |  FR_2.1.2 	| Remove product |
 |  FR_2.1.3 	| Update product |
-|  FR_2.1.5   	| Manage Low Stock Thresholds |
-|  FR_2.1.6   	| Show products (inventory) |
-|  FR_2.2   	| Manage order |
-|  FR_2.2.1 	| Add order |
-|  FR_2.2.2 	| Remove order |
-|  FR_2.2.3 	| Modify order |
+|  FR_2.1.4   	| Manage Low Stock Thresholds |
+|  FR_2.1.5   	| Show products (inventory) |
+|  FR_2.2   	| Order management |
+|  FR_2.2.1 	| Place new order |
+|  FR_2.2.2 	| Cancel order |
+|  FR_2.2.3 	| Edit order |
 |  FR_2.2.4 	| Show orders |
 ||
 |  FR_3     	| Catalogue management |
@@ -163,7 +163,7 @@ Elisa, 32, has just opened a brand new store, where she can earn money from her 
 |  FR_5     	| Support accounting |
 |  FR_5.1   	| Update finance |
 |  FR_5.1.1   	| Add invoice (passive) |
-|  FR_5.1.3   	| Add credit note | //if wrong invoice committed --> correct with a negative-import credit note
+|  FR_5.1.2  	| Add credit note | //if wrong invoice committed --> correct with a negative-import credit note
 |  FR_5.2 		| Show accounting data |
 |  FR_5.2.1   	| Show invoices |
 |  FR_5.2.2 	| Show suppliers |
@@ -173,7 +173,7 @@ Elisa, 32, has just opened a brand new store, where she can earn money from her 
 |  FR_5.3.2 	| Show best selling products |
 |  FR_5.4 		| Show banking data |
 |  FR_5.5 		| Show suppliers deadlines timetable |
-|  FR_5.6   	| Show financial statement | //used to see for what shop's revenues could be used: Are they enough to pay suppliers/debts and also to do new investments?
+|  FR_5.6   	| Show financial statement |
 ||
 |  FR_6     	| Accounts management |
 |  FR_6.1   	| Add account |
@@ -249,15 +249,15 @@ SalesManagement --> CreditCardSystem
 ### Use Case diagram: Sales management
 ```plantuml
 @startuml
-:Cashier:     --> (FR1 Sales Management)
-:Product:     <-- (FR1.1 Provide Shopping Cart and Total Amount)
-:FidelityCard: <-- (FR1.2 Handle Fidelity Card)
-(FR1 Sales Management) ..> (FR1.1 Provide Shopping Cart and Total Amount) : include
-(FR1.1 Provide Shopping Cart and Total Amount) ..> (FR1.2 Handle Fidelity Card) : include
-(FR1.2 Handle Fidelity Card) ..> (FR1.2.2 Authenticate Fidelity Card) : include
-(FR1 Sales Management) ..> (FR1.3 Handle Payment) : include
-(FR1.3 Handle Payment) <.. (Handle Payment via Cash) : extends
-(FR1.3 Handle Payment) <.. (Handle Payment via Credit Card) : extends
+:Cashier:     --> (FR_1 Sales Management)
+:Product:     <-- (FR_1.1 Provide Shopping Cart and Total Amount)
+:FidelityCard: <-- (FR_1.2 Handle Fidelity Card)
+(FR_1 Sales Management) ..> (FR_1.1 Provide Shopping Cart and Total Amount) : include
+(FR_1.1 Provide Shopping Cart and Total Amount) ..> (FR_1.2 Handle Fidelity Card) : include
+(FR_1.2 Handle Fidelity Card) ..> (FR_1.2.2 Authenticate Fidelity Card) : include
+(FR_1 Sales Management) ..> (FR_1.3 Handle Payment) : include
+(FR_1.3 Handle Payment) <.. (Handle Payment via Cash) : extends
+(FR_1.3 Handle Payment) <.. (Handle Payment via Credit Card) : extends
 @enduml
 ```
 
@@ -265,24 +265,24 @@ SalesManagement --> CreditCardSystem
 ```plantuml
 @startuml
 :WarehouseManager:     --> (Warehouse management)
-(Warehouse management) ..> (Inventory management) : include
-(Warehouse management) ..> (Order management) : include
-(Inventory management) ..> (Add product) : include
-(Inventory management) ..> (Remove product) : include
-(Inventory management) ..> (Update product) : include
+(Warehouse management) ..> (FR_2.1 Inventory management) : include
+(Warehouse management) ..> (FR_2.2 Order management) : include
+(Inventory management) ..> (FR_2.1.1 Add product) : include
+(Inventory management) ..> (FR_2.1.2 Remove product) : include
+(Inventory management) ..> (FR_2.1.3 Update product) : include
 ' (Update product)       ..> (Stock level) : include
 ' (Update product)       ..> (Purchase price) : include
 ' (Update product)       ..> (Description) : include
-(Inventory management) ..> (Show products) : include
+(Inventory management) ..> (FR_2.1.5 Show products) : include
 ' (Filter products)      ..> (Name) : by
 ' (Filter products)      ..> (Supplier) : by
 ' (Filter products)      ..> (Brand) : by
 ' (Filter products)      ..> (Price) : by
-(Inventory management) ..> (Manage Low Stock Thresholds) : include
-(Order management)     ..> (Place new order) : include
-(Order management)     ..> (Cancel order) : include
-(Order management)     ..> (Edit order) : include
-(Order management)     ..> (Show orders) : include
+(Inventory management) ..> (FR_2.1.4 Manage Low Stock Thresholds) : include
+(FR_2.2 Order management)     ..> (FR_2.2.1 Place new order) : include
+(FR_2.2 Order management)     ..> (FR_2.2.2 Cancel order) : include
+(FR_2.2 Order management)     ..> (FR_2.2.3 Edit order) : include
+(FR_2.2 Order management)     ..> (FR_2.2.4 Show orders) : include
 ' (Filter orders)        ..> (Date) : by
 ' (Filter orders)        ..> (Supplier) : by
 ' (Filter orders)        ..> (Amount) : by
@@ -295,11 +295,11 @@ SalesManagement --> CreditCardSystem
 ```plantuml
 @startuml
 
-:ShopDirector: --> (Catalogue management)
-(Catalogue management) ..> (Update price to sell of products) : include
-(Catalogue management) ..> (Add product) : include
-(Catalogue management) ..> (Remove product) : include
-(Catalogue management) ..> (Show products in the catalogue) : include
+:ShopDirector: --> (FR_3 Catalogue management)
+(FR_3 Catalogue management) ..> (FR_3.1 Update price to sell of products) : include
+(FR_3 Catalogue management) ..> (FR_3.2 Add product) : include
+(FR_3 Catalogue management) ..> (FR_3.3 Remove product) : include
+(FR_3 Catalogue management) ..> (FR_3.4 Show products in the catalogue) : include
 
 @enduml
 ```
@@ -309,28 +309,30 @@ SalesManagement --> CreditCardSystem
 ```plantuml
 @startuml
 
-:ShopDirector: --> (Customers management)
-(Customers management) ..> (Add fidelity card) : include
-(Customers management) ..> (Remove fidelity card) : include
-(Customers management) ..> (Show fidelity cards & cards points) : include
+:ShopDirector: --> (FR_4 Customers management)
+(FR_4Customers management) ..> (FR_4.1 Add fidelity card) : include
+(FR_4Customers management) ..> (FR_4.2 Remove fidelity card) : include
+(FR_4Customers management) ..> (FR_4.3 Show fidelity cards & cards points) : include
 
 @enduml
 ```
 
 ### Use Case diagram: Support accounting
 
+We didn't include every FR (show accounting data) in order to make the UCD readable.
+
 ```plantuml
 @startuml
 'Support accounting part
 
-:Accountant: --> (Support accounting)
-(Support accounting) ..> (Add passive invoice) : include
-(Support accounting) ..> (Add credit note) : include
-(Support accounting) ..> (Show statistics) : include
-(Support accounting) ..> (Show suppliers deadlines  timetable) : include
-
-(Show statistics) ..> (Show revenue and expenses in a timeframe) :include
-(Show statistics) ..> (Show best selling products) :include
+:Accountant: --> (FR_5 Support accounting)
+(FR_5 Support accounting) ..> (FR_5.1 Update finance) : include
+(FR_5.1 Update finance) ..> (FR_5.1.1 Add passive invoice) : include
+(FR_5.1 Update finance) ..> (FR_5.1.2 Add credit note) : include
+(FR_5 Support accounting) ..> (FR_5.3 Show statistics) : include
+(FR_5 Support accounting) ..> (FR_5.5 Show suppliers deadlines  timetable) : include
+(FR_5.3 Show statistics) ..> (FR_5.3.1 Show revenue and expenses in a timeframe) :include
+(FR_5.3 Show statistics) ..> (FR_5.3.2 Show best selling products) :include
 
 @enduml
 ```
@@ -339,11 +341,11 @@ SalesManagement --> CreditCardSystem
 
 ```plantuml
 @startuml
-:ITAdministrator: --> (Accounts management)
-(Accounts management) ..> (Add account) : include
-(Accounts management) ..> (Remove account) : include
-(Accounts management) ..> (Update account) : include
-(Accounts management) ..> (Modify privileges) : include
+:ITAdministrator: --> (FR_6 Accounts management)
+(FR_6 Accounts management) ..> (FR_6.1 Add account) : include
+(FR_6 Accounts management) ..> (FR_6.2 Remove account) : include
+(FR_6 Accounts management) ..> (FR_6.3 Update account) : include
+(FR_6 Accounts management) ..> (FR_6.4 Modify privileges) : include
 
 @enduml
 ```
@@ -353,8 +355,8 @@ SalesManagement --> CreditCardSystem
 ```plantuml
 @startuml
 
-:User: --> (Logout)
-:User: --> (Login)
+:User: --> (FR_7.2 Logout)
+:User: --> (FR_7.1 Login)
 
 @enduml
 ```
@@ -673,281 +675,105 @@ In these use cases, the actor is an user from the shop.
 skinparam classAttributeIconSize 0
 
 class EZShop {
- +Name
- +VAT number
- +Address
- +Email
- +TelephoneNumber
+ Name
+ VAT number
+ Address
+ Email
+ TelephoneNumber
 }
 
 class User {
- +SSN
- +Account_name
- +Account_pwd
- +Email
- +Name
- +Surname
- +Address
- +TelephoneNumber
- +PrivilegeLevel
+ SSN
+ Account_name
+ Account_pwd
+ Email
+ Name
+ Surname
+ Address
+ TelephoneNumber
+ PrivilegeLevel
 }
 
 
 class Customer {
- +SSN
- +Name
- +Surname
- +TelephoneNumber
- +Email
- +Address
+ SSN
+ Name
+ Surname
+ TelephoneNumber
+ Email
+ Address
 }
 class Subscriber {
- +IDFidelityCard
+ IDFidelityCard
 }
 class FidelityCard{
- +ID
- +SSN
- +Name
- +Surname
- +TelephoneNumber
- +Points
+ ID
+ SSN
+ Name
+ Surname
+ TelephoneNumber
+ Points
 }
 class Purchase {
- +IDPurchase
- +Status: credit card or cash
+ IDPurchase
+ Status: credit card or cash
 }
 class Product {
- +ID
- +Expire Date
+ ID
+ Expire Date
 }
 class ProductDescriptor {
- +ID
- +Name
- +Category
- +Price
- +Discount
- +Description
- +Brand
+ ID
+ Name
+ Category
+ Price
+ Discount
+ Description
+ Brand
 }
 class Purchase {
  
 }
 class Transaction {
- +ID
- +Date
- +Amount
+ ID
+ Date
+ Amount
 }
 class Order{
- +ID
- +Date
- +Amount
+ ID
+ Date
+ Amount
 }
 class Supplier{
- +ID
- +Name
- +VAT number
- +Address
- +Email
- +TelephoneNumber
+ ID
+ Name
+ VAT number
+ Address
+ Email
+ TelephoneNumber
 }
 class Invoice {
- +ID
- +Date
- +Amount
- +VAT number 
+ ID
+ Date
+ Amount
+ VAT number 
 }
 class BalanceSheet{
-+startDate
-+endDate
-+totExpenses
-+totRevenue
+startDate
+endDate
+totExpenses
+totRevenue
 }
 class CashRegister{
- +ID
+ ID
 }
 
 class CreditCard{
- +ID
+ ID
 }
 
 class Receipt{
- +ID
-}
-
-class ITAdministrator
-class Cashier
-class Product
-class ProductDescriptor
-class CashRegister
-class WarehouseManager
-class Accountant
-class ShopDirector
-class Customer
-class Subscriber
-class Purchase
-class CreditCard
-class Transaction
-Class Receipt
-Class Invoice
-Class CreditNote
-Class Supplier
-Class Order
-Class ActiveInvoice
-Class PassiveInvoice
-
-EZShop -down- "*" User
-ITAdministrator -up-|> User
-Cashier -up-|> User
-WarehouseManager-up-|> User
-Accountant-up-|> User
-ShopDirector-up-|> User
-Subscriber --|> Customer
-CreditNote --|> Invoice
-ActiveInvoice --|> Invoice
-PassiveInvoice --|> Invoice
-
-Invoice "*" --* BalanceSheet
-Purchase "*" --* BalanceSheet
-Accountant -- "*" BalanceSheet : analyses >
-EZShop -- Catalogue
-EZShop -- Inventory
-Inventory --"*" Product
-Catalogue --"*" ProductDescriptor
-Customer --"*" Purchase
-Purchase --"*" Product
-FidelityCard -- Subscriber: +owns <
-Product "*"-- ProductDescriptor: +is described by
-Transaction --"0..1" CreditCard
-Customer --"*" CreditCard: +owns >
-Purchase --"*" Transaction
-Transaction -- Receipt
-Cashier "*"--"*" CashRegister
-CashRegister --"*" Purchase
-Purchase --"*" ActiveInvoice
-Accountant --"*" PassiveInvoice: create
-WarehouseManager --"*" Order: places
-Order "*"-- Supplier: +from
-ShopDirector -- Catalogue: manages
-Order "*"--"*" Product
-PassiveInvoice "*"-- Order
-WarehouseManager -- Inventory: manages
-Cashier --"*" FidelityCard: manages
-ITAdministrator --"*" User: manages
-
-note "One purchase can have more than one\n transaction (e.g. if system refuses credit\n card at first attempt)" as N1
-N1 .. Transaction 
-note "There could be more than one\n invoice per purchase because\n it could be necessary to add a\n credit note to that purchase" as N2
-N2 .. Invoice
-note "Single product\nto be sold.\nIt does not\nhave a unique ID." as N3
-N3 .right. Product
-@enduml
-```
-
-#[SECOND VERSION]
-```plantuml
-@startuml
-skinparam classAttributeIconSize 0
-
-class EZShop {
- +Name
- +VAT number
- +Address
- +Email
- +TelephoneNumber
-}
-
-class User {
- +SSN
- +Account_name
- +Account_pwd
- +Email
- +Name
- +Surname
- +Address
- +TelephoneNumber
- +PrivilegeLevel
-}
-
-
-class Customer {
- +SSN
- +Name
- +Surname
- +TelephoneNumber
- +Email
- +Address
-}
-class Subscriber {
- +IDFidelityCard
-}
-class FidelityCard{
- +ID
- +SSN
- +Name
- +Surname
- +TelephoneNumber
- +Points
-}
-class Purchase {
- +IDPurchase
- +Status: credit card or cash
-}
-class Product {
- +ID
- +Expire Date
-}
-class ProductDescriptor {
- +ID
- +Name
- +Category
- +Price
- +Discount
- +Description
- +Brand
-}
-class Purchase {
- 
-}
-class Transaction {
- +ID
- +Date
- +Amount
-}
-class Order{
- +ID
- +Date
- +Amount
-}
-class Supplier{
- +ID
- +Name
- +VAT number
- +Address
- +Email
- +TelephoneNumber
-}
-class Invoice {
- +ID
- +Date
- +Amount
- +VAT number 
-}
-class BalanceSheet{
-+startDate
-+endDate
-+totExpenses
-+totRevenue
-}
-class CashRegister{
- +ID
-}
-
-class CreditCard{
- +ID
-}
-
-class Receipt{
- +ID
+ ID
 }
 
 class ITAdministrator
