@@ -168,13 +168,13 @@ Elisa, 32, has just opened a brand new store, where she can earn money from her 
 |  FR_5.2 		| Show accounting data |
 |  FR_5.2.1   	| Show invoices |
 |  FR_5.2.2 	| Show suppliers |
-|  FR_5.2.3 	| Show balance sheet |
+|  FR_5.2.3 	| Show suppliers deadlines timetable |
+|  FR_5.2.4 	| Show balance sheet |
+|  FR_5.2.5   	| Show financial statement |
 |  FR_5.3   	| Show statistics |
 |  FR_5.3.1 	| Show revenue and expenses in a timeframe |
 |  FR_5.3.2 	| Show best selling products |
 |  FR_5.4 		| Show banking data |
-|  FR_5.5 		| Show suppliers deadlines timetable |
-|  FR_5.6   	| Show financial statement |
 ||
 |  FR_6     	| Accounts management |
 |  FR_6.1   	| Add account |
@@ -568,7 +568,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | ----------------- | ----------- |
 |  Precondition     | 1. Accountant account must exist<br/>2. Accountant must be authenticated|
 |  Post condition   | New invoice has been added to the system |
-|  Nominal Scenario | 1. Accountant selects "New invoice"<br/>2. Software gives to user a form to fill out<br/>5. Accountant fills the form with the new invoice data<br/>6. Accountant confirms |
+|  Nominal Scenario | 1. Accountant selects "Add invoice"<br/>2. Software gives to user a form to fill out<br/>3. Accountant fills the form with the new invoice data<br/>4. Accountant confirms |
 |  Variants     	| - Accountant want to abort the operation without submit the new invoice addition: accountant click on 'Cancel' icon |
 
 ### Use case 23, UC23 - Add credit note
@@ -615,7 +615,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | Actors Involved   | Accountant  |
 | ----------------- | ----------- |
 |  Precondition     | 1. Accountant account must exist<br/>2. Accountant must be authenticated<br/>3. The Shop has got at least one supplier<br/>4. Suppliers deadline timetable is generated from invoices data |
-|  Post condition   | A list of deadlines are shown on screen |
+|  Post condition   | A list of deadlines is shown on screen |
 |  Nominal Scenario | 1. User selects a filter by supplier for the search results <br/>2. Application displays deadlines distinguishing them by selected suppliers and sorting them by date  |
 |  Variants     	| - All deadlines have been satisfied: an "Up to date with payments" message is displayed<br/>- One or more deadlines are expired: an alert message is generated  |
 
@@ -626,15 +626,15 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | ----------------- | --------- |
 |  Precondition     | User doesn't have an account yet |
 |  Post condition   | Account user is added to the system |
-|  Nominal Scenario | 1. ITAdministrator selects "create a new account" </br> 2. Software shows forms to insert the user data <br> 3. ITAdministrator inserts the user data</br>4. ITAdministrator confirms |
-|  Variants     	| - A user can have only one account: SSNs must be unique |
+|  Nominal Scenario | 1. ITAdministrator selects "Add new account" </br> 2. Software shows forms to insert the user data <br> 3. ITAdministrator inserts the user data</br>4. ITAdministrator confirms |
+|  Variants     	| - ITAdministrator wants to reset all fields during the operation by clicking on the "Reset" button |
 
 ### Use case 27, UC27 - Remove account
 | Actors Involved   | ITAdministrator	|
 | ----------------- | --------- |
 |  Precondition     | Account user must exist |
 |  Post condition   | Account user is removed from the system|
-|  Nominal Scenario | 1. ITAdministrator selects "delete an account" </br> 2. Software shows a list of accounts <br> 3. ITAdministrator chooses one of them <br> 4. ITAdministrator confirms  |
+|  Nominal Scenario | 1. ITAdministrator selects "Show accounts" </br> 2. Software shows a list of accounts <br> 3. ITAdministrator chooses one of them <br> 4. ITAdministrator chooses the "Remove account" option<br/>5. ITAdministrator confirms  |
 |  Variants     	| - |
 
 
@@ -643,23 +643,14 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | ----------------- | --------- |
 |  Precondition     | Account user must exist |
 |  Post condition   | Account user's info are modified |
-|  Nominal Scenario | 1. ITAdministrator selects "update an account" </br> 2. Software shows a list of accounts <br> 3. ITAdministrator chooses one of them <br> 4. Software shows forms to insert the user data <br> 5. ITAdministrator inserts the user data</br>6. ITAdministrator confirms|
-|  Variants     	| - |
-
-### Use case 29, UC29 - Modify privileges
-
-| Actors Involved   | ITAdministrator	|
-| ----------------- | --------- |
-|  Precondition     | Account user must exist |
-|  Post condition   | Account user's privileges are modified |
-|  Nominal Scenario | 1. ITAdministrator selects "update privileges of an account" </br> 2. Software shows a list of accounts <br> 3. ITAdministrator chooses one of them <br> 4. Software shows the current privileges and forms to insert new ones <br> 5. ITAdministrator chooses the privileges </br>6. ITAdministrator confirms|
-|  Variants     	| - |
+|  Nominal Scenario | 1. ITAdministrator selects "Show accounts" </br> 2. Software shows a list of accounts <br> 3. ITAdministrator chooses one of them <br> 4. ITAdministrator selects the "Update account" option</br>5. Software asks which changes are needed (user data or privileges) <br> 6. ITAdministrator chooses to update the account <br> 7. Software shows forms to insert the new data <br> 7. ITAdministrator inserts the new data</br>6. ITAdministrator confirms|
+|  Variants     	| - ITAdministrator chooses to modify privileges instead of user data |
 
 ## Authentication
 
 In these use cases, the actor is an user from the shop.
 
-### Use case 30, UC30 - Login
+### Use case 29, UC29 - Login
 | Actors Involved   | User		|
 | ----------------- | --------- |
 |  Precondition     | Account user must exist & must not be authenticated |
@@ -667,7 +658,7 @@ In these use cases, the actor is an user from the shop.
 |  Nominal Scenario | 1. User selects "login" <br> 2. Software show forms to insert email and password <br> 3. User inserts his email and password |
 |  Variants     	| - Email/password are wrong; an error is printed on the screen |
 
-### Use case 31, UC31 - Logout
+### Use case 30, UC30 - Logout
 | Actors Involved   | User		|
 | ----------------- | --------- |
 |  Precondition     | Account user must exist & must be authenticated  |
