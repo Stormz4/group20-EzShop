@@ -283,7 +283,7 @@ SalesManagement --> CreditCardSystem
 ' (Filter products)      ..> (Supplier) : by
 ' (Filter products)      ..> (Brand) : by
 ' (Filter products)      ..> (Price) : by
-(FR_2.1 Inventory management ) ..> (FR_2.1.4 Manage Low Stock Thresholds) : include
+(FR_2.1 Inventory management) ..> (FR_2.1.4 Manage Low Stock Thresholds) : include
 (FR_2.2 Order management)     ..> (FR_2.2.1 Place new order) : include
 (FR_2.2 Order management)     ..> (FR_2.2.2 Cancel order) : include
 (FR_2.2 Order management)     ..> (FR_2.2.3 Edit order) : include
