@@ -6,11 +6,11 @@ Authors:
 - Palmucci Leonardo s288126
 - Dario Lanfranco s287524 
 
-Date: 10/04/2021
+Date: 14/04/2021
 
 | Version | Changes |
 | ------- |---------|
-| 7 | Added glossary |
+| 8 | Added Personas and Stories |
 
 # Contents
 
@@ -65,7 +65,7 @@ EZShop is a software application to:
 # Context Diagram and interfaces
 
 ## Context Diagram
-\<Define here Context diagram using UML use case diagram>
+
 ```plantuml
 @startuml
 
@@ -86,12 +86,7 @@ Shop -- CashRegister
 @enduml
 ```
 
-\<actors are a subset of stakeholders>
-
 ## Interfaces
-\<describe here each interface in the context diagram>
-
-\<GUIs will be described graphically in a separate document>
 
 | Actor 				| Logical Interface | Physical Interface  |
 | --------------------- | -----------------	| ------------------- |
@@ -105,20 +100,18 @@ Shop -- CashRegister
 | Fidelity card 		| Bar code 			| Bar code reader | 
 
 # Stories and personas
-\<A Persona is a realistic impersonation of an actor. Define here a few personas and describe in plain text how a persona interacts with the system>
 
-\<Persona is-an-instance-of actor>
+Tom, 50, has worked in its own shop for five years together with his daughter. He has always managed orders by himself, calling wholesalers and dictating orders. Tom updates his catalogue seldom, so he orders the same products almost all the time. He would really need something that could place orders for him.
 
-\<stories will be formalized later as scenarios in use cases>
+Marco, 45, works as a cashier for a local grocery. She has always used a Cash Register to compute the price of every product, labelling each one of them with its price. Erring is human, but when you have to deal with a shopping cart with 20 items, it can become obnoxious. It would be really helpful to compute prices automatically, saving time and energy.
 
+Jacques, 35, is an experienced accountant, hired to the recently opened Electronics Store. He loves his job, but collecting receipts manually to keep track of incomes is the only thing that annoys him. In his previous work experience, he was used to have all the receipts he needed in his PC. He would like to repeat the same experience.   
+
+Elisa, 32, has just opened a brand new store, where she can earn money from her passion for gardening. Many friends of her are enthusiast of her bouquets and she would like to provide them with special discounts for the most loyal customers, maybe handing out Fidelity Cards for them. She would like an application that can manage "this sort of stuff".  
 
 # Functional and non functional requirements
 
 ## Functional Requirements
-
-\<In the form DO SOMETHING, or VERB NOUN, describe high level capabilities of the system>
-
-\<they match to high level use cases>
 
 | ID       		| Description  |
 | ------------- | ------------ |
@@ -208,8 +201,6 @@ Fidelity cards are managed totally by the shop. The customer can choose to get s
 
 ## Non Functional Requirements
 
-\<Describe constraints on functional requirements>
-
 | ID        |     Type 	    | 								Description  															| Refers to |
 | --------- | ------------- | ----------------------------------------------------------------------------------------------------- | --------- |
 | NFR_1     | Usability   	| User should learn how to use the software within 30 minutes of training 								| All FR 	|
@@ -223,7 +214,6 @@ Fidelity cards are managed totally by the shop. The customer can choose to get s
 # Use case diagram and use cases
 
 ## Use case diagram
-\<define here UML Use case diagram UCD summarizing all use cases, and their relationships>
 
 ```plantuml
 @startuml
@@ -248,7 +238,6 @@ Cashier --> CustomersManagement
 ShopDirector --> CatalogueManagement
 WarehouseDirector --> WarehouseManagement
 Accountant --> SupportAccounting
-
 
 ITAdministrator --> AccountsManagement
 
@@ -311,7 +300,6 @@ SalesManagement --> CreditCardSystem
 ' (Filter orders)        ..> (Date) : by
 ' (Filter orders)        ..> (Supplier) : by
 ' (Filter orders)        ..> (Amount) : by
-
 
 @enduml
 ```
@@ -385,12 +373,9 @@ SalesManagement --> CreditCardSystem
 @enduml
 ```
 
-\<next describe here each use case in the UCD>
-
-
 ##  Sales management
 
-In these Use Cases, the actor is the Cashier that has to deal with Shopping Carts and Payments. A Customer do not interact with the system: the Cashier manages everything.
+In these Use Cases, the actor is the Cashier that has to deal with Shopping Carts and Payments. A Customer does not interact with the system: the Cashier manages everything.
 
 ### Use case 1.1, UC1 - Provide Shopping Cart and Total Amount (with a Fidelity Card)
 | Actors Involved   | Cashier, Product, Fidelity Card |
@@ -480,7 +465,9 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Variants          |  -  |
 
 #
+
 ## Manage orders
+
 ### Use case x, UCx - Place new order
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
@@ -621,7 +608,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 |  Nominal Scenario | Accountant selects a specific timeframe and shows the shop's revenue and expenses in that time period |
 |  Variants     	| - Accountant decide to make application displaying the best selling products|
 
-##### Scenario x.1 
+#### Scenario x.1 
 
 | Scenario 			| Show revenue and expenses in a timeframe |
 | ----------------- | --------------------------- |
@@ -632,7 +619,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | 2     			| System searches both revenues and expenses of that timeframe |
 | 3    				| System displays found revenues and expenses and shows a diagram about those data |
 
-##### Scenario x.2 
+#### Scenario x.2 
 
 | Scenario 			| Show best selling products  |
 | ----------------- | --------------------------- |
@@ -707,10 +694,6 @@ In these use cases, the actor is an user from the shop.
 |  Variants     	| - |
 
 # Glossary
-
-\<use UML class diagram to define important terms, or concepts in the domain of the system, and their relationships> 
-
-\<concepts are used consistently all over the document, ex in use cases, requirements etc>
 
 ```plantuml
 @startuml
@@ -838,8 +821,6 @@ CreditNote --|> Invoice
 ActiveInvoice -up-|> Invoice
 PassiveInvoice -up-|> Invoice
 
-
-
 EZShop -right- Catalogue
 EZShop -right- Inventory
 Inventory --"*" Product
@@ -871,9 +852,6 @@ N2 .. Invoice
 ```
 
 # System Design
-\<describe here system design>
-
-\<must be consistent with Context diagram>
 
 Not really meaningful in this case. Only software components are needed.
 
@@ -889,13 +867,10 @@ artifact EZShopBackend
 
 node PaymentSystem
 
-
 UserPC "*"<.. EZShopApplication  : deploy
 UserPC -- EZShopServer : internet link
 EZShopServer <.. EZShopBackend : deploy
 UserPC --"*" PaymentSystem : internet  link
 @enduml
 ```
-
-\<describe here deployment diagram >
 
