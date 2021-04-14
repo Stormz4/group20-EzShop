@@ -203,7 +203,7 @@ Fidelity cards are managed totally by the shop. The customer can choose to get s
 | NFR_4 	| Privacy 		| Customers data should not be accessible to users other than the ones who manage fidelity cards.       | All FR 	|
 | NFR_5 	| Availability 	| At least 95% 																							| All FR 	|
 | NFR_6     | Security      | User should have access only to functions and resources which they require 							| All FR 	|
-|NFR_7|Privacy|Customer credit card data must not be stored in the system |FR1|
+| NFR_7		|Privacy| 	Customer credit card data must not be stored in the system |FR1|
 | Domain 	| // 			| Currency is Euro  																					| All FR 	|
 
 # Use case diagram and use cases
@@ -212,14 +212,14 @@ Fidelity cards are managed totally by the shop. The customer can choose to get s
 
 ```plantuml
 @startuml
-usecase Authentication
-usecase SalesManagement
-usecase CustomersManagement
-usecase CatalogueManagement
-usecase WarehouseManagement
-usecase SupportAccounting
-usecase AccountsManagement
 
+usecase (FR_1 SalesManagement)
+usecase (FR_2 WarehouseManagement)
+usecase (FR_3 CatalogueManagement)
+usecase (FR_4 CustomersManagement)
+usecase (FR_5 SupportAccounting)
+usecase (FR_6 AccountsManagement)
+usecase (FR_7 Authentication)
 
 User <|-- Cashier
 User <|-- WarehouseDirector
@@ -227,26 +227,27 @@ User <|-- Accountant
 User <|-- ShopDirector
 User <|-- ITAdministrator
 
-User --> Authentication
-Cashier --> SalesManagement
-Cashier --> CustomersManagement
-ShopDirector --> CatalogueManagement
-WarehouseDirector --> WarehouseManagement
-Accountant --> SupportAccounting
+Cashier --> (FR_1 SalesManagement)
+WarehouseDirector --> (FR_2 WarehouseManagement)
+ShopDirector --> (FR_3 CatalogueManagement)
+Cashier --> (FR_4 CustomersManagement)
+Accountant --> (FR_5 SupportAccounting)
+ITAdministrator --> (FR_6 AccountsManagement)
+User --> (FR_7 Authentication)
 
-ITAdministrator --> AccountsManagement
+(FR_1 SalesManagement) --> Product
+(FR_2 WarehouseManagement) --> Product
+(FR_3 CatalogueManagement) --> Product
+(FR_1 SalesManagement) ..> (FR_2 WarehouseManagement) : include
 
-SalesManagement --> Product
-WarehouseManagement --> Product
-CatalogueManagement --> Product
-SalesManagement ..> WarehouseManagement : include
-
-CustomersManagement --> FidelityCard
-SalesManagement --> CashRegister
-SalesManagement --> CreditCardSystem
+(FR_4 CustomersManagement) --> FidelityCard
+(FR_1 SalesManagement) --> CashRegister
+(FR_1 SalesManagement) --> CreditCardSystem
 @enduml
 ```
+
 ### Use Case diagram: Sales management
+
 ```plantuml
 @startuml
 :Cashier:     --> (FR_1 Sales Management)
@@ -852,7 +853,7 @@ N3 .left. Product
 
 # System Design
 
-Not really meaningful in this case. Only software components are needed.
+Not really meaningful in this case. Only software components are needed. Both the Credit Card system and the production of the Fidelity Card are external.
 
 # Deployment Diagram 
 
