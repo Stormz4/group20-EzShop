@@ -6,11 +6,11 @@ Authors:
 - Palmucci Leonardo s288126
 - Dario Lanfranco s287524 
 
-Date: 10/04/2021
+Date: 14/04/2021
 
 | Version | Changes |
 | ------- |---------|
-| 7 | Added glossary |
+| 8 | Added Personas and Stories |
 
 # Contents
 
@@ -59,13 +59,13 @@ EZShop is a software application to:
 | Maintainers | Who will repair the software eventually. It could be part of the staff or external. |
 | Marketing people | People who sell the software to shops. |
 | Product | Involved indirectly and managed by the software. |
-| Cash Register | The software involves the cash register since they're part of the output. |
-| Fidelity card | Fidely card associated with a customer. |
+| Cash Register | The software involves the Cash Register since they are part of the output. |
+| Fidelity Card | Fidelity Card associated to a Customer. |
 
 # Context Diagram and interfaces
 
 ## Context Diagram
-\<Define here Context diagram using UML use case diagram>
+
 ```plantuml
 @startuml
 
@@ -86,12 +86,7 @@ Shop -- CashRegister
 @enduml
 ```
 
-\<actors are a subset of stakeholders>
-
 ## Interfaces
-\<describe here each interface in the context diagram>
-
-\<GUIs will be described graphically in a separate document>
 
 | Actor 				| Logical Interface | Physical Interface  |
 | --------------------- | -----------------	| ------------------- |
@@ -106,42 +101,40 @@ Shop -- CashRegister
 | ITAdministrator| GUI | Screen, Keyboard, Mouse | 
 
 # Stories and personas
-\<A Persona is a realistic impersonation of an actor. Define here a few personas and describe in plain text how a persona interacts with the system>
 
-\<Persona is-an-instance-of actor>
+Tom, 50, has worked in its own shop for five years together with his daughter. He has always managed orders by himself, calling wholesalers and dictating orders. Tom updates his catalogue seldom, so he orders the same products almost all the time. He would really need something that could place orders for him.
 
-\<stories will be formalized later as scenarios in use cases>
+Marco, 45, works as a cashier for a local grocery. She has always used a Cash Register to compute the price of every product, labelling each one of them with its price. Erring is human, but when you have to deal with a shopping cart with 20 items, it can become obnoxious. It would be really helpful to compute prices automatically, saving time and energy.
 
+Jacques, 35, is an experienced accountant, hired to the recently opened Electronics Store. He loves his job, but collecting receipts manually to keep track of incomes is the only thing that annoys him. In his previous work experience, he was used to have all the receipts he needed in his PC. He would like to repeat the same experience.   
+
+Elisa, 32, has just opened a brand new store, where she can earn money from her passion for gardening. Many friends of her are enthusiast of her bouquets and she would like to provide them with special discounts for the most loyal customers, maybe handing out Fidelity Cards for them. She would like an application that can manage "this sort of stuff".  
 
 # Functional and non functional requirements
 
 ## Functional Requirements
 
-\<In the form DO SOMETHING, or VERB NOUN, describe high level capabilities of the system>
-
-\<they match to high level use cases>
-
 | ID       		| Description  |
 | ------------- | ------------ |
 |  FR_1     	| Sales management |
 |  FR_1.1   	| Provide Shopping Cart and Total Amount |
-|  FR_1.1.1	| Scan product |
+|  FR_1.1.1	| Scan Product |
 |  FR_1.1.2	| Search Product Price in the Catalogue |
-|  FR_1.1.3	| Apply Discounts (for any Customer) |
+|  FR_1.1.3	| Apply Discounts |
+|  FR_1.1.3.1	| Apply general Discounts (for any Customer) |
+|  FR_1.1.3.2 	| Apply general Discount for Fidelity Card owners |
+|  FR_1.1.3.3   | Apply Discounts for Fidelity Card owners according to Card Points |
 |  FR_1.1.4	| Compute Total Amount |
-|  FR_1.2	| Authentication of Fidelity Card |
+|  FR_1.2	| Handle Fidelity Card |
 |  FR_1.2.1	| Scan Fidelity Card |
-|  FR_1.2.2	| Validate Fidelity Card |
-|  FR_1.2.3	| Apply Discounts (for Customers with a Fidelity Card) |
-|  FR_1.2.4	| Update card points |
+|  FR_1.2.2	| Authenticate Fidelity Card |
 |  FR_1.3	| Handle Payment (Cash or via Credit Card) |
 |  FR_1.3.1	| Scan Credit Card (via Credit Card System) |
-|  FR_1.3.2	| Send money through Payment Gateway |
-|  FR_1.3.3	| Notify if Payment was successful or not |
-|  FR_1.3.4	| Open the Cash Register (after successful Payment)|
-|  FR_1.3.5	| Print the Receipt (after successful Payment)|
-|  FR_1.3.6	| Send Active Invoice to Accounting (after successful Payment)|
-|  FR_1.3.7	| Remove Shopping Cart elements from the Inventory (after successful Payment)|
+|  FR_1.3.2	| Notify Payment result|
+|  FR_1.3.3	| Open the Cash Register|
+|  FR_1.3.4	| Print Receipt |
+|  FR_1.3.5	| Send Transaction information to Accounting|
+|  FR_1.3.6	| Remove Shopping Cart elements from Inventory|
 ||
 |  FR_2     	| Warehouse management |
 |  FR_2.1   	| Inventory management |
@@ -191,13 +184,8 @@ Shop -- CashRegister
 |  FR_7.1		| Login |
 |  FR_7.2		| Logout |
 
-
-FR_1.5
-It means that fidelity card of a user must be updated and it is directly related to FR_4.
-In FR_1.6, whenever you scan a product, you add it to the list of products the customer is buying.
-
 FR_2 
-Inventory management is focused solely on the actual items being held within a warehouse. Warehouse management, in contrast, is more concerned with the “journey” of individual items as they flow through the warehouse.
+Inventory management is focused solely on the actual items being held within a warehouse. Warehouse management, in contrast, is more related to the items movement.
 
 FR_2.1.5
 Allow to set, update or remove Low Stock Thresholds so that an alert is generated if a product's quantity goes below the desired threshold.
@@ -206,8 +194,6 @@ FR_4
 Fidelity cards are managed totally by the shop. The customer can choose to get subscribe/unsubscribe and he will be given a card. He will just decide to use or not to use the points, which will be involved in giving discounts to the customer. If he wants to check how many points does he have, he has to get in contact with the shop by himself/with the cashier.
 
 ## Non Functional Requirements
-
-\<Describe constraints on functional requirements>
 
 | ID        |     Type 	    | 								Description  															| Refers to |
 | --------- | ------------- | ----------------------------------------------------------------------------------------------------- | --------- |
@@ -223,7 +209,6 @@ Fidelity cards are managed totally by the shop. The customer can choose to get s
 # Use case diagram and use cases
 
 ## Use case diagram
-\<define here UML Use case diagram UCD summarizing all use cases, and their relationships>
 
 ```plantuml
 @startuml
@@ -249,7 +234,6 @@ ShopDirector --> CatalogueManagement
 WarehouseDirector --> WarehouseManagement
 Accountant --> SupportAccounting
 
-
 ITAdministrator --> AccountsManagement
 
 SalesManagement --> Product
@@ -265,13 +249,15 @@ SalesManagement --> CreditCardSystem
 ### Use Case diagram: Sales management
 ```plantuml
 @startuml
-:Cashier:     --> (Sales Management)
-(Sales Management) ..> (Provide Shopping Cart and Total Amount) : include
-(Provide Shopping Cart and Total Amount) ..> (Authenticate Fidelity Card) : include
-(Provide Shopping Cart and Total Amount) ..> (Update Card Points) : include
-(Sales Management) ..> (Handle Payment) : include
-(Handle Payment) <.. (Handle Payment via Cash) : extends
-(Handle Payment) <.. (Handle Payment via Credit Card) : extends
+:Cashier:     --> (FR1 Sales Management)
+:Product:     <-- (FR1.1 Provide Shopping Cart and Total Amount)
+:FidelityCard: <-- (FR1.2 Handle Fidelity Card)
+(FR1 Sales Management) ..> (FR1.1 Provide Shopping Cart and Total Amount) : include
+(FR1.1 Provide Shopping Cart and Total Amount) ..> (FR1.2 Handle Fidelity Card) : include
+(FR1.2 Handle Fidelity Card) ..> (FR1.2.2 Authenticate Fidelity Card) : include
+(FR1 Sales Management) ..> (FR1.3 Handle Payment) : include
+(FR1.3 Handle Payment) <.. (Handle Payment via Cash) : extends
+(FR1.3 Handle Payment) <.. (Handle Payment via Credit Card) : extends
 @enduml
 ```
 
@@ -300,7 +286,6 @@ SalesManagement --> CreditCardSystem
 ' (Filter orders)        ..> (Date) : by
 ' (Filter orders)        ..> (Supplier) : by
 ' (Filter orders)        ..> (Amount) : by
-
 
 @enduml
 ```
@@ -374,25 +359,24 @@ SalesManagement --> CreditCardSystem
 @enduml
 ```
 
-\<next describe here each use case in the UCD>
-
-
 ##  Sales management
 
-### Use case 1, UC1 - Provide Shopping Cart and Total Amount
-| Actors Involved   | Cashier |
-| ----------------- | ------------- |
-|  Precondition     | 1. Cashier is already authenticated<br/> 2. Product has a valid Bar Code<br/> |
-|  Post condition   | 1. The list of products to buy is ready<br/> 2. The total amount to pay is computed and displayed<br/>|
-|  Nominal Scenario | 1. For every product in the customer's cart:<br/> 1.1. The Cashier scans the product using the Bar Code Reader<br/> 1.2 The code is readed correctly <br/> 1.3 The Application searches the Product in the Catalogue <br/> 1.4 The Application searches if a discount should be applied to the Product <br/> 1.5 If a Fidelity Card has been scanned, the Application searches if a discount should be applied to the Product for those who have a Fidelity Card <br/> 1.6 The Application retrieves the price of the Product and applies the discount if needed<br/> 1.7 The Application displays the price of the Product and the new partial amount to pay on the Cashier GUI<br/> 2. At the end, the final list of products and the total amount to pay is displayed on the Cashier GUI|
-|  Variants      	| - The Bar Code is valid, but the Bar Code Reader cannot read it correctly: the Cashier inputs the Bar Code to the Cashier GUI<br/> - The Customer does not want to buy a Product anymore: the Cashier removes it from the list using the Cashier GUI |
+In these Use Cases, the actor is the Cashier that has to deal with Shopping Carts and Payments. A Customer does not interact with the system: the Cashier manages everything.
 
-### Use case 2, UC1 - Authentication of a Fidelity Card
-| Actors Involved   | Cashier |
+### Use case 1.1, UC1 - Provide Shopping Cart and Total Amount (with a Fidelity Card)
+| Actors Involved   | Cashier, Product, Fidelity Card |
 | ----------------- | ------------- |
-|  Precondition     | 1. Cashier is already authenticated<br/> 2. Fidelity Card has a valid Bar Code<br/> 3. This scenario can occur at any time during Use Case 1.1|
+|  Precondition     | 1. Cashier is already authenticated<br/> 2. Product has a valid Bar Code<br/> 3. A Fidelity Card may be authenticated at any time during the Nominal Scenario|
+|  Post condition   | 1. The list of products to buy is ready<br/> 2. The total amount to pay is computed and displayed|
+|  Nominal Scenario | 1. For every product in the customer's cart:<br/> 1.1. The Cashier scans the Product using the Bar Code Reader and inputs the quantity of that Product<br/> 1.2 The Application searches the Product in the Catalogue and retrieves its selling price. <br/> 1.3 If a general discount is present, it is applied to the Product. <br/> 1.4 If a Fidelity Card has been scanned: <br/> 1.4.1 If a discount is present for Fidelity Card owners, it is applied to the Product. <br/> 1.4.2 The Fidelity Card Points related to the Product are added to the Fidelity Card <br/> 1.5 The Application displays the price of the Product and the new partial amount to pay on the Cashier GUI<br/> 2. If a Fidelity Card is present, the Cashier selects whether to apply additional discounts, depending on the Card Points (not more than one at a time).<br/> 2.1 If the Cashier applies them, Fidelity Card Points are removed according to the previous step.<br/> 3. At the end, the final list of products and the total amount to pay is displayed on the Cashier GUI|
+|  Variants      	| - The Bar Code is valid, but the Bar Code Reader cannot read it correctly: the Cashier inputs the Bar Code to the Cashier GUI<br/> - The Customer does not want to buy a Product anymore: the Cashier removes it from the list using the Cashier GUI<br/>   The Product Price is removed from the Amount to Pay <br/>   Fidelity Card Points related to the Product are removed from the Card <br/>|
+
+### Use case 1.2, UC1 - Authentication of a Fidelity Card
+| Actors Involved   | Cashier, Fidelity Card |
+| ----------------- | ------------- |
+|  Precondition     | 1. Cashier is already authenticated<br/> 2. Fidelity Card has a valid Bar Code<br/>|
 |  Post condition   | The Fidelity Card is recognized and the amount to pay is updated|
-|  Nominal Scenario | 1. The Cashier scans the Fidelity Card using the Bar Code Reader<br/> 2. The Application recognizes the Fidelity Card <br/> 3. The Application searches, for every scanned Product so far, if a discount should be applied for those who have a Fidelity Card<br/> 4. The Application updates the amount to pay according to the results of the previous step|
+|  Nominal Scenario | 1. The Cashier scans the Fidelity Card using the Bar Code Reader and recognizes it<br/> 2. For every scanned Product so far: if a discount for Fidelity Card owners is present, it is applied. <br/> 3. The Amount to pay is updated according to the results of the previous step|
 |  Variants     	| - The Bar Code is valid, but the Bar Code Reader cannot read it correctly: the Cashier inputs the Bar Code to the Cashier GUI |
 
 ### Use case 3, UC1 - Handle a Payment via Credit Card
@@ -400,15 +384,15 @@ SalesManagement --> CreditCardSystem
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier is already authenticated<br/> 2. Customer has a valid Credit Card<br/> 3. The list of products to buy is known<br/> 4. The total amount of pay is known|
 |  Post condition   | The customer has successfully paid <br/> The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
-|  Nominal Scenario | 1. The Credit Card System shows the amount to pay<br/> 2. The Credit Card system receives the customer's Credit Card and recognizes it<br/> 3. The Credit Card System bypasses the Application and automatically interacts with the Payment Gateway <br/> 4. After that the transaction has terminated successfully, the Credit Card System notifies the Application <br/> 5. The Application opens the Cash Register and asks to print the receipt <br/> 6. The Cash Register prints the receipt <br/> 7. The Application sends the invoice to the Accounting <br/> 8. For each Product in the list: remove it from the Inventory|
-|  Variants     	| - The Credit Card System is not able to recognize the Card: retry to recognize it<br/> - Transaction does not terminate successfully: the Credit Card System notifies the Application and displays an error message: restart from step 2|
+|  Nominal Scenario | 1. The Credit Card System shows the amount to pay<br/> 2. The Credit Card system receives the customer's Credit Card and recognizes it<br/> 3. The Credit Card System interacts with the Payment Gateway bypassing the Application<br/> 4. The Credit Card System notifies about the transaction result <br/> 5. The Cash Register is opened and prints the receipt <br/> 6. Transaction information is sent to the Accounting <br/> 7. Each Product in the list is removed from the Inventory|
+|  Variants     	| - The Credit Card System is not able to recognize the Card: retry to recognize it<br/> - Payment does not terminate successfully: the Credit Card System notifies the Application and displays an error message: restart from step 2|
 
 ### Use Case 4, UC1 - Handle a Payment via Cash
 | Actors Involved   | Cashier, Cash Register |
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier is already authenticated<br/> 2. The customer has successfully paid by cash<br/> 3. The list of products to buy is known<br/> 4. The total amount of pay is known|
 |  Post condition   | The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
-|  Nominal Scenario | 1. The Cashier tells the Application that the customer has successfully paid by cash<br/> 2. The Application opens the Cash Register and asks to print the receipt<br/>3. The Cash Register prints the receipt <br/> 4. The Application sends the invoice to the Accounting <br/> 5. For each Product in the list: remove it from the Inventory|
+|  Nominal Scenario | 1. The Cashier notifies that the customer has successfully paid by cash<br/> 2. The Cash Register is opened and prints the receipt<br/> 3. Transaction information is sent to the Accounting <br/> 4. Each Product in the list is removed from the Inventory|
 |  Variants     	| - |
 
 
@@ -468,6 +452,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Variants          |  - A different sorting criteria is selected<br/>-  Products are filtered writing something in the search bar or using filters (e.g. date, supplier, ...) |
 
 #
+
 ## Manage orders
 
 ### Use case x, UCx - Place new order
@@ -594,7 +579,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 |  Nominal Scenario | Accountant selects a specific timeframe and shows the shop's revenue and expenses in that time period |
 |  Variants     	| - Accountant decide to make application displaying the best selling products |
 
-##### Scenario x.1 
+#### Scenario x.1 
 
 | Scenario 			| Show revenue and expenses in a timeframe |
 | ----------------- | --------------------------- |
@@ -606,7 +591,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | 3     			| System searches both revenues and expenses of that timeframe which satisfy selected filters |
 | 4    				| System displays found revenues and expenses and shows a diagram about those data |
 
-##### Scenario x.2 
+#### Scenario x.2 
 
 | Scenario 			| Show best selling products  |
 | ----------------- | --------------------------- |
@@ -682,10 +667,6 @@ In these use cases, the actor is an user from the shop.
 |  Variants     	| - |
 
 # Glossary
-
-\<use UML class diagram to define important terms, or concepts in the domain of the system, and their relationships> 
-
-\<concepts are used consistently all over the document, ex in use cases, requirements etc>
 
 ```plantuml
 @startuml
@@ -1039,9 +1020,6 @@ N3 .left. Product
 ```
 
 # System Design
-\<describe here system design>
-
-\<must be consistent with Context diagram>
 
 Not really meaningful in this case. Only software components are needed.
 
@@ -1057,13 +1035,10 @@ artifact EZShopBackend
 
 node PaymentSystem
 
-
 UserPC "*"<.. EZShopApplication  : deploy
 UserPC -- EZShopServer : internet link
 EZShopServer <.. EZShopBackend : deploy
 UserPC --"*" PaymentSystem : internet  link
 @enduml
 ```
-
-\<describe here deployment diagram >
 
