@@ -271,27 +271,26 @@ SalesManagement --> CreditCardSystem
 :WarehouseManager:     --> (FR_2 Warehouse management)
 (FR_2 Warehouse management) ..> (FR_2.1 Inventory management) : include
 (FR_2 Warehouse management) ..> (FR_2.2 Order management) : include
-(FR_2.1 Inventory management) ..> (FR_2.1.1 Add product) : include
+(FR_2.1.1 Add product) <.left. (FR_2.1 Inventory management) : include
 (FR_2.1 Inventory management) ..> (FR_2.1.2 Remove product) : include
 (FR_2.1 Inventory management) ..> (FR_2.1.3 Update product) : include
-(FR_2.1 Inventory management) --> :Product: 
+ :Product: <--(FR_2.1 Inventory management) 
 ' (Update product)       ..> (Stock level) : include
 ' (Update product)       ..> (Purchase price) : include
 ' (Update product)       ..> (Description) : include
-(FR_2.1 Inventory management) ..> (FR_2.1.5 Show products) : include
+(FR_2.1 Inventory management) .up.> (FR_2.1.5 Show products) : include
 ' (Filter products)      ..> (Name) : by
 ' (Filter products)      ..> (Supplier) : by
 ' (Filter products)      ..> (Brand) : by
 ' (Filter products)      ..> (Price) : by
-(FR_2.1 Inventory management) ..> (FR_2.1.4 Manage Low Stock Thresholds) : include
-(FR_2.2 Order management)     ..> (FR_2.2.1 Place new order) : include
+(FR_2.1.4 Manage Low Stock Thresholds) <.up. (FR_2.1 Inventory management) : include
+ (FR_2.2.1 Place new order) <.. (FR_2.2 Order management)      : include
 (FR_2.2 Order management)     ..> (FR_2.2.2 Cancel order) : include
 (FR_2.2 Order management)     ..> (FR_2.2.3 Edit order) : include
 (FR_2.2 Order management)     ..> (FR_2.2.4 Show orders) : include
 ' (Filter orders)        ..> (Date) : by
 ' (Filter orders)        ..> (Supplier) : by
 ' (Filter orders)        ..> (Amount) : by
-
 @enduml
 ```
 
