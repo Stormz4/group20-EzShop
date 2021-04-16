@@ -451,6 +451,27 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Nominal Scenario  | Warehouse Manager accesses stock's section of the software, where he can look at the complete list of products sorted by ID (default sort) |
 | Variants          |  - A different sorting criteria is selected<br/>-  Products are filtered writing something in the search bar or using filters (e.g. date, supplier, ...) |
 
+#### Scenario 9.1 - Variant 
+
+| Scenario 			| Sort product |
+| ----------------- | --------------------------- |
+| Precondition     	|  Software shows a list of products present in the catalogue |
+| Post condition   	| Products are sorted and shown in a specific vay|
+| Step#        		| Description  |
+| 1     			| User selects a way to sort the products (Price, name, ID)|
+| 2    				| System displays products sorted by the chosen criteria|
+
+#### Scenario 9.2 - Variant 
+
+| Scenario 			| Filter product |
+| ----------------- | --------------------------- |
+| Precondition     	|  Software shows a list of products present in the catalogue |
+| Post condition   	| The filter is applied and the products that satisfy the filter are shown|
+| Step#        		| Description  |
+| 1     			| User filters the products by writing in the search bar (ID,name..) |
+| 2    				| System displays products filtered by the chosen criteria |
+
+
 #
 
 ## Manage orders
@@ -503,7 +524,18 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 |  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated |
 |  Post condition   | One or more products are added in the catalogue |
 |  Nominal Scenario |1. Shop director selects "add a product in the catalogue" <br> 2. Software shows a list of products present in the inventory <br> 3. Shop director one or more selects a product and inserts the price to sell for each <br> 4. Shop director confirms <br> 5. The application assigns the inventory ID to the product |
-|  Variants     	| - A product can be added only once in a catalogue: each product has an unique ID; an error message is printed.<br/>- Catalogue doesn't exist; the application creates a catalogue and the product is added |
+|  Variants     	| - A product can be added only once in a catalogue: each product has an unique ID; an error message is shown on the screen.<br/>|
+
+#### Scenario 15.1 - Variant 
+
+| Scenario 			| Sort product |
+| ----------------- | --------------------------- |
+| Precondition     	| 1. Product P is present in the catalogue <br> 2. Software has shown a list of products present in the invetory|
+| Post condition   	| An error messagge is shown on the screen and the use case is interrupted |
+| Step#        		| Description  |
+| 1     			| Shop director selects a product P which is already present in the catalogue |
+| 2    				| System displays an error message, which will stop the use case|
+
 
 ### Use case 16, UC16 - Remove product
 | Actors Involved	| Shop director |
@@ -520,6 +552,27 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Post condition 	| Software shows a list of products present in the catalogue, sorted by ID (default) |
 | Nominal Scenario  | 1. Shop director selects "show products in the catalogue"|
 | Variants          |  - A different sorting criteria is selected<br/>-  Products are filtered writing something in the search bar or using filters (type of product, selling price, ...) |
+
+#### Scenario 17.1 - Variant 
+
+| Scenario 			| Sort product |
+| ----------------- | --------------------------- |
+| Precondition     	| Software shows a list of products present in the catalogue |
+| Post condition   	| Products are sorted and shown in a specific vay|
+| Step#        		| Description  |
+| 1     			| User selects a way to sort the products (Price, name, ID)|
+| 2    				| System displays products sorted by the chosen criteria|
+
+#### Scenario 17.2 - Variant 
+
+| Scenario 			| Filter product |
+| ----------------- | --------------------------- |
+| Precondition     	|  Software shows a list of products present in the catalogue|
+| Post condition   	| The filter is applied and the products that satisfy the filter are shown|
+| Step#        		| Description  |
+| 1     			| User filters the products by writing in the search bar (ID,name..) |
+| 2    				| System displays products filtered by the chosen criteria |
+
 
 ## Customers management
 
@@ -549,6 +602,16 @@ We'll consider the Cashier as the actor.
 | Post condition 	| Software shows a list of fidelity cards, sorted by ID |
 | Nominal Scenario  | 1. Cashier selects "show all fidelity cards & cards points"|
 | Variants          | Fidelity cards are filtered writing something in the search bar (SSN, name, surname, telephone, ID) |
+
+#### Scenario 20.1 - Variant 
+
+| Scenario 			| Filter product |
+| ----------------- | --------------------------- |
+| Precondition     	| Software shows a list of fidelity cards, sorted by I |
+| Post condition   	| The filter is applied and the fidelity card that satisfy the filter are shown|
+| Step#        		| Description  |
+| 1     			| User filters the filtered by writing something in the search bar (SSN, name, surname, telephone, ID)
+| 2    				| System displays fidelity cards filtered by the chosen criteria |
 
 ## Support accounting
 
@@ -805,6 +868,7 @@ FidelityCard -- Subscriber: +owns <
 Product "*"-- ProductDescriptor: +is described by
 Transaction --"0..1" CreditCard
 Customer --"*" CreditCard: +owns >
+CreditCardSystem -- "*" CreditCard : interacts
 Purchase --"*" Transaction
 Transaction -- Receipt
 Cashier "*"--"*" CashRegister
