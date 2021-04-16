@@ -834,6 +834,10 @@ ID
 expireDate
 }
 
+class BarCodeReader{
+ID
+}
+
 class ITAdministrator
 class Cashier
 class Product
