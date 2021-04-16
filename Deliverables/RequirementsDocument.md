@@ -508,7 +508,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 
 ## Catalogue management
 
-### Use case 14, UC14 - Update selling price of products
+### Use case 14, UC14 - Update selling price of product
 | Actors Involved	| Shop director |
 | -----------------	| ------------- |
 |  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. The catalogue contains at least one product |
@@ -526,7 +526,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 
 #### Scenario 15.1 - Variant 
 
-| Scenario 			| Sort product |
+| Scenario 			| Product already present |
 | ----------------- | --------------------------- |
 | Precondition     	| 1. Product P is present in the catalogue <br> 2. Software has shown a list of products present in the invetory|
 | Post condition   	| An error messagge is shown on the screen and the use case is interrupted |
