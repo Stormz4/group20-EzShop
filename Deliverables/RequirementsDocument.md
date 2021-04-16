@@ -10,7 +10,7 @@ Date: 14/04/2021
 
 | Version | Changes |
 | ------- |---------|
-| 9 | Modified use case diagrams and matched the FRs with the use cases|
+| 10 | Modified use cases, context diagram|
 
 # Contents
 
@@ -441,8 +441,6 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Nominal Scenario  | 1. Warehouse Manager searches for the product using the search bar<br/>2. The software presents a list of matching products<br/>3. Warehouse Manager selects the target product<br/>4. Warehouse Manager clicks "Edit" button<br/>5. Software presents the interface from which product's properties can be modified<br/>6. Warehouse Manager sets, updates or removes the low stock threshold |
 | Variants          | - Target product does not exist in the inventory<br/> |
 
-[//]: # (TODO: write SET, UPDATE and REMOVE scenarios?) 
-
 ### Use case 9, UC9 - Show products
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
@@ -455,7 +453,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 
 | Scenario 			| Sort product |
 | ----------------- | --------------------------- |
-| Precondition     	|  Software shows a list of products present in the catalogue |
+| Precondition     	| Software shows a list of products present in the inventory |
 | Post condition   	| Products are sorted and shown in a specific vay|
 | Step#        		| Description  |
 | 1     			| User selects a way to sort the products (Price, name, ID)|
@@ -465,7 +463,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 
 | Scenario 			| Filter product |
 | ----------------- | --------------------------- |
-| Precondition     	|  Software shows a list of products present in the catalogue |
+| Precondition     	|  Software shows a list of products present in the inventory |
 | Post condition   	| The filter is applied and the products that satisfy the filter are shown|
 | Step#        		| Description  |
 | 1     			| User filters the products by writing in the search bar (ID,name..) |
@@ -664,7 +662,16 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | 2 			    | System searches the best 5 selling products of all time (products which lead to the highest revenues considering the whole shop history) which satisfy selected filter |
 | 3				    | System displays the found products (could be less than 5) and shows a graph about those data |
 
-### Use case 24, UC24 - Show suppliers deadlines timetable
+### Use case 24, UC23 - Show accounting data
+| Actors Involved   | Accountant  |
+| ----------------- | ----------- |
+|  Precondition     | 1. Accountant account must exist<br/>2. Accountant must be authenticated |
+|  Post condition   | Accounting data are shown on the screen |
+|  Nominal Scenario | 1. Accountant chooses to view either invoices, suppliers, deadlines timetable, balance sheet, financial statement <br> 2. Data is shown on the screen|
+|  Variants     	| Accountant chooses a different type of data|
+
+
+#### Scenario 24.1
 | Actors Involved   | Accountant  |
 | ----------------- | ----------- |
 |  Precondition     | 1. Accountant account must exist<br/>2. Accountant must be authenticated<br/>3. The Shop has got at least one supplier<br/>4. Suppliers deadline timetable is generated from invoices data |
@@ -706,7 +713,7 @@ In these use cases, the actor is an user from the shop.
 | Actors Involved   | User		|
 | ----------------- | --------- |
 |  Precondition     | Account user must exist & must not be authenticated |
-|  Post condition   | Account user is authenticated |
+|  Post condition   | Account user is authenticated and the main page of the user is shown on screen|
 |  Nominal Scenario | 1. User selects "login" <br> 2. Software show forms to insert email and password <br> 3. User inserts his email and password |
 |  Variants     	| - Email/password are wrong; an error is printed on the screen |
 
@@ -758,10 +765,6 @@ class Subscriber {
 }
 class FidelityCard{
  ID
- SSN
- Name
- Surname
- TelephoneNumber
  Points
 }
 class Purchase {
@@ -826,6 +829,11 @@ class Receipt{
  ID
 }
 
+class SupplierDeadline{
+ID
+expireDate
+}
+
 class ITAdministrator
 class Cashier
 class Product
@@ -872,6 +880,7 @@ CreditCardSystem -- "*" CreditCard : interacts
 Purchase --"*" Transaction
 Transaction -- Receipt
 Cashier "*"--"*" CashRegister
+BarCodeReader -- CashRegister
 CashRegister --"*" Purchase
 Purchase --"*" ActiveInvoice
 Accountant --"*" PassiveInvoice: create
@@ -879,11 +888,12 @@ WarehouseManager --"*" Order: places
 Order "*"-down- Supplier: +from
 ShopDirector -- Catalogue: manages
 Order "*"-right-"*" Product
+Order -- SupplierDeadline
 PassiveInvoice "*"-- Order
 WarehouseManager -- Inventory: manages
 Cashier -left-"*" FidelityCard: manages
 ITAdministrator --"*" User: manages
-Invoice "*" -up-* BalanceSheet
+PassiveInvoice "*" -up-* BalanceSheet
 Purchase "*" --* BalanceSheet
 Accountant -- "*" BalanceSheet : analyses >
 
@@ -898,7 +908,16 @@ N3 .left. Product
 
 # System Design
 
-Not really meaningful in this case. Only software components are needed. Both the Credit Card system and the production of the Fidelity Card are external.
+Only software components are needed, except for the BarCodeReader which is internal. Both the Credit Card system and the production of the Fidelity Card are external.
+
+```plantuml
+@startuml
+class EZShop
+class BarCodeReader
+
+EZShop o-- BarCodeReader
+@enduml
+```
 
 # Deployment Diagram 
 
