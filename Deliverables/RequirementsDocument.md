@@ -615,21 +615,63 @@ We'll consider the Cashier as the actor.
 
 In these use cases, the actor is an accountant, or a generic user from the shop having privileges of an accountant profile, managing the simplified accounting of the shop (hypothesis: annual revenue below 700'000€) taking data from Agenzia delle Entrate informatic system.
 
-### Use case 21, UC21 - Add invoice (passive)
+### Use case 21, UC21 - Update finance
 | Actors Involved   | Accountant  |
 | ----------------- | ----------- |
 |  Precondition     | 1. Accountant account must exist<br/>2. Accountant must be authenticated|
-|  Post condition   | New invoice has been added to the system |
-|  Nominal Scenario | 1. Accountant selects "Add invoice"<br/>2. Software gives to user a form to fill out<br/>3. Accountant fills the form with the new invoice data<br/>4. Accountant confirms |
-|  Variants     	| - Accountant want to abort the operation without submit the new invoice addition: accountant click on 'Cancel' icon |
+|  Post condition   | New invoice or credit note has been added to the system |
+|  Nominal Scenario | Accountant fills a form for the new invoice or credit note that has to be added to the system |
+|  Variants     	| - Accountant want to abort the  operation without submit the new addition: accountant clicks on 'Go back' button |
 
-### Use case 22, UC22- Add credit note
+#### Scenario 21.1
+| Scenario 			| Add invoice (passive) |
+| ----------------- | --------------------------- |
+| Precondition     	|  |
+| Post condition   	| New passive invoice has been added to the system |
+| Step#        		| Description  |
+| 1     			| Accountant selects "Add passive invoice" |
+| 2     			| Software gives to user a form to fill out |
+| 3     			| Accountant fills the form with the new invoice data |
+| 4    				| Accountant confirms by clicking on "Submit" button |
+
+#### Scenario 21.2
+| Scenario 			| Add credit note |
+| ----------------- | --------------------------- |
+| Precondition     	|  At least one incorrectly added invoice is present in the system |
+| Post condition   	| New credit note has been added to the system |
+| Step#        		| Description  |
+| 1     			| Accountant selects "Add credit note" |
+| 2     			| Software gives to user a form to fill out |
+| 3     			| Accountant fills the form with the new credit note data (negative import value) |
+| 4    				| Accountant confirms by clicking on "Submit" button |
+
+### Use case 22, UC22 - Show accounting data
 | Actors Involved   | Accountant  |
 | ----------------- | ----------- |
-|  Precondition     | 1. Accountant account must exist<br/>2. Accountant must be authenticated<br/>3. At least one incorrectly added invoice is present in the system |
-|  Post condition   | New credit note is added to the system to compensate wrong invoices |
-|  Nominal Scenario | 1. Accountant selects "New credit note"<br/>2. Software gives to user a form to fill out<br/>3. Accountant fills the form with the new credit note data (negative import value)<br/>4. Accountant confirms |
-|  Variants     	| - |
+|  Precondition     | 1. Accountant account must exist<br/>2. Accountant must be authenticated |
+|  Post condition   | Accounting data are shown on the screen |
+|  Nominal Scenario | Accountant chooses to view and filter either invoices, suppliers, deadlines timetable, balance sheet or  financial statement and the system displays data on the screen |
+|  Variants     	| - There is no data of the selected type yet: no data will be shown |
+
+#### Scenario 22.1
+| Scenario 			| Show suppliers deadlines timetable - Up to date |
+| ----------------- | --------------------------- |
+| Precondition     	|  1. The Shop has got at least one supplier<br/>2. Suppliers deadline timetable is generated from invoices data |
+| Post condition   	| A list of supplier deadlines is shown on screen |
+| Step#        		| Description  |
+| 1     			| User selects a filter by supplier for the search results |
+| 2     			| Application displays deadlines distinguishing them by selected suppliers and sorting them by date |
+| 3     			| All deadlines (even not selected by the filter) have been satisfied: an "Up to date with payments" message is displayed |
+
+#### Scenario 22.2
+| Scenario 			| Show suppliers deadlines timetable - Expired warning |
+| ----------------- | --------------------------- |
+| Precondition     	|  1. The Shop has got at least one supplier<br/>2. Suppliers deadline timetable is generated from invoices data |
+| Post condition   	| A list of supplier deadlines is shown on screen |
+| Step#        		| Description  |
+| 1     			| User selects a filter by supplier for the search results |
+| 2     			| Application displays deadlines distinguishing them by selected suppliers and sorting them by date |
+| 3     			| One or more of the deadlines (even not selected by the filter) are expired: an alert message is generated  |
 
 ### Use case 23, UC23 - Show statistics
 | Actors Involved   | Accountant  |
@@ -637,7 +679,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 |  Precondition     | 1. Accountant account must exist<br/>2. Accountant must be authenticated |
 |  Post condition   | Statistics are shown on screen by means of a table, a diagram or a graph |
 |  Nominal Scenario | Accountant selects a specific timeframe and shows the shop's revenue and expenses in that time period |
-|  Variants     	| - Accountant decide to make application displaying the best selling products |
+|  Variants     	| - Accountant decides to make application displaying the best selling products |
 
 #### Scenario 23.1 
 
@@ -649,7 +691,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | 1     			| User selects a specific timeframe |
 | 2     			| User selects a filter for the search results (e.g. by supplier, by product, etc.) |
 | 3     			| System searches both revenues and expenses of that timeframe which satisfy selected filters |
-| 4    				| System displays found revenues and expenses and shows a diagram about those data |
+| 4    				| System displays found revenues and expenses by showing a diagram about those data |
 
 #### Scenario 23.2 
 
@@ -662,26 +704,9 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | 2 			    | System searches the best 5 selling products of all time (products which lead to the highest revenues considering the whole shop history) which satisfy selected filter |
 | 3				    | System displays the found products (could be less than 5) and shows a graph about those data |
 
-### Use case 24, UC23 - Show accounting data
-| Actors Involved   | Accountant  |
-| ----------------- | ----------- |
-|  Precondition     | 1. Accountant account must exist<br/>2. Accountant must be authenticated |
-|  Post condition   | Accounting data are shown on the screen |
-|  Nominal Scenario | 1. Accountant chooses to view either invoices, suppliers, deadlines timetable, balance sheet, financial statement <br> 2. Data is shown on the screen|
-|  Variants     	| Accountant chooses a different type of data|
-
-
-#### Scenario 24.1
-| Actors Involved   | Accountant  |
-| ----------------- | ----------- |
-|  Precondition     | 1. Accountant account must exist<br/>2. Accountant must be authenticated<br/>3. The Shop has got at least one supplier<br/>4. Suppliers deadline timetable is generated from invoices data |
-|  Post condition   | A list of deadlines is shown on screen |
-|  Nominal Scenario | 1. User selects a filter by supplier for the search results <br/>2. Application displays deadlines distinguishing them by selected suppliers and sorting them by date  |
-|  Variants     	| - All deadlines have been satisfied: an "Up to date with payments" message is displayed<br/>- One or more deadlines are expired: an alert message is generated  |
-
 ## Accounts management
 
-### Use case 25, UC25 - Add account
+### Use case 24, UC24 - Add account
 | Actors Involved   | ITAdministrator	|
 | ----------------- | --------- |
 |  Precondition     | User doesn't have an account yet |
@@ -689,7 +714,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 |  Nominal Scenario | 1. ITAdministrator selects "Add new account" </br> 2. Software shows forms to insert the user data <br> 3. ITAdministrator inserts the user data</br>4. ITAdministrator confirms |
 |  Variants     	| - ITAdministrator wants to reset all fields during the operation by clicking on the "Reset" button |
 
-### Use case 26, UC26 - Remove account
+### Use case 25, UC25 - Remove account
 | Actors Involved   | ITAdministrator	|
 | ----------------- | --------- |
 |  Precondition     | Account user must exist |
@@ -697,7 +722,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 |  Nominal Scenario | 1. ITAdministrator selects "Show accounts" </br> 2. Software shows a list of accounts <br> 3. ITAdministrator chooses one of them <br> 4. ITAdministrator chooses the "Remove account" option<br/>5. ITAdministrator confirms  |
 |  Variants     	| - |
 
-### Use case 27, UC27 - Update account
+### Use case 26, UC26 - Update account
 | Actors Involved   | ITAdministrator	|
 | ----------------- | --------- |
 |  Precondition     | Account user must exist |
@@ -709,7 +734,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 
 In these use cases, the actor is an user from the shop.
 
-### Use case 28, UC28 - Login
+### Use case 27, UC27 - Login
 | Actors Involved   | User		|
 | ----------------- | --------- |
 |  Precondition     | Account user must exist & must not be authenticated |
@@ -717,7 +742,7 @@ In these use cases, the actor is an user from the shop.
 |  Nominal Scenario | 1. User selects "login" <br> 2. Software show forms to insert email and password <br> 3. User inserts his email and password |
 |  Variants     	| - Email/password are wrong; an error is printed on the screen |
 
-### Use case 29, UC29 - Logout
+### Use case 28, UC28 - Logout
 | Actors Involved   | User		|
 | ----------------- | --------- |
 |  Precondition     | Account user must exist & must be authenticated  |
