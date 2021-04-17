@@ -575,7 +575,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | -----------------	| ------------- |
 |  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated |
 |  Post condition   | One or more products are added in the catalogue |
-|  Nominal Scenario |1. Shop director selects "add a product in the catalogue" <br> 2. Software shows a list of products present in the inventory <br> 3. Shop director one or more selects a product and inserts the price to sell for each <br> 4. Shop director confirms <br> 5. The application assigns the inventory ID to the product |
+|  Nominal Scenario |1. Shop director selects "add a product in the catalogue" <br> 2. Software shows a list of products present in the inventory <br> 3. Shop director selects a product and inserts the price to sell<br> 4. Shop director confirms <br> 5. The application assigns the inventory ID to the product |
 |  Variants     	| - A product can be added only once in a catalogue: each product has an unique ID; an error message is shown on the screen.<br/>|
 
 #### Scenario 15.1 - Variant 
