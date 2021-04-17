@@ -375,34 +375,88 @@ In these Use Cases, the actor is the Cashier that has to deal with Shopping Cart
 ### Use case 1, UC1 - Provide Shopping Cart and Total Amount (with a Fidelity Card)
 | Actors Involved   | Cashier, Product, Fidelity Card |
 | ----------------- | ------------- |
-|  Precondition     | 1. Cashier is already authenticated<br/> 2. Product has a valid Bar Code<br/> 3. A Fidelity Card may be authenticated at any time during the Nominal Scenario|
+|  Precondition     | 1. Cashier account exists and is already authenticated<br/> 2. Product has a valid Bar Code<br/> 3. A Fidelity Card may be scanned (thus authenticated) at any time during the Nominal Scenario|
 |  Post condition   | 1. The list of products to buy is ready<br/> 2. The total amount to pay is computed and displayed|
 |  Nominal Scenario | 1. For every product in the customer's cart:<br/> 1.1. The Cashier scans the Product using the Bar Code Reader and inputs the quantity of that Product<br/> 1.2 The Application searches the Product in the Catalogue and retrieves its selling price <br/> 1.3 If a general discount is present, it is applied to the Product <br/> 1.4 If a Fidelity Card has been scanned: <br/> 1.4.1 If a discount is present for Fidelity Card owners, it is applied to the Product <br/> 1.4.2 The Fidelity Card Points related to the Product are added to the Fidelity Card <br/> 1.5 The Application displays the price of the Product and the new partial amount to pay on the Cashier GUI<br/> 2. If a Fidelity Card is present, the Cashier selects whether to apply additional discounts, depending on the Card Points (not more than one at a time)<br/> 2.1 If the Cashier applies them, Fidelity Card Points are removed according to the previous step<br/> 3. At the end, the final list of products and the total amount to pay is displayed on the Cashier GUI|
-|  Variants      	| - The Bar Code is valid, but the Bar Code Reader cannot read it correctly: the Cashier inputs the Bar Code to the Cashier GUI<br/> - The Customer does not want to buy a Product anymore: the Cashier removes it from the list using the Cashier GUI<br/>   The Product Price is removed from the Amount to Pay <br/>   Fidelity Card Points related to the Product are removed from the Card <br/>|
+|  Variants      	| - The Customer wants to subscribe at any time (new Fidelity Card must be created) <br/> - The Bar Code Reader cannot scan a Product<br/> - The Customer does not want to buy a Product anymore|
+
+#### Scenario 1.1 - Creating New Fidelity Card during Sale 
+| Scenario 			| Creating new Fidelity Card during Sale |
+| ----------------- | --------------------------- |
+| Precondition     	| 1. Cashier account exists and is already authenticated <br/>2. The Cashier may have already scanned some Products |
+| Post condition   	| 1. New Fidelity Card is created <br/> 2. Scanned Products have not to be scanned again|
+| Step#        		| Description  |
+| 1     		| Cashier suspends the Sale|
+| 2    			| Cashier adds a new Fidelity Card as described in UC18|
+| 3			| Cashier resumes the Sale |
+
+#### Scenario 1.2 - Inserting Product/Card Code manually
+| Scenario 			| Inserting Product/Card code manually |
+| ----------------- | --------------------------- |
+| Precondition     	| 1. Cashier account exists and is already authenticated <br/> 2. Product/Card has a valid Bar Code|
+| Post condition   	| 1. Product/Card Code is read correctly <br/> 2. Product is added to the Shopping Cart/Card is authenticated|
+| Step#        		| Description  |
+| 1     		| Cashier inserts the Code using the Cashier GUI|
+| 2    			| Product/Card is recognized: in case of Product, it is added to the Shopping Cart; in case of Card, it is authenticated |
+
+#### Scenario 1.3 - Remove Product from Shopping Cart 
+| Scenario 			| Creating new Fidelity Card during Sale |
+| ----------------- | --------------------------- |
+| Precondition     	| 1. Cashier account exists and is already authenticated <br/>2. The Cashier has already scanned the Product to remove <br/>3. A Fidelity Card may have been authenticated|
+| Post condition   	| 1. Product is removed from the Shopping Cart <br/> 2. Total Amount is updated <br/> 3. Fidelity Card Points are updated (in case Precondition 3 is verified)| 
+| Step#        		| Description  |
+| 1     		| Cashier removes the Product using the Cashier GUI that displays all the Products scanned so far|
+| 2			| The Product price is removed from the Total Amount |
+| 3			| The Product points are removed from the Fidelity Card|
 
 ### Use case 2, UC2 - Authentication of a Fidelity Card
 | Actors Involved   | Cashier, Fidelity Card |
 | ----------------- | ------------- |
-|  Precondition     | 1. Cashier is already authenticated<br/> 2. Fidelity Card has a valid Bar Code<br/>|
+|  Precondition     | 1. Cashier account exists and is already authenticated<br/> 2. Fidelity Card has a valid Bar Code<br/>|
 |  Post condition   | The Fidelity Card is recognized and the amount to pay is updated|
 |  Nominal Scenario | 1. The Cashier scans the Fidelity Card using the Bar Code Reader and recognizes it<br/> 2. For every scanned Product so far: if a discount for Fidelity Card owners is present, it is applied. <br/> 3. The Amount to pay is updated according to the results of the previous step|
-|  Variants     	| - The Bar Code is valid, but the Bar Code Reader cannot read it correctly: the Cashier inputs the Bar Code to the Cashier GUI |
+|  Variants     	| - The Bar Code is valid, but the Bar Code Reader cannot read it correctly (see Scenario 1.2)|
 
 ### Use case 3, UC3 - Handle a Payment via Credit Card
 | Actors Involved   | Cashier, Cash Register, Credit Card System |
 | ----------------- | ------------- |
-|  Precondition     | 1. Cashier is already authenticated<br/> 2. Customer has a valid Credit Card<br/> 3. The list of products to buy is known<br/> 4. The total amount of pay is known|
+|  Precondition     | 1. Cashier account exists and is already authenticated<br/> 2. Customer has a valid Credit Card<br/> 3. The Shopping Cart is known<br/> 4. The Total Amount to pay is known|
 |  Post condition   | The customer has successfully paid <br/> The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
 |  Nominal Scenario | 1. The Credit Card System shows the amount to pay<br/> 2. The Credit Card system receives the customer's Credit Card and recognizes it<br/> 3. The Credit Card System interacts with the Payment Gateway bypassing the Application<br/> 4. The Credit Card System notifies about the transaction result <br/> 5. The Cash Register is opened and prints the receipt <br/> 6. Transaction information is sent to the Accounting <br/> 7. Each Product in the list is removed from the Inventory|
-|  Variants     	| - The Credit Card System is not able to recognize the Card: retry to recognize it<br/> - Payment does not terminate successfully: the Credit Card System notifies the Application and displays an error message: restart from step 2 |
+|  Variants     	| - The Credit Card System is not able to recognize the Card<br/> - Payment does not terminate successfully <br/> - Customer does not want to pay via Credit Card anymore|
+
+#### Scenario 3.1 - Credit Card is not recognized
+| Scenario 			| Credit Card not recognized |
+| ----------------- | --------------------------- |
+| Precondition     	| 1. Cashier account exists and is already authenticated <br/> 2. Customer has a valid Credit Card <br/> 3. The Shopping Cart is known <br/> 4. The Total Amount to pay is known|
+| Post condition   	| 1. Credit Card may be recognized |
+| Step#        		| Description  |
+| 1     		| Cashier retries to scan the Credit Card (Credit Card System is external, it is not up to EZShop to deal with scanning errors)
+
+#### Scenario 3.2 - Handle a Failed Payment via Credit Card
+| Scenario 			| Handle a Failed Payment via Credit Card|
+| ----------------- | --------------------------- |
+| Precondition     	| 1. Cashier account exists and is already authenticated <br/> 2. Customer has a valid Credit Card <br/> 3. The Shopping Cart is known <br/> 4. The Total Amount to pay is knowni <br/> 5. Credit Card Payment has not terminated successfully|
+| Post condition   	| 1. Cashier is notifed about the Payment Result <br/> 2. It is possible to retry a Credit Card Payment|
+| Step#        		| Description  |
+| 1			| An Error message is displayed on the Cashier GUI |
+| 2			| Retry to Pay via Credit Card, restarting from UC3 |
+
+#### Scenario 3.3 - Changing Payment method
+| Scenario 			| Handle a Failed Payment via Credit Card|
+| ----------------- | --------------------------- |
+| Precondition     	| 1. Cashier account exists and is already authenticated <br/> 2. The Shopping Cart is known <br/> 3. The Total Amount to pay is known <br/> |
+| Post condition   	| 1. Payment method is changed |
+| Step#        		| Description  |
+| 1			| The Cashier selects to change Payment method via the Cashier GUI|
 
 ### Use Case 4, UC4 - Handle a Payment via Cash
 | Actors Involved   | Cashier, Cash Register |
 | ----------------- | ------------- |
-|  Precondition     | 1. Cashier is already authenticated<br/> 2. The customer has successfully paid by cash<br/> 3. The list of products to buy is known<br/> 4. The total amount of pay is known|
+|  Precondition     | 1. Cashier account exists and is already authenticated<br/> 2. The customer has successfully paid by cash<br/> 3. The Shopping Cart is known<br/> 4. The Total Amount of pay is known|
 |  Post condition   | The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
 |  Nominal Scenario | 1. The Cashier notifies that the customer has successfully paid by cash<br/> 2. The Cash Register is opened and prints the receipt<br/> 3. Transaction information is sent to the Accounting <br/> 4. Each Product in the list is removed from the Inventory|
-|  Variants     	| - |
+|  Variants     	| Customer does not want to pay via Cash anymore (see Scenario 3.3)|
 
 ## Inventory management
 In these use cases, the actor is the Warehouse Manager or another user with an account with the privileges required to manage the inventory. The actor can inspect the inventory, add new items to it, and update or remove the existing ones.
