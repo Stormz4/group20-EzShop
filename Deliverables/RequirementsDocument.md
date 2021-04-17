@@ -376,9 +376,9 @@ In these Use Cases, the actor is the Cashier that has to deal with Shopping Cart
 | Actors Involved   | Cashier, Product, Fidelity Card |
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier account exists and is already authenticated<br/> 2. Product has a valid Bar Code<br/> 3. A Fidelity Card may be scanned (thus authenticated) at any time during the Nominal Scenario|
-|  Post condition   | 1. The list of products to buy is ready<br/> 2. The total amount to pay is computed and displayed|
-|  Nominal Scenario | 1. For every product in the customer's cart:<br/> 1.1. The Cashier scans the Product using the Bar Code Reader and inputs the quantity of that Product<br/> 1.2 The Application searches the Product in the Catalogue and retrieves its selling price <br/> 1.3 If a general discount is present, it is applied to the Product <br/> 1.4 If a Fidelity Card has been scanned: <br/> 1.4.1 If a discount is present for Fidelity Card owners, it is applied to the Product <br/> 1.4.2 The Fidelity Card Points related to the Product are added to the Fidelity Card <br/> 1.5 The Application displays the price of the Product and the new partial amount to pay on the Cashier GUI<br/> 2. If a Fidelity Card is present, the Cashier selects whether to apply additional discounts, depending on the Card Points (not more than one at a time)<br/> 2.1 If the Cashier applies them, Fidelity Card Points are removed according to the previous step<br/> 3. At the end, the final list of products and the total amount to pay is displayed on the Cashier GUI|
-|  Variants      	| - The Customer wants to subscribe at any time (new Fidelity Card must be created) <br/> - The Bar Code Reader cannot scan a Product<br/> - The Customer does not want to buy a Product anymore|
+|  Post condition   | 1. The Shopping Cart is ready<br/> 2. The Total Amount to pay is computed and displayed|
+|  Nominal Scenario | 1. For every Product in the Customer's cart:<br/> 1.1. The Cashier scans the Product using the Bar Code Reader and inputs the quantity of that Product<br/> 1.2 The Application searches the Product in the Catalogue and retrieves its selling price <br/> 1.3 If a general discount is present, it is applied to the Product <br/> 1.4 If a Fidelity Card has been scanned: <br/> 1.4.1 If a discount is present for Fidelity Card owners, it is applied to the Product <br/> 1.4.2 The Fidelity Card Points related to the Product are added to the Fidelity Card <br/> 1.5 The Application displays the price of the Product and the new partial amount to pay on the Cashier GUI<br/> 2. If a Fidelity Card is present, the Cashier selects whether to apply additional discounts, depending on the Card Points (not more than one at a time)<br/> 2.1 If the Cashier applies them, Fidelity Card Points are removed according to the previous step<br/> 3. At the end, the final list of products and the total amount to pay is displayed on the Cashier GUI|
+|  Variants      	| - The Customer wants to subscribe at any time (new Fidelity Card must be created) <br/> - The Bar Code Reader cannot scan a Product<br/> - The Customer does not want to buy a Product anymore |
 
 #### Scenario 1.1 - Creating New Fidelity Card during Sale 
 | Scenario 			| Creating new Fidelity Card during Sale |
@@ -422,8 +422,8 @@ In these Use Cases, the actor is the Cashier that has to deal with Shopping Cart
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier account exists and is already authenticated<br/> 2. Customer has a valid Credit Card<br/> 3. The Shopping Cart is known<br/> 4. The Total Amount to pay is known|
 |  Post condition   | The customer has successfully paid <br/> The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
-|  Nominal Scenario | 1. The Credit Card System shows the amount to pay<br/> 2. The Credit Card system receives the customer's Credit Card and recognizes it<br/> 3. The Credit Card System interacts with the Payment Gateway bypassing the Application<br/> 4. The Credit Card System notifies about the transaction result <br/> 5. The Cash Register is opened and prints the receipt <br/> 6. Transaction information is sent to the Accounting <br/> 7. Each Product in the list is removed from the Inventory|
-|  Variants     	| - The Credit Card System is not able to recognize the Card<br/> - Payment does not terminate successfully <br/> - Customer does not want to pay via Credit Card anymore|
+|  Nominal Scenario | 1. The Credit Card System shows the amount to pay<br/> 2. The Credit Card system receives the Customer's Credit Card and recognizes it<br/> 3. The Credit Card System interacts with the Payment Gateway bypassing the Application<br/> 4. The Credit Card System notifies about the transaction result <br/> 5. The Cash Register is opened and prints the receipt <br/> 6. Transaction information is sent to the Accounting <br/> 7. Each Product in the list is removed from the Inventory|
+|  Variants     	| - The Credit Card System is not able to recognize the Card<br/> - Credit Card Payment does not terminate successfully <br/> - Customer wants to change Payment Method|
 
 #### Scenario 3.1 - Credit Card is not recognized
 | Scenario 			| Credit Card not recognized |
@@ -659,7 +659,7 @@ We'll consider the Cashier as the actor.
 
 | Scenario 			| Filter product |
 | ----------------- | --------------------------- |
-| Precondition     	| Software shows a list of fidelity cards, sorted by I |
+| Precondition     	| Software shows a list of fidelity cards, sorted by ID |
 | Post condition   	| The filter is applied and the fidelity card that satisfy the filter are shown|
 | Step#        		| Description  |
 | 1     			| User filters the filtered by writing something in the search bar (SSN, name, surname, telephone, ID)

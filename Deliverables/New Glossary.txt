@@ -1,0 +1,59 @@
+@startuml
+skinparam classAttributeIconSize 0
+hide circle
+
+class "Fidelity Card" {
+  ID
+  Bar Code
+  Name
+  Surname
+  SSN
+  Email Address
+  Card Points
+}
+class User {
+  Username
+  Password
+  Name
+  Surname
+  SSN
+  Privilege Level
+}
+class Cashier
+class Product {
+  ID
+  Bar Code
+  Expire Date
+}
+class "Product Descriptor" {
+  ID
+  Name
+  Category
+  Price
+  General Discount
+  Fidelity Card Discount
+  Fidelity Card Points
+  Description
+  Brand
+}
+class "Bar Code Reader"
+class Catalogue
+class "Cashier's Desk"
+class Invoice {
+   ID
+   Date
+   Total Amount
+}
+class "Active Invoice"
+
+"Active Invoice" --|> Invoice
+"Cashier's Desk" *-- "Bar Code Reader"
+"Cashier's Desk" *-- "Cash Register"
+User <|-- Cashier
+"Cash Register " --* "Cashier's Desk"
+Product -- "Product Descriptor" : is described by >
+Catalogue o-- "*" "Product Descriptor"
+"Purchase" o-- "*" "Product Descriptor"
+"Purchase" o-- "0..1" "Fidelity Card"
+"Active Invoice" -- "Purchase" : is related to >
+@enduml
