@@ -20,6 +20,7 @@ class User {
   Privilege Level
 }
 class Cashier
+class Accountant
 class Product {
   ID
   Bar Code
@@ -45,15 +46,33 @@ class Invoice {
    Total Amount
 }
 class "Active Invoice"
+class "Passive Invoice"
+class "Credit Note"
+class Order{
+   ID
+   VAT number supplier
+   Amount
+   DeadlineForPayment
+   ...
+}
+class "Balance Sheet"
 
+User <|-- Cashier
 "Active Invoice" --|> Invoice
+"Passive Invoice" --|> Invoice
+"Credit Note" --|> Invoice
+User <|-- Accountant
+
 "Cashier's Desk" *-- "Bar Code Reader"
 "Cashier's Desk" *-- "Cash Register"
-User <|-- Cashier
 "Cash Register " --* "Cashier's Desk"
 Product -- "Product Descriptor" : is described by >
 Catalogue o-- "*" "Product Descriptor"
 "Purchase" o-- "*" "Product Descriptor"
 "Purchase" o-- "0..1" "Fidelity Card"
+"Receipt" -- "Purchase" : is related to >
 "Active Invoice" -- "Purchase" : is related to >
+"Passive Invoice" -- "Order" : is related to >
+"Credit Note" -- "Order" : is related to >
+"Invoice" "*"-- "Balance Sheet": generate >
 @enduml

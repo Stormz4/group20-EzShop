@@ -675,7 +675,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 |  Precondition     | 1. Accountant account must exist<br/>2. Accountant must be authenticated|
 |  Post condition   | New invoice or credit note has been added to the system |
 |  Nominal Scenario | Accountant fills a form for the new invoice or credit note that has to be added to the system |
-|  Variants     	| - Accountant want to abort the  operation without submit the new addition: accountant clicks on 'Go back' button |
+|  Variants     	| - Accountant want to abort the  operation without submit the new addition: accountant clicks on "Go back" button<br/>- Accountant wants to reset all fields during the operation by clicking on the "Reset" button |
 
 #### Scenario 21.1
 | Scenario 			| Add invoice (passive) |
@@ -763,26 +763,81 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 ### Use case 24, UC24 - Add account
 | Actors Involved   | ITAdministrator	|
 | ----------------- | --------- |
-|  Precondition     | User doesn't have an account yet |
-|  Post condition   | Account user is added to the system |
-|  Nominal Scenario | 1. ITAdministrator selects "Add new account" </br> 2. Software shows forms to insert the user data <br> 3. ITAdministrator inserts the user data</br>4. ITAdministrator confirms |
-|  Variants     	| - ITAdministrator wants to reset all fields during the operation by clicking on the "Reset" button |
+|  Precondition     | 1. ITAdministrator is authenticated<br/>2. User doesn't have an account yet |
+|  Post condition   | New user account is added to the system |
+|  Nominal Scenario |  |
+|  Variants     	| - ITAdministrator wants to reset all fields during the operation by clicking on the "Reset" button<br/>- ITAdministrator press "Submit" button without completely fill the given form: an alert message is generated |
+
+#### Scenario 24.1 
+
+| Scenario 			| Add new user account  |
+| ----------------- | --------------------------- |
+| Precondition      | User doesn't have an account yet |
+| Post condition    | New user account is added to the system |
+| Step#          	| Description  |
+| 1     			|  ITAdministrator selects "Add new account" |
+| 2 			    | Software shows forms to insert the user data |
+| 3				    | ITAdministrator inserts the user data |
+| 4                 | ITAdministrator confirms |
+
+#### Scenario 24.2 
+
+| Scenario 			| Warning message  |
+| ----------------- | --------------------------- |
+| Precondition      | User doesn't have an account yet |
+| Post condition    | A warning message is printed on screen |
+| Step#          	| Description  |
+| 1     			|  ITAdministrator selects "Add new account" |
+| 2 			    | Software shows forms to insert the user data |
+| 3				    | ITAdministrator inserts the user data without fully insert all needed data |
+| 4                 | ITAdministrator confirms |
+| 5                 | Warning message is printed on screen |
 
 ### Use case 25, UC25 - Remove account
 | Actors Involved   | ITAdministrator	|
 | ----------------- | --------- |
-|  Precondition     | Account user must exist |
-|  Post condition   | Account user is removed from the system|
-|  Nominal Scenario | 1. ITAdministrator selects "Show accounts" </br> 2. Software shows a list of accounts <br> 3. ITAdministrator chooses one of them <br> 4. ITAdministrator chooses the "Remove account" option<br/>5. ITAdministrator confirms  |
+|  Precondition     | 1. ITAdministrator is authenticated<br/>2. User account must exist |
+|  Post condition   | User account is removed from the system |
+|  Nominal Scenario | ITAdministrator remove an user account from the showed list |
 |  Variants     	| - |
+
+#### Scenario 25.1 
+
+| Scenario 			| Remove a user account |
+| ----------------- | --------------------------- |
+| Precondition      | User account must exist |
+| Post condition    | User account is removed from the system |
+| Step#          	| Description  |
+| 1     			|  ITAdministrator selects "Show accounts" |
+| 2 			    | Software shows a list of accounts |
+| 3				    | ITAdministrator chooses one of them |
+| 4                 | ITAdministrator chooses the "Remove account" option |
+| 5                 | ITAdministrator confirms |
 
 ### Use case 26, UC26 - Update account
 | Actors Involved   | ITAdministrator	|
 | ----------------- | --------- |
 |  Precondition     | Account user must exist |
 |  Post condition   | Account user's info are modified |
-|  Nominal Scenario | 1. ITAdministrator selects "Show accounts" </br> 2. Software shows a list of accounts <br> 3. ITAdministrator chooses one of them <br> 4. ITAdministrator selects the "Update account" option</br>5. Software asks which changes are needed (user data or privileges) <br> 6. ITAdministrator chooses to update the account <br> 7. Software shows forms to insert the new data <br> 7. ITAdministrator inserts the new data</br>6. ITAdministrator confirms|
+|  Nominal Scenario | ITAdministrator chooses an account from the showed list and updates its data but privileges |
 |  Variants     	| - ITAdministrator chooses to modify privileges instead of user data |
+
+#### Scenario 26.1 
+
+| Scenario 			| Update a user account |
+| ----------------- | --------------------------- |
+| Precondition      | User account must exist |
+| Post condition    | User account data but privileges are updated |
+| Step#          	| Description  |
+| 1     			|  ITAdministrator selects "Show accounts" |
+| 2 			    | Software shows a list of accounts |
+| 3				    | ITAdministrator chooses one of them |
+| 4                 | ITAdministrator chooses the "Update account" option |
+| 5                 | Software asks which changes are needed (user data or privileges) |
+| 6                 | ITAdministrator chooses to update the account  |
+| 7                 | Software shows forms to insert the new data |
+| 8                 | ITAdministrator inserts the new data |
+| 9                 | ITAdministrator confirms |
 
 ## Authentication
 
@@ -791,17 +846,17 @@ In these use cases, the actor is an user from the shop.
 ### Use case 27, UC27 - Login
 | Actors Involved   | User		|
 | ----------------- | --------- |
-|  Precondition     | Account user must exist & must not be authenticated |
-|  Post condition   | Account user is authenticated and the main page of the user is shown on screen|
-|  Nominal Scenario | 1. User selects "login" <br> 2. Software show forms to insert email and password <br> 3. User inserts his email and password |
-|  Variants     	| - Email/password are wrong; an error is printed on the screen |
+|  Precondition     | 1. User account must exist<br/> 2. User account must be authenticated |
+|  Post condition   | User account is authenticated and the main page of the user is shown on screen|
+|  Nominal Scenario | User performs login by inserting its username and password |
+|  Variants     	| - The pair username/password is wrong: an error message is displayed on screen |
 
 ### Use case 28, UC28 - Logout
 | Actors Involved   | User		|
 | ----------------- | --------- |
-|  Precondition     | Account user must exist & must be authenticated  |
+|  Precondition     | 1. User account must exist<br/> 2. User account must be authenticated  |
 |  Post condition   | User is not authenticated anymore |
-|  Nominal Scenario | 1. User selects logout |
+|  Nominal Scenario | User selects "Logout" icon to exit from its working platform |
 |  Variants     	| - |
 
 # Glossary
