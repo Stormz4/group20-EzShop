@@ -805,7 +805,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 |  Precondition     | 1. Accountant account must exist<br/>2. Accountant must be authenticated |
 |  Post condition   | Accounting data are shown on the screen |
 |  Nominal Scenario | Accountant chooses to view and filter either invoices, suppliers, deadlines timetable, balance sheet or  financial statement and the system displays data on the screen |
-|  Variants     	| - There is no data of the selected type yet: no data will be shown |
+|  Variants     	| - |
 
 #### Scenario 22.1
 | Scenario 			| Show suppliers deadlines timetable - Up to date |
@@ -939,26 +939,6 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | 7                 | Software shows forms to insert the new data |
 | 8                 | ITAdministrator inserts the new data |
 | 9                 | ITAdministrator confirms |
-
-## Authentication
-
-In these use cases, the actor is an user from the shop.
-
-### Use case 27, UC27 - Login
-| Actors Involved   | User		|
-| ----------------- | --------- |
-|  Precondition     | 1. User account must exist<br/> 2. User account must be authenticated |
-|  Post condition   | User account is authenticated and the main page of the user is shown on screen|
-|  Nominal Scenario | User performs login by inserting its username and password |
-|  Variants     	| - The pair username/password is wrong: an error message is displayed on screen |
-
-### Use case 28, UC28 - Logout
-| Actors Involved   | User		|
-| ----------------- | --------- |
-|  Precondition     | 1. User account must exist<br/> 2. User account must be authenticated  |
-|  Post condition   | User is not authenticated anymore |
-|  Nominal Scenario | User selects "Logout" icon to exit from its working platform |
-|  Variants     	| - |
 
 # Glossary
 
@@ -1117,7 +1097,7 @@ CreditCardSystem -- "*" CreditCard : interacts
 Purchase --"*" Transaction
 Transaction -- Receipt
 Cashier "*"--"*" CashRegister
-BarCodeReader -- CashRegister
+BarCodeReader -up- CashRegister
 CashRegister --"*" Purchase : supports >
 Purchase -- "*" ActiveInvoice
 Accountant --"*" PassiveInvoice: create
@@ -1134,10 +1114,10 @@ Invoice "*" -up-* BalanceSheet
 CreditNote -- Invoice : is related to >
 Accountant -- "*" BalanceSheet : analyses >
 
-note "One purchase can have more than one\n transaction (e.g. if system refuses credit\n card at first attempt). Receipt is printed even when error occurs" as N1
-N1 .. Transaction 
-note "There could be more than one\n invoice per purchase because\n it could be necessary to add a\n credit note to that purchase" as N2
-N2 .right. Invoice
+note "One purchase can have\nmore than one transaction\n(e.g. if system refuses\n credit card\n at first attempt).\nReceipt is printed even\nwhen error occurs." as N1
+N1 .up. Transaction 
+note "There could be more than one\n invoice per purchase because\n it could be necessary to add a\n credit note to that purchase." as N2
+N2 .left. Invoice
 note "Single product\nto be sold.\nIt does not\nhave a unique ID." as N3
 N3 .left. Product
 @enduml
