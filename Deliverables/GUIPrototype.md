@@ -53,7 +53,7 @@ Date: 16/04/2021
 
 ## Scenario 17.1 - Show products in the catalogue
 
-![](GUI_images/UC17.1.png)
+![](GUI_images/17.1.png)
 
 ## Scenario 14.1 - Update selling price of product
 
