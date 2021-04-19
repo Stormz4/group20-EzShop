@@ -51,23 +51,47 @@ Date: 16/04/2021
 
 # Catalogue management
 
-## Show products in the catalogue
+## Scenario 17.1 - Show products in the catalogue
 
-## Update selling price of product
+![](GUI_images/UC17.1.png)
 
-## Add product
+## Scenario 14.1 - Update selling price of product
 
-### Scenario 15.1 - Product already present
+![](GUI_images/14.1.png)
 
-## Remove product
+## Scenario 15.1 - Product added correctly
+
+![](GUI_images/15.1.png)
+
+## Scenario 15.2 - Product already present
+
+![](GUI_images/15.2.png)
+
+## Scenario 16.1 - Remove product
+
+![](GUI_images/16.1.png)
 
 # Customers management
 
-## Show fidelity cards & card points
+![](GUI_images/CustomerManagement.png)
 
-## Add fidelity card
+![](GUI_images/CashierTab.png)
 
-## Remove fidelity card
+## Scenario 20.1 - Show fidelity cards & card points
+
+![](GUI_images/20.1.png)
+
+## Scenario 18.1 - Card added
+
+![](GUI_images/18.1.png)
+
+## Scenario 18.2 - Card already present
+
+![](GUI_images/18.2.png)
+
+## Scenario 19.1 - Remove fidelity card
+
+![](GUI_images/19.1.png)
 
 # Support accounting
 
