@@ -903,16 +903,17 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 
 #### Scenario 25.1 
 
-| Scenario 			| Remove a user account |
+| Scenario 			| Remove an user account |
 | ----------------- | --------------------------- |
 | Precondition      | User account must exist |
 | Post condition    | User account is removed from the system |
 | Step#          	| Description  |
 | 1     			|  ITAdministrator selects "Show accounts" |
 | 2 			    | Software shows a list of accounts |
-| 3				    | ITAdministrator chooses one of them |
+| 3				    | ITAdministrator chooses one or more of them |
 | 4                 | ITAdministrator chooses the "Remove account" option |
-| 5                 | ITAdministrator confirms |
+| 5                 | Application shows a confirmation window showing the selected accounts that are going to be removed from the system |
+| 6                 | ITAdministrator confirms |
 
 ### Use case 26, UC26 - Update account
 | Actors Involved   | ITAdministrator	|
