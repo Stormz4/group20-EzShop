@@ -14,9 +14,9 @@ Date: 16/04/2021
 
 \<Report here the GUI that you propose. You are free to organize it as you prefer. A suggested presentation matches the Use cases and scenarios defined in the Requirement document. The GUI can be shown as a sequence of graphical files (jpg, png)  >
 
-# Login
+# FR_7.1 - Login
 
-# Sales management
+# FR1 - Sales management
 ## Idle cash
 
 ## Provide shopping cart
@@ -25,31 +25,35 @@ Date: 16/04/2021
 
 [add others]
 
-# Warehouse management
+# FR_2 - Warehouse management
 
-## Inventory management
+## FR_2.1 - Inventory management
 
-### Show products
+### Scenario 9.1 - Show products
 
-### Add product to inventory
+### Scenario 5.1 - Add product to inventory
 
-### Remove product from inventory
+### Scenario 6.1 - Remove product from inventory
 
-### Update product
+### Scenario 7.1 - Update product
 
-### Manage Low Stock Threshold
+### Scenario 8.1 - Manage Low Stock Threshold
 
-## Manage orders
+## FR_2.2 Manage orders 
 
-### Show orders
+### Scenario 13.1 - Show orders
 
-### Place new order
+### Scenario 10.1 - Place new order
 
-### Cancel existing order
+### Scenario 11.1 - Cancel existing order
 
-### Edit existing order
+### Scenario 11.2 - 
 
-# Catalogue management
+### Scenario 12.1 - Edit existing order
+
+### Scenario 12.2 - Edit existing order
+
+# FR_3 Catalogue management
 
 ## Scenario 17.1 - Show products in the catalogue
 
@@ -71,7 +75,7 @@ Date: 16/04/2021
 
 ![](GUI_images/16.1.png)
 
-# Customers management
+# FR_4 Customers management
 
 ![](GUI_images/CustomerManagement.png)
 
@@ -95,29 +99,32 @@ Date: 16/04/2021
 
 ![](GUI_images/19.1warning.png)
 
-# Support accounting
+# FR_5 Support accounting
 
-## Add invoice (passive)
+## FR_5.1 Update finance 
 
-## Add credit note
+### Scenario 21.1 - Add invoice (passive)
 
-## Show statistics
+### Scenario 21.2 - Add credit note
+
+## FR_5.2 Show accounting data
+
+## Scenario 22.1 - Show suppliers deadlines timetable - Up to date
+
+## Scenario 22.2 - Show suppliers deadlines timetable - Expired warning 
+
+## FR_5.3 Show statistics
 
 ### Scenario 23.1 - Show revenue and expenses in a timeframe
 
 ### Scenario 23.2 - Show best selling products
 
-## Show accounting data
+# FR_6 Accounts management
 
-### Scenario  x
-[aggiungere scenari di accounting data]
+## Scenario 24.1 - Add new user account
 
-# Accounts management
+## Scenario 24.1 - Warning message
 
-## Add account
+## Scenario 25.1 - Remove account
 
-## Remove account
-
-## Update account
-
-# Logout
+## Scenario 26.1 - Update account
