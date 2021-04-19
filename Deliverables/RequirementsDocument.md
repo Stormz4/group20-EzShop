@@ -566,19 +566,49 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Actors Involved	| Shop director |
 | -----------------	| ------------- |
 |  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. The catalogue contains at least one product |
-|  Post condition   | Price of a product updated |
-|  Nominal Scenario | 1. Shop director selects "update a product" <br> 2. Software shows a list of products present in the catalogue <br> 3. Shop director selects a product <br> 4. Shop director modifies the price of the product in the catalogue <br> 5. Shop director confirms|
-|  Variants     	| - The catalogue is empty: no product will be shown |
+|  Post condition   |Selling price of a product updated |
+|  Nominal Scenario | Shop director chooses a product and updates his selling price|
+|  Variants     	| |
+
+
+#### Scenario 14.1
+
+| Scenario 			| Update selling price of product|
+| ----------------- | --------------------------- |
+| Precondition     	| 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. The catalogue contains at least one product |
+| Post condition   	| Selling price of a product updated |
+| Step#        		| Description  |
+| 1     			| Shop director selects to update a product |
+| 2    				| Software shows a list of products present in the catalogue  |
+| 3					| Shop director selects a product |
+| 4					| Shop director modifies the price of the product in the catalogue |
+| 5					| Shop director confirms |
+
+
 
 ### Use case 15, UC15 - Add product
 | Actors Involved	| Shop director |
 | -----------------	| ------------- |
 |  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated |
 |  Post condition   | One or more products are added in the catalogue |
-|  Nominal Scenario |1. Shop director selects "add a product in the catalogue" <br> 2. Software shows a list of products present in the inventory <br> 3. Shop director selects one or more products and inserts the price to sell for each<br> 4. Shop director confirms <br> 5. The application assigns the inventory ID to the product |
+|  Nominal Scenario | Shop director selects and adds products (present in the inventory) to the catalogue |
 |  Variants     	| - A product can be added only once in a catalogue: each product has an unique ID; an error message is shown on the screen.<br/>|
 
-#### Scenario 15.1 - Variant 
+
+#### Scenario 15.1
+
+| Scenario 			| Product added correctly |
+| ----------------- | --------------------------- |
+| Precondition     	|1. Account shop director must exist <br> 2. Account shop director is authenticated |
+| Post condition   	| One or more products are added in the catalogue |
+| Step#        		| Description  |
+| 1     			| Shop director selects to add a product in the catalogue |
+| 2    				| Software shows a list of products present in the inventory  |
+| 3					| Shop director selects one or more products and inserts the price to sell for each |
+| 4 				| Shop director confirms |
+| 5					| The application assigns the inventory ID to the product |
+
+#### Scenario 15.2 - Variant 
 
 | Scenario 			| Product already present |
 | ----------------- | --------------------------- |
@@ -594,18 +624,38 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | -----------------	| ------------- |
 |  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. The catalogue contains at least one product |
 |  Post condition   | One or more products are removed from the catalogue |
-|  Nominal Scenario | 1. Shop director selects "remove a product" <br> 2. Software shows a list of products present in the catalogue <br> 3. Shop director selects one or more products <br> 4. Shop director confirms|
-|  Variants     	| - The catalogue is empty: no product will be shown|
+|  Nominal Scenario | Shop director selects and removes a product from the inventory | 
+
+#### Scenario 16.1
+
+| Scenario 			| Remove product |
+| ----------------- | --------------------------- |
+| Precondition     	|1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. The catalogue contains at least one product |
+| Post condition   	| One or more products are removed from the catalogue|
+| Step#        		| Description  |
+| 1     			| Shop director selects to remove a product in the catalogue |
+| 2    				| Software shows a list of products present in the catalogue  |
+| 3					| Shop director selects one product |
+| 4 				| Shop director confirms |
 
 ### Use case 17, UC17 - Show products in the catalogue
 | Actors Involved 	| 			Shop director           |
 | ----------------- | ---------------------------------------- |
 | Precondition   	| 1. Shop director has an account<br/>2. Shop director is authenticated<br/>3. Catalogue exists |
 | Post condition 	| Software shows a list of products present in the catalogue, sorted by ID (default) |
-| Nominal Scenario  | 1. Shop director selects "show products in the catalogue"|
+| Nominal Scenario  | Once the shop director has done the authentication, a list of products is shown |
 | Variants          |  - A different sorting criteria is selected<br/>-  Products are filtered writing something in the search bar or using filters (type of product, selling price, ...) |
 
-#### Scenario 17.1 - Variant 
+#### Scenario 17.1
+
+| Scenario 			| Show products |
+| ----------------- | --------------------------- |
+| Precondition     	| 1. Shop director has an account<br/>2. Shop director is authenticated<br/>3. Catalogue exists|
+| Post condition   	| Software shows a list of products present in the catalogue, sorted by ID (default) |
+| Step#        		| Description  |
+| 1    				| System displays products sorted by ID (default) |
+
+#### Scenario 17.2 - Variant 
 
 | Scenario 			| Sort product |
 | ----------------- | --------------------------- |
@@ -615,11 +665,11 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | 1     			| User selects a way to sort the products (Price, name, ID)|
 | 2    				| System displays products sorted by the chosen criteria|
 
-#### Scenario 17.2 - Variant 
+#### Scenario 17.3 - Variant 
 
 | Scenario 			| Filter product |
 | ----------------- | --------------------------- |
-| Precondition     	|  Software shows a list of products present in the catalogue|
+| Precondition     	| Software shows a list of products present in the catalogue|
 | Post condition   	| The filter is applied and the products that satisfy the filter are shown|
 | Step#        		| Description  |
 | 1     			| User filters the products by writing in the search bar (ID,name..) |
@@ -636,26 +686,76 @@ We'll consider the Cashier as the actor.
 | ----------------- | ------------- |
 |  Precondition     | 1. Account cashier must exist<br/>2. Cashier is authenticated|
 |  Post condition   | A fidelity card is added to the database and is given to the customer |
-|  Nominal Scenario | 1. Cashier selects to add a fidelity card <br> 2. Software shows forms to add the customer data <br> 3. Cashier inserts the customer data <br> 4. Cashier confirms <br> 5. The application assigns a new ID to the card in the database <br> 6. A fidelity card containing a barcode is issued to the customer |
-|  Variants     	| - A customer can have at most one fidelity card active: each fidelity card has an unique ID, along with the customer SSN |
+|  Nominal Scenario | Cashier selects "add a fidelity card" and inserts the customer data, adding them to the database|
+|  Variants     	| - A customer can have at most one fidelity card active: each fidelity card has an unique ID, generated based on the customer SSN |
+
+
+#### Scenario 18.1
+
+| Scenario 			| Card added |
+| ----------------- | --------------------------- |
+| Precondition     	| 1. Account cashier must exist<br/>2. Cashier is authenticated|
+| Post condition   	| A fidelity card is added to the database and is given to the customer |
+| Step#        		| Description  |
+| 1     			| Cashier selects "add a fidelity card"|
+| 2    				| Software shows forms to add the customer data |
+| 3					| Cashier inserts the customer data |
+| 4					| Cashier confirms |
+| 5					| The application assigns a new ID to the card in the database |
+
+#### Scenario 18.2 - Variant
+
+| Scenario 			| Card already present |
+| ----------------- | --------------------------- |
+| Precondition     	| 1. Account cashier must exist<br/>2. Cashier is authenticated|
+| Post condition   	| An error messagge is shown on the screen and the use case is interrupted |
+| Step#        		| Description  |
+| 1     			| Cashier selects to add a fidelity card|
+| 2    				| Software shows forms to add the customer data |
+| 3					| Cashier inserts the customer data |
+| 4					| Cashier confirms |
+| 5					| The application shows an error message since the SSN is already present in the database |
+
 
 ### Use case 19, UC19 - Remove fidelity card
 | Actors Involved   | Cashier		|
 | ----------------- | ------------- |
 |  Precondition     |  1. Account cashier must exist<br/>2. Cashier is  authenticated<br/>3. The fidelity card must exist |
 |  Post condition   | One or more fidelity cards are removed from the database |
-|  Nominal Scenario | 1. Cashier selects to remove a fidelity card <br> 2. Software shows a list of fidelity cards <br> 3. Cashier chooses to remove one or more fidelity card <br> 4. Cashier confirms |
-|  Variants     	| - There are no fidelity cards: no card will be shown |
+|  Nominal Scenario | Cashier selects "remove a fidelity card" and the card is removed from the database |
+|  Variants     	| |
+
+#### Scenario 19.1
+
+| Scenario 			| Remove fidelity card |
+| ----------------- | --------------------------- |
+| Precondition     	|1. Account cashier must exist<br/>2. Cashier is  authenticated<br/>3. The fidelity card must exist |
+| Post condition   	| One fidelity card is removed from the database |
+| Step#        		| Description  |
+| 1     			| Cashier selects "remove a fidelity card" |
+| 2    				| Software shows a list of fidelity cards  |
+| 3					| Cashier chooses to remove one fidelity card |
+| 4					| Cashier confirms |
 
 ### Use case 20, UC20 - Show fidelity cards & cards points
 | Actors Involved 	| 			Cashier       |
 | ----------------- | ---------------------------------------- |
-| Precondition   	| 1. Cashier has an account<br/>2. Cashier is authenticated<br/>3. At least one fidelity card exists|
-| Post condition 	| Software shows a list of fidelity cards, sorted by ID |
-| Nominal Scenario  | 1. Cashier selects "show all fidelity cards & cards points"|
+| Precondition   	| 1. Cashier has an account<br/>2. Cashier is authenticated<br/>|
+| Post condition 	| Software shows a list of fidelity cards, sorted by ID (default) |
+| Nominal Scenario  | Cashier selects "show all fidelity cards & cards points"|
 | Variants          | Fidelity cards are filtered writing something in the search bar (SSN, name, surname, telephone, ID) |
 
-#### Scenario 20.1 - Variant 
+#### Scenario 20.1
+
+| Scenario 			| Show fidelity cards |
+| ----------------- | --------------------------- |
+| Precondition     	| 1. Cashier has an account<br/>2. Cashier is authenticated<br/>|
+| Post condition   	| Software shows a list of products present in the catalogue, sorted by ID (default) |
+| Step#        		| Description  |
+| 1					| Cashier selects "show all fidelity cards & cards points" |
+| 2    				| System displays products sorted by ID (default) |
+
+#### Scenario 20.2 - Variant 
 
 | Scenario 			| Filter product |
 | ----------------- | --------------------------- |
