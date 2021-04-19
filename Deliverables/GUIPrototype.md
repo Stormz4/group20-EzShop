@@ -93,6 +93,8 @@ Date: 16/04/2021
 
 ![](GUI_images/19.1.png)
 
+![](GUI_images/19.1warning.png)
+
 # Support accounting
 
 ## Add invoice (passive)
