@@ -721,7 +721,7 @@ We'll consider the Cashier as the actor.
 | Actors Involved   | Cashier		|
 | ----------------- | ------------- |
 |  Precondition     |  1. Account cashier must exist<br/>2. Cashier is  authenticated<br/>3. The fidelity card must exist |
-|  Post condition   | One or more fidelity cards are removed from the database |
+|  Post condition   | Fidelity cards are removed from the database |
 |  Nominal Scenario | Cashier selects "remove a fidelity card" and the card is removed from the database |
 |  Variants     	| |
 
@@ -730,7 +730,7 @@ We'll consider the Cashier as the actor.
 | Scenario 			| Remove fidelity card |
 | ----------------- | --------------------------- |
 | Precondition     	|1. Account cashier must exist<br/>2. Cashier is  authenticated<br/>3. The fidelity card must exist |
-| Post condition   	| One fidelity card is removed from the database |
+| Post condition   	| Fidelity card is removed from the database |
 | Step#        		| Description  |
 | 1     			| Cashier selects "remove a fidelity card" |
 | 2    				| Software shows a list of fidelity cards  |
