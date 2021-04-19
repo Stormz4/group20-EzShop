@@ -597,7 +597,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 
 #### Scenario 15.1
 
-| Scenario 			| Product added correctly |
+| Scenario 			| Add product |
 | ----------------- | --------------------------- |
 | Precondition     	|1. Account shop director must exist <br> 2. Account shop director is authenticated |
 | Post condition   	| One or more products are added in the catalogue |

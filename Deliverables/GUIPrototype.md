@@ -59,7 +59,7 @@ Date: 16/04/2021
 
 ![](GUI_images/14.1.png)
 
-## Scenario 15.1 - Product added correctly
+## Scenario 15.1 - Add product
 
 ![](GUI_images/15.1.png)
 
