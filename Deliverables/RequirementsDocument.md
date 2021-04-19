@@ -964,6 +964,7 @@ In these use cases, the actor is an user from the shop.
 ```plantuml
 @startuml
 skinparam classAttributeIconSize 0
+hide circle
 
 class EZShop {
  Name
@@ -994,12 +995,10 @@ class Customer {
  Email
  Address
 }
-class Subscriber {
- IDFidelityCard
-}
 class FidelityCard{
  ID
  Points
+ Bar Code
 }
 class Purchase {
  IDPurchase
@@ -1008,6 +1007,7 @@ class Purchase {
 class Product {
  ID
  Expire Date
+ Bar Code
 }
 class ProductDescriptor {
  ID
@@ -1016,7 +1016,7 @@ class ProductDescriptor {
  Price
  Discount
  Description
- Brand
+ Bar Code
 }
 class Purchase {
  
@@ -1081,7 +1081,6 @@ class WarehouseManager
 class Accountant
 class ShopDirector
 class Customer
-class Subscriber
 class Purchase
 class CreditCard
 class Transaction
@@ -1099,7 +1098,6 @@ Cashier -up-|> User
 WarehouseManager-up-|> User
 Accountant-up-|> User
 ShopDirector-up-|> User
-Subscriber --|> Customer
 CreditNote -up-|> Invoice
 ActiveInvoice -right-|> Invoice
 PassiveInvoice --|> Invoice
@@ -1110,20 +1108,20 @@ Inventory --"*" Product
 Catalogue --"*" ProductDescriptor
 Customer --"*" Purchase
 Purchase --"*" Product
-FidelityCard -- Subscriber: +owns <
-Product "*"-- ProductDescriptor: +is described by
+FidelityCard "0..1" -- Customer: owns <
+Product "*"-- ProductDescriptor: is described by
 Transaction --"0..1" CreditCard
-Customer --"*" CreditCard: +owns >
+Customer --"*" CreditCard: owns >
 CreditCardSystem -- "*" CreditCard : interacts
 Purchase --"*" Transaction
 Transaction -- Receipt
 Cashier "*"--"*" CashRegister
 BarCodeReader -- CashRegister
-CashRegister --"*" Purchase
-Purchase --"*" ActiveInvoice
+CashRegister --"*" Purchase : supports >
+Purchase -- "*" ActiveInvoice
 Accountant --"*" PassiveInvoice: create
 WarehouseManager --"*" Order: places
-Order "*"-down- Supplier: +from
+Order "*"-down- Supplier: from
 ShopDirector -- Catalogue: manages
 Order "*"-right-"*" Product
 Order -- SupplierDeadline
@@ -1131,11 +1129,11 @@ PassiveInvoice "*"-- Order
 WarehouseManager -- Inventory: manages
 Cashier -left-"*" FidelityCard: manages
 ITAdministrator --"*" User: manages
-PassiveInvoice "*" -up-* BalanceSheet
-Purchase "*" --* BalanceSheet
+Invoice "*" -up-* BalanceSheet
+CreditNote -- Invoice : is related to >
 Accountant -- "*" BalanceSheet : analyses >
 
-note "One purchase can have more than one\n transaction (e.g. if system refuses credit\n card at first attempt)" as N1
+note "One purchase can have more than one\n transaction (e.g. if system refuses credit\n card at first attempt). Receipt is printed even when error occurs" as N1
 N1 .. Transaction 
 note "There could be more than one\n invoice per purchase because\n it could be necessary to add a\n credit note to that purchase" as N2
 N2 .right. Invoice
