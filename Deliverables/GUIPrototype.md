@@ -85,7 +85,7 @@ Date: 16/04/2021
 
 ![](GUI_images/20.1.png)
 
-## Scenario 18.1 - Card added
+## Scenario 18.1 - Add fidelity card
 
 ![](GUI_images/18.1.png)
 
