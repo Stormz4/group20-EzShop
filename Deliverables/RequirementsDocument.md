@@ -144,7 +144,7 @@ Elisa, 32, has just opened a brand new gardening store, where she can earn money
 |  FR_2.1.3 	| Update product |
 |  FR_2.1.4   	| Manage Low Stock Thresholds |
 |  FR_2.1.5   	| Show products (inventory) |
-|  FR_2.2   	| Order management |
+|  FR_2.2   	| Orders management |
 |  FR_2.2.1 	| Place new order |
 |  FR_2.2.2 	| Cancel order |
 |  FR_2.2.3 	| Edit order |
@@ -181,12 +181,6 @@ Elisa, 32, has just opened a brand new gardening store, where she can earn money
 |  FR_6.2   	| Remove account|
 |  FR_6.3   	| Update account|
 |  FR_6.4    	| Modify privileges | //Authorize access to functions to specific actors according to access rights
-|  FR_7			| Authentication |
-|  FR_7.1		| Login |
-|  FR_7.2		| Logout |
-
-FR_2 
-Inventory management is focused solely on the actual items being held within a warehouse. Warehouse management, in contrast, is more related to the items movement.
 
 FR_2.1.5
 Allow to set, update or remove Low Stock Thresholds so that an alert is generated if a product's quantity goes below the desired threshold.
@@ -203,7 +197,7 @@ Fidelity cards are managed totally by the shop. The customer can choose to get s
 | NFR_3     | Localisation 	| Decimal numbers use . (dot) as decimal separator  													| All FR 	|
 | NFR_4 	| Privacy 		| Customers data should not be accessible to users other than the ones who manage fidelity cards.       | All FR 	|
 | NFR_5 	| Availability 	| At least 95% 																							| All FR 	|
-| NFR_6     | Security      | User should have access only to functions and resources which they require 							| All FR 	|
+| NFR_6     | Security      | Users must login to their account and, once done, they should have access only to functions and resources which they require 							| All FR 	|
 | NFR_7		|Privacy| 	Customer credit card data must not be stored in the system |FR1|
 | Domain 	| // 			| Currency is Euro  																					| All FR 	|
 
@@ -220,7 +214,6 @@ usecase (FR_3 CatalogueManagement)
 usecase (FR_4 CustomersManagement)
 usecase (FR_5 SupportAccounting)
 usecase (FR_6 AccountsManagement)
-usecase (FR_7 Authentication)
 
 User <|-- Cashier
 User <|-- WarehouseDirector
@@ -234,7 +227,6 @@ ShopDirector --> (FR_3 CatalogueManagement)
 Cashier --> (FR_4 CustomersManagement)
 Accountant --> (FR_5 SupportAccounting)
 ITAdministrator --> (FR_6 AccountsManagement)
-User --> (FR_7 Authentication)
 
 (FR_1 SalesManagement) --> Product
 (FR_2 WarehouseManagement) --> Product
@@ -344,17 +336,6 @@ We didn't include every FR (show accounting data) in order to make the UCD reada
 (FR_6 Accounts management) ..> (FR_6.2 Remove account) : include
 (FR_6 Accounts management) ..> (FR_6.3 Update account) : include
 (FR_6 Accounts management) ..> (FR_6.4 Modify privileges) : include
-
-@enduml
-```
-
-### Use Case diagram: Authentication
-
-```plantuml
-@startuml
-
-:User: --> (FR_7.2 Logout)
-:User: --> (FR_7.1 Login)
 
 @enduml
 ```
