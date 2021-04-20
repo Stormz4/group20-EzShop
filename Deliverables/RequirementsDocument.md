@@ -6,11 +6,11 @@ Authors:
 - Palmucci Leonardo s288126
 - Dario Lanfranco s287524 
 
-Date: 14/04/2021
+Date: 20/04/2021
 
 | Version | Changes |
 | ------- |---------|
-| 10 | Modified use cases, context diagram|
+| 11      | Minor refactoring of use cases |
 
 # Contents
 
@@ -27,7 +27,7 @@ Date: 14/04/2021
 - [Use case diagram and use cases](#use-case-diagram-and-use-cases)
 	+ [Use case diagram](#use-case-diagram)
 	+ [Use cases](#use-cases)
-    	+ [Relevant scenarios](#relevant-scenarios)
+    	+ [Relevant scenarios](#relevant-scenarios) TODO: rivedere
 - [Glossary](#glossary)
 - [System design](#system-design)
 - [Deployment diagram](#deployment-diagram)
@@ -50,7 +50,6 @@ EZShop is a software application to:
 | Analyst | Who will produce the requirement document. |
 | User | Who uses the system. It includes different user profiles. |
 | Cashier (profile 1) | Cashier who uses the software. Manages sales. |
-| Customer (profile 2) | Is affected indirectly through the cashier. |
 | Warehouse manager (profile 3) | Manages inventory and orders through the software. |
 | Accountant (profile 4) | Manages the accounting through the software. |
 | Customers manager (profile 5) | Manages the customers. In most shops it could be the Cashier. |
@@ -59,6 +58,7 @@ EZShop is a software application to:
 | Maintainers | Who will repair the software eventually. It could be part of the staff or external. |
 | Marketing people | People who sell the software to shops. |
 | Product | Involved indirectly and managed by the software. |
+| Customer | Is affected indirectly through the cashier. |
 | Cash Register | The software involves the Cash Register since they are part of the output. |
 | Fidelity Card | Fidelity Card associated to a Customer. |
 | Credit card system | Involved during the payment with a credit card |
@@ -141,10 +141,10 @@ Elisa, 32, has just opened a brand new gardening store, where she can earn money
 |  FR_2.1   	| Inventory management |
 |  FR_2.1.1 	| Add product |
 |  FR_2.1.2 	| Remove product |
-|  FR_2.1.3 	| Update product |
+|  FR_2.1.3 	| Edit product |
 |  FR_2.1.4   	| Manage Low Stock Thresholds |
 |  FR_2.1.5   	| Show products (inventory) |
-|  FR_2.2   	| Order management |
+|  FR_2.2   	| Orders management |
 |  FR_2.2.1 	| Place new order |
 |  FR_2.2.2 	| Cancel order |
 |  FR_2.2.3 	| Edit order |
@@ -181,12 +181,6 @@ Elisa, 32, has just opened a brand new gardening store, where she can earn money
 |  FR_6.2   	| Remove account|
 |  FR_6.3   	| Update account|
 |  FR_6.4    	| Modify privileges | //Authorize access to functions to specific actors according to access rights
-|  FR_7			| Authentication |
-|  FR_7.1		| Login |
-|  FR_7.2		| Logout |
-
-FR_2 
-Inventory management is focused solely on the actual items being held within a warehouse. Warehouse management, in contrast, is more related to the items movement.
 
 FR_2.1.5
 Allow to set, update or remove Low Stock Thresholds so that an alert is generated if a product's quantity goes below the desired threshold.
@@ -203,7 +197,7 @@ Fidelity cards are managed totally by the shop. The customer can choose to get s
 | NFR_3     | Localisation 	| Decimal numbers use . (dot) as decimal separator  													| All FR 	|
 | NFR_4 	| Privacy 		| Customers data should not be accessible to users other than the ones who manage fidelity cards.       | All FR 	|
 | NFR_5 	| Availability 	| At least 95% 																							| All FR 	|
-| NFR_6     | Security      | User should have access only to functions and resources which they require 							| All FR 	|
+| NFR_6     | Security      | Users must login to their account and, once done, they should have access only to functions and resources which they require 							| All FR 	|
 | NFR_7		|Privacy| 	Customer credit card data must not be stored in the system |FR1|
 | Domain 	| // 			| Currency is Euro  																					| All FR 	|
 
@@ -220,7 +214,6 @@ usecase (FR_3 CatalogueManagement)
 usecase (FR_4 CustomersManagement)
 usecase (FR_5 SupportAccounting)
 usecase (FR_6 AccountsManagement)
-usecase (FR_7 Authentication)
 
 User <|-- Cashier
 User <|-- WarehouseDirector
@@ -234,7 +227,6 @@ ShopDirector --> (FR_3 CatalogueManagement)
 Cashier --> (FR_4 CustomersManagement)
 Accountant --> (FR_5 SupportAccounting)
 ITAdministrator --> (FR_6 AccountsManagement)
-User --> (FR_7 Authentication)
 
 (FR_1 SalesManagement) --> Product
 (FR_2 WarehouseManagement) --> Product
@@ -277,22 +269,12 @@ User --> (FR_7 Authentication)
 (FR_2.1 Inventory management) ..> (FR_2.1.2 Remove product) : include
 (FR_2.1 Inventory management) ..> (FR_2.1.3 Update product) : include
  :Product: <--(FR_2.1 Inventory management) 
-' (Update product)       ..> (Stock level) : include
-' (Update product)       ..> (Purchase price) : include
-' (Update product)       ..> (Description) : include
 (FR_2.1 Inventory management) .up.> (FR_2.1.5 Show products) : include
-' (Filter products)      ..> (Name) : by
-' (Filter products)      ..> (Supplier) : by
-' (Filter products)      ..> (Brand) : by
-' (Filter products)      ..> (Price) : by
 (FR_2.1.4 Manage Low Stock Thresholds) <.up. (FR_2.1 Inventory management) : include
  (FR_2.2.1 Place new order) <.. (FR_2.2 Order management)      : include
 (FR_2.2 Order management)     ..> (FR_2.2.2 Cancel order) : include
 (FR_2.2 Order management)     ..> (FR_2.2.3 Edit order) : include
 (FR_2.2 Order management)     ..> (FR_2.2.4 Show orders) : include
-' (Filter orders)        ..> (Date) : by
-' (Filter orders)        ..> (Supplier) : by
-' (Filter orders)        ..> (Amount) : by
 @enduml
 ```
 
@@ -354,17 +336,6 @@ We didn't include every FR (show accounting data) in order to make the UCD reada
 (FR_6 Accounts management) ..> (FR_6.2 Remove account) : include
 (FR_6 Accounts management) ..> (FR_6.3 Update account) : include
 (FR_6 Accounts management) ..> (FR_6.4 Modify privileges) : include
-
-@enduml
-```
-
-### Use Case diagram: Authentication
-
-```plantuml
-@startuml
-
-:User: --> (FR_7.2 Logout)
-:User: --> (FR_7.1 Login)
 
 @enduml
 ```
@@ -513,43 +484,102 @@ In these Use Cases, the actor is the Cashier that has to deal with Shopping Cart
 | 4			| Each Product in the list is removed from the Inventory|
 
 ## Inventory management
-In these use cases, the actor is the Warehouse Manager or another user with an account with the privileges required to manage the inventory. The actor can inspect the inventory, add new items to it, and update or remove the existing ones.
+In these use cases, the actor is the Warehouse Manager. He can inspect the inventory, add new items to it, and update or remove the existing ones.
 In addition, the actor should be able to place new orders, and to cancel or edit the existing ones.
 
-### Use case 5, UC5 - Add product to inventory
+### Use case 5, UC5 - Add new product
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
 | Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
 | Post condition    | Inventory contains a new product		   |
-| Nominal Scenario  | 1. Warehouse Manager clicks on 'New Product' icon<br/>2. The software presents a form to fill in with product's information<br/>3. Warehouse Manager fills in the form<br/>4. The software assigns to the product an incremental and unique ID |
-| Variants          | - Before completing the operation, the Warehouse Manager decides to discard it<br/>- The product cannot be added because one or more compulsory fields have not been filled in |
+| Nominal Scenario  | Warehouse Manager adds a new product to the inventory |
+| Variants          | The product cannot be added because one or more compulsory fields have not been filled in |
 
-### Use case 6, UC6 - Remove product from inventory
+##### Scenario 5.1 - Add new product
+| Scenario 			| Add new product to the inventory |
+| ----------------- | --------------------------- |
+| Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
+| Post condition   	| Inventory contains a new product |
+| Step#        		| Description  |
+| 1                 | Warehouse Manager clicks on 'New Product' button |
+| 2                 | The software assigns to the product an incremental and unique ID |
+| 3                 | The software presents a window containing various fields to fill in with product's information (ID's field is not editable). One of the fields allows to set the Low Stock Threshold for the product. |
+| 4                 | Warehouse Manager fills in every field and presses 'Add' button |
+| 5                 | Software adds the product to the inventory |
+
+##### Scenario 5.2 - Add new product: missing compulsory fields
+| Scenario 			| Add new product: missing compulsory fields |
+| ----------------- | --------------------------- |
+| Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
+| Post condition   	| Inventory did not change |
+| Step#        		| Description  |
+| 1                 | Warehouse Manager clicks on 'New Product' button |
+| 2                 | The software assigns to the product an incremental and unique ID |
+| 3                 | The software presents a window containing various fields to fill in with product's information (ID's field is not editable) |
+| 4                 | Warehouse Manager fills in some field, but 'Add' button with one or more compulsory fields still blank |
+| 5                 | An alert is shown, explaining that it is not possible to add the product without the missing fields |
+| 6                 | Warehouse Manager can click 'Ok' button in order to dismiss the alert and get back to the window where the missing fields are now highlighted with red color |
+
+
+### Use case 6, UC6 - Remove product
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
 | Precondition      | 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists<br/>4. The account has the necessary privileges to modify the inventory |
-| Post condition    | Target product has been removed from the inventory|
-| Nominal Scenario  | 1. Warehouse Manager looks for the product using the search bar<br/>2. The software presents a list of matching products<br/>3. Warehouse Manager selects the target product<br/>4. Warehouse Manager clicks "Remove" button<br/>&ensp;(4.1) Software asks for confirmation<br/>&ensp;(4.2) Warehouse Manager confirms<br/>5. Software removes the product from the inventory |
-| Variants          | - Target product does not exist in the inventory<br/>- Product is removed in another way:<br/>&ensp;* right-clicking on product<br/>&ensp;* select "Remove" from context menu |
+| Post condition    | Target product has been removed from the inventory |
+| Nominal Scenario  | Warehouse Manager removes a product from the inventory |
+| Variants          | Warehouse Manager removes multiple products at once from the inventory |
 
-### Use case 7, UC7 - Update product
+##### Scenario 6.1 - Remove product
+| Scenario 			| Remove product              |
+| ----------------- | --------------------------- |
+| Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
+| Post condition   	| Target product has been removed from the inventory |
+| Step#        		| Description  |
+| 1                 | Warehouse Manager looks for target product using the search bar and/or the filters |
+| 2                 | The software presents a list of matching products |
+| 4                 | Warehouse Manager clicks the trash button of the target product |
+| 4.1               | Software asks for confirmation, showing a recap of the products that are going to be removed (always one in this case) |
+| 4.2               | Warehouse Manager confirms |
+| 5                 | Software removes the product from the inventory |
+
+##### Scenario 6.2 - Remove multiple products
+| Scenario 			| Remove multiple products    |
+| ----------------- | --------------------------- |
+| Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
+| Post condition   	| Target products have been removed from the inventory |
+| Step#        		| Description  |
+| 1                 | Warehouse Manager looks for target products using the search bar and/or the filters |
+| 2                 | The software presents a list of matching products |
+| 3                 | Warehouse Manager selects the target products |
+| 4                 | Warehouse Manager clicks "Remove" button |
+| 4.1               | Software asks for confirmation showing a recap of the products that are going to be removed |
+| 4.2               | Warehouse Manager confirms |
+| 5                 | Software removes the products from the inventory |
+
+
+### Use case 7, UC7 - Edit product
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
 | Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
-| Post condition 	| Target product's quantity has been updated |
+| Post condition 	| Target product has been updated |
 | Nominal Scenario  | 1. Warehouse Manager searches for the product using the search bar<br/>2. The software presents a list of matching products<br/>3. Warehouse Manager selects the target product<br/>4. Warehouse Manager clicks "Edit" button<br/>5. Software presents the interface from which product's properties (like quantity and price) can be modified<br/>6. Warehouse Manager edits one or more properties<br/>&ensp;(6.1) Software asks for confirmation<br/>&ensp;(6.2) Warehouse Manager confirms<br/>7. Software applies the update |
 | Variants          | - Target product does not exist in the inventory<br/> |
 
 
-### Use case 8, UC8 - Manage Low Stock Threshold
-| Actors Involved 	| 			Warehouse Manager              |
-| ----------------- | ---------------------------------------- |
-| Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
-| Post condition 	| A new threshold has been setted or an existing one has been updated or removed |
-| Nominal Scenario  | 1. Warehouse Manager searches for the product using the search bar<br/>2. The software presents a list of matching products<br/>3. Warehouse Manager selects the target product<br/>4. Warehouse Manager clicks "Edit" button<br/>5. Software presents the interface from which product's properties can be modified<br/>6. Warehouse Manager sets, updates or removes the low stock threshold |
-| Variants          | - Target product does not exist in the inventory<br/> |
+##### Scenario 7.1 - Edit product
+| Scenario 			| Edit product                |
+| ----------------- | --------------------------- |
+| Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
+| Post condition   	| Target product has been modified |
+| Step#        		| Description  |
+| 1                 | Warehouse Manager looks for target product using the search bar and/or the filters |
+| 2                 | The software presents a list of matching products |
+| 4                 | Warehouse Manager clicks the pencil button of the target product |
+| 5                 | The software presents a window containing all the fields filled in with product's information (ID's field is not editable).<br/> In this window, the product's Low Stock Threshold can be setted to the desired value or can be disabled (leaving the field blank) |
+| 6                 | Warehouse Manager edits one or more fields, then click 'Edit' button |
+| 7                 | The software updates the product |
 
-### Use case 9, UC9 - Show products
+### Use case 8, UC8 - Show products
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
 | Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
@@ -557,29 +587,28 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Nominal Scenario  | Warehouse Manager accesses stock's section of the software, where he can look at the complete list of products sorted by ID (default sort) |
 | Variants          |  - A different sorting criteria is selected<br/>-  Products are filtered writing something in the search bar or using filters (e.g. date, supplier, ...) |
 
-#### Scenario 9.1 - Variant 
+#### Scenario 8.1 - Variant 
 
-| Scenario 			| Sort product |
+| Scenario 			| Sort products |
 | ----------------- | --------------------------- |
-| Precondition     	| Software shows a list of products present in the inventory |
-| Post condition   	| Products are sorted and shown in a specific vay|
-| Step#        		| Description  |
-| 1     			| User selects a way to sort the products (Price, name, ID)|
-| 2    				| System displays products sorted by the chosen criteria|
+| Precondition     	| Software shows all the products, sorted by ID |
+| Post condition   	| Products are sorted according to user's choice |
+| Step#        		| Description |
+| 1     			| User changes sort criteria |
+| 2    				| System displays products sorted by custom criteria |
 
-#### Scenario 9.2 - Variant 
+#### Scenario 8.2 - Variant 
 
 | Scenario 			| Filter product |
 | ----------------- | --------------------------- |
-| Precondition     	|  Software shows a list of products present in the inventory |
-| Post condition   	| The filter is applied and the products that satisfy the filter are shown|
+| Precondition     	| Software shows all the products, sorted by ID |
+| Post condition   	| Only matching products are shown |
 | Step#        		| Description  |
-| 1     			| User filters the products by writing in the search bar (ID,name..) |
-| 2    				| System displays products filtered by the chosen criteria |
+| 1     			| User filters the products by writing in the search bar (ID,name..) and/or using filters |
+| 2    				| System displays products filtered by custom criteria |
 
 
 #
-
 ## Manage orders
 
 ### Use case 10, UC10 - Place new order
@@ -587,32 +616,132 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | ----------------- | ---------------------------------------- |
 | Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
 | Post condition 	| A new order has been placed |
-| Nominal Scenario  | 1. Warehouse Manager clicks on 'New Order' icon<br/>2. The software presents the view for placing a new order<br/>3. Warehouse Manager selects products, as well as the desired quantity, and fills in other necessary infos<br/>4. Software checks that the inserted supplier is already present in the supplier list<br/>5. Software asks for confirmation<br/>6. Warehouse Manager gives confirmation<br/> 7. The software places the order and assigns to it an incremental and unique ID |
-| Variants          | - Before completing the operation, the Warehouse Manager decides to discard it<br/>- The order cannot be placed for some reason<br/>- The software doesn't find the inserted supplier in the supplier list, so it makes the user to enter a new supplier |
+| Nominal Scenario  | Warehouse Manager places a new order |
+| Variants          | Order is placed directly from Inventory's window |
 
-### Use case 11, UC11 - Cancel existing order
+##### Scenario 10.1 - Place new order from 'Orders' window
+| Scenario 			| Place new order from 'Orders' window |
+| ----------------- | --------------- |
+| Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists<br/>4. Warehouse Manager is in 'Orders' window |
+| Post condition   	| A new order has been placed |
+| Step#        		| Description  |
+| 1                 | Warehouse Manager clicks on 'New Order' button (in 'Orders' window) |
+| 2                 | The software brings him to the 'Inventory' window already in selecting mode |
+| 3                 | Warehouse Manager selects the products that will be added to the order.  |
+| 4                 | Warehouse Manager clicks "New order" button (in 'Inventory' window) |
+| 5                 | The software assigns to the order an incremental and unique ID |
+| 6                 | The software presents a window containing a summary of the selected products;<br/> for each product there is an editable field in which can be specified the quantity |
+| 7                 | Warehouse Manager clicks "Place Order" button |
+| 8					| The order is placed
+
+##### Scenario 10.2 - Place new order from 'Inventory' window
+| Scenario 			| Place new order from 'Inventory' window |
+| ----------------- | --------------- |
+| Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists<br/>4. Warehouse Manager is in 'Inventory' window |
+| Post condition   	| A new order has been placed |
+| Step#        		| Description  |
+| 1                 | Warehouse Manager clicks on 'Select Products' button |
+| 2                 | Warehouse Manager selects the products that will be added to the order. |
+| 3                 | Warehouse Manager clicks "New order" button (in 'Inventory' window) |
+| 4                 | The software assigns to the order an incremental and unique ID |
+| 5                 | The software presents a window containing a summary of the selected products;<br/> for each product there is an editable field in which can be specified the quantity |
+| 6                 | Warehouse Manager clicks "Place Order" button |
+| 7					| The order is placed |
+
+##### Scenario 10.3 - Place new order not possible
+| Scenario 			| Place new order not possible |
+| ----------------- | --------------- |
+| Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists<br/>4. Warehouse Manager is in 'Inventory' window |
+| Post condition   	| 'New order' button is disabled |
+| Step#        		| Description  |
+| 1                 | Warehouse Manager clicks on 'Select Products' button |
+| 2                 | Warehouse Manager selects the products that will be added to the order. |
+| 3					| Products from different suppliers are selected, so the 'New order' button is disabled |
+
+
+
+### Use case 11, UC11 - Cancel order
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
-| Precondition      | 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists
-| Post condition    | Target product has been removed from the inventory|
-| Nominal Scenario  | 1. Warehouse Manager looks for the order using the search bar<br/>2. The software presents a list of matching orders<br/>3. Warehouse Manager selects the target order<br/>4. Warehouse Manager clicks "Remove" button<br/>&ensp;(4.1) Software asks for confirmation<br/>&ensp;(4.2) Warehouse Manager gives confirmation<br/>5. Order is canceled |
+| Precondition      | 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Orders exist<br/>4. The status of the order is 'Pending'
+| Post condition    | Target order has been canceled |
+| Nominal Scenario  | 1. Warehouse Manager looks for the order using the search bar  and/or the filters <br/>2. The software presents a list of matching orders<br/>3. Warehouse Manager selects the target order<br/>4. Warehouse Manager clicks "Remove" button<br/>&ensp;(4.1) Software asks for confirmation<br/>&ensp;(4.2) Warehouse Manager gives confirmation<br/>5. Order is canceled |
 | Variants          | - Target order does not exist<br/>- It is too late to cancel the order (e.g. it has already been completed) |
 
-### Use case 12, UC12 - Edit existing order
+##### Scenario 11.1 - Cancel order
+| Scenario 			| Cancel order                |
+| ----------------- | --------------------------- |
+| Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Orders exist<br/>4. The status of the target order is 'Pending' |
+| Post condition   	| Target order has been canceled |
+| Step#        		| Description  |
+| 1                 | Warehouse Manager looks for the order using the search bar and/or the filters |
+| 2                 | The software presents a list of matching orders |
+| 3                 | Warehouse Manager clicks the cancel button of the target product |
+| 4.1               | Software asks for confirmation, showing a recap of the oredrs that are going to be canceled (always one in this case) |
+| 4.2               | Warehouse Manager confirms |
+| 5                 | Software cancels the order |
+
+##### Scenario 11.2 - Cancel multiple orders
+| Scenario 			| Cancel multiple orders    |
+| ----------------- | --------------------------- |
+| Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Orders exist<br/>4. The status of the target orders is 'Pending' |
+| Post condition   	| Target order has been canceled |
+| Step#        		| Description  |
+| 1                 | Warehouse Manager clicks on 'Select Orders' button |
+| 2                 | Warehouse Manager selects the target orders |
+| 3                 | Warehouse Manager clicks "Cancel" button |
+| 3.1               | Software asks for confirmation, showing a recap of the oredrs that are going to be canceled (always one in this case) |
+| 3.2               | Warehouse Manager confirms |
+| 4                 | Software cancels the order |
+
+### Use case 12, UC12 - Edit order
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
-| Precondition      | 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists
-| Post condition    | Target product has been removed from the inventory|
-| Nominal Scenario  | 1. Warehouse Manager looks for the order using the search bar<br/>2. The software presents a list of matching orders<br/>3. Warehouse Manager selects the target order<br/>4. Warehouse Manager clicks "Edit" button<br/>5. Warehouse Manager makes desired changes to the order and, when done, clicks "Apply" button<br/>&ensp;(5.1) Software asks for confirmation<br/>&ensp;(5.2) Warehouse Manager gives confirmation<br/>6. Order is canceled |
+| Precondition      | 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Orders exist
+| Post condition    | Target order has been modified |
+| Nominal Scenario  | 1. <br/>2. <br/>3. Warehouse Manager selects the target order<br/>4. <br/>5. <br/>&ensp;(5.1) Software asks for confirmation<br/>&ensp;(5.2) Warehouse Manager gives confirmation<br/>6. Order is canceled |
 | Variants          | - Target order does not exist<br/>- It is too late to edit the order (e.g. it has already been completed) |
+
+##### Scenario 12.1 - Edit order
+| Scenario 			| Edit order    |
+| ----------------- | --------------------------- |
+| Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Orders exist<br/>4. The status of the target orders is 'Pending' |
+| Post condition   	| Target order has been modifiedy |
+| Step#        		| Description  |
+| 1                 | Warehouse Manager looks for the order using the search bar and/or the filters |
+| 2                 | The software presents a list of matching orders |
+| 3                 | Warehouse Manager clicks the pencil button |
+| 4                 | Software presents a dedicated window where Warehouse Manager makes desired changes to the order and, when done, clicks "Edit" button |
+| 5                 | Software updates the order |
+
 
 ### Use case 13, UC13 - Show orders
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
-| Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
+| Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Orders exist |
 | Post condition 	| Software shows a list of orders, sorted by ID (default) |
 | Nominal Scenario  | Warehouse Manager accesses orders section of the software, where he can look at the complete list of orders sorted by ID (default sort) |
 | Variants          |  - A different sorting criteria is selected<br/>-  Orders are filtered writing something in the search bar or using filters (e.g. date, supplier, ...) |
+
+#### Scenario 13.1 - Variant 
+
+| Scenario 			| Sort orders |
+| ----------------- | --------------------------- |
+| Precondition     	| Software shows all the orders, sorted by ID |
+| Post condition   	| Orders are sorted according to user's choice |
+| Step#        		| Description |
+| 1     			| User changes sort criteria |
+| 2    				| System displays orders sorted by custom criteria |
+
+#### Scenario 13.2 - Variant 
+
+| Scenario 			| Filter orders |
+| ----------------- | --------------------------- |
+| Precondition     	| Software shows all the orders, sorted by ID |
+| Post condition   	| Only matching orders are shown |
+| Step#        		| Description  |
+| 1     			| User filters the orders by writing in the search bar (ID,name..) and/or using filters |
+| 2    				| Software displays odrers filtered by custom criteria |
 
 ## Catalogue management
 
