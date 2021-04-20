@@ -61,7 +61,7 @@ EZShop is a software application to:
 | Product | Involved indirectly and managed by the software. |
 | Cash Register | The software involves the Cash Register since they are part of the output. |
 | Fidelity Card | Fidelity Card associated to a Customer. |
-| Credit card system | Is involved during the payment with a credit card |
+| Credit card system | Involved during the payment with a credit card |
 
 # Context Diagram and interfaces
 
@@ -336,8 +336,9 @@ We didn't include every FR (show accounting data) in order to make the UCD reada
 (FR_5 Support accounting) ..> (FR_5.1 Update finance) : include
 (FR_5.1 Update finance) ..> (FR_5.1.1 Add passive invoice) : include
 (FR_5.1 Update finance) ..> (FR_5.1.2 Add credit note) : include
+(FR_5 Support accounting) ..> (FR_5.2 Show accounting data) : include
 (FR_5 Support accounting) ..> (FR_5.3 Show statistics) : include
-(FR_5 Support accounting) ..> (FR_5.5 Show suppliers deadlines  timetable) : include
+(FR_5 Support accounting) ..> (FR_5.4 Show banking data) : include
 (FR_5.3 Show statistics) ..> (FR_5.3.1 Show revenue and expenses in a timeframe) :include
 (FR_5.3 Show statistics) ..> (FR_5.3.2 Show best selling products) :include
 
@@ -456,7 +457,7 @@ In these Use Cases, the actor is the Cashier that has to deal with Shopping Cart
 |  Precondition     | 1. Cashier account exists and is already authenticated<br/> 2. The customer has successfully paid by cash<br/> 3. The Shopping Cart is known<br/> 4. The Total Amount of pay is known|
 |  Post condition   | The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
 |  Nominal Scenario | 1. The Cashier notifies that the customer has successfully paid by cash<br/> 2. The Cash Register is opened and prints the receipt<br/> 3. Transaction information is sent to the Accounting <br/> 4. Each Product in the list is removed from the Inventory|
-|  Variants     	| Customer does not want to pay via Cash anymore (see Scenario 3.3)|
+|  Variants     	| - Customer does not want to pay via Cash anymore (see Scenario 3.3)|
 
 ## Inventory management
 In these use cases, the actor is the Warehouse Manager or another user with an account with the privileges required to manage the inventory. The actor can inspect the inventory, add new items to it, and update or remove the existing ones.
@@ -568,7 +569,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 |  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. The catalogue contains at least one product |
 |  Post condition   |Selling price of a product updated |
 |  Nominal Scenario | Shop director chooses a product and updates his selling price|
-|  Variants     	| |
+|  Variants     	| - |
 
 
 #### Scenario 14.1
@@ -624,7 +625,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | -----------------	| ------------- |
 |  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. The catalogue contains at least one product |
 |  Post condition   | One or more products are removed from the catalogue |
-|  Nominal Scenario | Shop director selects and removes a product from the inventory | 
+|  Nominal Scenario | - Shop director selects and removes a product from the inventory | 
 
 #### Scenario 16.1
 
@@ -723,7 +724,7 @@ We'll consider the Cashier as the actor.
 |  Precondition     |  1. Account cashier must exist<br/>2. Cashier is  authenticated<br/>3. The fidelity card must exist |
 |  Post condition   | Fidelity cards are removed from the database |
 |  Nominal Scenario | Cashier selects "remove a fidelity card" and the card is removed from the database |
-|  Variants     	| |
+|  Variants     	| - |
 
 #### Scenario 19.1
 
@@ -743,7 +744,7 @@ We'll consider the Cashier as the actor.
 | Precondition   	| 1. Cashier has an account<br/>2. Cashier is authenticated<br/>|
 | Post condition 	| Software shows a list of fidelity cards, sorted by ID (default) |
 | Nominal Scenario  | Cashier selects "show all fidelity cards & cards points"|
-| Variants          | Fidelity cards are filtered writing something in the search bar (SSN, name, surname, telephone, ID) |
+| Variants          | - Fidelity cards are filtered writing something in the search bar (SSN, name, surname, telephone, ID) |
 
 #### Scenario 20.1
 
