@@ -61,7 +61,7 @@ EZShop is a software application to:
 | Product | Involved indirectly and managed by the software. |
 | Cash Register | The software involves the Cash Register since they are part of the output. |
 | Fidelity Card | Fidelity Card associated to a Customer. |
-| Credit card system | Is involved during the payment with a credit card |
+| Credit card system | Involved during the payment with a credit card |
 
 # Context Diagram and interfaces
 
@@ -336,8 +336,9 @@ We didn't include every FR (show accounting data) in order to make the UCD reada
 (FR_5 Support accounting) ..> (FR_5.1 Update finance) : include
 (FR_5.1 Update finance) ..> (FR_5.1.1 Add passive invoice) : include
 (FR_5.1 Update finance) ..> (FR_5.1.2 Add credit note) : include
+(FR_5 Support accounting) ..> (FR_5.2 Show accounting data) : include
 (FR_5 Support accounting) ..> (FR_5.3 Show statistics) : include
-(FR_5 Support accounting) ..> (FR_5.5 Show suppliers deadlines  timetable) : include
+(FR_5 Support accounting) ..> (FR_5.4 Show banking data) : include
 (FR_5.3 Show statistics) ..> (FR_5.3.1 Show revenue and expenses in a timeframe) :include
 (FR_5.3 Show statistics) ..> (FR_5.3.2 Show best selling products) :include
 
@@ -586,8 +587,8 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | ----------------- | ---------------------------------------- |
 | Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
 | Post condition 	| A new order has been placed |
-| Nominal Scenario  | 1. Warehouse Manager clicks on 'New Order' icon<br/>2. The software presents the view for placing a new order<br/>3. Warehouse Manager selects products, as well as the desired quantity, and fills in other necessary infos<br/>&ensp;(3.1) Software asks for confirmation<br/>&ensp;(3.2) Warehouse Manager gives confirmation<br/> 4. The software places the order and assigns to it an incremental and unique ID |
-| Variants          | - Before completing the operation, the Warehouse Manager decides to discard it<br/>- The order cannot be placed for some reason |
+| Nominal Scenario  | 1. Warehouse Manager clicks on 'New Order' icon<br/>2. The software presents the view for placing a new order<br/>3. Warehouse Manager selects products, as well as the desired quantity, and fills in other necessary infos<br/>4. Software checks that the inserted supplier is already present in the supplier list<br/>5. Software asks for confirmation<br/>6. Warehouse Manager gives confirmation<br/> 7. The software places the order and assigns to it an incremental and unique ID |
+| Variants          | - Before completing the operation, the Warehouse Manager decides to discard it<br/>- The order cannot be placed for some reason<br/>- The software doesn't find the inserted supplier in the supplier list, so it makes the user to enter a new supplier |
 
 ### Use case 11, UC11 - Cancel existing order
 | Actors Involved 	| 			Warehouse Manager              |
@@ -618,31 +619,29 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 ### Use case 14, UC14 - Update selling price of product
 | Actors Involved	| Shop director |
 | -----------------	| ------------- |
-|  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. The catalogue contains at least one product |
+|  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. Software has shown a list of products present in the catalogue|
 |  Post condition   |Selling price of a product updated |
 |  Nominal Scenario | Shop director chooses a product and updates his selling price|
-|  Variants     	| |
+|  Variants     	| - |
 
 
 #### Scenario 14.1
 
 | Scenario 			| Update selling price of product|
 | ----------------- | --------------------------- |
-| Precondition     	| 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. The catalogue contains at least one product |
+| Precondition     	| 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. Software has shown a list of products present in the catalogue|
 | Post condition   	| Selling price of a product updated |
 | Step#        		| Description  |
 | 1     			| Shop director selects to update a product |
-| 2    				| Software shows a list of products present in the catalogue  |
-| 3					| Shop director selects a product |
-| 4					| Shop director modifies the price of the product in the catalogue |
-| 5					| Shop director confirms |
+| 2					| Shop director inserts the new price of the product in the catalogue |
+| 3					| Shop director confirms |
 
 
 
 ### Use case 15, UC15 - Add product
 | Actors Involved	| Shop director |
 | -----------------	| ------------- |
-|  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated |
+|  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. Software has shown a list of products present in the catalogue |
 |  Post condition   | One or more products are added in the catalogue |
 |  Nominal Scenario | Shop director selects and adds products (present in the inventory) to the catalogue |
 |  Variants     	| - A product can be added only once in a catalogue: each product has an unique ID; an error message is shown on the screen.<br/>|
@@ -652,12 +651,12 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 
 | Scenario 			| Add product |
 | ----------------- | --------------------------- |
-| Precondition     	|1. Account shop director must exist <br> 2. Account shop director is authenticated |
+| Precondition     	|1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. Software has shown a list of products present in the catalogue|
 | Post condition   	| One or more products are added in the catalogue |
 | Step#        		| Description  |
 | 1     			| Shop director selects to add a product in the catalogue |
 | 2    				| Software shows a list of products present in the inventory  |
-| 3					| Shop director selects one or more products and inserts the price to sell for each |
+| 3					| Shop director selects one or more products and inserts the selling price for each |
 | 4 				| Shop director confirms |
 | 5					| The application assigns the inventory ID to the product |
 
@@ -675,26 +674,24 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 ### Use case 16, UC16 - Remove product
 | Actors Involved	| Shop director |
 | -----------------	| ------------- |
-|  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. The catalogue contains at least one product |
-|  Post condition   | One or more products are removed from the catalogue |
-|  Nominal Scenario | Shop director selects and removes a product from the inventory | 
+|  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. Software has shown a list of products present in the catalogue|
+|  Post condition   | One products is removed from the catalogue |
+|  Nominal Scenario | - Shop director selects and removes a product from the inventory | 
 
 #### Scenario 16.1
 
 | Scenario 			| Remove product |
 | ----------------- | --------------------------- |
-| Precondition     	|1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. The catalogue contains at least one product |
+| Precondition     	|1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. Software has shown a list of products present in the catalogue |
 | Post condition   	| One or more products are removed from the catalogue|
 | Step#        		| Description  |
-| 1     			| Shop director selects to remove a product in the catalogue |
-| 2    				| Software shows a list of products present in the catalogue  |
-| 3					| Shop director selects one product |
-| 4 				| Shop director confirms |
+| 1					| Shop director selects one product to remove |
+| 2 				| Shop director confirms |
 
 ### Use case 17, UC17 - Show products in the catalogue
 | Actors Involved 	| 			Shop director           |
 | ----------------- | ---------------------------------------- |
-| Precondition   	| 1. Shop director has an account<br/>2. Shop director is authenticated<br/>3. Catalogue exists |
+| Precondition   	| 1. Shop director has an account<br/>2. Shop director is authenticated<br/> 3. Catalogue exists |
 | Post condition 	| Software shows a list of products present in the catalogue, sorted by ID (default) |
 | Nominal Scenario  | Once the shop director has done the authentication, a list of products is shown |
 | Variants          |  - A different sorting criteria is selected<br/>-  Products are filtered writing something in the search bar or using filters (type of product, selling price, ...) |
@@ -776,7 +773,7 @@ We'll consider the Cashier as the actor.
 |  Precondition     |  1. Account cashier must exist<br/>2. Cashier is  authenticated<br/>3. The fidelity card must exist |
 |  Post condition   | Fidelity cards are removed from the database |
 |  Nominal Scenario | Cashier selects "remove a fidelity card" and the card is removed from the database |
-|  Variants     	| |
+|  Variants     	| - |
 
 #### Scenario 19.1
 
@@ -796,7 +793,7 @@ We'll consider the Cashier as the actor.
 | Precondition   	| 1. Cashier has an account<br/>2. Cashier is authenticated<br/>|
 | Post condition 	| Software shows a list of fidelity cards, sorted by ID (default) |
 | Nominal Scenario  | Cashier selects "show all fidelity cards & cards points"|
-| Variants          | Fidelity cards are filtered writing something in the search bar (SSN, name, surname, telephone, ID) |
+| Variants          | - Fidelity cards are filtered writing something in the search bar (SSN, name, surname, telephone, ID) |
 
 #### Scenario 20.1
 
@@ -858,7 +855,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 |  Precondition     | 1. Accountant account must exist<br/>2. Accountant must be authenticated |
 |  Post condition   | Accounting data are shown on the screen |
 |  Nominal Scenario | Accountant chooses to view and filter either invoices, suppliers, deadlines timetable, balance sheet or  financial statement and the system displays data on the screen |
-|  Variants     	| - There is no data of the selected type yet: no data will be shown |
+|  Variants     	| - |
 
 #### Scenario 22.1
 | Scenario 			| Show suppliers deadlines timetable - Up to date |
@@ -918,7 +915,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | ----------------- | --------- |
 |  Precondition     | 1. ITAdministrator is authenticated<br/>2. User doesn't have an account yet |
 |  Post condition   | New user account is added to the system |
-|  Nominal Scenario |  |
+|  Nominal Scenario | ITAdministrator insert a new user account by compiling a given form |
 |  Variants     	| - ITAdministrator wants to reset all fields during the operation by clicking on the "Reset" button<br/>- ITAdministrator press "Submit" button without completely fill the given form: an alert message is generated |
 
 #### Scenario 24.1 
@@ -949,36 +946,36 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 ### Use case 25, UC25 - Remove account
 | Actors Involved   | ITAdministrator	|
 | ----------------- | --------- |
-|  Precondition     | 1. ITAdministrator is authenticated<br/>2. User account must exist |
-|  Post condition   | User account is removed from the system |
-|  Nominal Scenario | ITAdministrator remove an user account from the showed list |
+|  Precondition     | 1. ITAdministrator is authenticated<br/>2. At leat one user account must exist |
+|  Post condition   | One or more user accounts are removed from the system |
+|  Nominal Scenario | ITAdministrator remove user accounts from the showed list |
 |  Variants     	| - |
 
 #### Scenario 25.1 
 
 | Scenario 			| Remove an user account |
 | ----------------- | --------------------------- |
-| Precondition      | User account must exist |
-| Post condition    | User account is removed from the system |
+| Precondition      | At least one user account must exist |
+| Post condition    | Selected user accounts are removed from the system |
 | Step#          	| Description  |
 | 1     			|  ITAdministrator selects "Show accounts" |
 | 2 			    | Software shows a list of accounts |
 | 3				    | ITAdministrator chooses one or more of them |
 | 4                 | ITAdministrator chooses the "Remove account" option |
-| 5                 | Application shows a confirmation window showing the selected accounts that are going to be removed from the system |
+| 5                 | Application displays a confirmation window showing the selected accounts that are going to be removed from the system |
 | 6                 | ITAdministrator confirms |
 
 ### Use case 26, UC26 - Update account
 | Actors Involved   | ITAdministrator	|
 | ----------------- | --------- |
-|  Precondition     | Account user must exist |
-|  Post condition   | Account user's info are modified |
+|  Precondition     | User account must exist |
+|  Post condition   | User account's data is modified |
 |  Nominal Scenario | ITAdministrator chooses an account from the showed list and updates its data but privileges |
-|  Variants     	| - ITAdministrator chooses to modify privileges instead of user data |
+|  Variants     	| - ITAdministrator selects more than one user account: "Update account" button is disabled<br/>- ITAdministrator chooses to modify privileges instead of user data |
 
 #### Scenario 26.1 
 
-| Scenario 			| Update a user account |
+| Scenario 			| Update user data |
 | ----------------- | --------------------------- |
 | Precondition      | User account must exist |
 | Post condition    | User account data but privileges are updated |
@@ -993,25 +990,34 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | 8                 | ITAdministrator inserts the new data |
 | 9                 | ITAdministrator confirms |
 
-## Authentication
+#### Scenario 26.2 
 
-In these use cases, the actor is an user from the shop.
+| Scenario 			| Update Account button disabled |
+| ----------------- | --------------------------- |
+| Precondition      | At least two user accounts must exist |
+| Post condition    |  |
+| Step#          	| Description  |
+| 1     			|  ITAdministrator selects "Show accounts" |
+| 2 			    | Software shows a list of accounts |
+| 3				    | ITAdministrator chooses at least two of them |
+| 4                 | Software automatically disable the "Update account" button |
 
-### Use case 27, UC27 - Login
-| Actors Involved   | User		|
-| ----------------- | --------- |
-|  Precondition     | 1. User account must exist<br/> 2. User account must be authenticated |
-|  Post condition   | User account is authenticated and the main page of the user is shown on screen|
-|  Nominal Scenario | User performs login by inserting its username and password |
-|  Variants     	| - The pair username/password is wrong: an error message is displayed on screen |
+#### Scenario 26.3 
 
-### Use case 28, UC28 - Logout
-| Actors Involved   | User		|
-| ----------------- | --------- |
-|  Precondition     | 1. User account must exist<br/> 2. User account must be authenticated  |
-|  Post condition   | User is not authenticated anymore |
-|  Nominal Scenario | User selects "Logout" icon to exit from its working platform |
-|  Variants     	| - |
+| Scenario 			| Update user privileges |
+| ----------------- | --------------------------- |
+| Precondition      | User account must exist |
+| Post condition    |  |
+| Step#          	| Description  |
+| 1     			|  ITAdministrator selects "Show accounts" |
+| 2 			    | Software shows a list of accounts |
+| 3				    | ITAdministrator chooses one of them |
+| 4                 | ITAdministrator chooses the "Update account" option |
+| 5                 | Software asks which changes are needed (user data or privileges) |
+| 6                 | ITAdministrator chooses to update the privileges  |
+| 7                 | Software shows forms to insert the new privilege level |
+| 8                 | ITAdministrator inserts the choice |
+| 9                 | ITAdministrator confirms |
 
 # Glossary
 
@@ -1170,7 +1176,7 @@ CreditCardSystem -- "*" CreditCard : interacts
 Purchase --"*" Transaction
 Transaction -- Receipt
 Cashier "*"--"*" CashRegister
-BarCodeReader -- CashRegister
+BarCodeReader -up- CashRegister
 CashRegister --"*" Purchase : supports >
 Purchase -- "*" ActiveInvoice
 Accountant --"*" PassiveInvoice: create
@@ -1187,10 +1193,10 @@ Invoice "*" -up-* BalanceSheet
 CreditNote -- Invoice : is related to >
 Accountant -- "*" BalanceSheet : analyses >
 
-note "One purchase can have more than one\n transaction (e.g. if system refuses credit\n card at first attempt). Receipt is printed even when error occurs" as N1
-N1 .. Transaction 
-note "There could be more than one\n invoice per purchase because\n it could be necessary to add a\n credit note to that purchase" as N2
-N2 .right. Invoice
+note "One purchase can have\nmore than one transaction\n(e.g. if system refuses\n credit card\n at first attempt).\nReceipt is printed even\nwhen error occurs." as N1
+N1 .up. Transaction 
+note "There could be more than one\n invoice per purchase because\n it could be necessary to add a\n credit note to that purchase." as N2
+N2 .left. Invoice
 note "Single product\nto be sold.\nIt does not\nhave a unique ID." as N3
 N3 .left. Product
 @enduml
