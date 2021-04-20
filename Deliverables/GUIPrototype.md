@@ -14,14 +14,77 @@ Date: 16/04/2021
 
 # Home Page - Login
 
-# FR1 - Sales management
-## Idle cash
+# FR_1 - Sales management
 
-## Provide shopping cart
+## FR_1.1 - Provide Shopping Cart and Total Amount
 
-## Product not recognized
+### Scenario 1 - Provide Shopping Cart and Total Amount
 
-[add others]
+![](GUI_images/1.0.1.png)
+
+![](GUI_images/1.0.2.png)
+
+![](GUI_images/1.0.3.png)
+
+![](GUI_images/1.0.4.png)
+
+### Scenario 1.1 - Creating new Fidelity Card during Sale
+
+See "Scenario 18.1 - Add fidelity card"
+
+### Scenario 1.2 - Inserting Product/Card Code manually
+
+![](GUI_images/1.2.1.png)
+
+![](GUI_images/1.0.2.png)
+
+![](GUI_images/1.2.3.png)
+
+### Scenario 1.3 - Remove Product from Shopping Cart
+
+No difference with respect to 1.0.2, the only difference is that there is not the removed product anymore
+
+## FR_1.2 - Handle Fidelity Card
+
+### Scenario 2 - Authentication of a Fidelity Card
+
+As in "Scenario 1.2 - Inserting Product/Card Code manually", but there is no warning message if scanning the Card produces no error
+
+## FR_1.3 - Handle Payment
+
+### Scenario 3 - Handle a Payment via Credit Card
+
+![](GUI_images/3.0.1.png)
+
+![](GUI_images/3.0.2.png)
+
+![](GUI_images/3.0.3.png)
+
+![](GUI_images/3.0.4.png)
+
+![](GUI_images/3.0.5.png)
+
+### Scenario 3.1 - Credit Card not recognized
+
+![](GUI_images/3.1.1.png)
+
+![](GUI_images/3.0.2.png)
+
+### Scenario 3.2 - Handle a Failed Payment via Credit Card
+
+![](GUI_images/3.2.1.png)
+
+![](GUI_images/3.0.2.png)
+
+### Scenario 3.3 - Change Payment Method
+
+![](GUI_images/3.0.2.png)
+
+![](GUI_images/3.0.1.png)
+
+### Scenario 4 - Handle a Payment via Cash
+
+![](GUI_images/4.0.png)
 
 # FR_2 - Warehouse management
 

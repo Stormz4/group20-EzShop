@@ -349,8 +349,26 @@ In these Use Cases, the actor is the Cashier that has to deal with Shopping Cart
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier account exists and is already authenticated<br/> 2. Product has a valid Bar Code<br/> 3. A Fidelity Card may be scanned (thus authenticated) at any time during the Nominal Scenario|
 |  Post condition   | 1. The Shopping Cart is ready<br/> 2. The Total Amount to pay is computed and displayed|
-|  Nominal Scenario | 1. For every Product in the Customer's cart:<br/> 1.1. The Cashier scans the Product using the Bar Code Reader and inputs the quantity of that Product<br/> 1.2 The Application searches the Product in the Catalogue and retrieves its selling price <br/> 1.3 If a general discount is present, it is applied to the Product <br/> 1.4 If a Fidelity Card has been scanned: <br/> 1.4.1 If a discount is present for Fidelity Card owners, it is applied to the Product <br/> 1.4.2 The Fidelity Card Points related to the Product are added to the Fidelity Card <br/> 1.5 The Application displays the price of the Product and the new partial amount to pay on the Cashier GUI<br/> 2. If a Fidelity Card is present, the Cashier selects whether to apply additional discounts, depending on the Card Points (not more than one at a time)<br/> 2.1 If the Cashier applies them, Fidelity Card Points are removed according to the previous step<br/> 3. At the end, the final list of products and the total amount to pay is displayed on the Cashier GUI|
+|  Nominal Scenario | The Cashier defines the Shopping Cart and the Total Amount that the Customer has to pay |
 |  Variants      	| - The Customer wants to subscribe at any time (new Fidelity Card must be created) <br/> - The Bar Code Reader cannot scan a Product<br/> - The Customer does not want to buy a Product anymore |
+
+#### Scenario 1 - UC1 Nominal Scenario
+| Scenario 			| Provide Shopping Cart and Total Amount (with a Fidelity Card) |
+| ----------------- | --------------------------- |
+|  Precondition     | 1. Cashier account exists and is already authenticated<br/> 2. Product has a valid Bar Code<br/> 3. A Fidelity Card may be scanned (thus authenticated) at any time during the Nominal Scenario|
+|  Post condition   | 1. The Shopping Cart is ready<br/> 2. The Total Amount to pay is computed and displayed|
+| Step#		| Description |
+| 1		| For every Product in the Customer's cart:|
+| 1.1		| The Cashier scans the Product using the Bar Code Reader and inputs the quantity of that Product|
+| 1.2 		| The Application searches the Product in the Catalogue and retrieves its selling price |
+| 1.3 		| If a general discount is present, it is applied to the Product |
+| 1.4 		| If a Fidelity Card has been scanned: |
+| 1.4.1 	| If a discount is present for Fidelity Card owners, it is applied to the Product |
+| 1.4.2		| The Fidelity Card Points related to the Product are added to the Fidelity Card |
+| 1.5		| The Application displays the price of the Product and the new partial amount to pay on the Cashier GUI|
+| 2		| If a Fidelity Card is present, the Cashier selects whether to apply additional discounts, depending on the Card Points (not more than one at a time) |
+| 2.1		| If the Cashier applies them, Fidelity Card Points are removed according to the previous step|
+| 3 		| At the end, the final list of products and the total amount to pay is displayed on the Cashier GUI|
 
 #### Scenario 1.1 - Creating New Fidelity Card during Sale 
 | Scenario 			| Creating new Fidelity Card during Sale |
@@ -386,18 +404,42 @@ In these Use Cases, the actor is the Cashier that has to deal with Shopping Cart
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier account exists and is already authenticated<br/> 2. Fidelity Card has a valid Bar Code<br/>|
 |  Post condition   | The Fidelity Card is recognized and the amount to pay is updated|
-|  Nominal Scenario | 1. The Cashier scans the Fidelity Card using the Bar Code Reader and recognizes it<br/> 2. For every scanned Product so far: if a discount for Fidelity Card owners is present, it is applied. <br/> 3. The Amount to pay is updated according to the results of the previous step|
+|  Nominal Scenario | The Cashier authenticates a Fidelity Card at any time during a Purchase |
 |  Variants     	| - The Bar Code is valid, but the Bar Code Reader cannot read it correctly (see Scenario 1.2)|
+
+#### Scenario 2 - Nominal Scenario for UC2
+| Scenario 			| Authentication of a Fidelity Card |
+| ----------------- | --------------------------- |
+|  Precondition     | 1. Cashier account exists and is already authenticated<br/> 2. Fidelity Card has a valid Bar Code<br/>|
+|  Post condition   | The Fidelity Card is recognized and the amount to pay is updated|
+|  Step#       		| Description  |
+|  1			| The Cashier scans the Fidelity Card using the Bar Code Reader and recognizes it|
+|  2			| For every scanned Product so far: if a discount for Fidelity Card owners is present, it is applied.|
+|  3			| The Amount to pay is updated according to the results of the previous step|
 
 ### Use case 3, UC3 - Handle a Payment via Credit Card
 | Actors Involved   | Cashier, Cash Register, Credit Card System |
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier account exists and is already authenticated<br/> 2. Customer has a valid Credit Card<br/> 3. The Shopping Cart is known<br/> 4. The Total Amount to pay is known|
 |  Post condition   | The customer has successfully paid <br/> The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
-|  Nominal Scenario | 1. The Credit Card System shows the amount to pay<br/> 2. The Credit Card system receives the Customer's Credit Card and recognizes it<br/> 3. The Credit Card System interacts with the Payment Gateway bypassing the Application<br/> 4. The Credit Card System notifies about the transaction result <br/> 5. The Cash Register is opened and prints the receipt <br/> 6. Transaction information is sent to the Accounting <br/> 7. Each Product in the list is removed from the Inventory|
+|  Nominal Scenario | The Cashier manages a Credit Card Payment|
 |  Variants     	| - The Credit Card System is not able to recognize the Card<br/> - Credit Card Payment does not terminate successfully <br/> - Customer wants to change Payment Method|
 
-#### Scenario 3.1 - Credit Card is not recognized
+#### Scenario 3 - Nominal Scenario for UC3
+| Scenario 			| Handle a Payment via Credit Card |
+| ----------------- | --------------------------- |
+|  Precondition     | 1. Cashier account exists and is already authenticated<br/> 2. Customer has a valid Credit Card<br/> 3. The Shopping Cart is known<br/> 4. The Total Amount to pay is known|
+|  Post condition   | The customer has successfully paid <br/> The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
+|  Step#		| Description |
+|  1			| The Credit Card System shows the amount to pay|
+|  2			| The Credit Card System receives the Customer's Credit Card and recognizes it|
+|  3			| The Credit Card System interacts with the Payment Gateway bypassing the Application|
+|  4			| The Credit Card System notifies about the transaction result |
+|  5			| The Cash Register is opened and prints the receipt |
+|  6			| Transaction information is sent to the Accounting |
+|  7			| Each Product in the list is removed from the Inventory|
+
+#### Scenario 3.1
 | Scenario 			| Credit Card not recognized |
 | ----------------- | --------------------------- |
 | Precondition     	| 1. Cashier account exists and is already authenticated <br/> 2. Customer has a valid Credit Card <br/> 3. The Shopping Cart is known <br/> 4. The Total Amount to pay is known|
@@ -405,7 +447,7 @@ In these Use Cases, the actor is the Cashier that has to deal with Shopping Cart
 | Step#        		| Description  |
 | 1     		| Cashier retries to scan the Credit Card (Credit Card System is external, it is not up to EZShop to deal with scanning errors)
 
-#### Scenario 3.2 - Handle a Failed Payment via Credit Card
+#### Scenario 3.2
 | Scenario 			| Handle a Failed Payment via Credit Card|
 | ----------------- | --------------------------- |
 | Precondition     	| 1. Cashier account exists and is already authenticated <br/> 2. Customer has a valid Credit Card <br/> 3. The Shopping Cart is known <br/> 4. The Total Amount to pay is knowni <br/> 5. Credit Card Payment has not terminated successfully|
@@ -414,8 +456,8 @@ In these Use Cases, the actor is the Cashier that has to deal with Shopping Cart
 | 1			| An Error message is displayed on the Cashier GUI |
 | 2			| Retry to Pay via Credit Card, restarting from UC3 |
 
-#### Scenario 3.3 - Changing Payment method
-| Scenario 			| Handle a Failed Payment via Credit Card|
+#### Scenario 3.3
+| Scenario 			| Change Payment Method|
 | ----------------- | --------------------------- |
 | Precondition     	| 1. Cashier account exists and is already authenticated <br/> 2. The Shopping Cart is known <br/> 3. The Total Amount to pay is known <br/> |
 | Post condition   	| 1. Payment method is changed |
@@ -427,8 +469,19 @@ In these Use Cases, the actor is the Cashier that has to deal with Shopping Cart
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier account exists and is already authenticated<br/> 2. The customer has successfully paid by cash<br/> 3. The Shopping Cart is known<br/> 4. The Total Amount of pay is known|
 |  Post condition   | The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
-|  Nominal Scenario | 1. The Cashier notifies that the customer has successfully paid by cash<br/> 2. The Cash Register is opened and prints the receipt<br/> 3. Transaction information is sent to the Accounting <br/> 4. Each Product in the list is removed from the Inventory|
-|  Variants     	| - Customer does not want to pay via Cash anymore (see Scenario 3.3)|
+|  Nominal Scenario | The Cashier manages a Cash Payment|
+|  Variants     	| Customer does not want to pay via Cash anymore (see Scenario 3.3)|
+
+#### Scenario 4 - Nominal Scenario for UC4
+| Scenario 			| Handle a Payment via Cash|
+| ----------------- | --------------------------- |
+|  Precondition     | 1. Cashier account exists and is already authenticated<br/> 2. The customer has successfully paid by cash<br/> 3. The Shopping Cart is known<br/> 4. The Total Amount of pay is known|
+|  Post condition   | The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
+| Step#        		| Description  |
+| 1			| The Cashier notifies that the customer has successfully paid by cash|
+| 2			| The Cash Register is opened and prints the receipt|
+| 3			| Transaction information is sent to the Accounting |
+| 4			| Each Product in the list is removed from the Inventory|
 
 ## Inventory management
 In these use cases, the actor is the Warehouse Manager or another user with an account with the privileges required to manage the inventory. The actor can inspect the inventory, add new items to it, and update or remove the existing ones.
@@ -587,7 +640,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 ### Use case 14, UC14 - Update selling price of product
 | Actors Involved	| Shop director |
 | -----------------	| ------------- |
-|  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. The catalogue contains at least one product |
+|  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. Software has shown a list of products present in the catalogue|
 |  Post condition   |Selling price of a product updated |
 |  Nominal Scenario | Shop director chooses a product and updates his selling price|
 |  Variants     	| - |
@@ -597,21 +650,19 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 
 | Scenario 			| Update selling price of product|
 | ----------------- | --------------------------- |
-| Precondition     	| 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. The catalogue contains at least one product |
+| Precondition     	| 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. Software has shown a list of products present in the catalogue|
 | Post condition   	| Selling price of a product updated |
 | Step#        		| Description  |
 | 1     			| Shop director selects to update a product |
-| 2    				| Software shows a list of products present in the catalogue  |
-| 3					| Shop director selects a product |
-| 4					| Shop director modifies the price of the product in the catalogue |
-| 5					| Shop director confirms |
+| 2					| Shop director inserts the new price of the product in the catalogue |
+| 3					| Shop director confirms |
 
 
 
 ### Use case 15, UC15 - Add product
 | Actors Involved	| Shop director |
 | -----------------	| ------------- |
-|  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated |
+|  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. Software has shown a list of products present in the catalogue |
 |  Post condition   | One or more products are added in the catalogue |
 |  Nominal Scenario | Shop director selects and adds products (present in the inventory) to the catalogue |
 |  Variants     	| - A product can be added only once in a catalogue: each product has an unique ID; an error message is shown on the screen.<br/>|
@@ -621,12 +672,12 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 
 | Scenario 			| Add product |
 | ----------------- | --------------------------- |
-| Precondition     	|1. Account shop director must exist <br> 2. Account shop director is authenticated |
+| Precondition     	|1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. Software has shown a list of products present in the catalogue|
 | Post condition   	| One or more products are added in the catalogue |
 | Step#        		| Description  |
 | 1     			| Shop director selects to add a product in the catalogue |
 | 2    				| Software shows a list of products present in the inventory  |
-| 3					| Shop director selects one or more products and inserts the price to sell for each |
+| 3					| Shop director selects one or more products and inserts the selling price for each |
 | 4 				| Shop director confirms |
 | 5					| The application assigns the inventory ID to the product |
 
@@ -644,26 +695,24 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 ### Use case 16, UC16 - Remove product
 | Actors Involved	| Shop director |
 | -----------------	| ------------- |
-|  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. The catalogue contains at least one product |
-|  Post condition   | One or more products are removed from the catalogue |
+|  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. Software has shown a list of products present in the catalogue|
+|  Post condition   | One products is removed from the catalogue |
 |  Nominal Scenario | - Shop director selects and removes a product from the inventory | 
 
 #### Scenario 16.1
 
 | Scenario 			| Remove product |
 | ----------------- | --------------------------- |
-| Precondition     	|1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. The catalogue contains at least one product |
+| Precondition     	|1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. Software has shown a list of products present in the catalogue |
 | Post condition   	| One or more products are removed from the catalogue|
 | Step#        		| Description  |
-| 1     			| Shop director selects to remove a product in the catalogue |
-| 2    				| Software shows a list of products present in the catalogue  |
-| 3					| Shop director selects one product |
-| 4 				| Shop director confirms |
+| 1					| Shop director selects one product to remove |
+| 2 				| Shop director confirms |
 
 ### Use case 17, UC17 - Show products in the catalogue
 | Actors Involved 	| 			Shop director           |
 | ----------------- | ---------------------------------------- |
-| Precondition   	| 1. Shop director has an account<br/>2. Shop director is authenticated<br/>3. Catalogue exists |
+| Precondition   	| 1. Shop director has an account<br/>2. Shop director is authenticated<br/> 3. Catalogue exists |
 | Post condition 	| Software shows a list of products present in the catalogue, sorted by ID (default) |
 | Nominal Scenario  | Once the shop director has done the authentication, a list of products is shown |
 | Variants          |  - A different sorting criteria is selected<br/>-  Products are filtered writing something in the search bar or using filters (type of product, selling price, ...) |
