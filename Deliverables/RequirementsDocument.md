@@ -50,11 +50,11 @@ EZShop is a software application to:
 | Analyst | Who will produce the requirement document. |
 | User | Who uses the system. It includes different user profiles. |
 | Cashier (profile 1) | Cashier who uses the software. Manages sales. |
-| Warehouse manager (profile 3) | Manages inventory and orders through the software. |
-| Accountant (profile 4) | Manages the accounting through the software. |
-| Customers manager (profile 5) | Manages the customers. In most shops it could be the Cashier. |
-| Shop director (profile 6) | Director of the shop. Manages the catalogue of products. |
-| IT administrator (profile 7) | Who manages the software (Security/Accounts, DB). |
+| Warehouse manager (profile 2) | Manages inventory and orders through the software. |
+| Accountant (profile 3) | Manages the accounting through the software. |
+| Customers manager (profile 4) | Manages the customers. In most shops it could be the Cashier. |
+| Shop director (profile 5) | Director of the shop. Manages the catalogue of products. |
+| IT administrator (profile 6) | Who manages the software (Security/Accounts, DB). |
 | Maintainers | Who will repair the software eventually. It could be part of the staff or external. |
 | Marketing people | People who sell the software to shops. |
 | Product | Involved indirectly and managed by the software. |
