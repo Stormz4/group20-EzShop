@@ -566,7 +566,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 ### Use case 14, UC14 - Update selling price of product
 | Actors Involved	| Shop director |
 | -----------------	| ------------- |
-|  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. The catalogue contains at least one product |
+|  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. Software has shown a list of products present in the catalogue|
 |  Post condition   |Selling price of a product updated |
 |  Nominal Scenario | Shop director chooses a product and updates his selling price|
 |  Variants     	| - |
@@ -576,21 +576,19 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 
 | Scenario 			| Update selling price of product|
 | ----------------- | --------------------------- |
-| Precondition     	| 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. The catalogue contains at least one product |
+| Precondition     	| 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. Software has shown a list of products present in the catalogue|
 | Post condition   	| Selling price of a product updated |
 | Step#        		| Description  |
 | 1     			| Shop director selects to update a product |
-| 2    				| Software shows a list of products present in the catalogue  |
-| 3					| Shop director selects a product |
-| 4					| Shop director modifies the price of the product in the catalogue |
-| 5					| Shop director confirms |
+| 2					| Shop director inserts the new price of the product in the catalogue |
+| 3					| Shop director confirms |
 
 
 
 ### Use case 15, UC15 - Add product
 | Actors Involved	| Shop director |
 | -----------------	| ------------- |
-|  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated |
+|  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. Software has shown a list of products present in the catalogue |
 |  Post condition   | One or more products are added in the catalogue |
 |  Nominal Scenario | Shop director selects and adds products (present in the inventory) to the catalogue |
 |  Variants     	| - A product can be added only once in a catalogue: each product has an unique ID; an error message is shown on the screen.<br/>|
@@ -600,12 +598,12 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 
 | Scenario 			| Add product |
 | ----------------- | --------------------------- |
-| Precondition     	|1. Account shop director must exist <br> 2. Account shop director is authenticated |
+| Precondition     	|1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. Software has shown a list of products present in the catalogue|
 | Post condition   	| One or more products are added in the catalogue |
 | Step#        		| Description  |
 | 1     			| Shop director selects to add a product in the catalogue |
 | 2    				| Software shows a list of products present in the inventory  |
-| 3					| Shop director selects one or more products and inserts the price to sell for each |
+| 3					| Shop director selects one or more products and inserts the selling price for each |
 | 4 				| Shop director confirms |
 | 5					| The application assigns the inventory ID to the product |
 
@@ -623,26 +621,24 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 ### Use case 16, UC16 - Remove product
 | Actors Involved	| Shop director |
 | -----------------	| ------------- |
-|  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. The catalogue contains at least one product |
-|  Post condition   | One or more products are removed from the catalogue |
+|  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. Software has shown a list of products present in the catalogue|
+|  Post condition   | One products is removed from the catalogue |
 |  Nominal Scenario | - Shop director selects and removes a product from the inventory | 
 
 #### Scenario 16.1
 
 | Scenario 			| Remove product |
 | ----------------- | --------------------------- |
-| Precondition     	|1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. The catalogue contains at least one product |
+| Precondition     	|1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. Software has shown a list of products present in the catalogue |
 | Post condition   	| One or more products are removed from the catalogue|
 | Step#        		| Description  |
-| 1     			| Shop director selects to remove a product in the catalogue |
-| 2    				| Software shows a list of products present in the catalogue  |
-| 3					| Shop director selects one product |
-| 4 				| Shop director confirms |
+| 1					| Shop director selects one product to remove |
+| 2 				| Shop director confirms |
 
 ### Use case 17, UC17 - Show products in the catalogue
 | Actors Involved 	| 			Shop director           |
 | ----------------- | ---------------------------------------- |
-| Precondition   	| 1. Shop director has an account<br/>2. Shop director is authenticated<br/>3. Catalogue exists |
+| Precondition   	| 1. Shop director has an account<br/>2. Shop director is authenticated<br/> 3. Catalogue exists |
 | Post condition 	| Software shows a list of products present in the catalogue, sorted by ID (default) |
 | Nominal Scenario  | Once the shop director has done the authentication, a list of products is shown |
 | Variants          |  - A different sorting criteria is selected<br/>-  Products are filtered writing something in the search bar or using filters (type of product, selling price, ...) |
