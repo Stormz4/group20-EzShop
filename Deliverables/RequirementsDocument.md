@@ -503,19 +503,34 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Step#        		| Description  |
 | 1                 | Warehouse Manager clicks on 'New Product' icon |
 | 2                 | The software assigns to the product an incremental and unique ID |
-| 3                 | The software presents a form to fill in with product's information (ID's field is not editable) |
-| 4                 | Warehouse Manager fills in every field of the form and presses 'Add' button |
+| 3                 | The software presents a window containing various fields to fill in with product's information (ID's field is not editable) |
+| 4                 | Warehouse Manager fills in every field and presses 'Add' button |
+| 5                 | Software adds the product to the inventory |
 
-##### Scenario 5.2 - Add new product operation canceled
-| Scenario 			| Add new product operation canceled |
+##### Scenario 5.2 - Add new product: operation canceled
+| Scenario 			| Add new product: operation canceled |
 | ----------------- | --------------------------- |
 | Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
 | Post condition   	| Inventory did not change |
 | Step#        		| Description  |
 | 1                 | Warehouse Manager clicks on 'New Product' icon |
-| 2                 | The software presents a form to fill in with product's information |
-| 3                 | Warehouse Manager starts filling in the form, but at a certain point he clicks on |
-| 4                 | The software assigns to the product an incremental and unique ID |
+| 2                 | The software assigns to the product an incremental and unique ID |
+| 3                 | The software presents a window containing various fields to fill in with product's information (ID's field is not editable) |
+| 4                 | Warehouse Manager starts filling in some fields, but at a certain point he clicks 'Cancel' button |
+| 5                 | The window is dismissed and nothing changed in the inventory |
+
+##### Scenario 5.3 - Add new product: missing compulsory fields
+| Scenario 			| Add new product: missing compulsory fields |
+| ----------------- | --------------------------- |
+| Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
+| Post condition   	| Inventory did not change |
+| Step#        		| Description  |
+| 1                 | Warehouse Manager clicks on 'New Product' icon |
+| 2                 | The software assigns to the product an incremental and unique ID |
+| 3                 | The software presents a window containing various fields to fill in with product's information (ID's field is not editable) |
+| 4                 | Warehouse Manager fills in some field, but 'Add' button with one or more compulsory fields still blank |
+| 5                 | An alert is shown, explaining that it is not possible to add the product without the missing fields |
+| 6                 | Warehouse Manager can click 'Ok' button in order to dismiss the alert and get back to the window where the missing fields are now highlighted with red color |
 
 
 ### Use case 6, UC6 - Remove product
@@ -562,13 +577,18 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Variants          | - Target product does not exist in the inventory<br/> |
 
 
-### Use case 8, UC8 - Manage Low Stock Thresholds
-| Actors Involved 	| 			Warehouse Manager              |
-| ----------------- | ---------------------------------------- |
-| Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
-| Post condition 	| A new threshold has been setted or an existing one has been updated or removed |
-| Nominal Scenario  | 1. Warehouse Manager searches for the product (using the search bar and/or the filters)<br/>2. The software presents a list of matching products<br/>3. Warehouse Manager clicks the 'Edit' button of the target item<br/>4. Software presents the interface from which product's properties can be modified<br/>5. Warehouse Manager sets, updates or removes (leaving blank the field) the low stock threshold |
-| Variants          | - Target product does not exist in the inventory<br/> |
+##### Scenario 7.1 - Edit product
+| Scenario 			| Edit product                |
+| ----------------- | --------------------------- |
+| Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
+| Post condition   	| Target product has been modified |
+| Step#        		| Description  |
+| 1                 | Warehouse Manager looks for target product using the search bar and/or the filters |
+| 2                 | The software presents a list of matching products |
+| 4                 | Warehouse Manager clicks the pencil button of the target product |
+| 5                 | The software presents a window containing all the fields filled in with product's information (ID's field is not editable) |
+| 6                 | Warehouse Manager edits one or more fields, then click 'Edit' button |
+| 7                 | The software updates the product |
 
 ### Use case 9, UC9 - Show products
 | Actors Involved 	| 			Warehouse Manager              |
@@ -583,16 +603,16 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Scenario 			| Sort product |
 | ----------------- | --------------------------- |
 | Precondition     	| Software shows a list of products present in the inventory |
-| Post condition   	| Products are sorted and shown in a specific vay|
-| Step#        		| Description  |
-| 1     			| User selects a way to sort the products (Price, name, ID)|
-| 2    				| System displays products sorted by the chosen criteria|
+| Post condition   	| Products are sorted according to user's choice |
+| Step#        		| Description |
+| 1     			| User changes sort criteria |
+| 2    				| System displays products sorted by custom criteria |
 
 #### Scenario 9.2 - Variant 
 
 | Scenario 			| Filter product |
 | ----------------- | --------------------------- |
-| Precondition     	|  Software shows a list of products present in the inventory |
+| Precondition     	| Software shows a list of products present in the inventory |
 | Post condition   	| The filter is applied and the products that satisfy the filter are shown|
 | Step#        		| Description  |
 | 1     			| User filters the products by writing in the search bar (ID,name..) |
