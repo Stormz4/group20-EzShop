@@ -90,29 +90,74 @@ As in "Scenario 1.2 - Inserting Product/Card Code manually", but there is no war
 
 ## FR_2.1 - Inventory management
 
-### Scenario 9.1 - Show products
+![](GUI_images/WarehouseManagement/Inventory.png)
 
 ### Scenario 5.1 - Add product to inventory
 
+![](GUI_images/WarehouseManagement/Inventory_New_Product.png)
+
+![](GUI_images/WarehouseManagement/Inventory_New_Product_Filling_In.png)
+
+### Scenario 5.2 - Add product: missing compulsory fields
+
+![](GUI_images/WarehouseManagement/Inventory_New_Product_Missing_Compulsory_Field(s).png)
+
 ### Scenario 6.1 - Remove product from inventory
 
-### Scenario 7.1 - Update product
+![](GUI_images/WarehouseManagement/Inventory_Remove_Product.png)
 
-### Scenario 8.1 - Manage Low Stock Threshold
+### Scenario 6.2 - Remove multiple products from inventory
+
+![](GUI_images/WarehouseManagement/Inventory_Select_Products.png)
+
+![](GUI_images/WarehouseManagement/Inventory_Remove_Products.png)
+
+### Scenario 7.1 - Edit product
+
+![](GUI_images/WarehouseManagement/Inventory_Edit_Product.png)
+
+### Scenario 8.1 - Show products
+
+![](GUI_images/WarehouseManagement/Inventory.png)
 
 ## FR_2.2 Manage orders 
 
+### Scenario 10.1 - Place new order from 'Orders' window
+
+![](GUI_images/WarehouseManagement/Orders.png)
+
+![](GUI_images/WarehouseManagement/New_order.png)
+
+### Scenario 10.2 - Place new order from 'Inventory' window
+
+![](GUI_images/WarehouseManagement/Inventory_Select_Products.png)
+
+![](GUI_images/WarehouseManagement/New_order.png)
+
+### Scenario 10.3 - Place new order not possible
+
+![](GUI_images/WarehouseManagement/Inventory_Select_Products.png)
+
+![](GUI_images/WarehouseManagement/Inventory_Select_Products_different_Suppliers.png)
+
+### Scenario 11.1 - Cancel order
+
+![](GUI_images/WarehouseManagement/Orders_Cancel_Orders.png)
+
+### Scenario 11.2 - Cancel multiple orders
+
+![](GUI_images/WarehouseManagement/Orders_Selecting.png)
+
+![](GUI_images/WarehouseManagement/Orders_Cancel_Orders.png)
+
+### Scenario 12.1 - Edit order
+
+![](GUI_images/WarehouseManagement/Orders_Edit_Order.png)
+
 ### Scenario 13.1 - Show orders
 
-### Scenario 10.1 - Place new order
+![](GUI_images/WarehouseManagement/Orders.png)
 
-### Scenario 11.1 - Cancel existing order
-
-### Scenario 11.2 - 
-
-### Scenario 12.1 - Edit existing order
-
-### Scenario 12.2 - Edit existing order
 
 # FR_3 Catalogue management
 

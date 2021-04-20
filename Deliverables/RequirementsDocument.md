@@ -1136,7 +1136,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | Scenario 			| Update user privileges |
 | ----------------- | --------------------------- |
 | Precondition      | User account must exist |
-| Post condition    |  |
+| Post condition    | User account privileges have been updated |
 | Step#          	| Description  |
 | 1     			|  ITAdministrator selects "Show accounts" |
 | 2 			    | Software shows a list of accounts |
