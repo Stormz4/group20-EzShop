@@ -141,7 +141,7 @@ Elisa, 32, has just opened a brand new gardening store, where she can earn money
 |  FR_2.1   	| Inventory management |
 |  FR_2.1.1 	| Add product |
 |  FR_2.1.2 	| Remove product |
-|  FR_2.1.3 	| Update product |
+|  FR_2.1.3 	| Edit product |
 |  FR_2.1.4   	| Manage Low Stock Thresholds |
 |  FR_2.1.5   	| Show products (inventory) |
 |  FR_2.2   	| Orders management |
@@ -501,9 +501,9 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
 | Post condition   	| Inventory contains a new product |
 | Step#        		| Description  |
-| 1                 | Warehouse Manager clicks on 'New Product' icon |
+| 1                 | Warehouse Manager clicks on 'New Product' button |
 | 2                 | The software assigns to the product an incremental and unique ID |
-| 3                 | The software presents a window containing various fields to fill in with product's information (ID's field is not editable) |
+| 3                 | The software presents a window containing various fields to fill in with product's information (ID's field is not editable). One of the fields allows to set the Low Stock Threshold for the product. |
 | 4                 | Warehouse Manager fills in every field and presses 'Add' button |
 | 5                 | Software adds the product to the inventory |
 
@@ -513,7 +513,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
 | Post condition   	| Inventory did not change |
 | Step#        		| Description  |
-| 1                 | Warehouse Manager clicks on 'New Product' icon |
+| 1                 | Warehouse Manager clicks on 'New Product' button |
 | 2                 | The software assigns to the product an incremental and unique ID |
 | 3                 | The software presents a window containing various fields to fill in with product's information (ID's field is not editable) |
 | 4                 | Warehouse Manager fills in some field, but 'Add' button with one or more compulsory fields still blank |
@@ -556,6 +556,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | 4.2               | Warehouse Manager confirms |
 | 5                 | Software removes the products from the inventory |
 
+
 ### Use case 7, UC7 - Edit product
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
@@ -574,11 +575,11 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | 1                 | Warehouse Manager looks for target product using the search bar and/or the filters |
 | 2                 | The software presents a list of matching products |
 | 4                 | Warehouse Manager clicks the pencil button of the target product |
-| 5                 | The software presents a window containing all the fields filled in with product's information (ID's field is not editable) |
+| 5                 | The software presents a window containing all the fields filled in with product's information (ID's field is not editable).<br/> In this window, the product's Low Stock Threshold can be setted to the desired value or can be disabled (leaving the field blank) |
 | 6                 | Warehouse Manager edits one or more fields, then click 'Edit' button |
 | 7                 | The software updates the product |
 
-### Use case 9, UC9 - Show products
+### Use case 8, UC8 - Show products
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
 | Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
@@ -586,29 +587,28 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Nominal Scenario  | Warehouse Manager accesses stock's section of the software, where he can look at the complete list of products sorted by ID (default sort) |
 | Variants          |  - A different sorting criteria is selected<br/>-  Products are filtered writing something in the search bar or using filters (e.g. date, supplier, ...) |
 
-#### Scenario 9.1 - Variant 
+#### Scenario 8.1 - Variant 
 
 | Scenario 			| Sort product |
 | ----------------- | --------------------------- |
-| Precondition     	| Software shows a list of products present in the inventory |
+| Precondition     	| Software shows all the products, sorted by ID |
 | Post condition   	| Products are sorted according to user's choice |
 | Step#        		| Description |
 | 1     			| User changes sort criteria |
 | 2    				| System displays products sorted by custom criteria |
 
-#### Scenario 9.2 - Variant 
+#### Scenario 8.2 - Variant 
 
 | Scenario 			| Filter product |
 | ----------------- | --------------------------- |
-| Precondition     	| Software shows a list of products present in the inventory |
-| Post condition   	| The filter is applied and the products that satisfy the filter are shown|
+| Precondition     	| Software shows all the products, sorted by ID |
+| Post condition   	| Only matching products are shown |
 | Step#        		| Description  |
-| 1     			| User filters the products by writing in the search bar (ID,name..) |
-| 2    				| System displays products filtered by the chosen criteria |
+| 1     			| User filters the products by writing in the search bar (ID,name..) and/or using filters |
+| 2    				| System displays products filtered by custom criteria |
 
 
 #
-
 ## Manage orders
 
 ### Use case 10, UC10 - Place new order
@@ -616,8 +616,20 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | ----------------- | ---------------------------------------- |
 | Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
 | Post condition 	| A new order has been placed |
-| Nominal Scenario  | 1. Warehouse Manager clicks on 'New Order' icon<br/>2. The software presents the view for placing a new order<br/>3. Warehouse Manager selects products, as well as the desired quantity, and fills in other necessary infos<br/>&ensp;(3.1) Software asks for confirmation<br/>&ensp;(3.2) Warehouse Manager gives confirmation<br/> 4. The software places the order and assigns to it an incremental and unique ID |
-| Variants          | - Before completing the operation, the Warehouse Manager decides to discard it<br/>- The order cannot be placed for some reason |
+| Nominal Scenario  | 1. Warehouse Manager clicks on 'New Order' button<br/>2. The software presents the view for placing a new order<br/>3. Warehouse Manager selects products, as well as the desired quantity, and fills in other necessary infos<br/>&ensp;(3.1) Software asks for confirmation<br/>&ensp;(3.2) Warehouse Manager gives confirmation<br/> 4. The software places the order and assigns to it an incremental and unique ID |
+| Variants          | Order is placed directly from Inventory's window |
+
+##### Scenario 10.1 - Place new order from 'Orders' window
+| Scenario 			| Place new order |
+| ----------------- | --------------- |
+| Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists<br/>4. Warehouse Manager is in 'Orders' window |
+| Post condition   	| A new order has been placed |
+| Step#        		| Description  |
+| 1                 | Warehouse Manager clicks on 'New Order' button |
+| 2                 | The software brings him to the 'Inventory' window already in selecting mode |
+| 3                 | Warehouse Manager selects products that will be added to the order. If products from different suppliers are selected, the 'Place new order' button is disabled, because an order can contain only products from a single supplier. |
+| 4                 | Warehouse Manager clicks "Place new order" button |
+| 5                 | The software presents a window containing a summary of the selected products;<br/> for each product there is an editable field in which can be specified the quantity |
 
 ### Use case 11, UC11 - Cancel existing order
 | Actors Involved 	| 			Warehouse Manager              |
