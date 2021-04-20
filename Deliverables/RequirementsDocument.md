@@ -898,34 +898,34 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | ----------------- | --------- |
 |  Precondition     | 1. ITAdministrator is authenticated<br/>2. At leat one user account must exist |
 |  Post condition   | One or more user accounts are removed from the system |
-|  Nominal Scenario | ITAdministrator remove an user account from the showed list |
+|  Nominal Scenario | ITAdministrator remove user accounts from the showed list |
 |  Variants     	| - |
 
 #### Scenario 25.1 
 
 | Scenario 			| Remove an user account |
 | ----------------- | --------------------------- |
-| Precondition      | User account must exist |
-| Post condition    | User account is removed from the system |
+| Precondition      | At least one user account must exist |
+| Post condition    | Selected user accounts are removed from the system |
 | Step#          	| Description  |
 | 1     			|  ITAdministrator selects "Show accounts" |
 | 2 			    | Software shows a list of accounts |
 | 3				    | ITAdministrator chooses one or more of them |
 | 4                 | ITAdministrator chooses the "Remove account" option |
-| 5                 | Application shows a confirmation window showing the selected accounts that are going to be removed from the system |
+| 5                 | Application displays a confirmation window showing the selected accounts that are going to be removed from the system |
 | 6                 | ITAdministrator confirms |
 
 ### Use case 26, UC26 - Update account
 | Actors Involved   | ITAdministrator	|
 | ----------------- | --------- |
-|  Precondition     | Account user must exist |
-|  Post condition   | Account user's info are modified |
+|  Precondition     | User account must exist |
+|  Post condition   | User account's data is modified |
 |  Nominal Scenario | ITAdministrator chooses an account from the showed list and updates its data but privileges |
 |  Variants     	| - ITAdministrator selects more than one user account: "Update account" button is disabled<br/>- ITAdministrator chooses to modify privileges instead of user data |
 
 #### Scenario 26.1 
 
-| Scenario 			| Update a user account |
+| Scenario 			| Update user data |
 | ----------------- | --------------------------- |
 | Precondition      | User account must exist |
 | Post condition    | User account data but privileges are updated |
@@ -938,6 +938,35 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | 6                 | ITAdministrator chooses to update the account  |
 | 7                 | Software shows forms to insert the new data |
 | 8                 | ITAdministrator inserts the new data |
+| 9                 | ITAdministrator confirms |
+
+#### Scenario 26.2 
+
+| Scenario 			| Update Account button disabled |
+| ----------------- | --------------------------- |
+| Precondition      | At least two user accounts must exist |
+| Post condition    |  |
+| Step#          	| Description  |
+| 1     			|  ITAdministrator selects "Show accounts" |
+| 2 			    | Software shows a list of accounts |
+| 3				    | ITAdministrator chooses at least two of them |
+| 4                 | Software automatically disable the "Update account" button |
+
+#### Scenario 26.3 
+
+| Scenario 			| Update user privileges |
+| ----------------- | --------------------------- |
+| Precondition      | User account must exist |
+| Post condition    |  |
+| Step#          	| Description  |
+| 1     			|  ITAdministrator selects "Show accounts" |
+| 2 			    | Software shows a list of accounts |
+| 3				    | ITAdministrator chooses one of them |
+| 4                 | ITAdministrator chooses the "Update account" option |
+| 5                 | Software asks which changes are needed (user data or privileges) |
+| 6                 | ITAdministrator chooses to update the privileges  |
+| 7                 | Software shows forms to insert the new privilege level |
+| 8                 | ITAdministrator inserts the choice |
 | 9                 | ITAdministrator confirms |
 
 # Glossary

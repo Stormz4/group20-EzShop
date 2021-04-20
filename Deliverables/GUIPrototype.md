@@ -103,28 +103,109 @@ Date: 16/04/2021
 
 ## FR_5.1 Update finance 
 
+![](GUI_images/SupportAccounting/AccountantMenu1.png)
+
+![](GUI_images/SupportAccounting/Show_invoices.png)
+
 ### Scenario 21.1 - Add invoice (passive)
+
+![](GUI_images/SupportAccounting/Add_passive_invoice.png)
 
 ### Scenario 21.2 - Add credit note
 
+![](GUI_images/SupportAccounting/Add_credit_note.png)
+
 ## FR_5.2 Show accounting data
+
+![](GUI_images/SupportAccounting/AccountantMenu2.png)
+
+![](GUI_images/SupportAccounting/Show_accounting_data.png)
+
+![](GUI_images/SupportAccounting/Show_suppliers.png)
+
+![](GUI_images/SupportAccounting/Show_balance_sheet.png)
+
+![](GUI_images/SupportAccounting/Show_financial_statement.png)
 
 ## Scenario 22.1 - Show suppliers deadlines timetable - Up to date
 
-## Scenario 22.2 - Show suppliers deadlines timetable - Expired warning 
+![](GUI_images/SupportAccounting/Show_suppliers_deadline_timetable.png)
+
+## Scenario 22.2 - Show suppliers deadlines timetable - Expired warning
+
+![](GUI_images/SupportAccounting/Show_suppliers_deadline_timetable-Expired.png)
 
 ## FR_5.3 Show statistics
 
+![](GUI_images/SupportAccounting/AccountantMenu4.png)
+
 ### Scenario 23.1 - Show revenue and expenses in a timeframe
+
+![](GUI_images/SupportAccounting/Show_statistics_Revenues&Expenses.png)
 
 ### Scenario 23.2 - Show best selling products
 
+![](GUI_images/SupportAccounting/Show_statistics_best_selling_products.png)
+
+## FR_5.3 Show banking data
+
+![](GUI_images/SupportAccounting/AccountantMenu3.png)
+
+![](GUI_images/SupportAccounting/Show_banking_data.png)
+
 # FR_6 Accounts management
+
+![](GUI_images/AccountsManagement/Admin_tab.png)
 
 ## Scenario 24.1 - Add new user account
 
-## Scenario 24.1 - Warning message
+![](GUI_images/AccountsManagement/Add_new_account1.png)
+
+![](GUI_images/AccountsManagement/Add_new_account2.png)
+
+![](GUI_images/AccountsManagement/Add_new_account3.png)
+
+![](GUI_images/AccountsManagement/Add_new_account4.png)
+
+## Scenario 24.2 - Warning message
+
+![](GUI_images/AccountsManagement/Warning-not_all_fields_completed.png)
 
 ## Scenario 25.1 - Remove account
 
-## Scenario 26.1 - Update account
+![](GUI_images/AccountsManagement/Show_accounts1.png)
+
+![](GUI_images/AccountsManagement/Show_accounts2.png)
+
+![](GUI_images/AccountsManagement/Select_account_to_manage.png)
+
+![](GUI_images/AccountsManagement/Remove_account.png)
+
+## Scenario 26.1 - Update user data
+
+![](GUI_images/AccountsManagement/Show_accounts2.png)
+
+![](GUI_images/AccountsManagement/Select_account_to_manage.png)
+
+![](GUI_images/AccountsManagement/Selection_of_updates.png)
+
+![](GUI_images/AccountsManagement/Edit_user_data1.png)
+
+![](GUI_images/AccountsManagement/Edit_user_data2.png)
+
+## Scenario 26.2 - Update Account button disabled
+
+![](GUI_images/AccountsManagement/Update_account_option_disabled.png)
+
+## Scenario 26.3 - Update user privileges
+
+![](GUI_images/AccountsManagement/Show_accounts2.png)
+
+![](GUI_images/AccountsManagement/Select_account_to_manage.png)
+
+![](GUI_images/AccountsManagement/Selection_of_updates.png)
+
+![](GUI_images/AccountsManagement/Edit_privileges.png)
+
+![](GUI_images/AccountsManagement/Edit_privileges2.png)
+
