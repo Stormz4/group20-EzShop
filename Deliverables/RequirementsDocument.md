@@ -493,7 +493,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
 | Post condition    | Inventory contains a new product		   |
 | Nominal Scenario  | Warehouse Manager adds a new product to the inventory |
-| Variants          | - Before completing the operation, the Warehouse Manager decides to discard it<br/>- The product cannot be added because one or more compulsory fields have not been filled in |
+| Variants          | The product cannot be added because one or more compulsory fields have not been filled in |
 
 ##### Scenario 5.1 - Add new product
 | Scenario 			| Add new product to the inventory |
@@ -507,19 +507,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | 4                 | Warehouse Manager fills in every field and presses 'Add' button |
 | 5                 | Software adds the product to the inventory |
 
-##### Scenario 5.2 - Add new product: operation canceled
-| Scenario 			| Add new product: operation canceled |
-| ----------------- | --------------------------- |
-| Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
-| Post condition   	| Inventory did not change |
-| Step#        		| Description  |
-| 1                 | Warehouse Manager clicks on 'New Product' icon |
-| 2                 | The software assigns to the product an incremental and unique ID |
-| 3                 | The software presents a window containing various fields to fill in with product's information (ID's field is not editable) |
-| 4                 | Warehouse Manager starts filling in some fields, but at a certain point he clicks 'Cancel' button |
-| 5                 | The window is dismissed and nothing changed in the inventory |
-
-##### Scenario 5.3 - Add new product: missing compulsory fields
+##### Scenario 5.2 - Add new product: missing compulsory fields
 | Scenario 			| Add new product: missing compulsory fields |
 | ----------------- | --------------------------- |
 | Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
