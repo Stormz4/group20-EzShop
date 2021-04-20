@@ -533,8 +533,8 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | ----------------- | ---------------------------------------- |
 | Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
 | Post condition 	| A new order has been placed |
-| Nominal Scenario  | 1. Warehouse Manager clicks on 'New Order' icon<br/>2. The software presents the view for placing a new order<br/>3. Warehouse Manager selects products, as well as the desired quantity, and fills in other necessary infos<br/>&ensp;(3.1) Software asks for confirmation<br/>&ensp;(3.2) Warehouse Manager gives confirmation<br/> 4. The software places the order and assigns to it an incremental and unique ID |
-| Variants          | - Before completing the operation, the Warehouse Manager decides to discard it<br/>- The order cannot be placed for some reason |
+| Nominal Scenario  | 1. Warehouse Manager clicks on 'New Order' icon<br/>2. The software presents the view for placing a new order<br/>3. Warehouse Manager selects products, as well as the desired quantity, and fills in other necessary infos<br/>4. Software checks that the inserted supplier is already present in the supplier list<br/>5. Software asks for confirmation<br/>6. Warehouse Manager gives confirmation<br/> 7. The software places the order and assigns to it an incremental and unique ID |
+| Variants          | - Before completing the operation, the Warehouse Manager decides to discard it<br/>- The order cannot be placed for some reason<br/>- The software doesn't find the inserted supplier in the supplier list, so it makes the user to enter a new supplier |
 
 ### Use case 11, UC11 - Cancel existing order
 | Actors Involved 	| 			Warehouse Manager              |
@@ -805,7 +805,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 |  Precondition     | 1. Accountant account must exist<br/>2. Accountant must be authenticated |
 |  Post condition   | Accounting data are shown on the screen |
 |  Nominal Scenario | Accountant chooses to view and filter either invoices, suppliers, deadlines timetable, balance sheet or  financial statement and the system displays data on the screen |
-|  Variants     	| - There is no data of the selected type yet: no data will be shown |
+|  Variants     	| - |
 
 #### Scenario 22.1
 | Scenario 			| Show suppliers deadlines timetable - Up to date |
@@ -865,7 +865,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | ----------------- | --------- |
 |  Precondition     | 1. ITAdministrator is authenticated<br/>2. User doesn't have an account yet |
 |  Post condition   | New user account is added to the system |
-|  Nominal Scenario |  |
+|  Nominal Scenario | ITAdministrator insert a new user account by compiling a given form |
 |  Variants     	| - ITAdministrator wants to reset all fields during the operation by clicking on the "Reset" button<br/>- ITAdministrator press "Submit" button without completely fill the given form: an alert message is generated |
 
 #### Scenario 24.1 
@@ -896,8 +896,8 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 ### Use case 25, UC25 - Remove account
 | Actors Involved   | ITAdministrator	|
 | ----------------- | --------- |
-|  Precondition     | 1. ITAdministrator is authenticated<br/>2. User account must exist |
-|  Post condition   | User account is removed from the system |
+|  Precondition     | 1. ITAdministrator is authenticated<br/>2. At leat one user account must exist |
+|  Post condition   | One or more user accounts are removed from the system |
 |  Nominal Scenario | ITAdministrator remove an user account from the showed list |
 |  Variants     	| - |
 
@@ -921,7 +921,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 |  Precondition     | Account user must exist |
 |  Post condition   | Account user's info are modified |
 |  Nominal Scenario | ITAdministrator chooses an account from the showed list and updates its data but privileges |
-|  Variants     	| - ITAdministrator chooses to modify privileges instead of user data |
+|  Variants     	| - ITAdministrator selects more than one user account: "Update account" button is disabled<br/>- ITAdministrator chooses to modify privileges instead of user data |
 
 #### Scenario 26.1 
 
@@ -939,26 +939,6 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | 7                 | Software shows forms to insert the new data |
 | 8                 | ITAdministrator inserts the new data |
 | 9                 | ITAdministrator confirms |
-
-## Authentication
-
-In these use cases, the actor is an user from the shop.
-
-### Use case 27, UC27 - Login
-| Actors Involved   | User		|
-| ----------------- | --------- |
-|  Precondition     | 1. User account must exist<br/> 2. User account must be authenticated |
-|  Post condition   | User account is authenticated and the main page of the user is shown on screen|
-|  Nominal Scenario | User performs login by inserting its username and password |
-|  Variants     	| - The pair username/password is wrong: an error message is displayed on screen |
-
-### Use case 28, UC28 - Logout
-| Actors Involved   | User		|
-| ----------------- | --------- |
-|  Precondition     | 1. User account must exist<br/> 2. User account must be authenticated  |
-|  Post condition   | User is not authenticated anymore |
-|  Nominal Scenario | User selects "Logout" icon to exit from its working platform |
-|  Variants     	| - |
 
 # Glossary
 
@@ -1117,7 +1097,7 @@ CreditCardSystem -- "*" CreditCard : interacts
 Purchase --"*" Transaction
 Transaction -- Receipt
 Cashier "*"--"*" CashRegister
-BarCodeReader -- CashRegister
+BarCodeReader -up- CashRegister
 CashRegister --"*" Purchase : supports >
 Purchase -- "*" ActiveInvoice
 Accountant --"*" PassiveInvoice: create
@@ -1134,10 +1114,10 @@ Invoice "*" -up-* BalanceSheet
 CreditNote -- Invoice : is related to >
 Accountant -- "*" BalanceSheet : analyses >
 
-note "One purchase can have more than one\n transaction (e.g. if system refuses credit\n card at first attempt). Receipt is printed even when error occurs" as N1
-N1 .. Transaction 
-note "There could be more than one\n invoice per purchase because\n it could be necessary to add a\n credit note to that purchase" as N2
-N2 .right. Invoice
+note "One purchase can have\nmore than one transaction\n(e.g. if system refuses\n credit card\n at first attempt).\nReceipt is printed even\nwhen error occurs." as N1
+N1 .up. Transaction 
+note "There could be more than one\n invoice per purchase because\n it could be necessary to add a\n credit note to that purchase." as N2
+N2 .left. Invoice
 note "Single product\nto be sold.\nIt does not\nhave a unique ID." as N3
 N3 .left. Product
 @enduml
