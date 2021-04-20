@@ -450,7 +450,7 @@ In these Use Cases, the actor is the Cashier that has to deal with Shopping Cart
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier account exists and is already authenticated<br/> 2. Customer has a valid Credit Card<br/> 3. The Shopping Cart is known<br/> 4. The Total Amount to pay is known|
 |  Post condition   | The customer has successfully paid <br/> The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
-|  Nominal Scenario | 1. The Credit Card System shows the amount to pay<br/> 2. The Credit Card system receives the Customer's Credit Card and recognizes it<br/> 3. The Credit Card System interacts with the Payment Gateway bypassing the Application<br/> 4. The Credit Card System notifies about the transaction result <br/> 5. The Cash Register is opened and prints the receipt <br/> 6. Transaction information is sent to the Accounting <br/> 7. Each Product in the list is removed from the Inventory|
+|  Nominal Scenario | The Cashier manages a Credit Card Payment|
 |  Variants     	| - The Credit Card System is not able to recognize the Card<br/> - Credit Card Payment does not terminate successfully <br/> - Customer wants to change Payment Method|
 
 #### Scenario 3 - Nominal Scenario for UC3
@@ -485,7 +485,7 @@ In these Use Cases, the actor is the Cashier that has to deal with Shopping Cart
 | 2			| Retry to Pay via Credit Card, restarting from UC3 |
 
 #### Scenario 3.3
-| Scenario 			| Handle a Failed Payment via Credit Card|
+| Scenario 			| Change Payment Method|
 | ----------------- | --------------------------- |
 | Precondition     	| 1. Cashier account exists and is already authenticated <br/> 2. The Shopping Cart is known <br/> 3. The Total Amount to pay is known <br/> |
 | Post condition   	| 1. Payment method is changed |
@@ -497,7 +497,7 @@ In these Use Cases, the actor is the Cashier that has to deal with Shopping Cart
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier account exists and is already authenticated<br/> 2. The customer has successfully paid by cash<br/> 3. The Shopping Cart is known<br/> 4. The Total Amount of pay is known|
 |  Post condition   | The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
-|  Nominal Scenario | 1. The Cashier notifies that the customer has successfully paid by cash<br/> 2. The Cash Register is opened and prints the receipt<br/> 3. Transaction information is sent to the Accounting <br/> 4. Each Product in the list is removed from the Inventory|
+|  Nominal Scenario | The Cashier manages a Cash Payment|
 |  Variants     	| Customer does not want to pay via Cash anymore (see Scenario 3.3)|
 
 #### Scenario 4 - Nominal Scenario for UC4
