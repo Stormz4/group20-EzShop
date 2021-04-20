@@ -561,7 +561,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
 | Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
-| Post condition 	| Target product's quantity has been updated |
+| Post condition 	| Target product has been updated |
 | Nominal Scenario  | 1. Warehouse Manager searches for the product using the search bar<br/>2. The software presents a list of matching products<br/>3. Warehouse Manager selects the target product<br/>4. Warehouse Manager clicks "Edit" button<br/>5. Software presents the interface from which product's properties (like quantity and price) can be modified<br/>6. Warehouse Manager edits one or more properties<br/>&ensp;(6.1) Software asks for confirmation<br/>&ensp;(6.2) Warehouse Manager confirms<br/>7. Software applies the update |
 | Variants          | - Target product does not exist in the inventory<br/> |
 
@@ -589,7 +589,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 
 #### Scenario 8.1 - Variant 
 
-| Scenario 			| Sort product |
+| Scenario 			| Sort products |
 | ----------------- | --------------------------- |
 | Precondition     	| Software shows all the products, sorted by ID |
 | Post condition   	| Products are sorted according to user's choice |
@@ -627,7 +627,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Step#        		| Description  |
 | 1                 | Warehouse Manager clicks on 'New Order' button (in 'Orders' window) |
 | 2                 | The software brings him to the 'Inventory' window already in selecting mode |
-| 3                 | Warehouse Manager selects the products that will be added to the order. If products from different suppliers are selected, the 'Place new order' button is disabled, because an order can contain only products from a single supplier. |
+| 3                 | Warehouse Manager selects the products that will be added to the order.  |
 | 4                 | Warehouse Manager clicks "New order" button (in 'Inventory' window) |
 | 5                 | The software assigns to the order an incremental and unique ID |
 | 6                 | The software presents a window containing a summary of the selected products;<br/> for each product there is an editable field in which can be specified the quantity |
@@ -641,19 +641,29 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Post condition   	| A new order has been placed |
 | Step#        		| Description  |
 | 1                 | Warehouse Manager clicks on 'Select Products' button |
-| 2                 | Warehouse Manager selects the products that will be added to the order. If products from different suppliers are selected, the 'Place new order' button is disabled, because an order can contain only products from a single supplier. |
+| 2                 | Warehouse Manager selects the products that will be added to the order. |
 | 3                 | Warehouse Manager clicks "New order" button (in 'Inventory' window) |
 | 4                 | The software assigns to the order an incremental and unique ID |
 | 5                 | The software presents a window containing a summary of the selected products;<br/> for each product there is an editable field in which can be specified the quantity |
 | 6                 | Warehouse Manager clicks "Place Order" button |
 | 7					| The order is placed |
 
+##### Scenario 10.3 - Place new order not possible
+| Scenario 			| Place new order not possible |
+| ----------------- | --------------- |
+| Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists<br/>4. Warehouse Manager is in 'Inventory' window |
+| Post condition   	| 'New order' button is disabled |
+| Step#        		| Description  |
+| 1                 | Warehouse Manager clicks on 'Select Products' button |
+| 2                 | Warehouse Manager selects the products that will be added to the order. |
+| 3					| Products from different suppliers are selected, so the 'New order' button is disabled |
+
 
 
 ### Use case 11, UC11 - Cancel order
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
-| Precondition      | 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists<br/>4. The status of the order is 'Pending'
+| Precondition      | 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Orders exist<br/>4. The status of the order is 'Pending'
 | Post condition    | Target order has been canceled |
 | Nominal Scenario  | 1. Warehouse Manager looks for the order using the search bar  and/or the filters <br/>2. The software presents a list of matching orders<br/>3. Warehouse Manager selects the target order<br/>4. Warehouse Manager clicks "Remove" button<br/>&ensp;(4.1) Software asks for confirmation<br/>&ensp;(4.2) Warehouse Manager gives confirmation<br/>5. Order is canceled |
 | Variants          | - Target order does not exist<br/>- It is too late to cancel the order (e.g. it has already been completed) |
@@ -661,8 +671,8 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 ##### Scenario 11.1 - Cancel order
 | Scenario 			| Cancel order                |
 | ----------------- | --------------------------- |
-| Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists<br/>4. The status of the target order is 'Pending' |
-| Post condition   	| Target product has been removed from the inventory |
+| Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Orders exist<br/>4. The status of the target order is 'Pending' |
+| Post condition   	| Target order has been canceled |
 | Step#        		| Description  |
 | 1                 | Warehouse Manager looks for the order using the search bar and/or the filters |
 | 2                 | The software presents a list of matching orders |
@@ -674,31 +684,64 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 ##### Scenario 11.2 - Cancel multiple orders
 | Scenario 			| Cancel multiple orders    |
 | ----------------- | --------------------------- |
-| Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists<br/>4. The status of the target orders is 'Pending' |
-| Post condition   	| Target products have been removed from the inventory |
+| Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Orders exist<br/>4. The status of the target orders is 'Pending' |
+| Post condition   	| Target order has been canceled |
 | Step#        		| Description  |
 | 1                 | Warehouse Manager clicks on 'Select Orders' button |
-| 3                 | Warehouse Manager selects the target orders |
-| 4                 | Warehouse Manager clicks "Remove" button |
-| 4.1               | Software asks for confirmation showing a recap of the products that are going to be removed |
-| 4.2               | Warehouse Manager confirms |
-| 5                 | Software removes the products from the inventory |
+| 2                 | Warehouse Manager selects the target orders |
+| 3                 | Warehouse Manager clicks "Cancel" button |
+| 3.1               | Software asks for confirmation, showing a recap of the oredrs that are going to be canceled (always one in this case) |
+| 3.2               | Warehouse Manager confirms |
+| 4                 | Software cancels the order |
 
 ### Use case 12, UC12 - Edit order
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
-| Precondition      | 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists
-| Post condition    | Target product has been removed from the inventory|
-| Nominal Scenario  | 1. Warehouse Manager looks for the order using the search bar<br/>2. The software presents a list of matching orders<br/>3. Warehouse Manager selects the target order<br/>4. Warehouse Manager clicks "Edit" button<br/>5. Warehouse Manager makes desired changes to the order and, when done, clicks "Apply" button<br/>&ensp;(5.1) Software asks for confirmation<br/>&ensp;(5.2) Warehouse Manager gives confirmation<br/>6. Order is canceled |
+| Precondition      | 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Orders exist
+| Post condition    | Target order has been modified |
+| Nominal Scenario  | 1. <br/>2. <br/>3. Warehouse Manager selects the target order<br/>4. <br/>5. <br/>&ensp;(5.1) Software asks for confirmation<br/>&ensp;(5.2) Warehouse Manager gives confirmation<br/>6. Order is canceled |
 | Variants          | - Target order does not exist<br/>- It is too late to edit the order (e.g. it has already been completed) |
+
+##### Scenario 12.1 - Edit order
+| Scenario 			| Edit order    |
+| ----------------- | --------------------------- |
+| Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Orders exist<br/>4. The status of the target orders is 'Pending' |
+| Post condition   	| Target order has been modifiedy |
+| Step#        		| Description  |
+| 1                 | Warehouse Manager looks for the order using the search bar and/or the filters |
+| 2                 | The software presents a list of matching orders |
+| 3                 | Warehouse Manager clicks the pencil button |
+| 4                 | Software presents a dedicated window where Warehouse Manager makes desired changes to the order and, when done, clicks "Edit" button |
+| 5                 | Software updates the order |
+
 
 ### Use case 13, UC13 - Show orders
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
-| Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
+| Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Orders exist |
 | Post condition 	| Software shows a list of orders, sorted by ID (default) |
 | Nominal Scenario  | Warehouse Manager accesses orders section of the software, where he can look at the complete list of orders sorted by ID (default sort) |
 | Variants          |  - A different sorting criteria is selected<br/>-  Orders are filtered writing something in the search bar or using filters (e.g. date, supplier, ...) |
+
+#### Scenario 13.1 - Variant 
+
+| Scenario 			| Sort orders |
+| ----------------- | --------------------------- |
+| Precondition     	| Software shows all the orders, sorted by ID |
+| Post condition   	| Orders are sorted according to user's choice |
+| Step#        		| Description |
+| 1     			| User changes sort criteria |
+| 2    				| System displays orders sorted by custom criteria |
+
+#### Scenario 13.2 - Variant 
+
+| Scenario 			| Filter orders |
+| ----------------- | --------------------------- |
+| Precondition     	| Software shows all the orders, sorted by ID |
+| Post condition   	| Only matching orders are shown |
+| Step#        		| Description  |
+| 1     			| User filters the orders by writing in the search bar (ID,name..) and/or using filters |
+| 2    				| Software displays odrers filtered by custom criteria |
 
 ## Catalogue management
 
