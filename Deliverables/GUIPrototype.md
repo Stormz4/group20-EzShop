@@ -11,6 +11,10 @@ Date: 16/04/2021
 | Version | Changes |
 | ------- |---------|
 | 1 | Added template|
+| 2 | Added GUI prototypes for Customers management & Catalogue management |
+| 3 | Added GUI prototypes for Support accounting & Accounts management |
+| 4 | Added GUI prototypes for Sales management |
+| 5| Added GUI prototypes for Warehouse management |
 
 # Home Page - Login
 

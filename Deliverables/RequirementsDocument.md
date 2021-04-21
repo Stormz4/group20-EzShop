@@ -10,7 +10,17 @@ Date: 20/04/2021
 
 | Version | Changes |
 | ------- |---------|
-| 11      | Minor refactoring of use cases |
+| 1 | Added stakeholders, context diagram, interfaces, FR and NFR. |
+| 2 | Updated FR and added use cases FR3,FR4,FR6 |
+| 3 | Added FR5 Use Cases; Minor changes to FRs and NFRs; Modified context diagram and stakeholders |
+| 4 | Modified and added various use cases ; Added deployment diagram |
+| 5 | Added use case diagrams ; Fixes to use cases |
+| 6 | Added glossary ; use cases refactoring ; updated use case diagrams|
+| 7 | More updates to use case diagrams & merged a few use cases | 
+| 8 | Glossary updates ; Relevant updates regarding sales management |
+| 9 | Added stories & personas ; modified a lot of use cases, use case diagrams, stakeholders ; enumerated use cases |
+| 10 |  Extracted nominal scenarios, refactoring and updates regarding use cases |
+| 11 | Refactoring of use cases |
 
 # Contents
 
