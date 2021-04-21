@@ -14,6 +14,8 @@ Date: 16/04/2021
 
 # Home Page - Login
 
+![](GUI_images/Homepage.png)
+
 # FR_1 - Sales management
 
 ## FR_1.1 - Provide Shopping Cart and Total Amount
@@ -253,7 +255,7 @@ As in "Scenario 1.2 - Inserting Product/Card Code manually", but there is no war
 
 ![](GUI_images/SupportAccounting/Show_statistics_best_selling_products.png)
 
-## FR_5.3 Show banking data
+## FR_5.4 Show banking data
 
 ![](GUI_images/SupportAccounting/AccountantMenu3.png)
 

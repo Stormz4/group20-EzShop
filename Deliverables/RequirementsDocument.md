@@ -27,7 +27,7 @@ Date: 20/04/2021
 - [Use case diagram and use cases](#use-case-diagram-and-use-cases)
 	+ [Use case diagram](#use-case-diagram)
 	+ [Use cases](#use-cases)
-    	+ [Relevant scenarios](#relevant-scenarios) TODO: rivedere
+    	+ [Relevant scenarios](#relevant-scenarios)
 - [Glossary](#glossary)
 - [System design](#system-design)
 - [Deployment diagram](#deployment-diagram)
@@ -1075,7 +1075,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 ### Use case 25, UC25 - Remove account
 | Actors Involved   | ITAdministrator	|
 | ----------------- | --------- |
-|  Precondition     | 1. ITAdministrator is authenticated<br/>2. At leat one user account must exist |
+|  Precondition     | 1. ITAdministrator is authenticated<br/>2. At least one user account must exist |
 |  Post condition   | One or more user accounts are removed from the system |
 |  Nominal Scenario | ITAdministrator remove user accounts from the showed list |
 |  Variants     	| - |
@@ -1089,10 +1089,11 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | Step#          	| Description  |
 | 1     			|  ITAdministrator selects "Show accounts" |
 | 2 			    | Software shows a list of accounts |
-| 3				    | ITAdministrator chooses one or more of them |
-| 4                 | ITAdministrator chooses the "Remove account" option |
-| 5                 | Application displays a confirmation window showing the selected accounts that are going to be removed from the system |
-| 6                 | ITAdministrator confirms |
+| 3                 | Optionally, ITAdministrator filter by one of the account attributes |
+| 4				    | ITAdministrator chooses one or more of the accounts, which are output of the current filter |
+| 5                 | ITAdministrator chooses the "Remove account" option |
+| 6                 | Application displays a confirmation window showing the selected accounts that are going to be removed from the system |
+| 7                 | ITAdministrator confirms |
 
 ### Use case 26, UC26 - Update account
 | Actors Involved   | ITAdministrator	|
@@ -1111,13 +1112,14 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | Step#          	| Description  |
 | 1     			|  ITAdministrator selects "Show accounts" |
 | 2 			    | Software shows a list of accounts |
-| 3				    | ITAdministrator chooses one of them |
-| 4                 | ITAdministrator chooses the "Update account" option |
-| 5                 | Software asks which changes are needed (user data or privileges) |
-| 6                 | ITAdministrator chooses to update the account  |
-| 7                 | Software shows forms to insert the new data |
-| 8                 | ITAdministrator inserts the new data |
-| 9                 | ITAdministrator confirms |
+| 3                 | Optionally, ITAdministrator filter by one of the account attributes |
+| 4				    | ITAdministrator chooses one or more of the accounts, which are output of the current filter |
+| 5                 | ITAdministrator chooses the "Update account" option |
+| 6                 | Software asks which changes are needed (user data or privileges) |
+| 7                 | ITAdministrator chooses to update the account  |
+| 8                 | Software shows forms to insert the new data |
+| 9                 | ITAdministrator inserts the new data |
+| 10                 | ITAdministrator confirms |
 
 #### Scenario 26.2 
 
@@ -1128,8 +1130,9 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | Step#          	| Description  |
 | 1     			|  ITAdministrator selects "Show accounts" |
 | 2 			    | Software shows a list of accounts |
-| 3				    | ITAdministrator chooses at least two of them |
-| 4                 | Software automatically disable the "Update account" button |
+| 3                 | Optionally, ITAdministrator filter by one of the account attributes |
+| 4				    | ITAdministrator chooses at least two of the accounts, which are output of the current filter |
+| 5                 | Software automatically disable the "Update account" button |
 
 #### Scenario 26.3 
 
@@ -1140,13 +1143,14 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | Step#          	| Description  |
 | 1     			|  ITAdministrator selects "Show accounts" |
 | 2 			    | Software shows a list of accounts |
-| 3				    | ITAdministrator chooses one of them |
-| 4                 | ITAdministrator chooses the "Update account" option |
-| 5                 | Software asks which changes are needed (user data or privileges) |
-| 6                 | ITAdministrator chooses to update the privileges  |
-| 7                 | Software shows forms to insert the new privilege level |
-| 8                 | ITAdministrator inserts the choice |
-| 9                 | ITAdministrator confirms |
+| 3                 | Optionally, ITAdministrator filter by one of the account attributes |
+| 4				    | ITAdministrator chooses only one of the accounts, which are output of the current filter |
+| 5                 | ITAdministrator chooses the "Update account" option |
+| 6                 | Software asks which changes are needed (user data or privileges) |
+| 7                 | ITAdministrator chooses to update the privileges  |
+| 8                 | Software shows forms to insert the new privilege level |
+| 9                 | ITAdministrator inserts the choice |
+| 10                 | ITAdministrator confirms |
 
 # Glossary
 
