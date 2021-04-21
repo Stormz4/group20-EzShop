@@ -108,6 +108,9 @@ As in "Scenario 1.2 - Inserting Product/Card Code manually", but there is no war
 
 ![](GUI_images/WarehouseManagement/Inventory_New_Product_Missing_Compulsory_Field(s).png)
 
+### Scenario 5.3 - Add new product: new Supplier
+![](GUI_images/WarehouseManagement/Inventory_New_Supplier.png)
+
 ### Scenario 6.1 - Remove product from inventory
 
 ![](GUI_images/WarehouseManagement/Inventory_Remove_Product.png)

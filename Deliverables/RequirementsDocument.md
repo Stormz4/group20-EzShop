@@ -503,7 +503,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
 | Post condition    | Inventory contains a new product		   |
 | Nominal Scenario  | Warehouse Manager adds a new product to the inventory |
-| Variants          | The product cannot be added because one or more compulsory fields have not been filled in |
+| Variants          | - The product cannot be added because one or more compulsory fields have not been filled in<br/> - Supplier not present in the list, so user creates a new one |
 
 ##### Scenario 5.1 - Add new product
 | Scenario 			| Add new product to the inventory |
@@ -529,6 +529,21 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | 4                 | Warehouse Manager fills in some field, but 'Add' button with one or more compulsory fields still blank |
 | 5                 | An alert is shown, explaining that it is not possible to add the product without the missing fields |
 | 6                 | Warehouse Manager can click 'Ok' button in order to dismiss the alert and get back to the window where the missing fields are now highlighted with red color |
+
+##### Scenario 5.3 - Add new product: new Supplier
+| Scenario 			| Add new product: new Supplier |
+| ----------------- | --------------------------- |
+| Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
+| Post condition   	| Inventory contains a new product and there is a new Supplier in suppliers' list |
+| Step#        		| Description  |
+| 1                 | Warehouse Manager clicks on 'New Product' button |
+| 2                 | The software assigns to the product an incremental and unique ID |
+| 3                 | The software presents a window containing various fields to fill in with product's information (ID's field is not editable) |
+| 4                 | Warehouse Manager fills in all the fields but the one related to Supplier, because the desired one is not in the saved list |
+| 5                 | User clicks "New Supplier" |
+| 6                 | The software presents a window containing various fields to fill in with Supplier's information (ID's field is not editable) |
+| 7                 | Warehouse Manager fills in the fields and clicks "Add" button |
+| 8                 | The software saves the new supplier and brings the user back to the "Add Product" window |
 
 
 ### Use case 6, UC6 - Remove product
