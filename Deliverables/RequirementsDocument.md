@@ -675,8 +675,8 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | ----------------- | ---------------------------------------- |
 | Precondition      | 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Orders exist<br/>4. The status of the order is 'Pending'
 | Post condition    | Target order has been canceled |
-| Nominal Scenario  | 1. Warehouse Manager looks for the order using the search bar  and/or the filters <br/>2. The software presents a list of matching orders<br/>3. Warehouse Manager selects the target order<br/>4. Warehouse Manager clicks "Remove" button<br/>&ensp;(4.1) Software asks for confirmation<br/>&ensp;(4.2) Warehouse Manager gives confirmation<br/>5. Order is canceled |
-| Variants          | - Target order does not exist<br/>- It is too late to cancel the order (e.g. it has already been completed) |
+| Nominal Scenario  | Warehouse Manager cancels an order |
+| Variants          | Cancel multiple orders at once |
 
 ##### Scenario 11.1 - Cancel order
 | Scenario 			| Cancel order                |
@@ -686,7 +686,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Step#        		| Description  |
 | 1                 | Warehouse Manager looks for the order using the search bar and/or the filters |
 | 2                 | The software presents a list of matching orders |
-| 3                 | Warehouse Manager clicks the cancel button of the target product |
+| 3                 | Warehouse Manager clicks the "Cancel" button of the target product |
 | 4.1               | Software asks for confirmation, showing a recap of the oredrs that are going to be canceled (always one in this case) |
 | 4.2               | Warehouse Manager confirms |
 | 5                 | Software cancels the order |
@@ -695,22 +695,22 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Scenario 			| Cancel multiple orders    |
 | ----------------- | --------------------------- |
 | Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Orders exist<br/>4. The status of the target orders is 'Pending' |
-| Post condition   	| Target order has been canceled |
+| Post condition   	| Target orders have been canceled |
 | Step#        		| Description  |
 | 1                 | Warehouse Manager clicks on 'Select Orders' button |
 | 2                 | Warehouse Manager selects the target orders |
 | 3                 | Warehouse Manager clicks "Cancel" button |
-| 3.1               | Software asks for confirmation, showing a recap of the oredrs that are going to be canceled (always one in this case) |
+| 3.1               | Software asks for confirmation, showing a recap of the orders that are going to be canceled |
 | 3.2               | Warehouse Manager confirms |
-| 4                 | Software cancels the order |
+| 4                 | Software cancels the orders |
 
 ### Use case 12, UC12 - Edit order
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
-| Precondition      | 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Orders exist
+| Precondition      | 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Orders exist<br/>4. The status of the target orders is 'Pending'
 | Post condition    | Target order has been modified |
-| Nominal Scenario  | 1. <br/>2. <br/>3. Warehouse Manager selects the target order<br/>4. <br/>5. <br/>&ensp;(5.1) Software asks for confirmation<br/>&ensp;(5.2) Warehouse Manager gives confirmation<br/>6. Order is canceled |
-| Variants          | - Target order does not exist<br/>- It is too late to edit the order (e.g. it has already been completed) |
+| Nominal Scenario  | Warehouse Manager edits an order |
+| Variants          |  |
 
 ##### Scenario 12.1 - Edit order
 | Scenario 			| Edit order    |
@@ -739,7 +739,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | ----------------- | --------------------------- |
 | Precondition     	| Software shows all the orders, sorted by ID |
 | Post condition   	| Orders are sorted according to user's choice |
-| Step#        		| Description |
+| Step#        		| Description | 
 | 1     			| User changes sort criteria |
 | 2    				| System displays orders sorted by custom criteria |
 
