@@ -1,12 +1,17 @@
 # Design Document 
 
+Authors:
 
-Authors: 
+- Mattia Lisciandrello s286329
+- Christian Casalini s281823
+- Palmucci Leonardo s288126
+- Dario Lanfranco s287524
 
-Date:
+Date: 25/04/2021
 
-Version:
-
+| Version | Changes |
+| ------- |---------|
+| 1 | Added first version of design document. |
 
 # Contents
 
@@ -43,21 +48,18 @@ GUIEZShop contains view and controller, while EZShop contains model and logic. T
 @startuml
 left to right direction
 
-:Administrator: --> ShopManager
 
 class Shop{
-    +createNewProduct()
-    +createCustomerRecord()
-    +createOrder()
-    +startSaleTransaction()
+    +double returnCashPayment(Integer returnId)
+    +double returnCreditCardPayment(Integer returnId, String creditCard) 
+
+
 }
 
 class UserAccount{
     +username
     +password
     +privilege
-    +getUsername()
-    +getPassword()
 }
 
 Shop -- "*" UserAccount
