@@ -62,6 +62,7 @@ Date: 21/04/2021
 | Version | Changes |
 | ------- |---------|
 | 1 | Added first version of estimation. |
+| 2 | Changed estimate calendar time, including now each step |
 
 # Contents
 - [Estimate by product decomposition]
@@ -77,7 +78,7 @@ Date: 21/04/2021
 | S = Estimated size of project, in LOC (= NC * A) |20*40= 800 |
 | E = Estimated effort, in person hours (here use productivity 10 LOC per person hour)  |          S/Productivity = 800/10=80         |   
 | C = Estimated cost, in euro (here use 1 person hour cost = 30 euro) | 80*30=2400 | 
-| Estimated calendar time, in calendar weeks (Assume team of 4 people, 8 hours per day, 5 days per week ) |          80 person hours/4 = 20 person hours each. Around 1 calendar week for coding (and another 1 for testing).          |               
+| Estimated calendar time, in calendar weeks (Assume team of 4 people, 8 hours per day, 5 days per week ) | Around 7 weeks, including requirements, design, coding, testing. |               
 
 For each estimation an approximated value has been given (20 -> ~20 etc...). To estimate the number of classes, we've considered the worst case scenario (=most number of classes possible.)
 
