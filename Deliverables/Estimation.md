@@ -64,6 +64,7 @@ Date: 21/04/2021
 | 1 | Added first version of estimation. |
 | 2 | Changed estimate calendar time, including now each step |
 | 3 | Reconsidered calculations for effort, cost and activity decomposition | 
+| 4 | Added new gantt chart & new version | 
 
 # Contents
 - [Estimate by product decomposition]
@@ -101,12 +102,8 @@ The Gantt chart is made considering that the team is made of 4 people, which ded
 
 ```plantuml
 @startuml
-2021/04/04 is colored in salmon
-2021/04/03 is colored in salmon
-2021/04/10 is colored in salmon
-2021/04/11 is colored in salmon
-2021/04/17 is colored in salmon
-2021/04/18 is colored in salmon
+saturday are closed
+sunday are closed
 
 [Requirement analysis] lasts 6 days
 [Design] lasts 2 days
