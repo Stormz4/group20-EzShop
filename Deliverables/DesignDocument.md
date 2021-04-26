@@ -12,6 +12,8 @@ Date: 25/04/2021
 | Version | Changes |
 | ------- |---------|
 | 1 | Added first version of design document. |
+| 2 | Added functions in Shop | 
+| 3 | Added sequence diagrams |
 
 # Contents
 
@@ -157,12 +159,14 @@ Return --|> Debit
 
 
 class ProductType{
+    +ID
     +barCode
     +description
     +sellPrice
     +quantity
     +discountRate
     +notes
+    +updatePrice()
 }
 
 Shop - "*" ProductType
@@ -204,6 +208,7 @@ class Position {
     +aisleID
     +rackID
     +levelID
+    +updatePosition()
 }
 
 ProductType - "0..1" Position
@@ -272,13 +277,170 @@ N3 .. SaleTransaction
 # Verification sequence diagrams 
 \<select key scenarios from the requirement document. For each of them define a sequence diagram showing that the scenario can be implemented by the classes and methods in the design>
 
+## UC1 
+
+### Scenario 1-1
+
 ```plantuml
 @startuml
-Shopmanager --> Shop: Insert product descrition
-Shopmanager --> Shop: Insert new bar code
-Shopmanager --> Shop: Insert price per unit
-Shopmanager --> Shop: Insert product notes
-Shopmanager --> Shop: Insert location
-Shopmanager --> Shop: Confirm
+User --> Shop: Insert product descrition
+User --> Shop: Insert new bar code
+User --> Shop: Insert price per unit
+User --> Shop: Insert product notes
+User --> Shop: Insert location
+User --> Shop: Confirms
+Shop --> ProductType : createProductType()
+ProductType --> Shop : return ID
+Shop --> User : succesful message
 @enduml
 ```
+
+### Scenario 1-2
+
+```plantuml
+@startuml
+User --> Shop: getProductTypeByBarCode()
+User --> Shop: return ProductType
+User --> Shop: Selects record
+User --> Shop: Select a new product location
+Shop --> Position: updatePosition()
+ProductType --> Shop : return boolean
+Shop --> User : succesful message
+@enduml
+```
+
+### Scenario 1-3
+
+```plantuml
+@startuml
+User --> Shop: getProductTypeByBarCode()
+User --> Shop: return ProductType
+User --> Shop: Selects record
+User --> Shop: Inserts a new price > 0
+User --> Shop: Confirms
+Shop --> ProductType: updatePrice()
+ProductType --> Shop : return boolean
+Shop --> User : succesful message
+@enduml
+```
+
+
+## UC2 
+
+## UC3
+
+## UC4
+
+## UC5 
+
+## UC6 
+
+## UC7
+
+### Scenario 7-1
+
+| Scenario |  Manage payment by valid credit card |
+| ------------- |:-------------:| 
+|  Precondition     | Credit card C exists  |
+|  Post condition     | C.Balance -= Price  |
+| Step#        | Description  |
+|  1    |  Read C.number |
+|  2    |  Validate C.number with Luhn algorithm |  
+|  3    |  Ask to credit sale price |
+|  4    |  Price payed |
+|  5    |  exit with success |
+
+[//]: # "Dubbi su questo scenario"
+
+```plantuml
+@startuml
+User --> Shop: Read card number
+Shop --> SaleTransaction: receiveCreditCardPayment()
+SaleTransaction --> SaleTransaction: Validate with Luhn algorithm
+SaleTransaction --> SaleTransaction: Ask to credit sale price
+SaleTransaction --> Shop: return true
+Shop --> AccountingBook: recordBalanceUpdate()
+AccountingBook --> Shop: return true
+Shop --> User : succesful message
+@enduml
+```
+
+
+### Scenario 7-2
+
+| Scenario |  Manage payment by invalid credit card |
+| ------------- |:-------------:| 
+|  Precondition     | Credit card C does not exist  |
+|  Post condition     |   |
+| Step#        | Description  |
+|  1    |  Read C.number |
+|  2    |  Validate C.number with Luhn algorithm |  
+|  3    |  C.number invalid, issue warning |
+|  4    |  Exit with error |
+
+```plantuml
+@startuml
+User --> Shop: Read card number
+Shop --> SaleTransaction: receiveCreditCardPayment()
+SaleTransaction --> SaleTransaction: Validate with Luhn algorithm
+SaleTransaction --> Shop: return false
+Shop --> User : error message
+@enduml
+```
+
+### Scenario 7-3
+
+| Scenario |  Manage credit card payment with not enough credit |
+| ------------- |:-------------:| 
+|  Precondition     | Credit card C exists  |
+| | C.Balance < Price |
+|  Post condition     | C.Balance not changed  |
+| Step#        | Description  |
+|  1    |  Read C.number |
+|  2    |  Validate C.number with Luhn algorithm |  
+|  3    |  Ask to credit sale price |
+|  4    |  Balance not sufficient, issue warning |
+|  5    |  Exit with error |
+
+```plantuml
+@startuml
+User --> Shop: Read card number
+Shop --> SaleTransaction: receiveCreditCardPayment()
+SaleTransaction --> SaleTransaction: Validate with Luhn algorithm
+SaleTransaction --> SaleTransaction: Ask to credit sale price
+SaleTransaction --> Shop: return false
+Shop --> User : error message
+@enduml
+```
+
+### Scenario 7-4
+
+| Scenario |  Manage cash payment |
+| ------------- |:-------------:| 
+|  Precondition     | Cash >= Price  |
+|  Post condition     |   |
+| Step#        | Description  |
+|  1    |  Collect banknotes and coins |
+|  2    |  Compute cash quantity |  
+|  3    |  Record cash payment |
+|  4    |  Compute change |
+|  5    |  Return change |
+
+```plantuml
+@startuml
+User --> User: Collect banknotes and coins
+User --> User: Compute cash quantity
+User --> Shop: Record cash payment
+Shop --> SaleTransaction: receiveCashPayment()
+SaleTransaction --> Shop: return true
+Shop --> AccountingBook: recordBalanceUpdate()
+AccountingBook --> Shop: return true
+Shop --> User : succesful message
+@enduml
+```
+
+## UC8
+
+## UC9
+
+## UC10 
