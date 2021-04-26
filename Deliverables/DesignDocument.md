@@ -50,10 +50,78 @@ left to right direction
 
 
 class Shop{
+    .. Reset ..
+    +void reset()
+
+    .. UC1 - Manage Products ..
+    +Integer createProductType(String description, String productCode, double pricePerUnit, String note)
+    +boolean updateProduct(Integer id, String newDescription, String newCode, double newPrice, String newNote)
+    +boolean deleteProductType(Integer id)
+    +List<ProductType> getAllProductTypes()
+    +ProductType getProductTypeByBarCode(String barCode)
+    +List<ProductType> getProductTypesByDescription(String description)
+
+    .. UC2 - Manage user accounts and rights ..
+    +Integer createUser(String username, String password, String role)
+    +boolean deleteUser(Integer id)
+    +List<User> getAllUsers()
+    +User getUser(Integer id)
+    +boolean updateUserRights(Integer id, String role)  
+    
+    .. UC3 - Manage Inventory and Orders ..
+    +boolean updateQuantity(Integer productId, int toBeAdded)
+    +boolean updatePosition(Integer productId, String newPos)
+    +Integer issueReorder(String productCode, int quantity, double pricePerUnit)
+    +Integer payOrderFor(String productCode, int quantity, double pricePerUnit)
+    +boolean payOrder(Integer orderId)
+    +boolean recordOrderArrival(Integer orderId)
+    +List<Order> getAllOrders() throws UnauthorizedException;
+    
+    .. UC4 - Manage Customers and Cards ..
+    +Integer defineCustomer(String customerName)
+    +boolean modifyCustomer(Integer id, String newCustomerName, String newCustomerCard)
+    +boolean deleteCustomer(Integer id)
+    +Customer getCustomer(Integer id)
+    +List<Customer> getAllCustomers()
+    +String createCard()
+    +boolean attachCardToCustomer(String customerCard, Integer customerId)
+    +boolean modifyPointsOnCard(String customerCard, int pointsToBeAdded)
+
+    .. UC5 ..
+    +User login(String username, String password)
+    +boolean logout()
+
+    .. UC6 ..
+    +Integer startSaleTransaction() throws UnauthorizedException
+    +boolean addProductToSale(Integer transactionId, String productCode, int amount)
+    +boolean deleteProductFromSale(Integer transactionId, String productCode, int amount)
+    +boolean applyDiscountRateToProduct(Integer transactionId, String productCode, double discountRate)
+    +boolean applyDiscountRateToSale(Integer transactionId, double discountRate)
+    +int computePointsForSale(Integer transactionId)
+    +boolean closeSaleTransaction(Integer transactionId)
+    +boolean deleteSaleTicket(Integer ticketNumber)
+    +Ticket getSaleTicket(Integer transactionId)
+    +Ticket getTicketByNumber(Integer ticketNumber)
+
+    .. UC7 ..
+    +double receiveCashPayment(Integer ticketNumber, double cash)
+    +boolean receiveCreditCardPayment(Integer ticketNumber, String creditCard)
+
+    .. UC8 ..
+    +Integer startReturnTransaction(Integer ticketNumber)
+    +boolean returnProduct(Integer returnId, String productCode, int amount)
+    +boolean endReturnTransaction(Integer returnId, boolean commit)
+    +boolean deleteReturnTransaction(Integer returnId)
+    
+
+    .. UC9 - Accounting ..
+    +boolean recordBalanceUpdate(double toBeAdded)
+    +List<BalanceOperation> getCreditsAndDebits(LocalDate from, LocalDate to)
+    +double computeBalance()
+
+    .. UC10 - Manage return ..
     +double returnCashPayment(Integer returnId)
-    +double returnCreditCardPayment(Integer returnId, String creditCard) 
-
-
+    +double returnCreditCardPayment(Integer returnId, String creditCard)
 }
 
 class UserAccount{
@@ -161,9 +229,9 @@ ReturnTransaction "*" - ProductType
 
 note "ID is a number on 10 digits " as N1  
 N1 .. LoyaltyCard
-note "bar code is a number on 12 to 14  digits, compliant to GTIN specifications, see  https://www.gs1.org/services/how-calculate-check-digit-manually " as N2  
+note "bar code is a number on 12 to 14  digits,\ncompliant to GTIN specifications, see \nhttps://www.gs1.org/services/how-calculate-check-digit-manually " as N2  
 N2 .. ProductType
-note "ID is a unique identifier of a transaction,  printed on the receipt (ticket number) " as N3
+note "ID is a unique identifier of a transaction, \nprinted on the receipt (ticket number) " as N3
 N3 .. SaleTransaction
 @enduml
 ```
@@ -177,6 +245,20 @@ N3 .. SaleTransaction
 
 \<for each functional requirement from the requirement document, list which classes concur to implement it>
 
+
+!!! Useful link:    https://www.tablesgenerator.com/markdown_tables# 
+
+
+| FR ID | Shop | UserAccount | Administrator | Order | ProductType | Product | Position | SaleTransaction | Quantity | LoyaltyCard | Customer | ReturnTransaction | AccountBook | FinancialTransaction | Credit | Debit | Sale | Return |
+|:-----:|:----:|:-----------:|:-------------:|:-----:|:-----------:|:-------:|:--------:|:---------------:|:--------:|:-----------:|:--------:|:-----------------:|:-----------:|:--------------------:|:------:|:-----:|:----:|:------:|
+|  FR1  |   X  |      X      |       X       |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |      |        |
+|  ---  |      |             |               |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |      |        |
+|  FR3  |   X  |             |               |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |      |        |
+|  FR4  |   X  |             |               |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |      |        |
+|  FR5  |   X  |             |               |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |      |        |
+|  FR6  |   X  |      X      |       X       |       |             |         |          |                 |          |             |          |         X         |             |                      |        |       |      |        |
+|  FR7  |   X  |      X      |       X       |       |             |         |          |                 |          |             |          |         X         |             |                      |        |       |      |        |
+|  FR8  |   X  |      X      |       X       |       |             |         |          |                 |          |             |          |                   |      X      |           X          |    X   |   X   |   X  |    X   |
 
 
 
