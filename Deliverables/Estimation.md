@@ -86,30 +86,23 @@ For each estimation an approximated value has been given (20 -> ~20 etc...). To 
 ### 
 |         Activity name    | Estimated effort (person hours)   |             
 | ----------- | ------------------------------- | 
-| Review existing systems| 15 |
-| Perform work analysis | 15 |
-| Model process | 5 |
-| Identify user requirements | 60 |
-| Identify performance requirements | 10 |
-| TOTAL | 105 |
+| Requirement analysis | 105 |
+| Design | 40 | 
+| Coding | 80 |
+| Testing | 70 | 
 
 ###
 Insert here Gantt chart with above activities
 
 ```plantuml
 @startuml
-@startuml
-[Review existing systems] lasts 3 days
-[Perform work analysis] lasts 4 days
-[Model process] lasts 1 days
-[Identify user requirements] lasts 12 days
-[Identify performance requirements] lasts 2 days
+[Requirement analysis] lasts 21 days
+[Design] lasts 7 days
+[Coding + testing (unit, integratio, GUI)] lasts 26 days
 
 Project starts 2021-04-01
-[Review existing systems] starts 2021-04-01
-[Perform work analysis] starts 2021-04-03 
-[Model process] starts 2021-04-07 
-[Identify user requirements] starts 2021-04-08
-[Identify performance requirements] starts 2021-04-20
+[Requirement analysis] starts 2021-04-01
+[Design] starts 2021-04-23
+[Coding + testing (unit, integratio, GUI)] starts 2021-05-01
 @enduml
 ```
