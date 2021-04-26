@@ -63,6 +63,7 @@ Date: 21/04/2021
 | ------- |---------|
 | 1 | Added first version of estimation. |
 | 2 | Changed estimate calendar time, including now each step |
+| 3 | Reconsidered calculations for effort, cost and activity decomposition | 
 
 # Contents
 - [Estimate by product decomposition]
@@ -74,35 +75,63 @@ Date: 21/04/2021
 |             | Estimate                        |             
 | ----------- | ------------------------------- |  
 | NC =  Estimated number of classes to be developed   |  20          |             
-| A = Estimated average size per class, in LOC       |      40               | 
-| S = Estimated size of project, in LOC (= NC * A) |20*40= 800 |
-| E = Estimated effort, in person hours (here use productivity 10 LOC per person hour)  |          S/Productivity = 800/10=80         |   
-| C = Estimated cost, in euro (here use 1 person hour cost = 30 euro) | 80*30=2400 | 
-| Estimated calendar time, in calendar weeks (Assume team of 4 people, 8 hours per day, 5 days per week ) | Around 7 weeks, including requirements, design, coding, testing. |               
+| A = Estimated average size per class, in LOC       |      80               | 
+| S = Estimated size of project, in LOC (= NC * A) |20*80= 1600 |
+| E = Estimated effort, in person hours (here use productivity 10 LOC per person hour)  |          Considering that behind a LOC there is a lot of work (requirement, design etc) -> 475 person hours  (310 only for coding+testing)    |   
+| C = Estimated cost, in euro (here use 1 person hour cost = 30 euro) | 475*30=14250 | 
+| Estimated calendar time, in calendar weeks (Assume team of 4 people, 8 hours per day, 5 days per week ) | Almost 3 weeks |               
 
 For each estimation an approximated value has been given (20 -> ~20 etc...). To estimate the number of classes, we've considered the worst case scenario (=most number of classes possible.)
+
 
 # Estimate by activity decomposition
 ### 
 |         Activity name    | Estimated effort (person hours)   |             
 | ----------- | ------------------------------- | 
 | Requirement analysis | 105 |
-| Design | 40 | 
-| Coding | 80 |
-| Testing | 70 | 
+| Design | 60 | 
+| Coding | 160 |
+| Testing | 150 | 
 
 ###
-Insert here Gantt chart with above activities
+Insert here Gantt chart with above activities.
+
+The Gantt chart is made considering that the team is made of 4 people, which dedicates 8 hours per day, 5 days per week.
+
+
+```plantuml
+@startuml
+2021/04/04 is colored in salmon
+2021/04/03 is colored in salmon
+2021/04/10 is colored in salmon
+2021/04/11 is colored in salmon
+2021/04/17 is colored in salmon
+2021/04/18 is colored in salmon
+
+[Requirement analysis] lasts 6 days
+[Design] lasts 2 days
+[Coding + testing (unit, integration, GUI)] lasts 14 days
+
+Project starts 2021-04-01
+[Requirement analysis] starts 2021-04-01
+[Design] starts at [Requirement analysis]'s end
+[Coding + testing (unit, integration, GUI)] starts at [Design]'s end
+@enduml
+```
+
+(We added extra days for weekends, since the team works 5 days per week)
+
+This second Gantt chart is made considering the hours the team of 4 people dedicates to the project (and not "8 hours per day, 5 days per week"). Requirement analysis was 4 days, went to 6. Coding + testing goes from 10 to 14 
 
 ```plantuml
 @startuml
 [Requirement analysis] lasts 21 days
-[Design] lasts 7 days
-[Coding + testing (unit, integratio, GUI)] lasts 26 days
+[Design] lasts 8 days
+[Coding + testing (unit, integration, GUI)] lasts 25 days
 
 Project starts 2021-04-01
 [Requirement analysis] starts 2021-04-01
 [Design] starts 2021-04-23
-[Coding + testing (unit, integratio, GUI)] starts 2021-05-01
+[Coding + testing (unit, integration, GUI)] starts 2021-05-02
 @enduml
 ```
