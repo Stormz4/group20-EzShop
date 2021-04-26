@@ -77,7 +77,7 @@ Date: 21/04/2021
 | NC =  Estimated number of classes to be developed   |  20          |             
 | A = Estimated average size per class, in LOC       |      80               | 
 | S = Estimated size of project, in LOC (= NC * A) |20*80= 1600 |
-| E = Estimated effort, in person hours (here use productivity 10 LOC per person hour)  |          Considering that behind a LOC there is a lot of work (requirement, design etc) -> 475 person hours  (310 only for coding+testing)    |   
+| E = Estimated effort, in person hours (here use productivity 10 LOC per person hour)  |          Considering that behind a LOC there is a lot of work (requirement, design etc) -> 475 person hours  (160 for coding)    |   
 | C = Estimated cost, in euro (here use 1 person hour cost = 30 euro) | 475*30=14250 | 
 | Estimated calendar time, in calendar weeks (Assume team of 4 people, 8 hours per day, 5 days per week ) | Almost 3 weeks |               
 
