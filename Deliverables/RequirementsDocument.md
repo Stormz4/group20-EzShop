@@ -6,7 +6,7 @@ Authors:
 - Palmucci Leonardo s288126
 - Dario Lanfranco s287524 
 
-Date: 20/04/2021
+Date: 21/04/2021
 
 | Version | Changes |
 | ------- |---------|
@@ -192,11 +192,11 @@ Elisa, 32, has just opened a brand new gardening store, where she can earn money
 |  FR_6.3   	| Update account|
 |  FR_6.4    	| Modify privileges | //Authorize access to functions to specific actors according to access rights
 
-FR_2.1.5
+FR_2.1.4
 Allow to set, update or remove Low Stock Thresholds so that an alert is generated if a product's quantity goes below the desired threshold.
 
 FR_4
-Fidelity cards are managed totally by the shop. The customer can choose to get subscribe/unsubscribe and he will be given a card. He will just decide to use or not to use the points, which will be involved in giving discounts to the customer. If he wants to check how many points does he have, he has to get in contact with the shop by himself/with the cashier.
+Fidelity cards are managed totally by the shop. The customer can choose to subscribe/unsubscribe and he will be given a card. He will just decide to use or not to use the points, which will be involved in giving discounts to the customer. If he wants to check how many points does he have, he has to get in contact with the shop by himself/with the cashier.
 
 ## Non Functional Requirements
 
@@ -277,7 +277,7 @@ ITAdministrator --> (FR_6 AccountsManagement)
 (FR_2 Warehouse management) ..> (FR_2.2 Order management) : include
 (FR_2.1.1 Add product) <.left. (FR_2.1 Inventory management) : include
 (FR_2.1 Inventory management) ..> (FR_2.1.2 Remove product) : include
-(FR_2.1 Inventory management) ..> (FR_2.1.3 Update product) : include
+(FR_2.1 Inventory management) ..> (FR_2.1.3 Edit product) : include
  :Product: <--(FR_2.1 Inventory management) 
 (FR_2.1 Inventory management) .up.> (FR_2.1.5 Show products) : include
 (FR_2.1.4 Manage Low Stock Thresholds) <.up. (FR_2.1 Inventory management) : include
@@ -362,7 +362,7 @@ In these Use Cases, the actor is the Cashier that has to deal with Shopping Cart
 |  Nominal Scenario | The Cashier defines the Shopping Cart and the Total Amount that the Customer has to pay |
 |  Variants      	| - The Customer wants to subscribe at any time (new Fidelity Card must be created) <br/> - The Bar Code Reader cannot scan a Product<br/> - The Customer does not want to buy a Product anymore |
 
-#### Scenario 1 - UC1 Nominal Scenario
+#### Scenario 1.0 - UC1 Nominal Scenario
 | Scenario 			| Provide Shopping Cart and Total Amount (with a Fidelity Card) |
 | ----------------- | --------------------------- |
 |  Precondition     | 1. Cashier account exists and is already authenticated<br/> 2. Product has a valid Bar Code<br/> 3. A Fidelity Card may be scanned (thus authenticated) at any time during the Nominal Scenario|
@@ -417,7 +417,7 @@ In these Use Cases, the actor is the Cashier that has to deal with Shopping Cart
 |  Nominal Scenario | The Cashier authenticates a Fidelity Card at any time during a Purchase |
 |  Variants     	| - The Bar Code is valid, but the Bar Code Reader cannot read it correctly (see Scenario 1.2)|
 
-#### Scenario 2 - Nominal Scenario for UC2
+#### Scenario 2.0 - Nominal Scenario for UC2
 | Scenario 			| Authentication of a Fidelity Card |
 | ----------------- | --------------------------- |
 |  Precondition     | 1. Cashier account exists and is already authenticated<br/> 2. Fidelity Card has a valid Bar Code<br/>|
@@ -431,15 +431,15 @@ In these Use Cases, the actor is the Cashier that has to deal with Shopping Cart
 | Actors Involved   | Cashier, Cash Register, Credit Card System |
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier account exists and is already authenticated<br/> 2. Customer has a valid Credit Card<br/> 3. The Shopping Cart is known<br/> 4. The Total Amount to pay is known|
-|  Post condition   | The customer has successfully paid <br/> The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
+|  Post condition   | 1. The customer has successfully paid <br/> 2. The receipt is printed <br/> 3. Accounting is updated <br/> 4. Inventory is updated |
 |  Nominal Scenario | The Cashier manages a Credit Card Payment|
 |  Variants     	| - The Credit Card System is not able to recognize the Card<br/> - Credit Card Payment does not terminate successfully <br/> - Customer wants to change Payment Method|
 
-#### Scenario 3 - Nominal Scenario for UC3
+#### Scenario 3.0 - Nominal Scenario for UC3
 | Scenario 			| Handle a Payment via Credit Card |
 | ----------------- | --------------------------- |
 |  Precondition     | 1. Cashier account exists and is already authenticated<br/> 2. Customer has a valid Credit Card<br/> 3. The Shopping Cart is known<br/> 4. The Total Amount to pay is known|
-|  Post condition   | The customer has successfully paid <br/> The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
+|  Post condition   | 1. The customer has successfully paid <br/> 2. The receipt is printed <br/> 3. Accounting is updated <br/> 4. Inventory is updated |
 |  Step#		| Description |
 |  1			| The Credit Card System shows the amount to pay|
 |  2			| The Credit Card System receives the Customer's Credit Card and recognizes it|
@@ -470,7 +470,7 @@ In these Use Cases, the actor is the Cashier that has to deal with Shopping Cart
 | Scenario 			| Change Payment Method|
 | ----------------- | --------------------------- |
 | Precondition     	| 1. Cashier account exists and is already authenticated <br/> 2. The Shopping Cart is known <br/> 3. The Total Amount to pay is known <br/> |
-| Post condition   	| 1. Payment method is changed |
+| Post condition   	| Payment method is changed |
 | Step#        		| Description  |
 | 1			| The Cashier selects to change Payment method via the Cashier GUI|
 
@@ -478,15 +478,15 @@ In these Use Cases, the actor is the Cashier that has to deal with Shopping Cart
 | Actors Involved   | Cashier, Cash Register |
 | ----------------- | ------------- |
 |  Precondition     | 1. Cashier account exists and is already authenticated<br/> 2. The customer has successfully paid by cash<br/> 3. The Shopping Cart is known<br/> 4. The Total Amount of pay is known|
-|  Post condition   | The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
+|  Post condition   | 1. The receipt is printed <br/> 2. Accounting is updated <br/> 3. Inventory is updated |
 |  Nominal Scenario | The Cashier manages a Cash Payment|
 |  Variants     	| Customer does not want to pay via Cash anymore (see Scenario 3.3)|
 
-#### Scenario 4 - Nominal Scenario for UC4
+#### Scenario 4.0 - Nominal Scenario for UC4
 | Scenario 			| Handle a Payment via Cash|
 | ----------------- | --------------------------- |
 |  Precondition     | 1. Cashier account exists and is already authenticated<br/> 2. The customer has successfully paid by cash<br/> 3. The Shopping Cart is known<br/> 4. The Total Amount of pay is known|
-|  Post condition   | The receipt is printed <br/> Accounting is updated <br/> Inventory is updated|
+|  Post condition   | 1. The receipt is printed <br/> 2. Accounting is updated <br/> 3. Inventory is updated |
 | Step#        		| Description  |
 | 1			| The Cashier notifies that the customer has successfully paid by cash|
 | 2			| The Cash Register is opened and prints the receipt|
@@ -587,8 +587,8 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | ----------------- | ---------------------------------------- |
 | Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
 | Post condition 	| Target product has been updated |
-| Nominal Scenario  | 1. Warehouse Manager searches for the product using the search bar<br/>2. The software presents a list of matching products<br/>3. Warehouse Manager selects the target product<br/>4. Warehouse Manager clicks "Edit" button<br/>5. Software presents the interface from which product's properties (like quantity and price) can be modified<br/>6. Warehouse Manager edits one or more properties<br/>&ensp;(6.1) Software asks for confirmation<br/>&ensp;(6.2) Warehouse Manager confirms<br/>7. Software applies the update |
-| Variants          | - Target product does not exist in the inventory<br/> |
+| Nominal Scenario  | Warehouse Manager edits a product |
+| Variants          |  |
 
 
 ##### Scenario 7.1 - Edit product
@@ -636,7 +636,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 #
 ## Manage orders
 
-### Use case 10, UC10 - Place new order
+### Use case 9, UC9 - Place new order
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
 | Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists |
@@ -644,7 +644,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Nominal Scenario  | Warehouse Manager places a new order |
 | Variants          | Order is placed directly from Inventory's window |
 
-##### Scenario 10.1 - Place new order from 'Orders' window
+##### Scenario 9.1 - Place new order from 'Orders' window
 | Scenario 			| Place new order from 'Orders' window |
 | ----------------- | --------------- |
 | Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists<br/>4. Warehouse Manager is in 'Orders' window |
@@ -659,7 +659,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | 7                 | Warehouse Manager clicks "Place Order" button |
 | 8					| The order is placed
 
-##### Scenario 10.2 - Place new order from 'Inventory' window
+##### Scenario 9.2 - Place new order from 'Inventory' window
 | Scenario 			| Place new order from 'Inventory' window |
 | ----------------- | --------------- |
 | Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists<br/>4. Warehouse Manager is in 'Inventory' window |
@@ -673,7 +673,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | 6                 | Warehouse Manager clicks "Place Order" button |
 | 7					| The order is placed |
 
-##### Scenario 10.3 - Place new order not possible
+##### Scenario 9.3 - Place new order not possible
 | Scenario 			| Place new order not possible |
 | ----------------- | --------------- |
 | Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Inventory exists<br/>4. Warehouse Manager is in 'Inventory' window |
@@ -685,7 +685,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 
 
 
-### Use case 11, UC11 - Cancel order
+### Use case 10, UC10 - Cancel order
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
 | Precondition      | 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Orders exist<br/>4. The status of the order is 'Pending'
@@ -693,7 +693,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Nominal Scenario  | Warehouse Manager cancels an order |
 | Variants          | Cancel multiple orders at once |
 
-##### Scenario 11.1 - Cancel order
+##### Scenario 10.1 - Cancel order
 | Scenario 			| Cancel order                |
 | ----------------- | --------------------------- |
 | Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Orders exist<br/>4. The status of the target order is 'Pending' |
@@ -706,7 +706,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | 4.2               | Warehouse Manager confirms |
 | 5                 | Software cancels the order |
 
-##### Scenario 11.2 - Cancel multiple orders
+##### Scenario 10.2 - Cancel multiple orders
 | Scenario 			| Cancel multiple orders    |
 | ----------------- | --------------------------- |
 | Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Orders exist<br/>4. The status of the target orders is 'Pending' |
@@ -719,7 +719,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | 3.2               | Warehouse Manager confirms |
 | 4                 | Software cancels the orders |
 
-### Use case 12, UC12 - Edit order
+### Use case 11, UC11 - Edit order
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
 | Precondition      | 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Orders exist<br/>4. The status of the target orders is 'Pending'
@@ -727,7 +727,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Nominal Scenario  | Warehouse Manager edits an order |
 | Variants          |  |
 
-##### Scenario 12.1 - Edit order
+##### Scenario 11.1 - Edit order
 | Scenario 			| Edit order    |
 | ----------------- | --------------------------- |
 | Precondition     	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Orders exist<br/>4. The status of the target orders is 'Pending' |
@@ -740,7 +740,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | 5                 | Software updates the order |
 
 
-### Use case 13, UC13 - Show orders
+### Use case 12, UC12 - Show orders
 | Actors Involved 	| 			Warehouse Manager              |
 | ----------------- | ---------------------------------------- |
 | Precondition   	| 1. Warehouse Manager has an account<br/>2. Warehouse Manager is authenticated<br/>3. Orders exist |
@@ -748,7 +748,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Nominal Scenario  | Warehouse Manager accesses orders section of the software, where he can look at the complete list of orders sorted by ID (default sort) |
 | Variants          |  - A different sorting criteria is selected<br/>-  Orders are filtered writing something in the search bar or using filters (e.g. date, supplier, ...) |
 
-#### Scenario 13.1 - Variant 
+#### Scenario 12.1 - Variant 
 
 | Scenario 			| Sort orders |
 | ----------------- | --------------------------- |
@@ -758,7 +758,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | 1     			| User changes sort criteria |
 | 2    				| System displays orders sorted by custom criteria |
 
-#### Scenario 13.2 - Variant 
+#### Scenario 12.2 - Variant 
 
 | Scenario 			| Filter orders |
 | ----------------- | --------------------------- |
@@ -770,7 +770,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 
 ## Catalogue management
 
-### Use case 14, UC14 - Update selling price of product
+### Use case 13, UC13 - Update selling price of product
 | Actors Involved	| Shop director |
 | -----------------	| ------------- |
 |  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. Software has shown a list of products present in the catalogue|
@@ -779,7 +779,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 |  Variants     	| - |
 
 
-#### Scenario 14.1
+#### Scenario 13.1
 
 | Scenario 			| Update selling price of product|
 | ----------------- | --------------------------- |
@@ -792,7 +792,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 
 
 
-### Use case 15, UC15 - Add product
+### Use case 14, UC14 - Add product
 | Actors Involved	| Shop director |
 | -----------------	| ------------- |
 |  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. Software has shown a list of products present in the catalogue |
@@ -801,7 +801,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 |  Variants     	| - A product can be added only once in a catalogue: each product has an unique ID; an error message is shown on the screen.<br/>|
 
 
-#### Scenario 15.1
+#### Scenario 14.1
 
 | Scenario 			| Add product |
 | ----------------- | --------------------------- |
@@ -814,7 +814,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | 4 				| Shop director confirms |
 | 5					| The application assigns the inventory ID to the product |
 
-#### Scenario 15.2 - Variant 
+#### Scenario 14.2 - Variant 
 
 | Scenario 			| Product already present |
 | ----------------- | --------------------------- |
@@ -825,14 +825,15 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | 2    				| System displays an error message, which will stop the use case|
 
 
-### Use case 16, UC16 - Remove product
+### Use case 15, UC15 - Remove product
 | Actors Involved	| Shop director |
 | -----------------	| ------------- |
 |  Precondition     | 1. Account shop director must exist <br> 2. Account shop director is authenticated <br> 3. Software has shown a list of products present in the catalogue|
 |  Post condition   | One products is removed from the catalogue |
-|  Nominal Scenario | - Shop director selects and removes a product from the inventory | 
+|  Nominal Scenario | Shop director selects and removes a product from the inventory |
+|  Variants     	| - |
 
-#### Scenario 16.1
+#### Scenario 15.1
 
 | Scenario 			| Remove product |
 | ----------------- | --------------------------- |
@@ -842,7 +843,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | 1					| Shop director selects one product to remove |
 | 2 				| Shop director confirms |
 
-### Use case 17, UC17 - Show products in the catalogue
+### Use case 16, UC16 - Show products in the catalogue
 | Actors Involved 	| 			Shop director           |
 | ----------------- | ---------------------------------------- |
 | Precondition   	| 1. Shop director has an account<br/>2. Shop director is authenticated<br/> 3. Catalogue exists |
@@ -850,7 +851,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Nominal Scenario  | Once the shop director has done the authentication, a list of products is shown |
 | Variants          |  - A different sorting criteria is selected<br/>-  Products are filtered writing something in the search bar or using filters (type of product, selling price, ...) |
 
-#### Scenario 17.1
+#### Scenario 16.1
 
 | Scenario 			| Show products |
 | ----------------- | --------------------------- |
@@ -859,22 +860,22 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 | Step#        		| Description  |
 | 1    				| System displays products sorted by ID (default) |
 
-#### Scenario 17.2 - Variant 
+#### Scenario 16.2 - Variant 
 
 | Scenario 			| Sort product |
 | ----------------- | --------------------------- |
 | Precondition     	| Software shows a list of products present in the catalogue |
-| Post condition   	| Products are sorted and shown in a specific vay|
+| Post condition   	| Products are sorted and shown in a specific way|
 | Step#        		| Description  |
 | 1     			| User selects a way to sort the products (Price, name, ID)|
 | 2    				| System displays products sorted by the chosen criteria|
 
-#### Scenario 17.3 - Variant 
+#### Scenario 16.3 - Variant 
 
 | Scenario 			| Filter product |
 | ----------------- | --------------------------- |
 | Precondition     	| Software shows a list of products present in the catalogue|
-| Post condition   	| The filter is applied and the products that satisfy the filter are shown|
+| Post condition   	| The filter is applied and the matching products are shown|
 | Step#        		| Description  |
 | 1     			| User filters the products by writing in the search bar (ID,name..) |
 | 2    				| System displays products filtered by the chosen criteria |
@@ -885,7 +886,7 @@ In addition, the actor should be able to place new orders, and to cancel or edit
 Actors could be Cashier or other worker in charge to manage the customers.
 We'll consider the Cashier as the actor.
 
-### Use case 18, UC18 - Add fidelity card
+### Use case 17, UC17 - Add fidelity card
 | Actors Involved   | Cashier		|
 | ----------------- | ------------- |
 |  Precondition     | 1. Account cashier must exist<br/>2. Cashier is authenticated|
@@ -894,7 +895,7 @@ We'll consider the Cashier as the actor.
 |  Variants     	| - A customer can have at most one fidelity card active: each fidelity card has an unique ID, generated based on the customer SSN |
 
 
-#### Scenario 18.1
+#### Scenario 17.1
 
 | Scenario 			| Card added |
 | ----------------- | --------------------------- |
@@ -907,7 +908,7 @@ We'll consider the Cashier as the actor.
 | 4					| Cashier confirms |
 | 5					| The application assigns a new ID to the card in the database |
 
-#### Scenario 18.2 - Variant
+#### Scenario 17.2 - Variant
 
 | Scenario 			| Card already present |
 | ----------------- | --------------------------- |
@@ -921,7 +922,7 @@ We'll consider the Cashier as the actor.
 | 5					| The application shows an error message since the SSN is already present in the database |
 
 
-### Use case 19, UC19 - Remove fidelity card
+### Use case 18, UC18 - Remove fidelity card
 | Actors Involved   | Cashier		|
 | ----------------- | ------------- |
 |  Precondition     |  1. Account cashier must exist<br/>2. Cashier is  authenticated<br/>3. The fidelity card must exist |
@@ -929,7 +930,7 @@ We'll consider the Cashier as the actor.
 |  Nominal Scenario | Cashier selects "remove a fidelity card" and the card is removed from the database |
 |  Variants     	| - |
 
-#### Scenario 19.1
+#### Scenario 18.1
 
 | Scenario 			| Remove fidelity card |
 | ----------------- | --------------------------- |
@@ -941,7 +942,7 @@ We'll consider the Cashier as the actor.
 | 3					| Cashier chooses to remove one fidelity card |
 | 4					| Cashier confirms |
 
-### Use case 20, UC20 - Show fidelity cards & cards points
+### Use case 19, UC19 - Show fidelity cards & cards points
 | Actors Involved 	| 			Cashier       |
 | ----------------- | ---------------------------------------- |
 | Precondition   	| 1. Cashier has an account<br/>2. Cashier is authenticated<br/>|
@@ -949,7 +950,7 @@ We'll consider the Cashier as the actor.
 | Nominal Scenario  | Cashier selects "show all fidelity cards & cards points"|
 | Variants          | - Fidelity cards are filtered writing something in the search bar (SSN, name, surname, telephone, ID) |
 
-#### Scenario 20.1
+#### Scenario 19.1
 
 | Scenario 			| Show fidelity cards |
 | ----------------- | --------------------------- |
@@ -959,7 +960,7 @@ We'll consider the Cashier as the actor.
 | 1					| Cashier selects "show all fidelity cards & cards points" |
 | 2    				| System displays products sorted by ID (default) |
 
-#### Scenario 20.2 - Variant 
+#### Scenario 19.2 - Variant 
 
 | Scenario 			| Filter product |
 | ----------------- | --------------------------- |
@@ -973,7 +974,7 @@ We'll consider the Cashier as the actor.
 
 In these use cases, the actor is an accountant, or a generic user from the shop having privileges of an accountant profile, managing the simplified accounting of the shop (hypothesis: annual revenue below 700'000€) taking data from Agenzia delle Entrate informatic system.
 
-### Use case 21, UC21 - Update finance
+### Use case 20, UC20 - Update finance
 | Actors Involved   | Accountant  |
 | ----------------- | ----------- |
 |  Precondition     | 1. Accountant account must exist<br/>2. Accountant must be authenticated|
@@ -981,7 +982,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 |  Nominal Scenario | Accountant fills a form for the new invoice or credit note that has to be added to the system |
 |  Variants     	| - Accountant want to abort the  operation without submit the new addition: accountant clicks on "Go back" button<br/>- Accountant wants to reset all fields during the operation by clicking on the "Reset" button |
 
-#### Scenario 21.1
+#### Scenario 20.1
 | Scenario 			| Add invoice (passive) |
 | ----------------- | --------------------------- |
 | Precondition     	|  |
@@ -992,7 +993,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | 3     			| Accountant fills the form with the new invoice data |
 | 4    				| Accountant confirms by clicking on "Submit" button |
 
-#### Scenario 21.2
+#### Scenario 20.2
 | Scenario 			| Add credit note |
 | ----------------- | --------------------------- |
 | Precondition     	|  At least one incorrectly added invoice is present in the system |
@@ -1003,7 +1004,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | 3     			| Accountant fills the form with the new credit note data (negative import value) |
 | 4    				| Accountant confirms by clicking on "Submit" button |
 
-### Use case 22, UC22 - Show accounting data
+### Use case 21, UC21 - Show accounting data
 | Actors Involved   | Accountant  |
 | ----------------- | ----------- |
 |  Precondition     | 1. Accountant account must exist<br/>2. Accountant must be authenticated |
@@ -1011,7 +1012,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 |  Nominal Scenario | Accountant chooses to view and filter either invoices, suppliers, deadlines timetable, balance sheet or  financial statement and the system displays data on the screen |
 |  Variants     	| - |
 
-#### Scenario 22.1
+#### Scenario 21.1
 | Scenario 			| Show suppliers deadlines timetable - Up to date |
 | ----------------- | --------------------------- |
 | Precondition     	|  1. The Shop has got at least one supplier<br/>2. Suppliers deadline timetable is generated from invoices data |
@@ -1021,7 +1022,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | 2     			| Application displays deadlines distinguishing them by selected suppliers and sorting them by date |
 | 3     			| All deadlines (even not selected by the filter) have been satisfied: an "Up to date with payments" message is displayed |
 
-#### Scenario 22.2
+#### Scenario 21.2
 | Scenario 			| Show suppliers deadlines timetable - Expired warning |
 | ----------------- | --------------------------- |
 | Precondition     	|  1. The Shop has got at least one supplier<br/>2. Suppliers deadline timetable is generated from invoices data |
@@ -1031,7 +1032,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | 2     			| Application displays deadlines distinguishing them by selected suppliers and sorting them by date |
 | 3     			| One or more of the deadlines (even not selected by the filter) are expired: an alert message is generated  |
 
-### Use case 23, UC23 - Show statistics
+### Use case 22, UC22 - Show statistics
 | Actors Involved   | Accountant  |
 | ----------------- | ----------- |
 |  Precondition     | 1. Accountant account must exist<br/>2. Accountant must be authenticated |
@@ -1039,7 +1040,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 |  Nominal Scenario | Accountant selects a specific timeframe and shows the shop's revenue and expenses in that time period |
 |  Variants     	| - Accountant decides to make application displaying the best selling products |
 
-#### Scenario 23.1 
+#### Scenario 22.1 
 
 | Scenario 			| Show revenue and expenses in a timeframe |
 | ----------------- | --------------------------- |
@@ -1051,7 +1052,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | 3     			| System searches both revenues and expenses of that timeframe which satisfy selected filters |
 | 4    				| System displays found revenues and expenses by showing a diagram about those data |
 
-#### Scenario 23.2 
+#### Scenario 22.2 
 
 | Scenario 			| Show best selling products  |
 | ----------------- | --------------------------- |
@@ -1064,7 +1065,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 
 ## Accounts management
 
-### Use case 24, UC24 - Add account
+### Use case 23, UC23 - Add account
 | Actors Involved   | ITAdministrator	|
 | ----------------- | --------- |
 |  Precondition     | 1. ITAdministrator is authenticated<br/>2. User doesn't have an account yet |
@@ -1072,7 +1073,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 |  Nominal Scenario | ITAdministrator insert a new user account by compiling a given form |
 |  Variants     	| - ITAdministrator wants to reset all fields during the operation by clicking on the "Reset" button<br/>- ITAdministrator press "Submit" button without completely fill the given form: an alert message is generated |
 
-#### Scenario 24.1 
+#### Scenario 23.1 
 
 | Scenario 			| Add new user account  |
 | ----------------- | --------------------------- |
@@ -1084,7 +1085,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | 3				    | ITAdministrator inserts the user data |
 | 4                 | ITAdministrator confirms |
 
-#### Scenario 24.2 
+#### Scenario 23.2 
 
 | Scenario 			| Warning message  |
 | ----------------- | --------------------------- |
@@ -1097,7 +1098,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | 4                 | ITAdministrator confirms |
 | 5                 | Warning message is printed on screen |
 
-### Use case 25, UC25 - Remove account
+### Use case 24, UC24 - Remove account
 | Actors Involved   | ITAdministrator	|
 | ----------------- | --------- |
 |  Precondition     | 1. ITAdministrator is authenticated<br/>2. At least one user account must exist |
@@ -1105,7 +1106,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 |  Nominal Scenario | ITAdministrator remove user accounts from the showed list |
 |  Variants     	| - |
 
-#### Scenario 25.1 
+#### Scenario 24.1 
 
 | Scenario 			| Remove an user account |
 | ----------------- | --------------------------- |
@@ -1120,7 +1121,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | 6                 | Application displays a confirmation window showing the selected accounts that are going to be removed from the system |
 | 7                 | ITAdministrator confirms |
 
-### Use case 26, UC26 - Update account
+### Use case 25, UC25 - Update account
 | Actors Involved   | ITAdministrator	|
 | ----------------- | --------- |
 |  Precondition     | User account must exist |
@@ -1128,7 +1129,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 |  Nominal Scenario | ITAdministrator chooses an account from the showed list and updates its data but privileges |
 |  Variants     	| - ITAdministrator selects more than one user account: "Update account" button is disabled<br/>- ITAdministrator chooses to modify privileges instead of user data |
 
-#### Scenario 26.1 
+#### Scenario 25.1 
 
 | Scenario 			| Update user data |
 | ----------------- | --------------------------- |
@@ -1146,7 +1147,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | 9                 | ITAdministrator inserts the new data |
 | 10                 | ITAdministrator confirms |
 
-#### Scenario 26.2 
+#### Scenario 25.2 
 
 | Scenario 			| Update Account button disabled |
 | ----------------- | --------------------------- |
@@ -1159,7 +1160,7 @@ In these use cases, the actor is an accountant, or a generic user from the shop 
 | 4				    | ITAdministrator chooses at least two of the accounts, which are output of the current filter |
 | 5                 | Software automatically disable the "Update account" button |
 
-#### Scenario 26.3 
+#### Scenario 25.3 
 
 | Scenario 			| Update user privileges |
 | ----------------- | --------------------------- |

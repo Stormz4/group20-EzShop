@@ -6,7 +6,7 @@ Authors:
 - Palmucci Leonardo s288126
 - Dario Lanfranco s287524 
 
-Date: 16/04/2021
+Date: 21/04/2021
 
 | Version | Changes |
 | ------- |---------|
@@ -14,7 +14,7 @@ Date: 16/04/2021
 | 2 | Added GUI prototypes for Customers management & Catalogue management |
 | 3 | Added GUI prototypes for Support accounting & Accounts management |
 | 4 | Added GUI prototypes for Sales management |
-| 5| Added GUI prototypes for Warehouse management |
+| 5 | Added GUI prototypes for Warehouse management |
 
 # Home Page - Login
 
@@ -24,7 +24,7 @@ Date: 16/04/2021
 
 ## FR_1.1 - Provide Shopping Cart and Total Amount
 
-### Scenario 1 - Provide Shopping Cart and Total Amount
+### Scenario 1.0 - Provide Shopping Cart and Total Amount
 
 ![](GUI_images/1.0.1.png)
 
@@ -52,13 +52,13 @@ No difference with respect to 1.0.2, the only difference is that there is not th
 
 ## FR_1.2 - Handle Fidelity Card
 
-### Scenario 2 - Authentication of a Fidelity Card
+### Scenario 2.0 - Authentication of a Fidelity Card
 
 As in "Scenario 1.2 - Inserting Product/Card Code manually", but there is no warning message if scanning the Card produces no error
 
 ## FR_1.3 - Handle Payment
 
-### Scenario 3 - Handle a Payment via Credit Card
+### Scenario 3.0 - Handle a Payment via Credit Card
 
 ![](GUI_images/3.0.1.png)
 
@@ -88,7 +88,7 @@ As in "Scenario 1.2 - Inserting Product/Card Code manually", but there is no war
 
 ![](GUI_images/3.0.1.png)
 
-### Scenario 4 - Handle a Payment via Cash
+### Scenario 4.0 - Handle a Payment via Cash
 
 ![](GUI_images/4.0.png)
 
@@ -131,62 +131,62 @@ As in "Scenario 1.2 - Inserting Product/Card Code manually", but there is no war
 
 ## FR_2.2 Manage orders 
 
-### Scenario 10.1 - Place new order from 'Orders' window
+### Scenario 9.1 - Place new order from 'Orders' window
 
 ![](GUI_images/WarehouseManagement/Orders.png)
 
 ![](GUI_images/WarehouseManagement/New_order.png)
 
-### Scenario 10.2 - Place new order from 'Inventory' window
+### Scenario 9.2 - Place new order from 'Inventory' window
 
 ![](GUI_images/WarehouseManagement/Inventory_Select_Products.png)
 
 ![](GUI_images/WarehouseManagement/New_order.png)
 
-### Scenario 10.3 - Place new order not possible
+### Scenario 9.3 - Place new order not possible
 
 ![](GUI_images/WarehouseManagement/Inventory_Select_Products.png)
 
 ![](GUI_images/WarehouseManagement/Inventory_Select_Products_different_Suppliers.png)
 
-### Scenario 11.1 - Cancel order
+### Scenario 10.1 - Cancel order
 
 ![](GUI_images/WarehouseManagement/Orders_Cancel_Orders.png)
 
-### Scenario 11.2 - Cancel multiple orders
+### Scenario 10.2 - Cancel multiple orders
 
 ![](GUI_images/WarehouseManagement/Orders_Selecting.png)
 
 ![](GUI_images/WarehouseManagement/Orders_Cancel_Orders.png)
 
-### Scenario 12.1 - Edit order
+### Scenario 11.1 - Edit order
 
 ![](GUI_images/WarehouseManagement/Orders_Edit_Order.png)
 
-### Scenario 13.1 - Show orders
+### Scenario 12.1 - Show orders
 
 ![](GUI_images/WarehouseManagement/Orders.png)
 
 
 # FR_3 Catalogue management
 
-## Scenario 17.1 - Show products in the catalogue
+## Scenario 16.1 - Show products in the catalogue
 
 ![](GUI_images/17.1.png)
 
-## Scenario 14.1 - Update selling price of product
+## Scenario 13.1 - Update selling price of product
 
 ![](GUI_images/14.1.png)
 
-## Scenario 15.1 - Add product
+## Scenario 14.1 - Add product
 
 ![](GUI_images/15.1.png)
 
-## Scenario 15.2 - Product already present
+## Scenario 14.2 - Product already present
 
 ![](GUI_images/15.2.png)
 
-## Scenario 16.1 - Remove product
+## Scenario 15.1 - Remove product
 
 ![](GUI_images/16.1.png)
 
@@ -196,19 +196,19 @@ As in "Scenario 1.2 - Inserting Product/Card Code manually", but there is no war
 
 ![](GUI_images/CashierTab.png)
 
-## Scenario 20.1 - Show fidelity cards & card points
+## Scenario 19.1 - Show fidelity cards & card points
 
 ![](GUI_images/20.1.png)
 
-## Scenario 18.1 - Add fidelity card
+## Scenario 17.1 - Add fidelity card
 
 ![](GUI_images/18.1.png)
 
-## Scenario 18.2 - Card already present
+## Scenario 17.2 - Card already present
 
 ![](GUI_images/18.2.png)
 
-## Scenario 19.1 - Remove fidelity card
+## Scenario 18.1 - Remove fidelity card
 
 ![](GUI_images/19.1.png)
 
@@ -222,11 +222,11 @@ As in "Scenario 1.2 - Inserting Product/Card Code manually", but there is no war
 
 ![](GUI_images/SupportAccounting/Show_invoices.png)
 
-### Scenario 21.1 - Add invoice (passive)
+### Scenario 20.1 - Add invoice (passive)
 
 ![](GUI_images/SupportAccounting/Add_passive_invoice.png)
 
-### Scenario 21.2 - Add credit note
+### Scenario 20.2 - Add credit note
 
 ![](GUI_images/SupportAccounting/Add_credit_note.png)
 
@@ -242,11 +242,11 @@ As in "Scenario 1.2 - Inserting Product/Card Code manually", but there is no war
 
 ![](GUI_images/SupportAccounting/Show_financial_statement.png)
 
-## Scenario 22.1 - Show suppliers deadlines timetable - Up to date
+## Scenario 21.1 - Show suppliers deadlines timetable - Up to date
 
 ![](GUI_images/SupportAccounting/Show_suppliers_deadline_timetable.png)
 
-## Scenario 22.2 - Show suppliers deadlines timetable - Expired warning
+## Scenario 21.2 - Show suppliers deadlines timetable - Expired warning
 
 ![](GUI_images/SupportAccounting/Show_suppliers_deadline_timetable-Expired.png)
 
@@ -254,11 +254,11 @@ As in "Scenario 1.2 - Inserting Product/Card Code manually", but there is no war
 
 ![](GUI_images/SupportAccounting/AccountantMenu4.png)
 
-### Scenario 23.1 - Show revenue and expenses in a timeframe
+### Scenario 22.1 - Show revenue and expenses in a timeframe
 
 ![](GUI_images/SupportAccounting/Show_statistics_Revenues&Expenses.png)
 
-### Scenario 23.2 - Show best selling products
+### Scenario 22.2 - Show best selling products
 
 ![](GUI_images/SupportAccounting/Show_statistics_best_selling_products.png)
 
@@ -272,7 +272,7 @@ As in "Scenario 1.2 - Inserting Product/Card Code manually", but there is no war
 
 ![](GUI_images/AccountsManagement/Admin_tab.png)
 
-## Scenario 24.1 - Add new user account
+## Scenario 23.1 - Add new user account
 
 ![](GUI_images/AccountsManagement/Add_new_account1.png)
 
@@ -282,11 +282,11 @@ As in "Scenario 1.2 - Inserting Product/Card Code manually", but there is no war
 
 ![](GUI_images/AccountsManagement/Add_new_account4.png)
 
-## Scenario 24.2 - Warning message
+## Scenario 23.2 - Warning message
 
 ![](GUI_images/AccountsManagement/Warning-not_all_fields_completed.png)
 
-## Scenario 25.1 - Remove account
+## Scenario 24.1 - Remove account
 
 ![](GUI_images/AccountsManagement/Show_accounts1.png)
 
@@ -296,7 +296,7 @@ As in "Scenario 1.2 - Inserting Product/Card Code manually", but there is no war
 
 ![](GUI_images/AccountsManagement/Remove_account.png)
 
-## Scenario 26.1 - Update user data
+## Scenario 25.1 - Update user data
 
 ![](GUI_images/AccountsManagement/Show_accounts2.png)
 
@@ -308,11 +308,11 @@ As in "Scenario 1.2 - Inserting Product/Card Code manually", but there is no war
 
 ![](GUI_images/AccountsManagement/Edit_user_data2.png)
 
-## Scenario 26.2 - Update Account button disabled
+## Scenario 25.2 - Update Account button disabled
 
 ![](GUI_images/AccountsManagement/Update_account_option_disabled.png)
 
-## Scenario 26.3 - Update user privileges
+## Scenario 25.3 - Update user privileges
 
 ![](GUI_images/AccountsManagement/Show_accounts2.png)
 
