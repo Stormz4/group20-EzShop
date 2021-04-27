@@ -76,11 +76,11 @@ Date: 21/04/2021
 |             | Estimate                        |             
 | ----------- | ------------------------------- |  
 | NC =  Estimated number of classes to be developed   |  20          |             
-| A = Estimated average size per class, in LOC       |      80               | 
-| S = Estimated size of project, in LOC (= NC * A) |20*80= 1600 |
-| E = Estimated effort, in person hours (here use productivity 10 LOC per person hour)  |          Considering that behind a LOC there is a lot of work (requirement, design etc) -> 475 person hours  (160 for coding)    |   
-| C = Estimated cost, in euro (here use 1 person hour cost = 30 euro) | 475*30=14250 | 
-| Estimated calendar time, in calendar weeks (Assume team of 4 people, 8 hours per day, 5 days per week ) | Almost 3 weeks |               
+| A = Estimated average size per class, in LOC       |      150               | 
+| S = Estimated size of project, in LOC (= NC * A) |20*150= 3000 |
+| E = Estimated effort, in person hours (here use productivity 10 LOC per person hour)  |          300 person hours   |   
+| C = Estimated cost, in euro (here use 1 person hour cost = 30 euro) | 300*30=9000€ | 
+| Estimated calendar time, in calendar weeks (Assume team of 4 people, 8 hours per day, 5 days per week ) | Two weeks (10 days, exluding weekends. 300/32 -> 9.4 -> 10) |               
 
 For each estimation an approximated value has been given (20 -> ~20 etc...). To estimate the number of classes, we've considered the worst case scenario (=most number of classes possible.)
 
@@ -91,8 +91,11 @@ For each estimation an approximated value has been given (20 -> ~20 etc...). To 
 | ----------- | ------------------------------- | 
 | Requirement analysis | 105 |
 | Design | 60 | 
-| Coding | 160 |
-| Testing | 150 | 
+| Coding | 100 |
+| Unit testing | 20 | 
+| Integration testing | 50 | 
+| GUI testing | 20 |
+| TOTAL | 355 | 
 
 ###
 Insert here Gantt chart with above activities.
@@ -105,30 +108,19 @@ The Gantt chart is made considering that the team is made of 4 people, which ded
 saturday are closed
 sunday are closed
 
-[Requirement analysis] lasts 6 days
+[Requirement analysis] lasts 4 days
 [Design] lasts 2 days
-[Coding + testing (unit, integration, GUI)] lasts 14 days
+[Coding] lasts 4 days
+[Unit testing] lasts 1 days 
+[Integration testing] lasts 2 days
+[GUI testing] lasts 1 days
 
 Project starts 2021-04-01
 [Requirement analysis] starts 2021-04-01
 [Design] starts at [Requirement analysis]'s end
-[Coding + testing (unit, integration, GUI)] starts at [Design]'s end
-@enduml
-```
-
-(We added extra days for weekends, since the team works 5 days per week)
-
-This second Gantt chart is made considering the hours the team of 4 people dedicates to the project (and not "8 hours per day, 5 days per week"). Requirement analysis was 4 days, went to 6. Coding + testing goes from 10 to 14 
-
-```plantuml
-@startuml
-[Requirement analysis] lasts 21 days
-[Design] lasts 8 days
-[Coding + testing (unit, integration, GUI)] lasts 25 days
-
-Project starts 2021-04-01
-[Requirement analysis] starts 2021-04-01
-[Design] starts 2021-04-23
-[Coding + testing (unit, integration, GUI)] starts 2021-05-02
+[Coding] starts at [Design]'s end
+[Unit testing] starts at [Coding]'s end
+[Integration testing] starts at [Unit testing]'s end
+[GUI testing] starts at [Integration testing]'s end
 @enduml
 ```

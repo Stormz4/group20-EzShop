@@ -14,6 +14,7 @@ Date: 25/04/2021
 | 1 | Added first version of design document. |
 | 2 | Added functions in Shop | 
 | 3 | Added sequence diagrams |
+| 4 | Added sequence diagrams for UC9, fixed the class diagram along with the new requirements |
 
 # Contents
 
@@ -100,17 +101,17 @@ class Shop{
     +boolean applyDiscountRateToProduct(Integer transactionId, String productCode, double discountRate)
     +boolean applyDiscountRateToSale(Integer transactionId, double discountRate)
     +int computePointsForSale(Integer transactionId)
-    +boolean closeSaleTransaction(Integer transactionId)
-    +boolean deleteSaleTicket(Integer ticketNumber)
-    +Ticket getSaleTicket(Integer transactionId)
-    +Ticket getTicketByNumber(Integer ticketNumber)
+    +boolean endSaleTransaction(Integer transactionId)
+    +boolean deleteSaleTransaction(transactionId)
+    +SaleTransaction getSaleTransaction(Integer transactionId)
+  
 
     .. UC7 ..
-    +double receiveCashPayment(Integer ticketNumber, double cash)
-    +boolean receiveCreditCardPayment(Integer ticketNumber, String creditCard)
+    +double receiveCashPayment(Integer transactionId, double cash)
+    +boolean receiveCreditCardPayment(Integer transactionId, String creditCard)
 
     .. UC8 ..
-    +Integer startReturnTransaction(Integer ticketNumber)
+    +Integer startReturnTransaction(Integer transactionId)
     +boolean returnProduct(Integer returnId, String productCode, int amount)
     +boolean endReturnTransaction(Integer returnId, boolean commit)
     +boolean deleteReturnTransaction(Integer returnId)
@@ -140,6 +141,7 @@ class FinancialTransaction {
  +description
  +amount
  +date
++boolean recordBalanceUpdate(double toBeAdded)
 }
 AccountBook -- "*" FinancialTransaction
 
@@ -154,8 +156,8 @@ class Sale
 class Return
 
 Order --|> Debit
-Sale --|> Credit
-Return --|> Debit
+SaleTransaction --|> Credit
+ReturnTransaction --|> Debit
 
 
 class ProductType{
@@ -166,7 +168,10 @@ class ProductType{
     +quantity
     +discountRate
     +notes
-    +updatePrice()
+    +Integer createProductType(String description, String productCode, double pricePerUnit, String note)
+    +boolean updateProduct(Integer id, String newDescription, String newCode, double newPrice, String newNote)
+    +boolean deleteProductType(Integer id)
+    +ProductType getProductTypeByBarCode(String barCode)
 }
 
 Shop - "*" ProductType
@@ -178,6 +183,8 @@ class SaleTransaction {
     +cost
     +paymentType
     +discount rate
+    +double receiveCashPayment(Integer transactionId, double cash)
+    +boolean receiveCreditCardPayment(Integer transactionId, String creditCard)
 }
 SaleTransaction - "*" ProductType
 
@@ -300,11 +307,13 @@ Shop --> User : succesful message
 ```plantuml
 @startuml
 User --> Shop: getProductTypeByBarCode()
-User --> Shop: return ProductType
+Shop --> ProductType: getProductTypeByBarCode()
+ProductType --> Shop: return ProductType
+
 User --> Shop: Selects record
 User --> Shop: Select a new product location
 Shop --> Position: updatePosition()
-ProductType --> Shop : return boolean
+Position --> Shop : return boolean
 Shop --> User : succesful message
 @enduml
 ```
@@ -313,17 +322,17 @@ Shop --> User : succesful message
 
 ```plantuml
 @startuml
-User --> Shop: getProductTypeByBarCode()
-User --> Shop: return ProductType
+User --> Shop: Search by bar code
+Shop --> ProductType: getProductTypeByBarCode()
+ProductType --> Shop: return ProductType
 User --> Shop: Selects record
 User --> Shop: Inserts a new price > 0
 User --> Shop: Confirms
-Shop --> ProductType: updatePrice()
+Shop --> ProductType: updateProduct()
 ProductType --> Shop : return boolean
 Shop --> User : succesful message
 @enduml
 ```
-
 
 ## UC2 
 
@@ -339,18 +348,7 @@ Shop --> User : succesful message
 
 ### Scenario 7-1
 
-| Scenario |  Manage payment by valid credit card |
-| ------------- |:-------------:| 
-|  Precondition     | Credit card C exists  |
-|  Post condition     | C.Balance -= Price  |
-| Step#        | Description  |
-|  1    |  Read C.number |
-|  2    |  Validate C.number with Luhn algorithm |  
-|  3    |  Ask to credit sale price |
-|  4    |  Price payed |
-|  5    |  exit with success |
-
-[//]: # "Dubbi su questo scenario"
+[//]: # "Dubbi su questo scenario e i successivi"
 
 ```plantuml
 @startuml
@@ -390,18 +388,6 @@ Shop --> User : error message
 
 ### Scenario 7-3
 
-| Scenario |  Manage credit card payment with not enough credit |
-| ------------- |:-------------:| 
-|  Precondition     | Credit card C exists  |
-| | C.Balance < Price |
-|  Post condition     | C.Balance not changed  |
-| Step#        | Description  |
-|  1    |  Read C.number |
-|  2    |  Validate C.number with Luhn algorithm |  
-|  3    |  Ask to credit sale price |
-|  4    |  Balance not sufficient, issue warning |
-|  5    |  Exit with error |
-
 ```plantuml
 @startuml
 User --> Shop: Read card number
@@ -414,17 +400,6 @@ Shop --> User : error message
 ```
 
 ### Scenario 7-4
-
-| Scenario |  Manage cash payment |
-| ------------- |:-------------:| 
-|  Precondition     | Cash >= Price  |
-|  Post condition     |   |
-| Step#        | Description  |
-|  1    |  Collect banknotes and coins |
-|  2    |  Compute cash quantity |  
-|  3    |  Record cash payment |
-|  4    |  Compute change |
-|  5    |  Return change |
 
 ```plantuml
 @startuml
@@ -442,5 +417,30 @@ Shop --> User : succesful message
 ## UC8
 
 ## UC9
+
+### Scenario 9-1
+
+| Scenario |  List credits and debits |
+| ------------- |:-------------:| 
+|  Precondition     | Manager C exists and is logged in |
+|  Post condition     | Transactions list displayed  |
+| Step#        | Description  |
+|  1    |  C selects a start date |  
+|  2    |  C selects an end date |
+|  3    |  C sends transaction list request to the system |
+|  4    |  The system returns the transactions list |
+|  5    |  The list is displayed  |
+
+
+```plantuml
+@startuml
+User --> Shop: Selects a start date
+User --> Shop: Selects an end date
+User --> Shop: Send transaction list request
+Shop --> AccountingBook: getCreditsAndDebits()
+AccountingBook --> Shop: return transactions list
+Shop --> User: display list
+@enduml
+```
 
 ## UC10 
