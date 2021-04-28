@@ -134,6 +134,8 @@ class User{
     +privilege
 }
 
+Administrator --|> User
+
 Shop -- "*" User
 
 class AccountBook {
@@ -258,11 +260,11 @@ N3 .. SaleTransaction
 @startuml
 
 class BarCodeReader {
-   +read()
+   +scan()
 }
 
 class CreditCardReader {
-   +read()
+   +scan()
    +validate()
 }
 
@@ -278,16 +280,16 @@ class CreditCardReader {
 !!! Useful link:    https://www.tablesgenerator.com/markdown_tables# 
 
 
-| FR ID | Shop | User | Administrator | Order | ProductType | Product | Position | SaleTransaction | Quantity | LoyaltyCard | Customer | ReturnTransaction | AccountBook | FinancialTransaction | Credit | Debit | Sale | Return |
-|:-----:|:----:|:-----------:|:-------------:|:-----:|:-----------:|:-------:|:--------:|:---------------:|:--------:|:-----------:|:--------:|:-----------------:|:-----------:|:--------------------:|:------:|:-----:|:----:|:------:|
-|  FR1  |   X  |      X      |       X       |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |      |        |
-|  ---  |      |             |               |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |      |        |
-|  FR3  |   X  |             |               |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |      |        |
-|  FR4  |   X  |             |               |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |      |        |
-|  FR5  |   X  |             |               |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |      |        |
-|  FR6  |   X  |      X      |       X       |       |             |         |          |                 |          |             |          |         X         |             |                      |        |       |      |        |
-|  FR7  |   X  |      X      |       X       |       |             |         |          |                 |          |             |          |         X         |             |                      |        |       |      |        |
-|  FR8  |   X  |      X      |       X       |       |             |         |          |                 |          |             |          |                   |      X      |           X          |    X   |   X   |   X  |    X   |
+| FR ID | Shop | User | Administrator | Order | ProductType | Product | Position | SaleTransaction | Quantity | LoyaltyCard | Customer | ReturnTransaction | AccountingBook | FinancialTransaction | Credit | Debit | Sale | Return | CreditCardReader | BardCodeReader | LoyaltyCardreader | Printer |
+|:-----:|:----:|:-----------:|:-------------:|:-----:|:-----------:|:-------:|:--------:|:---------------:|:--------:|:-----------:|:--------:|:-----------------:|:-----------:|:--------------------:|:------:|:-----:|:----:|:------:|:---------:|:--------------:|:--------------:|:---------:|
+|  FR1  |   X  |      X      |       X       |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |      |        |	    |		     |		      |           |
+|  ---  |      |             |               |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |      |        |	    |		     |		      |           |
+|  FR3  |   X  |             |               |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |      |        |	    |		     |		      |           |
+|  FR4  |   X  |             |               |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |      |        |	    |		     |		      |           |
+|  FR5  |   X  |             |               |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |      |        |	    |		     |		      |           |
+|  FR6  |   X  |      X      |       X       |       |      X      |         |          |                 |          |             |          |         X         |      X      |                      |        |       |      |        |	    |	    X        |		      |           |
+|  FR7  |   X  |      X      |       X       |       |      X      |         |          |                 |          |             |          |         X         |      X      |                      |        |       |      |        |     X     |		     |		      |           |
+|  FR8  |   X  |      X      |       X       |       |             |         |          |                 |          |             |          |                   |      X      |           X          |    X   |   X   |   X  |    X   |	    |		     |		      |           |
 
 
 
@@ -315,7 +317,7 @@ User --> Shop: Insert location
 User --> Shop: Confirms
 Shop --> ProductType : createProductType()
 ProductType --> Shop : return ID
-Shop --> User : succesful message
+Shop --> User : successful message
 @enduml
 ```
 
@@ -331,7 +333,7 @@ User --> Shop: Selects record
 User --> Shop: Select a new product location
 Shop --> Position: updatePosition()
 Position --> Shop : return boolean
-Shop --> User : succesful message
+Shop --> User : successful message
 @enduml
 ```
 
@@ -347,11 +349,57 @@ User --> Shop: Inserts a new price > 0
 User --> Shop: Confirms
 Shop --> ProductType: updateProduct()
 ProductType --> Shop : return boolean
-Shop --> User : succesful message
+Shop --> User : successful message
 @enduml
 ```
 
 ## UC2 
+### Scenario 2-1
+```plantuml
+@startuml
+autonumber
+Administrator -> Shop: Insert username
+Administrator -> Shop: Insert password
+Administrator -> Shop: Insert role
+Shop -> User: createUser()
+User --> Shop: return Integer (unique identifier)
+Administrator -> Shop: Selects user rights
+Shop -> User: updateUserRights()
+User --> Shop: return boolean
+Administrator -> Shop: Confirms
+Shop --> Administrator: successful message
+@enduml
+```
+
+
+### Scenario 2-2
+```plantuml
+@startuml
+autonumber
+Administrator -> Shop: Select an account to be deleted
+Shop -> User: getUser()
+User --> Shop: return User
+Shop -> User: deleteUser()
+User --> Shop: return boolean
+Shop --> Administrator: successful message
+@enduml
+```
+
+
+### Scenario 2-3
+```plantuml
+@startuml
+autonumber
+Administrator -> Shop: Select an account to be updated
+Shop -> User: getUser()
+User --> Shop: return User
+Administrator -> Shop: Select new rights for the account
+Shop -> User: updateUserRights()
+User --> Shop: return boolean
+Shop --> Administrator: successful message
+@enduml
+```
+
 
 ## UC3
 
@@ -518,6 +566,66 @@ Shop --> User : succesful message
 
 ## UC8
 
+### Scenario 8-1
+
+[//]: # "problem: how can Shop update balance if it doesn't know the returned price?"
+
+```plantuml
+@startuml
+autonumber
+User -> Shop: Insert ticket number (ticket ID)
+Shop -> ReturnTransaction: startReturnTransaction()
+User -> BarCodeReader: scan()
+BarCodeReader --> Shop: return String (BarCode)
+User -> Shop: Insert quantity of returned items
+Shop -> ReturnTransaction: returnProduct()
+ReturnTransaction -> ProductType: getProductTypeByBarCode()
+ProductType --> ReturnTransaction: return ProductType
+ReturnTransaction -> ProductType: Update quantity by N
+ReturnTransaction --> Shop: return Integer (ReturnTransaction ID)
+activate Shop #EEA900
+Shop -> Shop: Manage credit card return (go to UC10)
+Shop --> User: return successful message
+deactivate Shop
+User -> Shop: Close return transaction
+Shop -> ReturnTransaction: endReturnTransaction()
+ReturnTransaction --> Shop: return boolean
+Shop -> AccountingBook: recordBalanceUpdate()
+AccountingBook --> Shop: return boolean
+Shop --> User: successful message 
+@enduml
+```
+
+### Scenario 8-2
+
+[//]: # "problem: how can Shop update balance if it doesn't know the returned price? + how to update Sale Ticket?"
+
+```plantuml
+@startuml
+autonumber
+User -> Shop: Insert ticket number (ticket ID)
+Shop -> ReturnTransaction: startReturnTransaction()
+User -> BarCodeReader: scan()
+BarCodeReader --> Shop: return String (BarCode)
+User -> Shop: Insert quantity of returned items
+Shop -> ReturnTransaction: returnProduct()
+ReturnTransaction -> ProductType: getProductTypeByBarCode()
+ProductType --> ReturnTransaction: return ProductType
+ReturnTransaction -> ProductType: Update quantity by N
+ReturnTransaction --> Shop: return Integer (ReturnTransaction ID)
+activate Shop #EEA900
+Shop -> Shop: Manage cash return (go to UC10)
+Shop --> User: return successful message
+deactivate Shop
+User -> Shop: Close return transaction
+Shop -> ReturnTransaction: endReturnTransaction()
+ReturnTransaction --> Shop: return boolean
+Shop -> AccountingBook: recordBalanceUpdate()
+AccountingBook --> Shop: return boolean
+Shop --> User: successful message 
+@enduml
+```
+
 ## UC9
 
 ### Scenario 9-1
@@ -546,3 +654,34 @@ Shop --> User: display list
 ```
 
 ## UC10 
+
+[//]: # "problem: Quale classe deve fare quelle cose? 'Shop'????"
+
+### Scenario 10-1
+
+```plantuml
+@startuml
+autonumber
+participant User order 1
+participant Shop order 2
+participant CreditCardReader order 3
+User -> CreditCardReader: scan()
+CreditCardReader -> Shop: return credit card string
+Shop -> Shop: Validate credit card number (Luhn algorithm) ???
+User -> Shop: returnCreditCardPayment() ???
+Shop --> Shop: Amount returned ???
+Shop --> User: Successful message
+@enduml
+```
+
+### Scenario 10-2
+
+```plantuml
+@startuml
+autonumber
+User -> User: Collect banconotes and coins
+User -> Shop: returnCashPayment()
+Shop --> User: Successful message
+@enduml
+```
+
