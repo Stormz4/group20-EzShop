@@ -34,15 +34,17 @@ The design must satisfy the Official Requirements document, notably functional a
 
 ```plantuml
 @startuml
-package GUIEZShop
+package EZShop.gui
 package EZShop
-package Readers 
-GUIEZShop ..> EZShop
-Readers ..> EZShop
+package EZShop.data
+package EZShop.exceptions
+EZShop.gui -- EZShop
+EZShop.exceptions --|> EZShop
+EZShop.data --|> EZShop
 @enduml
 ```
 
-GUIEZShop contains view and controller, while EZShop contains model and logic. The architetural pattern choosed is MVC.
+EZShop.gui contains view and controller, while EZShop contains model and logic. The architetural pattern choosed is MVC.
 
 # Low level design
 
@@ -133,7 +135,14 @@ class User{
     +username: String
     +password: String
     +role: String
+    +Integer createUser(String username, String password, String role)
+    +boolean deleteUser(Integer id)
+    +List<User> getAllUsers()
+    +User getUser(Integer id)
+    +boolean updateUserRights(Integer id, String role)
 }
+
+Administrator --|> User
 
 Shop -- "*" User
 
@@ -157,8 +166,6 @@ Credit --|> BalanceOperation
 Debit --|> BalanceOperation
 
 class Order
-class Sale
-class Return
 
 Order --|> Debit
 SaleTransaction --|> Credit
@@ -232,6 +239,12 @@ Order "*" - ProductType
 class ReturnTransaction {
   +quantity: int
   +returnedValue: double
+  +Integer startReturnTransaction(Integer transactionId)
+  +boolean returnProduct(Integer returnId, String productCode, int amount)
+  +boolean endReturnTransaction(Integer returnId, boolean commit)
+  +boolean deleteReturnTransaction(Integer returnId)
+  +double returnCashPayment(Integer returnId)
+  +double returnCreditCardPayment(Integer returnId, String creditCard)
 }
 
 ReturnTransaction "*" - SaleTransaction
@@ -246,24 +259,6 @@ N3 .. SaleTransaction
 @enduml
 ```
 
-## Readers Class Diagram
-
-
-```plantuml
-@startuml
-
-class BarCodeReader {
-   +read()
-}
-
-class CreditCardReader {
-   +read()
-   +validate()
-}
-
-@enduml
-```
-
 
 # Verification traceability matrix
 
@@ -273,16 +268,15 @@ class CreditCardReader {
 !!! Useful link:    https://www.tablesgenerator.com/markdown_tables# 
 
 
-| FR ID | Shop | User | Administrator | Order | ProductType | Product | Position | SaleTransaction | Quantity | LoyaltyCard | Customer | ReturnTransaction | AccountBook | FinancialTransaction | Credit | Debit | Sale | Return |
-|:-----:|:----:|:-----------:|:-------------:|:-----:|:-----------:|:-------:|:--------:|:---------------:|:--------:|:-----------:|:--------:|:-----------------:|:-----------:|:--------------------:|:------:|:-----:|:----:|:------:|
-|  FR1  |   X  |      X      |       X       |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |      |        |
-|  ---  |      |             |               |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |      |        |
-|  FR3  |   X  |             |               |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |      |        |
-|  FR4  |   X  |             |               |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |      |        |
-|  FR5  |   X  |             |               |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |      |        |
-|  FR6  |   X  |      X      |       X       |       |             |         |          |                 |          |             |          |         X         |             |                      |        |       |      |        |
-|  FR7  |   X  |      X      |       X       |       |             |         |          |                 |          |             |          |         X         |             |                      |        |       |      |        |
-|  FR8  |   X  |      X      |       X       |       |             |         |          |                 |          |             |          |                   |      X      |           X          |    X   |   X   |   X  |    X   |
+| FR ID | Shop | User | Administrator | Order | ProductType | Product | Position | SaleTransaction | Quantity | LoyaltyCard | Customer | ReturnTransaction | AccountingBook | FinancialTransaction | Credit | Debit | 
+|:-----:|:----:|:-----------:|:-------------:|:-----:|:-----------:|:-------:|:--------:|:---------------:|:--------:|:-----------:|:--------:|:-----------------:|:-----------:|:--------------------:|:------:|:-----:|
+|  FR1  |   X  |      X      |       X       |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |
+|  FR3  |   X  |             |               |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |
+|  FR4  |   X  |             |               |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |
+|  FR5  |   X  |             |               |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |
+|  FR6  |   X  |      X      |       X       |       |      X      |         |          |                 |          |             |          |         X         |      X      |                      |        |       |
+|  FR7  |   X  |      X      |       X       |       |      X      |         |          |                 |          |             |          |         X         |      X      |                      |        |       |
+|  FR8  |   X  |      X      |       X       |       |             |         |          |                 |          |             |          |                   |      X      |           X          |    X   |   X   |
 
 
 
@@ -310,7 +304,7 @@ User --> Shop: Insert location
 User --> Shop: Confirms
 Shop --> ProductType : createProductType()
 ProductType --> Shop : return ID
-Shop --> User : succesful message
+Shop --> User : successful message
 @enduml
 ```
 
@@ -326,7 +320,7 @@ User --> Shop: Selects record
 User --> Shop: Select a new product location
 Shop --> Position: updatePosition()
 Position --> Shop : return boolean
-Shop --> User : succesful message
+Shop --> User : successful message
 @enduml
 ```
 
@@ -342,11 +336,57 @@ User --> Shop: Inserts a new price > 0
 User --> Shop: Confirms
 Shop --> ProductType: updateProduct()
 ProductType --> Shop : return boolean
-Shop --> User : succesful message
+Shop --> User : successful message
 @enduml
 ```
 
 ## UC2 
+### Scenario 2-1
+```plantuml
+@startuml
+autonumber
+Administrator -> Shop: Insert username
+Administrator -> Shop: Insert password
+Administrator -> Shop: Insert role
+Shop -> User: createUser()
+User --> Shop: return Integer (unique identifier)
+Administrator -> Shop: Selects user rights
+Shop -> User: updateUserRights()
+User --> Shop: return boolean
+Administrator -> Shop: Confirms
+Shop --> Administrator: successful message
+@enduml
+```
+
+
+### Scenario 2-2
+```plantuml
+@startuml
+autonumber
+Administrator -> Shop: Select an account to be deleted
+Shop -> User: getUser()
+User --> Shop: return User
+Shop -> User: deleteUser()
+User --> Shop: return boolean
+Shop --> Administrator: successful message
+@enduml
+```
+
+
+### Scenario 2-3
+```plantuml
+@startuml
+autonumber
+Administrator -> Shop: Select an account to be updated
+Shop -> User: getUser()
+User --> Shop: return User
+Administrator -> Shop: Select new rights for the account
+Shop -> User: updateUserRights()
+User --> Shop: return boolean
+Shop --> Administrator: successful message
+@enduml
+```
+
 
 ## UC3
 
@@ -466,6 +506,68 @@ Shop --> User : succesful message
 
 ## UC8
 
+### Scenario 8-1
+
+```plantuml
+@startuml
+autonumber
+User -> Shop: Insert transaction ID
+Shop -> ReturnTransaction: startReturnTransaction()
+User -> Shop: scan product BarCode
+User -> Shop: Insert quantity of returned items
+Shop -> ReturnTransaction: returnProduct()
+ReturnTransaction -> ProductType: getProductTypeByBarCode()
+ProductType --> ReturnTransaction: return ProductType
+ReturnTransaction -> ProductType: Update quantity by N
+ReturnTransaction --> Shop: return boolean
+ReturnTransaction --> Shop: return Integer (ReturnTransaction ID)
+ref over Shop, User
+Manage credit card return (go to UC10)
+end ref
+User -> Shop: Close return transaction
+Shop -> ReturnTransaction: endReturnTransaction()
+ReturnTransaction --> Shop: return boolean
+
+ref over ReturnTransaction, AccountingBook
+Update balance (go to UC10)
+end ref
+
+ReturnTransaction --> Shop: Amount returned
+Shop --> User: Successful message
+@enduml
+```
+
+### Scenario 8-2
+
+```plantuml
+@startuml
+autonumber
+User -> Shop: Insert transaction ID
+Shop -> ReturnTransaction: startReturnTransaction()
+User -> Shop: scan product BarCode
+User -> Shop: Insert quantity of returned items
+Shop -> ReturnTransaction: returnProduct()
+ReturnTransaction -> ProductType: getProductTypeByBarCode()
+ProductType --> ReturnTransaction: return ProductType
+ReturnTransaction -> ProductType: Update quantity by N
+ReturnTransaction --> Shop: return boolean
+ReturnTransaction --> Shop: return Integer (ReturnTransaction ID)
+ref over Shop, User
+Manage cash return (go to UC10)
+end ref
+User -> Shop: Close return transaction
+Shop -> ReturnTransaction: endReturnTransaction()
+ReturnTransaction --> Shop: return boolean
+
+ref over ReturnTransaction, AccountingBook
+Update balance (go to UC10)
+end ref
+
+ReturnTransaction --> Shop: Amount returned
+Shop --> User: Successful message
+@enduml
+```
+
 ## UC9
 
 ### Scenario 9-1
@@ -494,3 +596,33 @@ Shop --> User: display list
 ```
 
 ## UC10 
+
+### Scenario 10-1
+
+```plantuml
+@startuml
+autonumber
+User -> Shop: Scan credit card number
+Shop -> ReturnTransaction: returnCreditCardPayment()
+ReturnTransaction -> AccountingBook: recordBalanceUpdate()
+AccountingBook --> ReturnTransaction: return boolean
+ReturnTransaction --> Shop: Amount returned
+Shop --> User: Successful message
+@enduml
+```
+
+### Scenario 10-2
+
+```plantuml
+@startuml
+autonumber
+User -> User: Collect banconotes and coins
+User -> Shop: Record cash return
+Shop -> ReturnTransaction: returnCashPayment()
+ReturnTransaction -> AccountingBook: recordBalanceUpdate()
+AccountingBook --> ReturnTransaction: return boolean
+ReturnTransaction --> Shop: Amount returned
+Shop --> User: Successful message
+@enduml
+```
+
