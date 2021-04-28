@@ -135,7 +135,9 @@ class User{
 
 Shop -- "*" User
 
-class AccountBook 
+class AccountBook {
+ +boolean recordBalanceUpdate(double toBeAdded)
+}
 AccountBook - Shop
 class FinancialTransaction {
  +description
@@ -372,37 +374,59 @@ Shop --> User : return
 
 ```plantuml
 @startuml
+User --> Shop: start Sale Transaction
+Shop --> SaleTransaction: startSaleTransaction()
+SaleTransaction --> Shop: return TransactionID
+
+SaleTransaction --> BarCodeReader: read()
+BarCodeReader --> SaleTransaction : return BarCode
+
+Shop --> SaleTransaction: addProductToSale()
+SaleTransaction --> SaleTransaction : addProductToSale()
+SaleTransaction --> SaleTransaction : return boolean
+SaleTransaction --> Shop : return boolean
+Shop --> ProductType : updateQuantity()
+ProductType --> Shop: return boolean
+User --> Shop: endSaleTransaction()
+Shop --> Shop: getSaleTransaction()
+Shop --> User: show Sale review
+Shop --> User: ask Payment Type (See UC7)
 @enduml
-
-### Scenario 6-2
-
-```plantuml
-@startuml
-@enduml
-
-### Scenario 6-3
-
-```plantuml
-@startuml
-@enduml
+```
 
 ### Scenario 6-4
 
 ```plantuml
 @startuml
+User --> Shop: start Sale Transaction
+Shop --> SaleTransaction: startSaleTransaction()
+SaleTransaction --> Shop: return TransactionID
+
+Shop --> BarCodeReader: read()
+BarCodeReader --> Shop : return BarCode
+
+Shop --> SaleTransaction: addProductToSale()
+SaleTransaction --> SaleTransaction : addProductToSale()
+SaleTransaction --> SaleTransaction : return boolean
+SaleTransaction --> Shop : return boolean
+Shop --> ProductType : updateQuantity()
+ProductType --> Shop: return boolean
+User --> Shop: endSaleTransaction()
+Shop --> Shop: getSaleTransaction()
+Shop --> User: show Sale review
+Shop --> User: ask Payment Type
+
+Shop --> LoyaltyCardReader: read()
+LoyaltyCardReader --> Shop : return CardCode
+
+Shop --> User: show Card
+User --> Shop: manage Payment (see UC7)
+Shop --> LoyaltyCard: modifyPointsOnCard()
+LoyaltyCard --> Shop: return boolean
+Shop --> User: return boolean
+Shop --> User: print Sale
 @enduml
-
-### Scenario 6-5
-
-```plantuml
-@startuml
-@enduml
-
-### Scenario 6-6
-
-```plantuml
-@startuml
-@enduml
+```
 
 ## UC7
 
