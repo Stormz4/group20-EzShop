@@ -77,7 +77,7 @@ class Shop{
     .. UC3 - Manage Inventory and Orders ..
     +boolean updateQuantity(Integer productId, int toBeAdded)
     +boolean updatePosition(Integer productId, String newPos)
-    +Integer issueReorder(String productCode, int quantity, double pricePerUnit)
+    +Integer issueOrder(String productCode, int quantity, double pricePerUnit)
     +Integer payOrderFor(String productCode, int quantity, double pricePerUnit)
     +boolean payOrder(Integer orderId)
     +boolean recordOrderArrival(Integer orderId)
@@ -131,9 +131,10 @@ class Shop{
 }
 
 class User{
-    +username
-    +password
-    +privilege
+    +userID: Integer
+    +username: String
+    +password: String
+    +role: String
     +Integer createUser(String username, String password, String role)
     +boolean deleteUser(Integer id)
     +List<User> getAllUsers()
@@ -149,19 +150,20 @@ class AccountBook {
  +boolean recordBalanceUpdate(double toBeAdded)
 }
 AccountBook - Shop
-class FinancialTransaction {
- +description
- +amount
- +date
+class BalanceOperation {
+ +transactionID: Integer
+ +description: String 
+ +amount: int
+ +date: LocalDate
 +boolean recordBalanceUpdate(double toBeAdded)
 }
-AccountBook -- "*" FinancialTransaction
+AccountBook -- "*" BalanceOperation
 
 class Credit 
 class Debit
 
-Credit --|> FinancialTransaction
-Debit --|> FinancialTransaction
+Credit --|> BalanceOperation
+Debit --|> BalanceOperation
 
 class Order
 
@@ -171,13 +173,13 @@ ReturnTransaction --|> Debit
 
 
 class ProductType{
-    +ID
-    +barCode
-    +description
-    +sellPrice
-    +quantity
-    +discountRate
-    +notes
+    +productID: Integer
+    +barCode: String
+    +description: String
+    +pricePerUnit: double
+    +quantity: int
+    +discountRate: float
+    +notes: String
     +Integer createProductType(String description, String productCode, double pricePerUnit, String note)
     +boolean updateProduct(Integer id, String newDescription, String newCode, double newPrice, String newNote)
     +boolean deleteProductType(Integer id)
@@ -187,45 +189,38 @@ class ProductType{
 Shop - "*" ProductType
 
 class SaleTransaction {
-    +ID 
-    +date
-    +time
-    +cost
-    +paymentType
-    +discount rate
+    +time: LocalDate
+    +paymentType: String
+    +discountRate: float
     +double receiveCashPayment(Integer transactionId, double cash)
     +boolean receiveCreditCardPayment(Integer transactionId, String creditCard)
 }
 SaleTransaction - "*" ProductType
 
 class Quantity {
-    +quantity
+    +quantity: int
 }
 (SaleTransaction, ProductType)  .. Quantity
 
 class LoyaltyCard {
-    +ID
-    +points
+    +cardID: Integer
+    +points: int
 }
 
 class Customer {
-    +name
-    +surname
+    +name: String
+    +surname: String
 }
 
 LoyaltyCard "0..1" - Customer
 
 SaleTransaction "*" -- "0..1" LoyaltyCard
 
-class Product {
-    
-}
-
 class Position {
-    +aisleID
-    +rackID
-    +levelID
-    +updatePosition()
+    +aisleID: Integer
+    +rackID: Integer
+    +levelID: Integer
+    +boolean updatePosition(Integer productId, String newPos)
 }
 
 ProductType - "0..1" Position
@@ -233,17 +228,17 @@ ProductType - "0..1" Position
 ProductType -- "*" Product : describes
 
 class Order {
-  +supplier
-  +pricePerUnit
-  +quantity
-  +status
+  +supplier: String
+  +pricePerUnit: double
+  +quantity: int
+  +status: int
 }
 
 Order "*" - ProductType
 
 class ReturnTransaction {
-  +quantity
-  +returnedValue
+  +quantity: int
+  +returnedValue: double
   +Integer startReturnTransaction(Integer transactionId)
   +boolean returnProduct(Integer returnId, String productCode, int amount)
   +boolean endReturnTransaction(Integer returnId, boolean commit)
@@ -317,7 +312,7 @@ Shop --> User : successful message
 
 ```plantuml
 @startuml
-User --> Shop: getProductTypeByBarCode()
+User --> Shop: Searches by bar code
 Shop --> ProductType: getProductTypeByBarCode()
 ProductType --> Shop: return ProductType
 
@@ -485,59 +480,12 @@ Shop --> User: print Sale
 
 ```plantuml
 @startuml
-User --> Shop: receiveCreditCardPayment()
+User --> Shop: Read credit card number
 Shop --> SaleTransaction: receiveCreditCardPayment()
-SaleTransaction --> CreditCardReader: read()
-CreditCardReader --> SaleTransaction: return CreditCardCode
-SaleTransaction --> CreditCardReader: validate()
-CreditCardReader --> SaleTransaction: return true
-SaleTransaction --> CreditCardReader: collectSalePrice()
 SaleTransaction --> Shop: return true
 Shop --> AccountingBook: recordBalanceUpdate()
 AccountingBook --> Shop: return true
 Shop --> User : succesful message
-@enduml
-```
-
-### Scenario 7-2
-
-| Scenario |  Manage payment by invalid credit card |
-| ------------- |:-------------:| 
-|  Precondition     | Credit card C does not exist  |
-|  Post condition     |   |
-| Step#        | Description  |
-|  1    |  Read C.number |
-|  2    |  Validate C.number with Luhn algorithm |  
-|  3    |  C.number invalid, issue warning |
-|  4    |  Exit with error |
-
-```plantuml
-@startuml
-User --> Shop: receiveCreditCardPayment()
-Shop --> SaleTransaction: receiveCreditCardPayment()
-SaleTransaction --> CreditCardReader: read()
-CreditCardReader --> SaleTransaction: return CreditCardCode
-SaleTransaction --> CreditCardReader: validate() 
-CreditCardReader --> SaleTransaction: return false
-SaleTransaction --> Shop: return false
-Shop --> User : error message
-@enduml
-```
-
-### Scenario 7-3
-
-```plantuml
-@startuml
-User --> Shop: receiveCreditCardPayment()
-Shop --> SaleTransaction: receiveCreditCardPayment()
-SaleTransaction --> CreditCardReader: read()
-CreditCardReader --> SaleTransaction: return CreditCardCode
-SaleTransaction --> CreditCardReader: validate() 
-CreditCardReader --> SaleTransaction: return true
-SaleTransaction --> CreditCardReader: collectSalePrice()
-CreditCardReader --> SaleTransaction: return false
-SaleTransaction --> Shop: return false
-Shop --> User : error message
 @enduml
 ```
 
@@ -547,7 +495,7 @@ Shop --> User : error message
 @startuml
 User --> User: Collect banknotes and coins
 User --> User: Compute cash quantity
-User --> Shop: receiveCashPayment() 
+User --> Shop: Record cash payment
 Shop --> SaleTransaction: receiveCashPayment()
 SaleTransaction --> Shop: return true
 Shop --> AccountingBook: recordBalanceUpdate()
