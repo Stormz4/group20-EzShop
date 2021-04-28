@@ -36,8 +36,9 @@ The design must satisfy the Official Requirements document, notably functional a
 @startuml
 package GUIEZShop
 package EZShop
-
+package Readers
 GUIEZShop ..> EZShop
+Readers ..> EZShop
 @enduml
 ```
 
@@ -45,7 +46,7 @@ GUIEZShop contains view and controller, while EZShop contains model and logic. T
 
 # Low level design
 
-<for each package, report class diagram>
+## EZShop Class Diagram
 
 ```plantuml
 @startuml
@@ -78,7 +79,7 @@ class Shop{
     +Integer payOrderFor(String productCode, int quantity, double pricePerUnit)
     +boolean payOrder(Integer orderId)
     +boolean recordOrderArrival(Integer orderId)
-    +List<Order> getAllOrders() throws UnauthorizedException;
+    +List<Order> getAllOrders()
     
     .. UC4 - Manage Customers and Cards ..
     +Integer defineCustomer(String customerName)
@@ -127,15 +128,17 @@ class Shop{
     +double returnCreditCardPayment(Integer returnId, String creditCard)
 }
 
-class UserAccount{
+class User{
     +username
     +password
     +privilege
 }
 
-Shop -- "*" UserAccount
+Shop -- "*" User
 
-class AccountBook 
+class AccountBook {
+ +boolean recordBalanceUpdate(double toBeAdded)
+}
 AccountBook - Shop
 class FinancialTransaction {
  +description
@@ -248,9 +251,23 @@ N3 .. SaleTransaction
 @enduml
 ```
 
+## Readers Class Diagram
 
 
+```plantuml
+@startuml
 
+class BarCodeReader {
+   +read()
+}
+
+class CreditCardReader {
+   +read()
+   +validate()
+}
+
+@enduml
+```
 
 
 # Verification traceability matrix
@@ -261,7 +278,7 @@ N3 .. SaleTransaction
 !!! Useful link:    https://www.tablesgenerator.com/markdown_tables# 
 
 
-| FR ID | Shop | UserAccount | Administrator | Order | ProductType | Product | Position | SaleTransaction | Quantity | LoyaltyCard | Customer | ReturnTransaction | AccountBook | FinancialTransaction | Credit | Debit | Sale | Return |
+| FR ID | Shop | User | Administrator | Order | ProductType | Product | Position | SaleTransaction | Quantity | LoyaltyCard | Customer | ReturnTransaction | AccountBook | FinancialTransaction | Credit | Debit | Sale | Return |
 |:-----:|:----:|:-----------:|:-------------:|:-----:|:-----------:|:-------:|:--------:|:---------------:|:--------:|:-----------:|:--------:|:-----------------:|:-----------:|:--------------------:|:------:|:-----:|:----:|:------:|
 |  FR1  |   X  |      X      |       X       |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |      |        |
 |  ---  |      |             |               |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |      |        |
@@ -342,7 +359,83 @@ Shop --> User : succesful message
 
 ## UC5 
 
+### Scenario 5-1
+
+```plantuml
+@startuml
+User --> Shop: login()
+Shop --> User : success/error message
+@enduml
+```
+
+### Scenario 5-2
+
+```plantuml
+@startuml
+User --> Shop: logout()
+Shop --> User : return
+@enduml
+```
+
 ## UC6 
+
+### Scenario 6-1
+
+```plantuml
+@startuml
+User --> Shop: start Sale Transaction
+Shop --> SaleTransaction: startSaleTransaction()
+SaleTransaction --> Shop: return TransactionID
+
+SaleTransaction --> BarCodeReader: read()
+BarCodeReader --> SaleTransaction : return BarCode
+
+Shop --> SaleTransaction: addProductToSale()
+SaleTransaction --> SaleTransaction : addProductToSale()
+SaleTransaction --> SaleTransaction : return boolean
+SaleTransaction --> Shop : return boolean
+Shop --> ProductType : updateQuantity()
+ProductType --> Shop: return boolean
+User --> Shop: endSaleTransaction()
+Shop --> Shop: getSaleTransaction()
+Shop --> User: show Sale review
+Shop --> User: ask Payment Type (See UC7)
+@enduml
+```
+
+### Scenario 6-4
+
+```plantuml
+@startuml
+User --> Shop: start Sale Transaction
+Shop --> SaleTransaction: startSaleTransaction()
+SaleTransaction --> Shop: return TransactionID
+
+Shop --> BarCodeReader: read()
+BarCodeReader --> Shop : return BarCode
+
+Shop --> SaleTransaction: addProductToSale()
+SaleTransaction --> SaleTransaction : addProductToSale()
+SaleTransaction --> SaleTransaction : return boolean
+SaleTransaction --> Shop : return boolean
+Shop --> ProductType : updateQuantity()
+ProductType --> Shop: return boolean
+User --> Shop: endSaleTransaction()
+Shop --> Shop: getSaleTransaction()
+Shop --> User: show Sale review
+Shop --> User: ask Payment Type
+
+Shop --> LoyaltyCardReader: read()
+LoyaltyCardReader --> Shop : return CardCode
+
+Shop --> User: show Card
+User --> Shop: manage Payment (see UC7)
+Shop --> LoyaltyCard: modifyPointsOnCard()
+LoyaltyCard --> Shop: return boolean
+Shop --> User: return boolean
+Shop --> User: print Sale
+@enduml
+```
 
 ## UC7
 
@@ -352,17 +445,19 @@ Shop --> User : succesful message
 
 ```plantuml
 @startuml
-User --> Shop: Read card number
+User --> Shop: receiveCreditCardPayment()
 Shop --> SaleTransaction: receiveCreditCardPayment()
-SaleTransaction --> SaleTransaction: Validate with Luhn algorithm
-SaleTransaction --> SaleTransaction: Ask to credit sale price
+SaleTransaction --> CreditCardReader: read()
+CreditCardReader --> SaleTransaction: return CreditCardCode
+SaleTransaction --> CreditCardReader: validate()
+CreditCardReader --> SaleTransaction: return true
+SaleTransaction --> CreditCardReader: collectSalePrice()
 SaleTransaction --> Shop: return true
 Shop --> AccountingBook: recordBalanceUpdate()
 AccountingBook --> Shop: return true
 Shop --> User : succesful message
 @enduml
 ```
-
 
 ### Scenario 7-2
 
@@ -378,9 +473,12 @@ Shop --> User : succesful message
 
 ```plantuml
 @startuml
-User --> Shop: Read card number
+User --> Shop: receiveCreditCardPayment()
 Shop --> SaleTransaction: receiveCreditCardPayment()
-SaleTransaction --> SaleTransaction: Validate with Luhn algorithm
+SaleTransaction --> CreditCardReader: read()
+CreditCardReader --> SaleTransaction: return CreditCardCode
+SaleTransaction --> CreditCardReader: validate() 
+CreditCardReader --> SaleTransaction: return false
 SaleTransaction --> Shop: return false
 Shop --> User : error message
 @enduml
@@ -390,10 +488,14 @@ Shop --> User : error message
 
 ```plantuml
 @startuml
-User --> Shop: Read card number
+User --> Shop: receiveCreditCardPayment()
 Shop --> SaleTransaction: receiveCreditCardPayment()
-SaleTransaction --> SaleTransaction: Validate with Luhn algorithm
-SaleTransaction --> SaleTransaction: Ask to credit sale price
+SaleTransaction --> CreditCardReader: read()
+CreditCardReader --> SaleTransaction: return CreditCardCode
+SaleTransaction --> CreditCardReader: validate() 
+CreditCardReader --> SaleTransaction: return true
+SaleTransaction --> CreditCardReader: collectSalePrice()
+CreditCardReader --> SaleTransaction: return false
 SaleTransaction --> Shop: return false
 Shop --> User : error message
 @enduml
@@ -405,7 +507,7 @@ Shop --> User : error message
 @startuml
 User --> User: Collect banknotes and coins
 User --> User: Compute cash quantity
-User --> Shop: Record cash payment
+User --> Shop: receiveCashPayment() 
 Shop --> SaleTransaction: receiveCashPayment()
 SaleTransaction --> Shop: return true
 Shop --> AccountingBook: recordBalanceUpdate()
