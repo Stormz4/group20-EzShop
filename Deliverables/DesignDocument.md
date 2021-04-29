@@ -41,12 +41,15 @@ package it.polito.ezshop.model
 package it.polito.ezshop.data
 package it.polito.ezshop.exceptions
 it.polito.ezshop.gui -- it.polito.ezshop.model
-it.polito.ezshop.exceptions --|> it.polito.ezshop.model
+it.polito.ezshop.exceptions <|-- it.polito.ezshop.model
 it.polito.ezshop.data <|-- it.polito.ezshop.model
 @enduml
 ```
 
-EZShop.gui contains view and controller. The architetural pattern choosed is MVC.
+it.polito.ezshop.gui contains view and controller. The architetural pattern choosed is MVC+3 tier. 
+
+it.polito.ezshop.exceptions contains the exceptions used in the API.
+
 
 # Low level design
 
@@ -170,6 +173,7 @@ Shop -- "*" User
 class AccountBook {
  +balance: double
  +boolean addBalanceOperation(BalanceOperation op)
+ +boolean updateBalance(double toBeAdded)
 }
 AccountBook - Shop
 class BalanceOperation {
@@ -310,19 +314,22 @@ N7 .. ReturnTransaction
 # Verification sequence diagrams 
 \<select key scenarios from the requirement document. For each of them define a sequence diagram showing that the scenario can be implemented by the classes and methods in the design>
 
+The User will communicate with the GUI, which will invoke Shop's methods (instead of making the User communicate with the Shop directly).
+
 ## UC1 
 
 ### Scenario 1-1
 
 ```plantuml
 @startuml
-User --> Shop: Insert product descrition
-User --> Shop: Insert new bar code
-User --> Shop: Insert price per unit
-User --> Shop: Insert product notes
-User --> Shop: Insert location
-User --> Shop: Confirms
-Shop --> ProductType : createProductType()
+User --> GUI: Insert product descrition
+User --> GUI: Insert new bar code
+User --> GUI: Insert price per unit
+User --> GUI: Insert product notes
+User --> GUI: Insert location
+User --> GUI: Confirms
+GUI --> Shop: createProductType()
+Shop --> ProductType : new ProductType
 ProductType --> Shop : return ID
 Shop --> User : successful message
 @enduml
@@ -332,33 +339,18 @@ Shop --> User : successful message
 
 ```plantuml
 @startuml
-User --> Shop: Searches by bar code
-Shop --> ProductType: getProductTypeByBarCode()
-ProductType --> Shop: return ProductType
+User --> GUI: Searches by bar code
+GUI --> Shop: getProductTypeByBarCode()
+Shop --> GUI: return ProductType
 
-User --> Shop: Selects record
-User --> Shop: Select a new product location
-Shop --> Position: updatePosition()
-Position --> Shop : return boolean
-Shop --> User : successful message
+User --> GUI: Selects record
+User --> GUI: Select a new product location
+GUI --> Shop: updatePosition()
+Shop --> GUI : return boolean
+GUI --> User : successful message
 @enduml
 ```
 
-### Scenario 1-3
-
-```plantuml
-@startuml
-User --> Shop: Search by bar code
-Shop --> ProductType: getProductTypeByBarCode()
-ProductType --> Shop: return ProductType
-User --> Shop: Selects record
-User --> Shop: Inserts a new price > 0
-User --> Shop: Confirms
-Shop --> ProductType: updateProduct()
-ProductType --> Shop : return boolean
-Shop --> User : successful message
-@enduml
-```
 
 ## UC2 
 ### Scenario 2-1
@@ -500,12 +492,13 @@ Shop --> User: print Sale
 
 ```plantuml
 @startuml
-User --> Shop: Read credit card number
-Shop --> SaleTransaction: receiveCreditCardPayment()
-SaleTransaction --> Shop: return true
-Shop --> AccountingBook: recordBalanceUpdate()
-AccountingBook --> Shop: return true
-Shop --> User : succesful message
+User --> GUI: Read credit card number
+GUI --> Shop: receiveCreditCardPayment()
+Shop --> Shop: recordBalanceUpdate()
+Shop --> AccountBook: updateBalance()
+AccountBook --> Shop: return true
+Shop --> GUI: return true
+GUI --> User: succesful message
 @enduml
 ```
 
@@ -515,12 +508,13 @@ Shop --> User : succesful message
 @startuml
 User --> User: Collect banknotes and coins
 User --> User: Compute cash quantity
-User --> Shop: Record cash payment
-Shop --> SaleTransaction: receiveCashPayment()
-SaleTransaction --> Shop: return true
-Shop --> AccountingBook: recordBalanceUpdate()
-AccountingBook --> Shop: return true
-Shop --> User : succesful message
+User --> GUI: Record cash payment
+GUI --> Shop: receiveCashPayment()
+Shop --> Shop: recordBalanceUpdate()
+Shop --> AccountBook: updateBalance()
+AccountBook --> Shop: return true
+Shop --> GUI: return true
+GUI --> User: succesful message
 @enduml
 ```
 
