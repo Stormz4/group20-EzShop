@@ -15,6 +15,7 @@ Date: 25/04/2021
 | 2 | Added functions in Shop | 
 | 3 | Added sequence diagrams |
 | 4 | Added sequence diagrams for UC9, fixed the class diagram along with the new requirements |
+| 5 | Updated class diagram |
 
 # Contents
 
@@ -34,28 +35,28 @@ The design must satisfy the Official Requirements document, notably functional a
 
 ```plantuml
 @startuml
-package EZShop.gui
-package EZShop
-package EZShop.data
-package EZShop.exceptions
-EZShop.gui -- EZShop
-EZShop.exceptions --|> EZShop
-EZShop.data --|> EZShop
+package it.polito.ezshop.gui
+package it.polito.ezshop.model
+package it.polito.ezshop.data
+package it.polito.ezshop.exceptions
+it.polito.ezshop.gui -- it.polito.ezshop.model
+it.polito.ezshop.exceptions --|> it.polito.ezshop.model
+it.polito.ezshop.data <|-- it.polito.ezshop.model
 @enduml
 ```
 
-EZShop.gui contains view and controller, while EZShop contains model and logic. The architetural pattern choosed is MVC.
+EZShop.gui contains view and controller. The architetural pattern choosed is MVC.
 
 # Low level design
 
 ## EZShop Class Diagram
 
+The packages are related in this way:
+
 ```plantuml
 @startuml
-left to right direction
-
-
-class Shop{
+package EZShop.data{
+interface EZShopInterface{
     .. Reset ..
     +void reset()
 
@@ -129,17 +130,36 @@ class Shop{
     +double returnCashPayment(Integer returnId)
     +double returnCreditCardPayment(Integer returnId, String creditCard)
 }
+}
+
+package EZShop.model{
+ class Shop{
+
+}
+}
+
+class Shop implements EZShopInterface
+@enduml
+```
+
+The model contains the following classes, which are persistent:
+
+```plantuml
+@startuml
+
+left to right direction
+
+
+package EZShop.model{
+class Shop{
+
+}
 
 class User{
     +userID: Integer
     +username: String
     +password: String
     +role: String
-    +Integer createUser(String username, String password, String role)
-    +boolean deleteUser(Integer id)
-    +List<User> getAllUsers()
-    +User getUser(Integer id)
-    +boolean updateUserRights(Integer id, String role)
 }
 
 Administrator --|> User
@@ -147,7 +167,6 @@ Administrator --|> User
 Shop -- "*" User
 
 class AccountBook {
- +boolean recordBalanceUpdate(double toBeAdded)
 }
 AccountBook - Shop
 class BalanceOperation {
@@ -155,7 +174,6 @@ class BalanceOperation {
  +description: String 
  +amount: int
  +date: LocalDate
-+boolean recordBalanceUpdate(double toBeAdded)
 }
 AccountBook -- "*" BalanceOperation
 
@@ -180,10 +198,6 @@ class ProductType{
     +quantity: int
     +discountRate: float
     +notes: String
-    +Integer createProductType(String description, String productCode, double pricePerUnit, String note)
-    +boolean updateProduct(Integer id, String newDescription, String newCode, double newPrice, String newNote)
-    +boolean deleteProductType(Integer id)
-    +ProductType getProductTypeByBarCode(String barCode)
 }
 
 Shop - "*" ProductType
@@ -192,8 +206,6 @@ class SaleTransaction {
     +time: LocalDate
     +paymentType: String
     +discountRate: float
-    +double receiveCashPayment(Integer transactionId, double cash)
-    +boolean receiveCreditCardPayment(Integer transactionId, String creditCard)
 }
 SaleTransaction - "*" ProductType
 
@@ -220,12 +232,10 @@ class Position {
     +aisleID: Integer
     +rackID: Integer
     +levelID: Integer
-    +boolean updatePosition(Integer productId, String newPos)
 }
 
 ProductType - "0..1" Position
 
-ProductType -- "*" Product : describes
 
 class Order {
   +supplier: String
@@ -239,13 +249,9 @@ Order "*" - ProductType
 class ReturnTransaction {
   +quantity: int
   +returnedValue: double
-  +Integer startReturnTransaction(Integer transactionId)
-  +boolean returnProduct(Integer returnId, String productCode, int amount)
-  +boolean endReturnTransaction(Integer returnId, boolean commit)
-  +boolean deleteReturnTransaction(Integer returnId)
-  +double returnCashPayment(Integer returnId)
-  +double returnCreditCardPayment(Integer returnId, String creditCard)
+
 }
+
 
 ReturnTransaction "*" - SaleTransaction
 ReturnTransaction "*" - ProductType
@@ -256,6 +262,15 @@ note "bar code is a number on 12 to 14  digits,\ncompliant to GTIN specification
 N2 .. ProductType
 note "ID is a unique identifier of a transaction, \nprinted on the receipt (ticket number) " as N3
 N3 .. SaleTransaction
+note "AccountBook contains a map of balance operation" as N4
+N4 .. AccountBook
+note "Shop contains data structures for User, Products" as N5
+N5 .. Shop
+note "SaleTransaction contains a list of Products" as N6
+N6 .. SaleTransaction
+note "ReturnTransaction contains a list of Products" as N7
+N7 .. ReturnTransaction
+}
 @enduml
 ```
 
