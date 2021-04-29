@@ -7,7 +7,7 @@ Authors:
 - Palmucci Leonardo s288126
 - Dario Lanfranco s287524
 
-Date: 25/04/2021
+Date: 29/04/2021
 
 | Version | Changes |
 | ------- |---------|
@@ -16,6 +16,7 @@ Date: 25/04/2021
 | 3 | Added sequence diagrams |
 | 4 | Added sequence diagrams for UC9, fixed the class diagram along with the new requirements |
 | 5 | Updated class diagram |
+| 6 | Fixed some sequence diagrams, added method to AccountBook |
 
 # Contents
 
@@ -55,7 +56,7 @@ The packages are related in this way:
 
 ```plantuml
 @startuml
-package EZShop.data{
+package it.polito.ezshop.data{
 interface EZShopInterface{
     .. Reset ..
     +void reset()
@@ -132,7 +133,7 @@ interface EZShopInterface{
 }
 }
 
-package EZShop.model{
+package it.polito.ezshop.model{
  class Shop{
 
 }
@@ -150,7 +151,7 @@ The model contains the following classes, which are persistent:
 left to right direction
 
 
-package EZShop.model{
+package it.polito.ezshop.model{
 class Shop{
 
 }
@@ -167,6 +168,8 @@ Administrator --|> User
 Shop -- "*" User
 
 class AccountBook {
+ +balance: double
+ +boolean addBalanceOperation(BalanceOperation op)
 }
 AccountBook - Shop
 class BalanceOperation {
@@ -362,16 +365,18 @@ Shop --> User : successful message
 ```plantuml
 @startuml
 autonumber
-Administrator -> Shop: Insert username
-Administrator -> Shop: Insert password
-Administrator -> Shop: Insert role
-Shop -> User: createUser()
-User --> Shop: return Integer (unique identifier)
-Administrator -> Shop: Selects user rights
-Shop -> User: updateUserRights()
-User --> Shop: return boolean
-Administrator -> Shop: Confirms
-Shop --> Administrator: successful message
+Administrator -> GUI: Insert username
+Administrator -> GUI: Insert password
+Administrator -> GUI: Insert role
+GUI -> Shop: createUser()
+Shop -> User: new User()
+User --> Shop: return User
+Shop --> GUI: return Integer (unique identifier)
+Administrator -> GUI: Selects user rights
+GUI -> Shop: updateUserRights()
+Shop --> GUI: return boolean
+Administrator -> GUI: Confirms
+GUI --> Administrator: successful message
 @enduml
 ```
 
@@ -380,12 +385,10 @@ Shop --> Administrator: successful message
 ```plantuml
 @startuml
 autonumber
-Administrator -> Shop: Select an account to be deleted
-Shop -> User: getUser()
-User --> Shop: return User
-Shop -> User: deleteUser()
-User --> Shop: return boolean
-Shop --> Administrator: successful message
+Administrator -> GUI: Select an account to be deleted
+GUI -> Shop: deleteUser()
+Shop --> GUI: return boolean
+GUI --> Administrator: successful message
 @enduml
 ```
 
@@ -394,13 +397,13 @@ Shop --> Administrator: successful message
 ```plantuml
 @startuml
 autonumber
-Administrator -> Shop: Select an account to be updated
-Shop -> User: getUser()
-User --> Shop: return User
-Administrator -> Shop: Select new rights for the account
-Shop -> User: updateUserRights()
-User --> Shop: return boolean
-Shop --> Administrator: successful message
+Administrator -> GUI: Select an account to be updated
+GUI -> Shop: getUser()
+Shop --> GUI: return User
+Administrator -> GUI: Select new rights for the account
+GUI -> Shop: updateUserRights()
+Shop --> GUI: return boolean
+GUI --> Administrator: successful message
 @enduml
 ```
 
@@ -528,29 +531,24 @@ Shop --> User : succesful message
 ```plantuml
 @startuml
 autonumber
-User -> Shop: Insert transaction ID
-Shop -> ReturnTransaction: startReturnTransaction()
-User -> Shop: scan product BarCode
-User -> Shop: Insert quantity of returned items
-Shop -> ReturnTransaction: returnProduct()
-ReturnTransaction -> ProductType: getProductTypeByBarCode()
-ProductType --> ReturnTransaction: return ProductType
-ReturnTransaction -> ProductType: Update quantity by N
-ReturnTransaction --> Shop: return boolean
-ReturnTransaction --> Shop: return Integer (ReturnTransaction ID)
-ref over Shop, User
-Manage credit card return (go to UC10)
+User -> GUI: Insert transaction ID
+GUI -> Shop: startReturnTransaction()
+Shop -> ReturnTransaction: new ReturnTransaction()
+ReturnTransaction --> Shop: return ReturnTransaction
+User -> GUI: Insert product BarCode
+User -> GUI: Insert quantity of returned items
+GUI -> Shop: returnProduct()
+Shop -> Shop: getProductTypeByBarCode()
+Shop -> ProductType: Update quantity by N
+Shop --> GUI: return boolean
+Shop --> GUI: return Integer (ReturnTransaction ID)
+ref over GUI, User, Shop, AccountBook
+Manage credit card return and update balance (go to UC10)
 end ref
-User -> Shop: Close return transaction
-Shop -> ReturnTransaction: endReturnTransaction()
-ReturnTransaction --> Shop: return boolean
-
-ref over ReturnTransaction, AccountingBook
-Update balance (go to UC10)
-end ref
-
-ReturnTransaction --> Shop: Amount returned
-Shop --> User: Successful message
+User -> GUI: Close return transaction
+GUI -> Shop: endReturnTransaction()
+Shop --> GUI: return boolean
+GUI --> User: Successful message
 @enduml
 ```
 
@@ -559,29 +557,24 @@ Shop --> User: Successful message
 ```plantuml
 @startuml
 autonumber
-User -> Shop: Insert transaction ID
-Shop -> ReturnTransaction: startReturnTransaction()
-User -> Shop: scan product BarCode
-User -> Shop: Insert quantity of returned items
-Shop -> ReturnTransaction: returnProduct()
-ReturnTransaction -> ProductType: getProductTypeByBarCode()
-ProductType --> ReturnTransaction: return ProductType
-ReturnTransaction -> ProductType: Update quantity by N
-ReturnTransaction --> Shop: return boolean
-ReturnTransaction --> Shop: return Integer (ReturnTransaction ID)
-ref over Shop, User
-Manage cash return (go to UC10)
+User -> GUI: Insert transaction ID
+GUI -> Shop: startReturnTransaction()
+Shop -> ReturnTransaction: new ReturnTransaction()
+ReturnTransaction --> Shop: return ReturnTransaction
+User -> GUI: Insert product BarCode
+User -> GUI: Insert quantity of returned items
+GUI -> Shop: returnProduct()
+Shop -> Shop: getProductTypeByBarCode()
+Shop -> ProductType: Update quantity by N
+Shop --> GUI: return boolean
+Shop --> GUI: return Integer (ReturnTransaction ID)
+ref over GUI, User, Shop, AccountBook
+Manage cash return and update balance (go to UC10)
 end ref
-User -> Shop: Close return transaction
-Shop -> ReturnTransaction: endReturnTransaction()
-ReturnTransaction --> Shop: return boolean
-
-ref over ReturnTransaction, AccountingBook
-Update balance (go to UC10)
-end ref
-
-ReturnTransaction --> Shop: Amount returned
-Shop --> User: Successful message
+User -> GUI: Close return transaction
+GUI -> Shop: endReturnTransaction()
+Shop --> GUI: return boolean
+GUI --> User: Successful message
 @enduml
 ```
 
@@ -619,12 +612,12 @@ Shop --> User: display list
 ```plantuml
 @startuml
 autonumber
-User -> Shop: Scan credit card number
-Shop -> ReturnTransaction: returnCreditCardPayment()
-ReturnTransaction -> AccountingBook: recordBalanceUpdate()
-AccountingBook --> ReturnTransaction: return boolean
-ReturnTransaction --> Shop: Amount returned
-Shop --> User: Successful message
+User -> GUI: Insert credit card number
+GUI -> Shop: returnCreditCardPayment()
+Shop -> AccountBook: addBalanceOperation()
+AccountBook --> Shop: return boolean
+Shop --> GUI: Amount returned
+GUI --> User: Successful message
 @enduml
 ```
 
@@ -634,12 +627,12 @@ Shop --> User: Successful message
 @startuml
 autonumber
 User -> User: Collect banconotes and coins
-User -> Shop: Record cash return
-Shop -> ReturnTransaction: returnCashPayment()
-ReturnTransaction -> AccountingBook: recordBalanceUpdate()
-AccountingBook --> ReturnTransaction: return boolean
-ReturnTransaction --> Shop: Amount returned
-Shop --> User: Successful message
+User -> GUI: Record cash return
+GUI -> Shop: returnCashPayment()
+Shop -> AccountBook: addBalanceOperation()
+AccountBook --> Shop: return boolean
+Shop --> GUI: Amount returned
+GUI --> User: Successful message
 @enduml
 ```
 
