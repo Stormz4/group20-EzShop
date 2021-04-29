@@ -252,6 +252,8 @@ class ReturnTransaction {
 
 }
 
+Shop -- "*" LoyaltyCard
+Shop -- "*" Customer
 
 ReturnTransaction "*" - SaleTransaction
 ReturnTransaction "*" - ProductType
@@ -264,7 +266,7 @@ note "ID is a unique identifier of a transaction, \nprinted on the receipt (tick
 N3 .. SaleTransaction
 note "AccountBook contains a map of balance operation" as N4
 N4 .. AccountBook
-note "Shop contains data structures for User, Products" as N5
+note "Shop contains data structures for User, Products, Customers/Loyalty cards and a copy of AccountBook" as N5
 N5 .. Shop
 note "SaleTransaction contains a list of Products" as N6
 N6 .. SaleTransaction
