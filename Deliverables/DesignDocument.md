@@ -221,13 +221,14 @@ class SaleTransaction {
 SaleTransaction - "*" ProductType
 
 class LoyaltyCard {
-    +cardID: Integer
+    +cardID: String
     +points: int
 }
 
 class Customer {
     +name: String
     +surname: String
+    +updateCustomer(String name, String surname, String card)
 }
 
 LoyaltyCard "0..1" - Customer
@@ -413,35 +414,12 @@ GUI --> Administrator: successful message
 
 #
 ## UC3
-
-```plantuml
-@startuml
-autonumber
-User -> GUI: Create new order O for product PT
-GUI -> Shop: payOrderFor()
-Shop -> Order: new Order()
-Order --> Shop: return Order
-Shop -> Order: setStatus()
-Shop -> BalanceOperation: new BalanceOperation()
-BalanceOperation --> Shop: return BalanceOperation
-Shop -> AccountBook: addBalanceOperation()
-AccountBook --> Shop: return boolean
-Shop --> GUI: return boolean
-Shop -> Order: setStatus()
-GUI --> Manager: show outcome message
-GUI -> Shop: recordOrderArrival()
-Shop -> Shop: updateQuantity()
-Shop --> GUI: return boolean
-GUI --> User: Show outcome message
-@enduml
-```   
-
 ### Scenario 3-1
 ```plantuml
 @startuml
 autonumber
 Manager -> GUI: Create new order O for product PT
-GUI -> Shop: issueReorder()
+GUI -> Shop: issueOrder()
 Shop -> Order: new Order()
 Order --> Shop: return Order
 Shop -> Order: setStatus(Issued)
@@ -464,6 +442,7 @@ Shop -> BalanceOperation: new BalanceOperation()
 BalanceOperation --> Shop: return BalanceOperation
 Shop -> AccountBook: addBalanceOperation()
 AccountBook --> Shop: return boolean
+Shop -> Shop: recordBalanceUpdate()
 Shop -> Order: setStatus(Payed)
 Shop --> GUI: return boolean
 GUI --> Manager: Show outcome message
