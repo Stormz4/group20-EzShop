@@ -234,7 +234,7 @@ class LoyaltyCard {
 class Customer {
     +name: String
     +surname: String
-    +updateCustomer(String name, String surname, String card)
+    +update(String name, String surname, String card)
 }
 
 LoyaltyCard "0..1" - Customer
@@ -320,14 +320,14 @@ The User will communicate with the GUI, which will invoke Shop's methods (instea
 @startuml
 Actor User
 autonumber
-User --> GUI: Insert product descrition
-User --> GUI: Insert new bar code
+User -> GUI: Insert product descrition
+User -> GUI: Insert new bar code
 User --> GUI: Insert price per unit
-User --> GUI: Insert product notes
-User --> GUI: Insert location
-User --> GUI: Confirms
-GUI --> Shop: createProductType()
-Shop --> ProductType : new ProductType
+User -> GUI: Insert product notes
+User -> GUI: Insert location
+User -> GUI: Confirms
+GUI -> Shop: createProductType()
+Shop -> ProductType : new ProductType
 ProductType --> Shop : return ID
 Shop --> User : successful message
 @enduml
@@ -455,7 +455,7 @@ Shop --> GUI: return Customer
 User -> GUI: Fills fields with Cu's personal data
 User -> GUI: Confirm
 GUI -> Shop: modifyCustomer(id, ...)
-Shop -> Customer: updateCustomer()
+Shop -> Customer: update()
 Shop --> GUI: return boolean
 GUI --> User: Show outcome message
 @enduml
