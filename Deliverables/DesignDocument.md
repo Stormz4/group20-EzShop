@@ -172,7 +172,7 @@ Shop -- "*" User
 
 class AccountBook {
  +balance: double
- +boolean addBalanceOperation(BalanceOperation op)
+ +boolean addBalanceOperation(Integer transactionID)
  +boolean updateBalance(double toBeAdded)
 }
 AccountBook - Shop
@@ -495,7 +495,7 @@ Shop --> User: print Sale
 User --> GUI: Read credit card number
 GUI --> Shop: receiveCreditCardPayment()
 Shop --> Shop: recordBalanceUpdate()
-Shop --> AccountBook: updateBalance()
+Shop --> AccountBook: addBalanceOperation()
 AccountBook --> Shop: return true
 Shop --> GUI: return true
 GUI --> User: succesful message
@@ -511,7 +511,7 @@ User --> User: Compute cash quantity
 User --> GUI: Record cash payment
 GUI --> Shop: receiveCashPayment()
 Shop --> Shop: recordBalanceUpdate()
-Shop --> AccountBook: updateBalance()
+Shop --> AccountBook: addBalanceOperation()
 AccountBook --> Shop: return true
 Shop --> GUI: return true
 GUI --> User: succesful message
