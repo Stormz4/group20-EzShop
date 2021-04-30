@@ -175,6 +175,7 @@ class AccountBook {
  +boolean addBalanceOperation(Integer transactionID)
  +boolean updateBalance(double toBeAdded)
  +List<BalanceOperation> getAllTransactions()
+ +boolean updateBalanceOperation(Integer transactionID)
 }
 AccountBook - Shop
 class BalanceOperation {
