@@ -303,14 +303,14 @@ N8 .. LoyaltyCard
 !!! Useful link:    https://www.tablesgenerator.com/markdown_tables# 
 
 
-| FR ID | Shop | User | Administrator | Order | ProductType | Product | Position | SaleTransaction | Quantity | LoyaltyCard | Customer | ReturnTransaction | AccountingBook | FinancialTransaction | Credit | Debit | 
+| FR ID | Shop | User | Administrator | Order | ProductType | Product | Position | SaleTransaction | Quantity | LoyaltyCard | Customer | ReturnTransaction | AccountBook | FinancialTransaction | Credit | Debit | 
 |:-----:|:----:|:-----------:|:-------------:|:-----:|:-----------:|:-------:|:--------:|:---------------:|:--------:|:-----------:|:--------:|:-----------------:|:-----------:|:--------------------:|:------:|:-----:|
 |  FR1  |   X  |      X      |       X       |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |
 |  FR3  |   X  |             |               |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |
 |  FR4  |   X  |             |               |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |
 |  FR5  |   X  |             |               |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |
-|  FR6  |   X  |      X      |       X       |       |      X      |         |          |                 |          |             |          |         X         |      X      |                      |        |       |
-|  FR7  |   X  |      X      |       X       |       |      X      |         |          |                 |          |             |          |         X         |      X      |                      |        |       |
+|  FR6  |   X  |      X      |       X       |       |      X      |         |          |        X        |     X    |      X      |          |         X         |      X      |                      |        |       |
+|  FR7  |   X  |      X      |       X       |       |             |         |          |                 |          |             |          |                   |      X      |                      |        |       |
 |  FR8  |   X  |      X      |       X       |       |             |         |          |                 |          |             |          |                   |      X      |           X          |    X   |   X   |
 
 
