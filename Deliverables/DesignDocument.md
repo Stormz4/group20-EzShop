@@ -17,6 +17,7 @@ Date: 29/04/2021
 | 4 | Added sequence diagrams for UC9, fixed the class diagram along with the new requirements |
 | 5 | Updated class diagram |
 | 6 | Fixed some sequence diagrams, added method to AccountBook |
+| 7 | Modified use case diagrams, class diagram and verification matrix |
 
 # Contents
 
@@ -30,9 +31,6 @@ Date: 29/04/2021
 The design must satisfy the Official Requirements document, notably functional and non functional requirements
 
 # High level design 
-
-<discuss architectural styles used, if any>
-<report package diagram>
 
 ```plantuml
 @startuml
@@ -150,7 +148,6 @@ The model contains the following classes, which are persistent:
 
 ```plantuml
 @startuml
-
 left to right direction
 
 
@@ -159,12 +156,34 @@ class Shop{
 
 }
 
+
+
+class ProductType{
+    +productID: Integer
+    +barCode: String
+    +description: String
+    +pricePerUnit: double
+    +quantity: int
+    +discountRate: float
+    +notes: String
+}
+
 class User{
     +userID: Integer
     +username: String
     +password: String
-    +role: String
+    +role: UserEnum
 }
+
+
+Enum UserEnum {
+    Cashier
+    ShopManager
+    Administrator
+}
+
+User -[hidden]-> UserEnum
+
 
 Administrator --|> User
 
@@ -176,8 +195,10 @@ class AccountBook {
  +boolean updateBalance(double toBeAdded)
  +List<BalanceOperation> getAllTransactions()
  +boolean updateBalanceOperation(Integer transactionID)
+ --
+ updateBalance(double toBeAdded)\n called inside recordBalanceUpdate
 }
-AccountBook - Shop
+AccountBook -down- Shop
 class BalanceOperation {
  +transactionID: Integer
  +description: String 
@@ -199,17 +220,8 @@ SaleTransaction --|> Credit
 ReturnTransaction --|> Debit
 
 
-class ProductType{
-    +productID: Integer
-    +barCode: String
-    +description: String
-    +pricePerUnit: double
-    +quantity: int
-    +discountRate: float
-    +notes: String
-}
 
-Shop - "*" ProductType
+Shop -down- "*" ProductType
 
 class SaleTransaction {
     +time: LocalDate
@@ -275,22 +287,14 @@ Shop -- "*" Customer
 ReturnTransaction "*" - SaleTransaction
 ReturnTransaction "*" - ProductType
 
-note "ID is a number on 10 digits " as N1  
-N1 .. LoyaltyCard
+note left of LoyaltyCard: "ID is a number on 10 digits "
 note "bar code is a number on 12 to 14  digits,\ncompliant to GTIN specifications, see \nhttps://www.gs1.org/services/how-calculate-check-digit-manually " as N2  
 N2 .. ProductType
 note "ID is a unique identifier of a transaction, \nprinted on the receipt (ticket number) " as N3
 N3 .. SaleTransaction
-note "AccountBook contains a list of balance operations" as N4
-N4 .. AccountBook
-note "Shop contains data structures for User, Products, Customers/Loyalty cards and a copy of AccountBook" as N5
-N5 .. Shop
-note "SaleTransaction contains a list of Products" as N6
-N6 .. SaleTransaction
-note "ReturnTransaction contains a list of Products" as N7
-N7 .. ReturnTransaction
-note "LoyaltyCard keeps also track of the customer which is related to" as N8
-N8 .. LoyaltyCard
+note "One to one relationships will be implented with \n a reference to the object \n For example, LoyalityCard will have a Customer) " as N4
+note "One to many relationships will be implemented \n with data structures" as N5
+
 }
 @enduml
 ```
@@ -298,33 +302,19 @@ N8 .. LoyaltyCard
 
 # Verification traceability matrix
 
-\<for each functional requirement from the requirement document, list which classes concur to implement it>
-
-
 !!! Useful link:    https://www.tablesgenerator.com/markdown_tables# 
 
-
-| FR ID | Shop | User | Administrator | Order | ProductType | Product | Position | SaleTransaction | Quantity | LoyaltyCard | Customer | ReturnTransaction | AccountBook | FinancialTransaction | Credit | Debit | 
-|:-----:|:----:|:-----------:|:-------------:|:-----:|:-----------:|:-------:|:--------:|:---------------:|:--------:|:-----------:|:--------:|:-----------------:|:-----------:|:--------------------:|:------:|:-----:|
-|  FR1  |   X  |      X      |       X       |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |
-|  FR3  |   X  |             |               |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |
-|  FR4  |   X  |             |               |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |
-|  FR5  |   X  |             |               |       |             |         |          |                 |          |             |          |                   |             |                      |        |       |
-|  FR6  |   X  |      X      |       X       |       |      X      |         |          |        X        |     X    |      X      |          |         X         |      X      |                      |        |       |
-|  FR7  |   X  |      X      |       X       |       |             |         |          |                 |          |             |          |                   |      X      |                      |        |       |
-|  FR8  |   X  |      X      |       X       |       |             |         |          |                 |          |             |          |                   |      X      |           X          |    X   |   X   |
-
-
-
-
-
-
-
-
-
+| FR ID | Shop | User | Administrator | Order | ProductType | Position | SaleTransaction | LoyaltyCard | Customer | ReturnTransaction | AccountBook | Balance Operation | Credit | Debit |
+|-------|------|------|---------------|-------|-------------|----------|-----------------|-------------|----------|-------------------|-------------|-------------------|--------|-------|
+| FR1   | X    | X    | X             |       |             |          |                 |             |          |                   |             |                   |        |       |
+| FR3   | X    | X    | X             |       | X           | X        |                 |             |          |                   |             |                   |        |       |
+| FR4   | X    | X    | X             | X     | X           | X        |                 |             |          | X                 | X           | X                 |        | X     |
+| FR5   | X    | X    | X             |       |             |          |                 | X           | X        |                   |             |                   |        |       |
+| FR6   | X    | X    | X             |       | X           |          | X               | X           |          | X                 | X           | X                 | X      | X     |
+| FR7   | X    | X    | X             |       |             |          | X               |             |          | X                 | X           | X                 | X      | X     |
+| FR8   | X    | X    | X             |       |             |          | X               |             |          |                   | X           | X                 | X      | X     |
 
 # Verification sequence diagrams 
-\<select key scenarios from the requirement document. For each of them define a sequence diagram showing that the scenario can be implemented by the classes and methods in the design>
 
 The User will communicate with the GUI, which will invoke Shop's methods (instead of making the User communicate with the Shop directly).
 
@@ -587,8 +577,6 @@ end ref
 
 ### Scenario 7-1
 
-[//]: # "Dubbi su questo scenario e i successivi"
-
 ```plantuml
 @startuml
 User --> GUI: Read credit card number
@@ -608,7 +596,6 @@ User --> User: Compute cash quantity
 User --> GUI: Record cash payment
 GUI --> Shop: receiveCashPayment()
 Shop --> Shop: recordBalanceUpdate()
-Shop --> AccountBook: addBalanceOperation()
 AccountBook --> Shop: return true
 Shop --> GUI: return double
 GUI --> User: return double
