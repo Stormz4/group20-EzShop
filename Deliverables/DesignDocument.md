@@ -172,20 +172,16 @@ class User{
     +userID: Integer
     +username: String
     +password: String
-    +role: UserEnum
+    +role: UserRoleEnum
 }
 
-
-Enum UserEnum {
+Enum UserRoleEnum {
     Cashier
     ShopManager
     Administrator
 }
 
 User -[hidden]-> UserEnum
-
-
-Administrator --|> User
 
 Shop -- "*" User
 
