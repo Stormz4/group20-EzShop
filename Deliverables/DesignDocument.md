@@ -430,23 +430,30 @@ Shop --> User : return
 
 ```plantuml
 @startuml
-User --> Shop: start Sale Transaction
-Shop --> SaleTransaction: startSaleTransaction()
+User -> GUI: start Sale Transaction
+GUI -> Shop: startSaleTransaction()
+Shop -> SaleTransaction: startSaleTransaction()
 SaleTransaction --> Shop: return TransactionID
-
-SaleTransaction --> BarCodeReader: read()
-BarCodeReader --> SaleTransaction : return BarCode
-
-Shop --> SaleTransaction: addProductToSale()
-SaleTransaction --> SaleTransaction : addProductToSale()
-SaleTransaction --> SaleTransaction : return boolean
+Shop --> GUI: return boolean
+User -> GUI: click Add Product
+GUI -> Shop: addProductToSale()
+Shop -> SaleTransaction: addProductToSale()
 SaleTransaction --> Shop : return boolean
-Shop --> ProductType : updateQuantity()
+Shop --> GUI: return boolean
+Shop -> ProductType : updateQuantity()
 ProductType --> Shop: return boolean
-User --> Shop: endSaleTransaction()
-Shop --> Shop: getSaleTransaction()
-Shop --> User: show Sale review
-Shop --> User: ask Payment Type (See UC7)
+User -> GUI: close Sale Transaction
+GUI -> Shop: endSaleTransaction()
+Shop --> GUI: return Boolean
+GUI --> User: show Sale review
+GUI --> User: ask Payment Type (See UC7)
+User -> GUI: confirm Sale
+GUI -> Shop: recordBalanceUpdate()
+Shop -> Shop: recordBalanceUpdate()
+Shop -> AccountBook: updateBalance()
+AccountBook --> Shop: return true
+Shop --> GUI: return true
+GUI --> User: return true
 @enduml
 ```
 
@@ -477,10 +484,6 @@ LoyaltyCardReader --> Shop : return CardCode
 
 Shop --> User: show Card
 User --> Shop: manage Payment (see UC7)
-Shop --> LoyaltyCard: modifyPointsOnCard()
-LoyaltyCard --> Shop: return boolean
-Shop --> User: return boolean
-Shop --> User: print Sale
 @enduml
 ```
 
