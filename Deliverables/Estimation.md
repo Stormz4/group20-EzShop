@@ -7,7 +7,7 @@ Authors:
 - Palmucci Leonardo s288126
 - Dario Lanfranco s287524
 
-Date: 21/04/2021
+Date: 30/04/2021
 
 | Version | Changes |
 | ------- |---------|
@@ -15,6 +15,7 @@ Date: 21/04/2021
 | 2 | Changed estimate calendar time, including now each step |
 | 3 | Reconsidered calculations for effort, cost and activity decomposition | 
 | 4 | Added new gantt chart & new version | 
+| 5 | Fixed links of Contents section |
 
 # Contents
 - [Estimate by product decomposition](#Estimate-by-product-decomposition)

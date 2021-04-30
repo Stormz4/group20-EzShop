@@ -7,7 +7,7 @@ Authors:
 - Palmucci Leonardo s288126
 - Dario Lanfranco s287524
 
-Date: 29/04/2021
+Date: 30/04/2021
 
 | Version | Changes |
 | ------- |---------|
@@ -18,6 +18,7 @@ Date: 29/04/2021
 | 5 | Updated class diagram |
 | 6 | Fixed some sequence diagrams, added method to AccountBook |
 | 7 | Modified use case diagrams, class diagram and verification matrix |
+| 8 | Last fixes. Final version |
 
 # Contents
 
