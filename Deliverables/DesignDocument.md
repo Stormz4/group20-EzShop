@@ -41,8 +41,8 @@ package it.polito.ezshop.model
 package it.polito.ezshop.data
 package it.polito.ezshop.exceptions
 it.polito.ezshop.gui -- it.polito.ezshop.model
-it.polito.ezshop.exceptions <|-- it.polito.ezshop.model
-it.polito.ezshop.data <|-- it.polito.ezshop.model
+it.polito.ezshop.exceptions <-- it.polito.ezshop.model
+it.polito.ezshop.data <-- it.polito.ezshop.model
 @enduml
 ```
 
@@ -272,7 +272,7 @@ note "bar code is a number on 12 to 14  digits,\ncompliant to GTIN specification
 N2 .. ProductType
 note "ID is a unique identifier of a transaction, \nprinted on the receipt (ticket number) " as N3
 N3 .. SaleTransaction
-note "AccountBook contains a map of balance operation" as N4
+note "AccountBook contains a list of balance operations" as N4
 N4 .. AccountBook
 note "Shop contains data structures for User, Products, Customers/Loyalty cards and a copy of AccountBook" as N5
 N5 .. Shop
@@ -280,6 +280,8 @@ note "SaleTransaction contains a list of Products" as N6
 N6 .. SaleTransaction
 note "ReturnTransaction contains a list of Products" as N7
 N7 .. ReturnTransaction
+note "LoyaltyCard keeps also track of the customer which is related to" as N8
+N8 .. LoyaltyCard
 }
 @enduml
 ```
@@ -514,8 +516,8 @@ GUI --> Shop: receiveCashPayment()
 Shop --> Shop: recordBalanceUpdate()
 Shop --> AccountBook: addBalanceOperation()
 AccountBook --> Shop: return true
-Shop --> GUI: return true
-GUI --> User: succesful message
+Shop --> GUI: return double
+GUI --> User: return double
 @enduml
 ```
 
@@ -542,6 +544,10 @@ Manage credit card return and update balance (go to UC10)
 end ref
 User -> GUI: Close return transaction
 GUI -> Shop: endReturnTransaction()
+Shop -> AccountBook: getBalanceOperationById() ???
+AccountBook --> Shop: return BalanceOperation ???
+Shop -> AccountBook: setStatus(CLOSED) ???
+AccountBook --> Shop: return boolean ???
 Shop --> GUI: return boolean
 GUI --> User: Successful message
 @enduml
