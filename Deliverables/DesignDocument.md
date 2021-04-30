@@ -216,13 +216,9 @@ class SaleTransaction {
     +paymentType: String
     +discountRate: float
     +boolean: isClosed
+    +HashMap<Integer, int>
 }
 SaleTransaction - "*" ProductType
-
-class Quantity {
-    +quantity: int
-}
-(SaleTransaction, ProductType)  .. Quantity
 
 class LoyaltyCard {
     +cardID: Integer
@@ -251,10 +247,20 @@ class Order {
   +supplier: String
   +pricePerUnit: double
   +quantity: int
-  +status: int
+  +status: OrderStatusEnum
 }
 
 Order "*" - ProductType
+
+Enum OrderStatusEnum {
+    Issued
+    Ordered
+    Payed
+    Completed
+}
+
+Order -[hidden]-> OrderStatusEnum
+
 
 class ReturnTransaction {
   +quantity: int
@@ -405,9 +411,113 @@ GUI --> Administrator: successful message
 ```
 
 
+#
 ## UC3
 
+```plantuml
+@startuml
+autonumber
+User -> GUI: Create new order O for product PT
+GUI -> Shop: payOrderFor()
+Shop -> Order: new Order()
+Order --> Shop: return Order
+Shop -> Order: setStatus()
+Shop -> BalanceOperation: new BalanceOperation()
+BalanceOperation --> Shop: return BalanceOperation
+Shop -> AccountBook: addBalanceOperation()
+AccountBook --> Shop: return boolean
+Shop --> GUI: return boolean
+Shop -> Order: setStatus()
+GUI --> Manager: show outcome message
+GUI -> Shop: recordOrderArrival()
+Shop -> Shop: updateQuantity()
+Shop --> GUI: return boolean
+GUI --> User: Show outcome message
+@enduml
+```   
+
+### Scenario 3-1
+```plantuml
+@startuml
+autonumber
+Manager -> GUI: Create new order O for product PT
+GUI -> Shop: issueReorder()
+Shop -> Order: new Order()
+Order --> Shop: return Order
+Shop -> Order: setStatus(Issued)
+Shop --> GUI: return orderID
+GUI -> Manager: show outcome message
+@enduml
+```   
+
+### Scenario 3-2
+```plantuml
+@startuml
+autonumber
+Manager -> GUI: Create new order O for product PT
+GUI -> Shop: getAllOrders()
+Shop --> GUI: returns List<Order>
+GUI --> Manager: Show orders
+Manager -> GUI: Register payment done for O
+GUI -> Shop: payOrder(orderID)
+Shop -> BalanceOperation: new BalanceOperation()
+BalanceOperation --> Shop: return BalanceOperation
+Shop -> AccountBook: addBalanceOperation()
+AccountBook --> Shop: return boolean
+Shop -> Order: setStatus(Payed)
+Shop --> GUI: return boolean
+GUI --> Manager: Show outcome message
+@enduml
+```   
+
+#
 ## UC4
+### Scenario 4-1
+```plantuml
+@startuml
+autonumber
+User -> GUI: Asks Cu personal data
+GUI -> Shop: getCustomer(id)
+Shop --> GUI: return Customer
+User -> GUI: Fills fields with Cu's personal data
+User -> GUI: Confirm
+GUI -> Shop: modifyCustomer(id, ...)
+Shop -> Customer: updateCustomer()
+Shop --> GUI: return boolean
+GUI --> User: Show outcome message
+@enduml
+```   
+
+### Scenario 4-2
+```plantuml
+@startuml
+autonumber
+User -> GUI: Creates a new Loyalty card L
+GUI -> Shop: createCard()
+Shop --> GUI: return cardCode
+GUI --> User: Show outcome message
+User -> GUI: User attaches L to U
+GUI -> Shop: attachCardToCustomer()
+Shop --> GUI: return boolean
+GUI --> User: Show outcome message
+@enduml
+```   
+
+### Scenario 4-3
+```plantuml
+@startuml
+autonumber
+User -> GUI: User selects customer record U
+GUI -> Shop: getCustomer()
+Shop --> GUI: return Customer
+User -> GUI: User detaches L from U
+GUI -> Shop: modifyCustomer()
+Shop -> Customer: setCard()
+Shop --> GUI: return boolean
+GUI -> User: Show outcome message 
+@enduml
+```   
+
 
 ## UC5 
 
