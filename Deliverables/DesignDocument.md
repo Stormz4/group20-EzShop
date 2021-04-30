@@ -223,8 +223,8 @@ class SaleTransaction {
     +time: LocalDate
     +paymentType: String
     +discountRate: float
-    +boolean: isClosed
-    +HashMap<Integer, int>
+    +isClosed: boolean
+    +quantityPerProduct: HashMap<Integer, int>
 }
 SaleTransaction - "*" ProductType
 
@@ -234,6 +234,7 @@ class LoyaltyCard {
 }
 
 class Customer {
+    +customerID: Integer
     +name: String
     +surname: String
     +update(String name, String surname, String card)
@@ -274,7 +275,7 @@ Order -[hidden]-> OrderStatusEnum
 class ReturnTransaction {
   +quantity: int
   +returnedValue: double
-  +boolean: isClosed
+  +isClosed: boolean
 }
 
 Shop -- "*" LoyaltyCard
@@ -284,12 +285,36 @@ ReturnTransaction "*" - SaleTransaction
 ReturnTransaction "*" - ProductType
 
 note left of LoyaltyCard: "ID is a number on 10 digits "
-note "bar code is a number on 12 to 14  digits,\ncompliant to GTIN specifications, see \nhttps://www.gs1.org/services/how-calculate-check-digit-manually " as N2  
+note "bar code is a number on 12 to \n14 digits, compliant to GTIN \nspecifications, see https://www.gs1\n.org/services/how-calculate-check\n-digit-manually " as N2  
 N2 .. ProductType
 note "ID is a unique identifier of a transaction, \nprinted on the receipt (ticket number) " as N3
-N3 .. SaleTransaction
-note "One to one relationships will be implented with \n a reference to the object \n For example, LoyalityCard will have a Customer) " as N4
-note "One to many relationships will be implemented \n with data structures" as N5
+N3 .right. SaleTransaction
+
+note "Map to \nimplement 1..n" as N6
+note "Map to \nimplement 1..n" as N7
+note "Map to \nimplement 1..n" as N8
+note "Map to \nimplement 1..n" as N9
+note "Map to \nimplement 1..n" as N10
+note "Map to \nimplement 1..n" as N11
+note "Map to \nimplement 1..n" as N12
+
+
+AccountBook .. N6
+N6 .. BalanceOperation
+Shop .. N7
+N7 .. Customer
+LoyaltyCard .. N8
+N8 .. SaleTransaction
+ProductType .. N9
+N9 .. Shop
+Shop .. N10
+N10 .. User
+Shop .. N11
+N11 .. LoyaltyCard
+SaleTransaction .. N12
+N12 .. ReturnTransaction
+
+
 
 }
 @enduml
