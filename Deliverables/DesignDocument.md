@@ -191,8 +191,6 @@ class AccountBook {
  +boolean updateBalance(double toBeAdded)
  +List<BalanceOperation> getAllTransactions()
  +boolean updateBalanceOperation(Integer transactionID)
- --
- updateBalance(double toBeAdded)\n called inside recordBalanceUpdate
 }
 AccountBook -down- Shop
 class BalanceOperation {
@@ -320,6 +318,8 @@ The User will communicate with the GUI, which will invoke Shop's methods (instea
 
 ```plantuml
 @startuml
+Actor User
+autonumber
 User --> GUI: Insert product descrition
 User --> GUI: Insert new bar code
 User --> GUI: Insert price per unit
@@ -337,6 +337,8 @@ Shop --> User : successful message
 
 ```plantuml
 @startuml
+Actor User
+autonumber
 User --> GUI: Searches by bar code
 GUI --> Shop: getProductTypeByBarCode()
 Shop --> GUI: return ProductType
@@ -354,19 +356,20 @@ GUI --> User : successful message
 ### Scenario 2-1
 ```plantuml
 @startuml
+Actor User
 autonumber
-Administrator -> GUI: Insert username
-Administrator -> GUI: Insert password
-Administrator -> GUI: Insert role
+User -> GUI: Insert username
+User -> GUI: Insert password
+User -> GUI: Insert role
 GUI -> Shop: createUser()
 Shop -> User: new User()
 User --> Shop: return User
 Shop --> GUI: return Integer (unique identifier)
-Administrator -> GUI: Selects user rights
+User -> GUI: Selects user rights
 GUI -> Shop: updateUserRights()
 Shop --> GUI: return boolean
-Administrator -> GUI: Confirms
-GUI --> Administrator: successful message
+User -> GUI: Confirms
+GUI --> User: successful message
 @enduml
 ```
 
@@ -374,11 +377,12 @@ GUI --> Administrator: successful message
 ### Scenario 2-2
 ```plantuml
 @startuml
+Actor User
 autonumber
-Administrator -> GUI: Select an account to be deleted
+User -> GUI: Select an account to be deleted
 GUI -> Shop: deleteUser()
 Shop --> GUI: return boolean
-GUI --> Administrator: successful message
+GUI --> User: successful message
 @enduml
 ```
 
@@ -386,14 +390,15 @@ GUI --> Administrator: successful message
 ### Scenario 2-3
 ```plantuml
 @startuml
+Actor User
 autonumber
-Administrator -> GUI: Select an account to be updated
+User -> GUI: Select an account to be updated
 GUI -> Shop: getUser()
 Shop --> GUI: return User
-Administrator -> GUI: Select new rights for the account
+User -> GUI: Select new rights for the account
 GUI -> Shop: updateUserRights()
 Shop --> GUI: return boolean
-GUI --> Administrator: successful message
+GUI --> User: successful message
 @enduml
 ```
 
@@ -403,26 +408,28 @@ GUI --> Administrator: successful message
 ### Scenario 3-1
 ```plantuml
 @startuml
+Actor User
 autonumber
-Manager -> GUI: Create new order O for product PT
+User -> GUI: Create new order O for product PT
 GUI -> Shop: issueOrder()
 Shop -> Order: new Order()
 Order --> Shop: return Order
 Shop -> Order: setStatus(Issued)
 Shop --> GUI: return orderID
-GUI -> Manager: show outcome message
+GUI -> User: show outcome message
 @enduml
 ```   
 
 ### Scenario 3-2
 ```plantuml
 @startuml
+Actor User
 autonumber
-Manager -> GUI: Create new order O for product PT
+User -> GUI: Create new order O for product PT
 GUI -> Shop: getAllOrders()
 Shop --> GUI: returns List<Order>
-GUI --> Manager: Show orders
-Manager -> GUI: Register payment done for O
+GUI --> User: Show orders
+User -> GUI: Register payment done for O
 GUI -> Shop: payOrder(orderID)
 Shop -> BalanceOperation: new BalanceOperation()
 BalanceOperation --> Shop: return BalanceOperation
@@ -431,7 +438,7 @@ AccountBook --> Shop: return boolean
 Shop -> Shop: recordBalanceUpdate()
 Shop -> Order: setStatus(Payed)
 Shop --> GUI: return boolean
-GUI --> Manager: Show outcome message
+GUI --> User: Show outcome message
 @enduml
 ```   
 
@@ -440,6 +447,7 @@ GUI --> Manager: Show outcome message
 ### Scenario 4-1
 ```plantuml
 @startuml
+Actor User
 autonumber
 User -> GUI: Asks Cu personal data
 GUI -> Shop: getCustomer(id)
@@ -456,6 +464,7 @@ GUI --> User: Show outcome message
 ### Scenario 4-2
 ```plantuml
 @startuml
+Actor User
 autonumber
 User -> GUI: Creates a new Loyalty card L
 GUI -> Shop: createCard()
@@ -471,6 +480,7 @@ GUI --> User: Show outcome message
 ### Scenario 4-3
 ```plantuml
 @startuml
+Actor User
 autonumber
 User -> GUI: User selects customer record U
 GUI -> Shop: getCustomer()
@@ -490,6 +500,8 @@ GUI -> User: Show outcome message
 
 ```plantuml
 @startuml
+Actor User
+autonumber
 User --> GUI : Insert username
 User --> GUI : Insert password
 User --> GUI : confirm
@@ -503,6 +515,8 @@ GUI --> User: Show functionalities
 
 ```plantuml
 @startuml
+Actor User
+autonumber
 User --> GUI: Log out
 GUI --> Shop: logout()
 Shop --> GUI : return boolean
@@ -516,6 +530,8 @@ GUI --> User : Change page
 
 ```plantuml
 @startuml
+Actor User
+autonumber
 User -> GUI: start Sale Transaction
 GUI -> Shop: startSaleTransaction()
 Shop -> SaleTransaction: new SaleTransaction()
@@ -542,6 +558,8 @@ end ref
 
 ```plantuml
 @startuml
+Actor User
+autonumber
 User -> GUI: start Sale Transaction
 GUI -> Shop: startSaleTransaction()
 Shop -> SaleTransaction: new SaleTransaction()
@@ -575,6 +593,8 @@ end ref
 
 ```plantuml
 @startuml
+Actor User
+autonumber
 User --> GUI: Read credit card number
 GUI --> Shop: receiveCreditCardPayment()
 Shop --> Shop: recordBalanceUpdate()
@@ -587,6 +607,8 @@ GUI --> User: succesful message
 
 ```plantuml
 @startuml
+Actor User
+autonumber
 User --> User: Collect banknotes and coins
 User --> User: Compute cash quantity
 User --> GUI: Record cash payment
@@ -604,6 +626,7 @@ GUI --> User: return double
 
 ```plantuml
 @startuml
+Actor User
 autonumber
 User -> GUI: Insert transaction ID
 GUI -> Shop: startReturnTransaction()
@@ -632,9 +655,10 @@ GUI --> User: Successful message
 
 ### Scenario 9-1
 
-
 ```plantuml
 @startuml
+Actor User
+autonumber
 User --> GUI: Selects a start date
 User --> GUI: Selects an end date
 User --> GUI: Send transaction list request
@@ -652,6 +676,7 @@ GUI --> User: display list
 
 ```plantuml
 @startuml
+Actor User
 autonumber
 User -> GUI: Insert credit card number
 GUI -> Shop: returnCreditCardPayment()
@@ -667,6 +692,7 @@ GUI --> User: Successful message
 
 ```plantuml
 @startuml
+Actor User
 autonumber
 User -> User: Collect banconotes and coins
 User -> GUI: Record cash return
