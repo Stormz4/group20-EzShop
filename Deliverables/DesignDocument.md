@@ -148,9 +148,6 @@ The model contains the following classes, which are persistent:
 
 ```plantuml
 @startuml
-left to right direction
-
-
 package it.polito.ezshop.model{
 class Shop{
 
@@ -200,7 +197,7 @@ class BalanceOperation {
  +date: LocalDate
  +type: BalanceOpTypeEnum
 }
-AccountBook -- "*" BalanceOperation
+AccountBook -up- "*" BalanceOperation
 
 Enum BalanceOpTypeEnum {
     Credit
@@ -279,7 +276,7 @@ class ReturnTransaction {
 }
 
 Shop -- "*" LoyaltyCard
-Shop -- "*" Customer
+Shop -down- "*" Customer
 
 ReturnTransaction "*" - SaleTransaction
 ReturnTransaction "*" - ProductType
@@ -313,8 +310,6 @@ Shop .. N11
 N11 .. LoyaltyCard
 SaleTransaction .. N12
 N12 .. ReturnTransaction
-
-
 
 }
 @enduml
