@@ -413,8 +413,12 @@ GUI --> Administrator: successful message
 
 ```plantuml
 @startuml
-User --> Shop: login()
-Shop --> User : success/error message
+User --> GUI : Insert username
+User --> GUI : Insert password
+User --> GUI : confirm
+GUI --> Shop: login()
+Shop --> GUI : return user
+GUI --> User: Show functionalities
 @enduml
 ```
 
@@ -422,8 +426,10 @@ Shop --> User : success/error message
 
 ```plantuml
 @startuml
-User --> Shop: logout()
-Shop --> User : return
+User --> GUI: Log out
+GUI --> Shop: logout()
+Shop --> GUI : return boolean
+GUI --> User : Change page
 @enduml
 ```
 
