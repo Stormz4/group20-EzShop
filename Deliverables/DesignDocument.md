@@ -21,8 +21,8 @@ Date: 29/04/2021
 
 # Contents
 
-- [High level design](#package-diagram)
-- [Low level design](#class-diagram)
+- [High level design](#high-level-design)
+- [Low level design](#low-level-design)
 - [Verification traceability matrix](#verification-traceability-matrix)
 - [Verification sequence diagrams](#verification-sequence-diagrams)
 
@@ -148,9 +148,6 @@ The model contains the following classes, which are persistent:
 
 ```plantuml
 @startuml
-left to right direction
-
-
 package it.polito.ezshop.model{
 class Shop{
 
@@ -191,8 +188,6 @@ class AccountBook {
  +boolean updateBalance(double toBeAdded)
  +List<BalanceOperation> getAllTransactions()
  +boolean updateBalanceOperation(Integer transactionID)
- --
- updateBalance(double toBeAdded)\n called inside recordBalanceUpdate
 }
 AccountBook -down- Shop
 class BalanceOperation {
@@ -200,20 +195,22 @@ class BalanceOperation {
  +description: String 
  +amount: int
  +date: LocalDate
+ +type: BalanceOpTypeEnum
 }
-AccountBook -- "*" BalanceOperation
+AccountBook -up- "*" BalanceOperation
 
-class Credit 
-class Debit
+Enum BalanceOpTypeEnum {
+    Credit
+    Debit
+}
 
-Credit --|> BalanceOperation
-Debit --|> BalanceOperation
+BalanceOperation -[hidden]-> BalanceOpTypeEnum
 
 class Order
 
-Order --|> Debit
-SaleTransaction --|> Credit
-ReturnTransaction --|> Debit
+Order --|> BalanceOperation
+SaleTransaction --|> BalanceOperation
+ReturnTransaction --|> BalanceOperation
 
 
 
@@ -223,8 +220,8 @@ class SaleTransaction {
     +time: LocalDate
     +paymentType: String
     +discountRate: float
-    +boolean: isClosed
-    +HashMap<Integer, int>
+    +isClosed: boolean
+    +quantityPerProduct: HashMap<Integer, int>
 }
 SaleTransaction - "*" ProductType
 
@@ -234,9 +231,10 @@ class LoyaltyCard {
 }
 
 class Customer {
+    +customerID: Integer
     +name: String
     +surname: String
-    +updateCustomer(String name, String surname, String card)
+    +update(String name, String surname, String card)
 }
 
 LoyaltyCard "0..1" - Customer
@@ -274,22 +272,44 @@ Order -[hidden]-> OrderStatusEnum
 class ReturnTransaction {
   +quantity: int
   +returnedValue: double
-  +boolean: isClosed
+  +isClosed: boolean
 }
 
 Shop -- "*" LoyaltyCard
-Shop -- "*" Customer
+Shop -down- "*" Customer
 
 ReturnTransaction "*" - SaleTransaction
 ReturnTransaction "*" - ProductType
 
 note left of LoyaltyCard: "ID is a number on 10 digits "
-note "bar code is a number on 12 to 14  digits,\ncompliant to GTIN specifications, see \nhttps://www.gs1.org/services/how-calculate-check-digit-manually " as N2  
+note "bar code is a number on 12 to \n14 digits, compliant to GTIN \nspecifications, see https://www.gs1\n.org/services/how-calculate-check\n-digit-manually " as N2  
 N2 .. ProductType
 note "ID is a unique identifier of a transaction, \nprinted on the receipt (ticket number) " as N3
-N3 .. SaleTransaction
-note "One to one relationships will be implented with \n a reference to the object \n For example, LoyalityCard will have a Customer) " as N4
-note "One to many relationships will be implemented \n with data structures" as N5
+N3 .right. SaleTransaction
+
+note "Map to \nimplement 1..n" as N6
+note "Map to \nimplement 1..n" as N7
+note "Map to \nimplement 1..n" as N8
+note "Map to \nimplement 1..n" as N9
+note "Map to \nimplement 1..n" as N10
+note "Map to \nimplement 1..n" as N11
+note "Map to \nimplement 1..n" as N12
+
+
+AccountBook .. N6
+N6 .. BalanceOperation
+Shop .. N7
+N7 .. Customer
+LoyaltyCard .. N8
+N8 .. SaleTransaction
+ProductType .. N9
+N9 .. Shop
+Shop .. N10
+N10 .. User
+Shop .. N11
+N11 .. LoyaltyCard
+SaleTransaction .. N12
+N12 .. ReturnTransaction
 
 }
 @enduml
@@ -298,15 +318,15 @@ note "One to many relationships will be implemented \n with data structures" as 
 
 # Verification traceability matrix
 
-| FR ID | Shop | User | Administrator | Order | ProductType | Position | SaleTransaction | LoyaltyCard | Customer | ReturnTransaction | AccountBook | Balance Operation | Credit | Debit |
-|:-------:|:------:|:------:|:---------------:|:-------:|:-------------:|:----------:|:-----------------:|:-------------:|:----------:|:-------------------:|:-------------:|-------------------:|:--------:|:-------:|
-| FR1   | X    | X    | X             |       |             |          |                 |             |          |                   |             |                   |        |       |
-| FR3   | X    | X    | X             |       | X           | X        |                 |             |          |                   |             |                   |        |       |
-| FR4   | X    | X    | X             | X     | X           | X        |                 |             |          |                   | X           | X                 |        | X     |
-| FR5   | X    | X    | X             |       |             |          |                 | X           | X        |                   |             |                   |        |       |
-| FR6   | X    | X    | X             |       | X           |          | X               | X           |          | X                 | X           | X                 | X      | X     |
-| FR7   | X    | X    | X             |       |             |          | X               |             |          | X                 | X           | X                 | X      | X     |
-| FR8   | X    | X    | X             |       |             |          | X               |             |          |        X          | X           | X                 | X      | X     |
+| FR ID | Shop | User | Administrator | Order | ProductType | Position | SaleTransaction | LoyaltyCard | Customer | ReturnTransaction | AccountBook | Balance Operation |
+|:-------:|:------:|:------:|:---------------:|:-------:|:-------------:|:----------:|:-----------------:|:-------------:|:----------:|:-------------------:|:-------------:|-------------------:|
+| FR1   | X    | X    | X             |       |             |          |                 |             |          |                   |             |                   |
+| FR3   | X    | X    | X             |       | X           | X        |                 |             |          |                   |             |                   |
+| FR4   | X    | X    | X             | X     | X           | X        |                 |             |          |                   | X           | X                 |
+| FR5   | X    | X    | X             |       |             |          |                 | X           | X        |                   |             |                   |
+| FR6   | X    | X    | X             |       | X           |          | X               | X           |          | X                 | X           | X                 |
+| FR7   | X    | X    | X             |       |             |          | X               |             |          | X                 | X           | X                 |
+| FR8   | X    | X    | X             |       |             |          | X               |             |          |        X          | X           | X                 |
 
 # Verification sequence diagrams 
 
@@ -318,14 +338,16 @@ The User will communicate with the GUI, which will invoke Shop's methods (instea
 
 ```plantuml
 @startuml
-User --> GUI: Insert product descrition
-User --> GUI: Insert new bar code
-User --> GUI: Insert price per unit
-User --> GUI: Insert product notes
-User --> GUI: Insert location
-User --> GUI: Confirms
-GUI --> Shop: createProductType()
-Shop --> ProductType : new ProductType
+Actor User
+autonumber
+User -> GUI: Insert product descrition
+User -> GUI: Insert new bar code
+User -> GUI: Insert price per unit
+User -> GUI: Insert product notes
+User -> GUI: Insert location
+User -> GUI: Confirms
+GUI -> Shop: createProductType()
+Shop -> ProductType : new ProductType
 ProductType --> Shop : return ID
 Shop --> User : successful message
 @enduml
@@ -335,13 +357,15 @@ Shop --> User : successful message
 
 ```plantuml
 @startuml
-User --> GUI: Searches by bar code
-GUI --> Shop: getProductTypeByBarCode()
+Actor User
+autonumber
+User -> GUI: Searches by bar code
+GUI -> Shop: getProductTypeByBarCode()
 Shop --> GUI: return ProductType
 
-User --> GUI: Selects record
-User --> GUI: Select a new product location
-GUI --> Shop: updatePosition()
+User -> GUI: Selects record
+User -> GUI: Select a new product location
+GUI -> Shop: updatePosition()
 Shop --> GUI : return boolean
 GUI --> User : successful message
 @enduml
@@ -352,6 +376,7 @@ GUI --> User : successful message
 ### Scenario 2-1
 ```plantuml
 @startuml
+Actor Administrator
 autonumber
 Administrator -> GUI: Insert username
 Administrator -> GUI: Insert password
@@ -364,7 +389,7 @@ Administrator -> GUI: Selects user rights
 GUI -> Shop: updateUserRights()
 Shop --> GUI: return boolean
 Administrator -> GUI: Confirms
-GUI --> Administrator: successful message
+GUI --> Administrator: Successful message
 @enduml
 ```
 
@@ -372,11 +397,12 @@ GUI --> Administrator: successful message
 ### Scenario 2-2
 ```plantuml
 @startuml
+Actor User
 autonumber
-Administrator -> GUI: Select an account to be deleted
+User -> GUI: Select an account to be deleted
 GUI -> Shop: deleteUser()
 Shop --> GUI: return boolean
-GUI --> Administrator: successful message
+GUI --> User: Successful message
 @enduml
 ```
 
@@ -384,14 +410,15 @@ GUI --> Administrator: successful message
 ### Scenario 2-3
 ```plantuml
 @startuml
+Actor User
 autonumber
-Administrator -> GUI: Select an account to be updated
+User -> GUI: Select an account to be updated
 GUI -> Shop: getUser()
 Shop --> GUI: return User
-Administrator -> GUI: Select new rights for the account
+User -> GUI: Select new rights for the account
 GUI -> Shop: updateUserRights()
 Shop --> GUI: return boolean
-GUI --> Administrator: successful message
+GUI --> User: Successful message
 @enduml
 ```
 
@@ -401,26 +428,28 @@ GUI --> Administrator: successful message
 ### Scenario 3-1
 ```plantuml
 @startuml
+Actor User
 autonumber
-Manager -> GUI: Create new order O for product PT
+User -> GUI: Create new order O for product PT
 GUI -> Shop: issueOrder()
 Shop -> Order: new Order()
 Order --> Shop: return Order
 Shop -> Order: setStatus(Issued)
 Shop --> GUI: return orderID
-GUI -> Manager: show outcome message
+GUI --> User: show outcome message
 @enduml
 ```   
 
 ### Scenario 3-2
 ```plantuml
 @startuml
+Actor User
 autonumber
-Manager -> GUI: Create new order O for product PT
+User -> GUI: Create new order O for product PT
 GUI -> Shop: getAllOrders()
 Shop --> GUI: returns List<Order>
-GUI --> Manager: Show orders
-Manager -> GUI: Register payment done for O
+GUI --> User: Show orders
+User -> GUI: Register payment done for O
 GUI -> Shop: payOrder(orderID)
 Shop -> BalanceOperation: new BalanceOperation()
 BalanceOperation --> Shop: return BalanceOperation
@@ -429,7 +458,7 @@ AccountBook --> Shop: return boolean
 Shop -> Shop: recordBalanceUpdate()
 Shop -> Order: setStatus(Payed)
 Shop --> GUI: return boolean
-GUI --> Manager: Show outcome message
+GUI --> User: Show outcome message
 @enduml
 ```   
 
@@ -438,6 +467,7 @@ GUI --> Manager: Show outcome message
 ### Scenario 4-1
 ```plantuml
 @startuml
+Actor User
 autonumber
 User -> GUI: Asks Cu personal data
 GUI -> Shop: getCustomer(id)
@@ -445,7 +475,7 @@ Shop --> GUI: return Customer
 User -> GUI: Fills fields with Cu's personal data
 User -> GUI: Confirm
 GUI -> Shop: modifyCustomer(id, ...)
-Shop -> Customer: updateCustomer()
+Shop -> Customer: update()
 Shop --> GUI: return boolean
 GUI --> User: Show outcome message
 @enduml
@@ -454,6 +484,7 @@ GUI --> User: Show outcome message
 ### Scenario 4-2
 ```plantuml
 @startuml
+Actor User
 autonumber
 User -> GUI: Creates a new Loyalty card L
 GUI -> Shop: createCard()
@@ -469,6 +500,7 @@ GUI --> User: Show outcome message
 ### Scenario 4-3
 ```plantuml
 @startuml
+Actor User
 autonumber
 User -> GUI: User selects customer record U
 GUI -> Shop: getCustomer()
@@ -477,7 +509,7 @@ User -> GUI: User detaches L from U
 GUI -> Shop: modifyCustomer()
 Shop -> Customer: setCard()
 Shop --> GUI: return boolean
-GUI -> User: Show outcome message 
+GUI --> User: Show outcome message 
 @enduml
 ```   
 
@@ -488,10 +520,12 @@ GUI -> User: Show outcome message
 
 ```plantuml
 @startuml
-User --> GUI : Insert username
-User --> GUI : Insert password
-User --> GUI : confirm
-GUI --> Shop: login()
+Actor User
+autonumber
+User -> GUI : Insert username
+User -> GUI : Insert password
+User -> GUI : confirm
+GUI -> Shop: login()
 Shop --> GUI : return user
 GUI --> User: Show functionalities
 @enduml
@@ -501,8 +535,10 @@ GUI --> User: Show functionalities
 
 ```plantuml
 @startuml
-User --> GUI: Log out
-GUI --> Shop: logout()
+Actor User
+autonumber
+User -> GUI: Log out
+GUI -> Shop: logout()
 Shop --> GUI : return boolean
 GUI --> User : Change page
 @enduml
@@ -514,6 +550,8 @@ GUI --> User : Change page
 
 ```plantuml
 @startuml
+Actor User
+autonumber
 User -> GUI: start Sale Transaction
 GUI -> Shop: startSaleTransaction()
 Shop -> SaleTransaction: new SaleTransaction()
@@ -540,6 +578,8 @@ end ref
 
 ```plantuml
 @startuml
+Actor User
+autonumber
 User -> GUI: start Sale Transaction
 GUI -> Shop: startSaleTransaction()
 Shop -> SaleTransaction: new SaleTransaction()
@@ -573,9 +613,11 @@ end ref
 
 ```plantuml
 @startuml
-User --> GUI: Read credit card number
-GUI --> Shop: receiveCreditCardPayment()
-Shop --> Shop: recordBalanceUpdate()
+Actor User
+autonumber
+User -> GUI: Read credit card number
+GUI -> Shop: receiveCreditCardPayment()
+Shop -> Shop: recordBalanceUpdate()
 Shop --> GUI: return true
 GUI --> User: succesful message
 @enduml
@@ -585,11 +627,13 @@ GUI --> User: succesful message
 
 ```plantuml
 @startuml
-User --> User: Collect banknotes and coins
-User --> User: Compute cash quantity
-User --> GUI: Record cash payment
-GUI --> Shop: receiveCashPayment()
-Shop --> Shop: recordBalanceUpdate()
+Actor User
+autonumber
+User -> User: Collect banknotes and coins
+User -> User: Compute cash quantity
+User -> GUI: Record cash payment
+GUI -> Shop: receiveCashPayment()
+Shop -> Shop: recordBalanceUpdate()
 AccountBook --> Shop: return true
 Shop --> GUI: return double
 GUI --> User: return double
@@ -602,6 +646,7 @@ GUI --> User: return double
 
 ```plantuml
 @startuml
+Actor User
 autonumber
 User -> GUI: Insert transaction ID
 GUI -> Shop: startReturnTransaction()
@@ -630,14 +675,15 @@ GUI --> User: Successful message
 
 ### Scenario 9-1
 
-
 ```plantuml
 @startuml
-User --> GUI: Selects a start date
-User --> GUI: Selects an end date
-User --> GUI: Send transaction list request
-GUI --> Shop: getCreditsAndDebits()
-Shop --> AccountBook: getAllTransactions()
+Actor User
+autonumber
+User -> GUI: Selects a start date
+User -> GUI: Selects an end date
+User -> GUI: Send transaction list request
+GUI -> Shop: getCreditsAndDebits()
+Shop -> AccountBook: getAllTransactions()
 AccountBook --> Shop: return transaction list
 Shop --> GUI: return transactions list
 GUI --> User: display list
@@ -650,10 +696,11 @@ GUI --> User: display list
 
 ```plantuml
 @startuml
+Actor User
 autonumber
 User -> GUI: Insert credit card number
 GUI -> Shop: returnCreditCardPayment()
-Shop --> Shop: recordBalanceUpdate()
+Shop -> Shop: recordBalanceUpdate()
 Shop -> AccountBook: addBalanceOperation()
 AccountBook --> Shop: return boolean
 Shop --> GUI: Amount returned
@@ -665,11 +712,12 @@ GUI --> User: Successful message
 
 ```plantuml
 @startuml
+Actor User
 autonumber
 User -> User: Collect banconotes and coins
 User -> GUI: Record cash return
 GUI -> Shop: returnCashPayment()
-Shop --> Shop: recordBalanceUpdate()
+Shop -> Shop: recordBalanceUpdate()
 Shop -> AccountBook: addBalanceOperation()
 AccountBook --> Shop: return boolean
 Shop --> GUI: Amount returned
