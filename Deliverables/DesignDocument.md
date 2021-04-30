@@ -214,6 +214,7 @@ class SaleTransaction {
     +time: LocalDate
     +paymentType: String
     +discountRate: float
+    +boolean: isClosed
 }
 SaleTransaction - "*" ProductType
 
@@ -257,7 +258,7 @@ Order "*" - ProductType
 class ReturnTransaction {
   +quantity: int
   +returnedValue: double
-
+  +boolean: isClosed
 }
 
 Shop -- "*" LoyaltyCard
@@ -441,60 +442,56 @@ GUI --> User : Change page
 @startuml
 User -> GUI: start Sale Transaction
 GUI -> Shop: startSaleTransaction()
-Shop -> SaleTransaction: startSaleTransaction()
+Shop -> SaleTransaction: new SaleTransaction()
 SaleTransaction --> Shop: return TransactionID
 Shop --> GUI: return boolean
-User -> GUI: click Add Product
+User -> GUI: Insert product BarCode
 GUI -> Shop: addProductToSale()
-Shop -> SaleTransaction: addProductToSale()
-SaleTransaction --> Shop : return boolean
-Shop --> GUI: return boolean
-Shop -> ProductType : updateQuantity()
-ProductType --> Shop: return boolean
+Shop -> Shop: getProductByBarCode()
+Shop -> Shop : updateQuantity()
 User -> GUI: close Sale Transaction
 GUI -> Shop: endSaleTransaction()
-Shop --> GUI: return Boolean
-GUI --> User: show Sale review
-GUI --> User: ask Payment Type (See UC7)
-User -> GUI: confirm Sale
-GUI -> Shop: recordBalanceUpdate()
-Shop -> Shop: recordBalanceUpdate()
-Shop -> AccountBook: updateBalance()
-AccountBook --> Shop: return true
-Shop --> GUI: return true
-GUI --> User: return true
+Shop -> AccountBook: addBalanceOperation()
+AccountBook --> Shop: return boolean
+Shop --> GUI: return boolean
+GUI --> User: ask Payment Type
+User -> GUI: Select payment type
+ref over GUI, User, Shop, AccountBook
+ manage Payment and update balance (see UC7)
+end ref
 @enduml
 ```
 
-### Scenario 6-4
+### Scenario 6-3
 
 ```plantuml
 @startuml
-User --> Shop: start Sale Transaction
-Shop --> SaleTransaction: startSaleTransaction()
+User -> GUI: start Sale Transaction
+GUI -> Shop: startSaleTransaction()
+Shop -> SaleTransaction: new SaleTransaction()
 SaleTransaction --> Shop: return TransactionID
-
-Shop --> BarCodeReader: read()
-BarCodeReader --> Shop : return BarCode
-
-Shop --> SaleTransaction: addProductToSale()
-SaleTransaction --> SaleTransaction : addProductToSale()
-SaleTransaction --> SaleTransaction : return boolean
-SaleTransaction --> Shop : return boolean
-Shop --> ProductType : updateQuantity()
-ProductType --> Shop: return boolean
-User --> Shop: endSaleTransaction()
-Shop --> Shop: getSaleTransaction()
-Shop --> User: show Sale review
-Shop --> User: ask Payment Type
-
-Shop --> LoyaltyCardReader: read()
-LoyaltyCardReader --> Shop : return CardCode
-
-Shop --> User: show Card
-User --> Shop: manage Payment (see UC7)
+Shop --> GUI: return boolean
+User -> GUI: Insert product BarCode
+GUI -> Shop: addProductToSale()
+Shop -> Shop: getProductByBarCode()
+Shop -> Shop : updateQuantity()
+Shop --> GUI: return boolean
+User -> GUI: insert discount rate
+GUI -> Shop: applyDiscountRateToSale()
+Shop --> GUI: return boolean
+User -> GUI: close Sale Transaction
+GUI -> Shop: endSaleTransaction()
+Shop -> AccountBook: addBalanceOperation()
+AccountBook --> Shop: return boolean
+Shop --> GUI: return boolean
+GUI --> User: ask Payment Type
+User -> GUI: Select payment type
+ref over GUI, User, Shop, AccountBook
+ manage Payment and update balance (see UC7)
+end ref
 @enduml
 ```
+
 
 ## UC7
 
@@ -507,8 +504,6 @@ User --> Shop: manage Payment (see UC7)
 User --> GUI: Read credit card number
 GUI --> Shop: receiveCreditCardPayment()
 Shop --> Shop: recordBalanceUpdate()
-Shop --> AccountBook: addBalanceOperation()
-AccountBook --> Shop: return true
 Shop --> GUI: return true
 GUI --> User: succesful message
 @enduml
@@ -545,7 +540,7 @@ User -> GUI: Insert product BarCode
 User -> GUI: Insert quantity of returned items
 GUI -> Shop: returnProduct()
 Shop -> Shop: getProductTypeByBarCode()
-Shop -> ProductType: Update quantity by N
+Shop -> Shop : updateQuantity()
 Shop --> GUI: return boolean
 Shop --> GUI: return Integer (ReturnTransaction ID)
 ref over GUI, User, Shop, AccountBook
@@ -553,36 +548,8 @@ Manage credit card return and update balance (go to UC10)
 end ref
 User -> GUI: Close return transaction
 GUI -> Shop: endReturnTransaction()
-Shop -> AccountBook: getBalanceOperationById() ???
-AccountBook --> Shop: return BalanceOperation ???
-Shop -> AccountBook: setStatus(CLOSED) ???
-AccountBook --> Shop: return boolean ???
-Shop --> GUI: return boolean
-GUI --> User: Successful message
-@enduml
-```
-
-### Scenario 8-2
-
-```plantuml
-@startuml
-autonumber
-User -> GUI: Insert transaction ID
-GUI -> Shop: startReturnTransaction()
-Shop -> ReturnTransaction: new ReturnTransaction()
-ReturnTransaction --> Shop: return ReturnTransaction
-User -> GUI: Insert product BarCode
-User -> GUI: Insert quantity of returned items
-GUI -> Shop: returnProduct()
-Shop -> Shop: getProductTypeByBarCode()
-Shop -> ProductType: Update quantity by N
-Shop --> GUI: return boolean
-Shop --> GUI: return Integer (ReturnTransaction ID)
-ref over GUI, User, Shop, AccountBook
-Manage cash return and update balance (go to UC10)
-end ref
-User -> GUI: Close return transaction
-GUI -> Shop: endReturnTransaction()
+Shop -> AccountBook: updateBalanceOperation()
+AccountBook --> Shop: return boolean
 Shop --> GUI: return boolean
 GUI --> User: Successful message
 @enduml
@@ -615,6 +582,7 @@ GUI --> User: display list
 autonumber
 User -> GUI: Insert credit card number
 GUI -> Shop: returnCreditCardPayment()
+Shop --> Shop: recordBalanceUpdate()
 Shop -> AccountBook: addBalanceOperation()
 AccountBook --> Shop: return boolean
 Shop --> GUI: Amount returned
@@ -630,6 +598,7 @@ autonumber
 User -> User: Collect banconotes and coins
 User -> GUI: Record cash return
 GUI -> Shop: returnCashPayment()
+Shop --> Shop: recordBalanceUpdate()
 Shop -> AccountBook: addBalanceOperation()
 AccountBook --> Shop: return boolean
 Shop --> GUI: Amount returned
