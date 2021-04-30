@@ -198,20 +198,22 @@ class BalanceOperation {
  +description: String 
  +amount: int
  +date: LocalDate
+ +type: BalanceOpTypeEnum
 }
 AccountBook -- "*" BalanceOperation
 
-class Credit 
-class Debit
+Enum BalanceOpTypeEnum {
+    Credit
+    Debit
+}
 
-Credit --|> BalanceOperation
-Debit --|> BalanceOperation
+BalanceOperation -[hidden]-> BalanceOpTypeEnum
 
 class Order
 
-Order --|> Debit
-SaleTransaction --|> Credit
-ReturnTransaction --|> Debit
+Order --|> BalanceOperation
+SaleTransaction --|> BalanceOperation
+ReturnTransaction --|> BalanceOperation
 
 
 
@@ -320,7 +322,7 @@ Actor User
 autonumber
 User -> GUI: Insert product descrition
 User -> GUI: Insert new bar code
-User --> GUI: Insert price per unit
+User -> GUI: Insert price per unit
 User -> GUI: Insert product notes
 User -> GUI: Insert location
 User -> GUI: Confirms
@@ -337,13 +339,13 @@ Shop --> User : successful message
 @startuml
 Actor User
 autonumber
-User --> GUI: Searches by bar code
-GUI --> Shop: getProductTypeByBarCode()
+User -> GUI: Searches by bar code
+GUI -> Shop: getProductTypeByBarCode()
 Shop --> GUI: return ProductType
 
-User --> GUI: Selects record
-User --> GUI: Select a new product location
-GUI --> Shop: updatePosition()
+User -> GUI: Selects record
+User -> GUI: Select a new product location
+GUI -> Shop: updatePosition()
 Shop --> GUI : return boolean
 GUI --> User : successful message
 @enduml
@@ -354,20 +356,20 @@ GUI --> User : successful message
 ### Scenario 2-1
 ```plantuml
 @startuml
-Actor User
+Actor Administrator
 autonumber
-User -> GUI: Insert username
-User -> GUI: Insert password
-User -> GUI: Insert role
+Administrator -> GUI: Insert username
+Administrator -> GUI: Insert password
+Administrator -> GUI: Insert role
 GUI -> Shop: createUser()
 Shop -> User: new User()
 User --> Shop: return User
 Shop --> GUI: return Integer (unique identifier)
-User -> GUI: Selects user rights
+Administrator -> GUI: Selects user rights
 GUI -> Shop: updateUserRights()
 Shop --> GUI: return boolean
-User -> GUI: Confirms
-GUI --> User: successful message
+Administrator -> GUI: Confirms
+GUI --> Administrator: Successful message
 @enduml
 ```
 
@@ -380,7 +382,7 @@ autonumber
 User -> GUI: Select an account to be deleted
 GUI -> Shop: deleteUser()
 Shop --> GUI: return boolean
-GUI --> User: successful message
+GUI --> User: Successful message
 @enduml
 ```
 
@@ -396,7 +398,7 @@ Shop --> GUI: return User
 User -> GUI: Select new rights for the account
 GUI -> Shop: updateUserRights()
 Shop --> GUI: return boolean
-GUI --> User: successful message
+GUI --> User: Successful message
 @enduml
 ```
 
@@ -500,10 +502,10 @@ GUI -> User: Show outcome message
 @startuml
 Actor User
 autonumber
-User --> GUI : Insert username
-User --> GUI : Insert password
-User --> GUI : confirm
-GUI --> Shop: login()
+User -> GUI : Insert username
+User -> GUI : Insert password
+User -> GUI : confirm
+GUI -> Shop: login()
 Shop --> GUI : return user
 GUI --> User: Show functionalities
 @enduml
@@ -515,8 +517,8 @@ GUI --> User: Show functionalities
 @startuml
 Actor User
 autonumber
-User --> GUI: Log out
-GUI --> Shop: logout()
+User -> GUI: Log out
+GUI -> Shop: logout()
 Shop --> GUI : return boolean
 GUI --> User : Change page
 @enduml
@@ -593,9 +595,9 @@ end ref
 @startuml
 Actor User
 autonumber
-User --> GUI: Read credit card number
-GUI --> Shop: receiveCreditCardPayment()
-Shop --> Shop: recordBalanceUpdate()
+User -> GUI: Read credit card number
+GUI -> Shop: receiveCreditCardPayment()
+Shop -> Shop: recordBalanceUpdate()
 Shop --> GUI: return true
 GUI --> User: succesful message
 @enduml
@@ -607,11 +609,11 @@ GUI --> User: succesful message
 @startuml
 Actor User
 autonumber
-User --> User: Collect banknotes and coins
-User --> User: Compute cash quantity
-User --> GUI: Record cash payment
-GUI --> Shop: receiveCashPayment()
-Shop --> Shop: recordBalanceUpdate()
+User -> User: Collect banknotes and coins
+User -> User: Compute cash quantity
+User -> GUI: Record cash payment
+GUI -> Shop: receiveCashPayment()
+Shop -> Shop: recordBalanceUpdate()
 AccountBook --> Shop: return true
 Shop --> GUI: return double
 GUI --> User: return double
@@ -657,11 +659,11 @@ GUI --> User: Successful message
 @startuml
 Actor User
 autonumber
-User --> GUI: Selects a start date
-User --> GUI: Selects an end date
-User --> GUI: Send transaction list request
-GUI --> Shop: getCreditsAndDebits()
-Shop --> AccountBook: getAllTransactions()
+User -> GUI: Selects a start date
+User -> GUI: Selects an end date
+User -> GUI: Send transaction list request
+GUI -> Shop: getCreditsAndDebits()
+Shop -> AccountBook: getAllTransactions()
 AccountBook --> Shop: return transaction list
 Shop --> GUI: return transactions list
 GUI --> User: display list
@@ -678,7 +680,7 @@ Actor User
 autonumber
 User -> GUI: Insert credit card number
 GUI -> Shop: returnCreditCardPayment()
-Shop --> Shop: recordBalanceUpdate()
+Shop -> Shop: recordBalanceUpdate()
 Shop -> AccountBook: addBalanceOperation()
 AccountBook --> Shop: return boolean
 Shop --> GUI: Amount returned
@@ -695,7 +697,7 @@ autonumber
 User -> User: Collect banconotes and coins
 User -> GUI: Record cash return
 GUI -> Shop: returnCashPayment()
-Shop --> Shop: recordBalanceUpdate()
+Shop -> Shop: recordBalanceUpdate()
 Shop -> AccountBook: addBalanceOperation()
 AccountBook --> Shop: return boolean
 Shop --> GUI: Amount returned
