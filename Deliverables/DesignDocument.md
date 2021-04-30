@@ -436,7 +436,7 @@ Shop -> Order: new Order()
 Order --> Shop: return Order
 Shop -> Order: setStatus(Issued)
 Shop --> GUI: return orderID
-GUI -> User: show outcome message
+GUI --> User: show outcome message
 @enduml
 ```   
 
@@ -509,7 +509,7 @@ User -> GUI: User detaches L from U
 GUI -> Shop: modifyCustomer()
 Shop -> Customer: setCard()
 Shop --> GUI: return boolean
-GUI -> User: Show outcome message 
+GUI --> User: Show outcome message 
 @enduml
 ```   
 
