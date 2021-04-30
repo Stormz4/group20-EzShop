@@ -174,6 +174,7 @@ class AccountBook {
  +balance: double
  +boolean addBalanceOperation(Integer transactionID)
  +boolean updateBalance(double toBeAdded)
+ +List<BalanceOperation> getAllTransactions()
 }
 AccountBook - Shop
 class BalanceOperation {
@@ -576,26 +577,17 @@ GUI --> User: Successful message
 
 ### Scenario 9-1
 
-| Scenario |  List credits and debits |
-| ------------- |:-------------:| 
-|  Precondition     | Manager C exists and is logged in |
-|  Post condition     | Transactions list displayed  |
-| Step#        | Description  |
-|  1    |  C selects a start date |  
-|  2    |  C selects an end date |
-|  3    |  C sends transaction list request to the system |
-|  4    |  The system returns the transactions list |
-|  5    |  The list is displayed  |
-
 
 ```plantuml
 @startuml
-User --> Shop: Selects a start date
-User --> Shop: Selects an end date
-User --> Shop: Send transaction list request
-Shop --> AccountingBook: getCreditsAndDebits()
-AccountingBook --> Shop: return transactions list
-Shop --> User: display list
+User --> GUI: Selects a start date
+User --> GUI: Selects an end date
+User --> GUI: Send transaction list request
+GUI --> Shop: getCreditsAndDebits()
+Shop --> AccountBook: getAllTransactions()
+AccountBook --> Shop: return transaction list
+Shop --> GUI: return transactions list
+GUI --> User: display list
 @enduml
 ```
 
