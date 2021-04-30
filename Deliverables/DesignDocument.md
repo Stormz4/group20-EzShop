@@ -96,11 +96,11 @@ interface EZShopInterface{
     +boolean attachCardToCustomer(String customerCard, Integer customerId)
     +boolean modifyPointsOnCard(String customerCard, int pointsToBeAdded)
 
-    .. UC5 ..
+    .. UC5 - Authenticate, authorize ..
     +User login(String username, String password)
     +boolean logout()
 
-    .. UC6 ..
+    .. UC6 - Manage sale transaction ..
     +Integer startSaleTransaction() throws UnauthorizedException
     +boolean addProductToSale(Integer transactionId, String productCode, int amount)
     +boolean deleteProductFromSale(Integer transactionId, String productCode, int amount)
@@ -112,11 +112,11 @@ interface EZShopInterface{
     +SaleTransaction getSaleTransaction(Integer transactionId)
   
 
-    .. UC7 ..
+    .. UC7 - Manage payment ..
     +double receiveCashPayment(Integer transactionId, double cash)
     +boolean receiveCreditCardPayment(Integer transactionId, String creditCard)
 
-    .. UC8 ..
+    .. UC8 - Manage return transaction ..
     +Integer startReturnTransaction(Integer transactionId)
     +boolean returnProduct(Integer returnId, String productCode, int amount)
     +boolean endReturnTransaction(Integer returnId, boolean commit)
@@ -296,17 +296,15 @@ note "One to many relationships will be implemented \n with data structures" as 
 
 # Verification traceability matrix
 
-!!! Useful link:    https://www.tablesgenerator.com/markdown_tables# 
-
 | FR ID | Shop | User | Administrator | Order | ProductType | Position | SaleTransaction | LoyaltyCard | Customer | ReturnTransaction | AccountBook | Balance Operation | Credit | Debit |
-|-------|------|------|---------------|-------|-------------|----------|-----------------|-------------|----------|-------------------|-------------|-------------------|--------|-------|
+|:-------:|:------:|:------:|:---------------:|:-------:|:-------------:|:----------:|:-----------------:|:-------------:|:----------:|:-------------------:|:-------------:|-------------------:|:--------:|:-------:|
 | FR1   | X    | X    | X             |       |             |          |                 |             |          |                   |             |                   |        |       |
 | FR3   | X    | X    | X             |       | X           | X        |                 |             |          |                   |             |                   |        |       |
-| FR4   | X    | X    | X             | X     | X           | X        |                 |             |          | X                 | X           | X                 |        | X     |
+| FR4   | X    | X    | X             | X     | X           | X        |                 |             |          |                   | X           | X                 |        | X     |
 | FR5   | X    | X    | X             |       |             |          |                 | X           | X        |                   |             |                   |        |       |
 | FR6   | X    | X    | X             |       | X           |          | X               | X           |          | X                 | X           | X                 | X      | X     |
 | FR7   | X    | X    | X             |       |             |          | X               |             |          | X                 | X           | X                 | X      | X     |
-| FR8   | X    | X    | X             |       |             |          | X               |             |          |                   | X           | X                 | X      | X     |
+| FR8   | X    | X    | X             |       |             |          | X               |             |          |        X          | X           | X                 | X      | X     |
 
 # Verification sequence diagrams 
 
