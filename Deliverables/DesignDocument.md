@@ -21,8 +21,8 @@ Date: 29/04/2021
 
 # Contents
 
-- [High level design](#package-diagram)
-- [Low level design](#class-diagram)
+- [High level design](#high-level-design)
+- [Low level design](#low-level-design)
 - [Verification traceability matrix](#verification-traceability-matrix)
 - [Verification sequence diagrams](#verification-sequence-diagrams)
 
@@ -298,15 +298,15 @@ note "One to many relationships will be implemented \n with data structures" as 
 
 # Verification traceability matrix
 
-| FR ID | Shop | User | Administrator | Order | ProductType | Position | SaleTransaction | LoyaltyCard | Customer | ReturnTransaction | AccountBook | Balance Operation | Credit | Debit |
-|:-------:|:------:|:------:|:---------------:|:-------:|:-------------:|:----------:|:-----------------:|:-------------:|:----------:|:-------------------:|:-------------:|-------------------:|:--------:|:-------:|
-| FR1   | X    | X    | X             |       |             |          |                 |             |          |                   |             |                   |        |       |
-| FR3   | X    | X    | X             |       | X           | X        |                 |             |          |                   |             |                   |        |       |
-| FR4   | X    | X    | X             | X     | X           | X        |                 |             |          |                   | X           | X                 |        | X     |
-| FR5   | X    | X    | X             |       |             |          |                 | X           | X        |                   |             |                   |        |       |
-| FR6   | X    | X    | X             |       | X           |          | X               | X           |          | X                 | X           | X                 | X      | X     |
-| FR7   | X    | X    | X             |       |             |          | X               |             |          | X                 | X           | X                 | X      | X     |
-| FR8   | X    | X    | X             |       |             |          | X               |             |          |        X          | X           | X                 | X      | X     |
+| FR ID | Shop | User | Administrator | Order | ProductType | Position | SaleTransaction | LoyaltyCard | Customer | ReturnTransaction | AccountBook | Balance Operation |
+|:-------:|:------:|:------:|:---------------:|:-------:|:-------------:|:----------:|:-----------------:|:-------------:|:----------:|:-------------------:|:-------------:|-------------------:|
+| FR1   | X    | X    | X             |       |             |          |                 |             |          |                   |             |                   |
+| FR3   | X    | X    | X             |       | X           | X        |                 |             |          |                   |             |                   |
+| FR4   | X    | X    | X             | X     | X           | X        |                 |             |          |                   | X           | X                 |
+| FR5   | X    | X    | X             |       |             |          |                 | X           | X        |                   |             |                   |
+| FR6   | X    | X    | X             |       | X           |          | X               | X           |          | X                 | X           | X                 |
+| FR7   | X    | X    | X             |       |             |          | X               |             |          | X                 | X           | X                 |
+| FR8   | X    | X    | X             |       |             |          | X               |             |          |        X          | X           | X                 |
 
 # Verification sequence diagrams 
 
