@@ -2,9 +2,19 @@
 
 Authors: Vittorio Di Leo, Maurizio Morisio 
 
-Date: 21 April 2021
+Date: 27 April 2021
 
-Version: 1.0
+Version: 1.2
+
+ 
+| Version number | Change |
+| ----------------- |:-----------|
+| 1.1 | Modified glossary, Sale is now SaleTransaction|
+| 1.1 | Modified glossary, Return is now ReturnTransaction|
+| 1.2 | canceled Return, Sale in glossary |
+| 1.2 | canceled FR6.9 and other references to sale ticket canceled in use cases|
+| 1.2 | FinancialTransaction  renamed in BalanceOperation in glossary |
+
 
 # Contents
 
@@ -123,12 +133,11 @@ ch -> (EZShop)
 | FR6.5 | Apply discount rate to a product type  |
 | FR6.6 | Compute points for a sale |
 | FR6.7 | Read bar code on product |
-| FR6.8 | Print sale ticket |
-| FR6.9 | Get sale ticket from ticket number |
+| FR6.8 | Print sale receipt |
 | FR6.10 | Close  a sale transaction  |
 | FR6.11 | Rollback or commit a closed sale transaction  |
 | FR6.12 | Start  a return transaction  |
-| FR6.13 | Return a product listed in a sale ticket |
+| FR6.13 | Return a product listed in a sale transaction |
 | FR6.14 | Close  a return transaction  |
 | FR6.15 | Rollback or commit a closed return transaction  |
 | FR7 | Manage payment |
@@ -465,7 +474,7 @@ mngr --> (Manage inventory and orders)
 | ------------- |:-------------:|
 |  Precondition     | There are products available in the store |
 |  | No sale transaction has already been opened with the instance of EzShop under consideration |
-|  Post condition     | Sale is recorded, Ticket T is created |
+|  Post condition     | Sale is recorded |
 |  Nominal Scenario   | Employee starts a new sale transaction and then, for each product P in the customer's cart, he records the quantity to be added to the transaction. The relative available quantity of P available in store is updated. The transaction is closed |
 |  Variants     | discount rate to be applied to a product P  |
 | | discount rate applied to the whole sale |
@@ -488,7 +497,7 @@ mngr --> (Manage inventory and orders)
 |  6    |  System asks payment type |
 |  7    |  Manage  payment (see UC7) |
 |  8    |  Payment successful |
-|  9   |  C confirms the sale and prints the sale Ticket |
+|  9   |  C confirms the sale and prints the sale receipt |
 |  10   |  Balance is updated |
 
 ##### Scenario 6-2
@@ -509,7 +518,7 @@ mngr --> (Manage inventory and orders)
 |  7    |  Sytem ask payment type |
 |  8    |  Manage  payment (go to UC 7) |
 |  9   |  Payment successful |
-|  10   |  C confirms the sale and prints the sale Ticket |
+|  10   |  C confirms the sale and prints the sale receipt |
 |  11   |  Balance is updated |
 
 ##### Scenario 6-3
@@ -530,7 +539,7 @@ mngr --> (Manage inventory and orders)
 |  7    |  Sytem ask payment type |
 |  8    |  Manage  payment (go to UC 7 ) |
 |  9    |  Payment successful |
-|  10   |  C confirms the sale and prints the sale Ticket |
+|  10   |  C confirms the sale and prints the sale receipt |
 |  11   |  Balance is updated |
 
 ##### Scenario 6-4
@@ -554,7 +563,7 @@ mngr --> (Manage inventory and orders)
 |  8    |  Manage credit card payment (go to scenario 3) |
 |  9   |  Payment successful |
 |  10   |  L.points updated |
-|  11   |  C confirms the sale and prints the sale Ticket |
+|  11   |  C confirms the sale and prints the sale receipt |
 |  12   |  Balance is updated |
 
 ##### Scenario 6-5
@@ -573,8 +582,8 @@ mngr --> (Manage inventory and orders)
 |  5    |  C closes the sale transaction |
 |  6    |  System ask payment type |
 |  7    |  Customer cancels the payment |
-|  8    |  Sale transaction aborted |
-|  9   |  Sale ticket deleted, no change will be recorded |
+|  8    |  Sale transaction aborted  no change will be recorded|
+
 
 ##### Scenario 6-6
 
@@ -594,7 +603,7 @@ mngr --> (Manage inventory and orders)
 |  7    |  Sytem ask payment type |
 |  8    |  Manage cash payment (UC7) |
 |  9    |  Payment successful |
-|  10   |  C confirms the sale and prints the sale Ticket |
+|  10   |  C confirms the sale and prints the sale receipt |
 |  11   |  Balance is updated |
 
 
@@ -606,7 +615,7 @@ mngr --> (Manage inventory and orders)
 |  Post condition     |   |
 |  Nominal Scenario     |  read credit card number, check card, debit card |
 | Variants      | Credit Card invalid (does not exist or stolen or expired), issue warning |
-|   | Customer has not enough cash to pay the ticket, issue warning |
+|   | Customer has not enough cash to pay the sale , issue warning |
 |   | Credit Card has not enough money, issue warning |
 
 
@@ -666,12 +675,12 @@ mngr --> (Manage inventory and orders)
 
 | Actors Involved        |  Administrator, Shop Manager, Cashier |
 | ------------- |:-------------:|
-|  Precondition     | Ticket T exists |
+|  Precondition     | Transaction T exists |
 |  | No return transaction has already been opened with the instance of EzShop under consideration |
 |  Post condition     | Balance updated |
 |  | The available quantity of the products involved in the transaction is updated |
-|  Nominal Scenario   | User  starts a new return transaction inserting the T's unique number. User selects product to be returned and quantity.  The customer receives a reimbursement equal to the value of the returned products, the balance is updated and the quantity of products available  is updated.  Reimbursement is cash if the Ticked was paid cash, by credit card if it was paid by credit card|
-|  Variants     | Ticket number does not exists, issue warning |
+|  Nominal Scenario   | User  starts a new return transaction inserting the T's unique number. User selects product to be returned and quantity.  The customer receives a reimbursement equal to the value of the returned products, the balance is updated and the quantity of products available  is updated.  Reimbursement is cash if the sale was paid cash, by credit card if it was paid by credit card|
+|  Variants     | Transaction number does not exists, issue warning |
 |  |  Return payment failed, transaction rolled back |
 
 
@@ -681,12 +690,12 @@ mngr --> (Manage inventory and orders)
 | ------------- |:-------------:| 
 |  Precondition     | Cashier C exists and is logged in |
 | | Product Type X exists |
-| | Ticket T exists and has at least N units of X |
-| | Ticket T was paid with credit card |
+| | Transaction T exists and has at least N units of X |
+| | Transaction T was paid with credit card |
 |  Post condition     | Balance -= N*T.priceForProductX  |
 | | X.quantity += N |
 | Step#        | Description  |
-|  1    |  C inserts T.ticketNumber |
+|  1    |  C inserts T.transactionId |
 |  2    |  Return transaction starts |  
 |  3    |  C reads bar code of X |
 |  4    |  C adds N units of X to the return transaction |
@@ -701,12 +710,12 @@ mngr --> (Manage inventory and orders)
 | ------------- |:-------------:| 
 |  Precondition     | Cashier C exists and is logged in |
 | | Product Type X exists |
-| | Ticket T exists and has at least N units of X |
-| | Ticket T was paid cash |
+| | Ticktransaction T exists and has at least N units of X |
+| | Transaction T was paid cash |
 |  Post condition     | Balance -= N*T.priceForProductX  |
 | | X.quantity += N |
 | Step#        | Description  |
-|  1    |  C inserts T.ticketNumber |
+|  1    |  C inserts T.transactionId |
 |  2    |  Return transaction starts |  
 |  3    |  C reads bar code of X |
 |  4    |  C adds N units of X to the return transaction |
@@ -714,7 +723,7 @@ mngr --> (Manage inventory and orders)
 |  6    |  Manage cash return (go to UC 10) |
 |  7   |  Return  successful |
 |  8   |  C confirms the return transaction and closes it  |
-|  9   |  Sale Ticket is updated |
+|  9   |  Transaction is updated |
 |  10   |  Balance is updated |
 
 
@@ -790,26 +799,25 @@ left to right direction
 class Shop
 class AccountBook 
 AccountBook - Shop
-class FinancialTransaction {
+class BalanceOperation {
  description
  amount
  date
 }
-AccountBook -- "*" FinancialTransaction
+AccountBook -- "*" BalanceOperation
 
 class Credit 
 class Debit
 
-Credit --|> FinancialTransaction
-Debit --|> FinancialTransaction
+Credit --|> BalanceOperation
+Debit --|> BalanceOperation
 
 class Order
-class Sale
-class Return
+
 
 Order --|> Debit
-Sale --|> Credit
-Return --|> Debit
+SaleTransaction --|> Credit
+ReturnTransaction --|> Debit
 
 
 class ProductType{
@@ -825,8 +833,6 @@ Shop - "*" ProductType
 
 class SaleTransaction {
     ID 
-    date
-    time
     cost
     paymentType
     discount rate
@@ -887,7 +893,7 @@ note "ID is a number on 10 digits " as N1
 N1 .. LoyaltyCard
 note "bar code is a number on 12 to 14  digits, compliant to GTIN specifications, see  https://www.gs1.org/services/how-calculate-check-digit-manually " as N2  
 N2 .. ProductType
-note "ID is a unique identifier of a transaction,  printed on the receipt (ticket number) " as N3
+note "ID is a unique identifier of a transaction,  printed on the receipt " as N3
 N3 .. SaleTransaction
 
 ```
