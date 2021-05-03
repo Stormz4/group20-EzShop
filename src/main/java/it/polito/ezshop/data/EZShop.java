@@ -3,10 +3,14 @@ package it.polito.ezshop.data;
 import it.polito.ezshop.exceptions.*;
 
 import java.time.LocalDate;
+import java.util.LinkedList;
 import java.util.List;
 
 
 public class EZShop implements EZShopInterface {
+    List<Customer> customers = new LinkedList<>();
+    EZCustomer c1 = new EZCustomer(1, "Ciccio", "00001", 0);
+    // populate customers
 
 
     @Override
@@ -66,7 +70,18 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public List<ProductType> getAllProductTypes() throws UnauthorizedException {
-        return null;
+        List<ProductType> productTypes = new LinkedList<>();
+        Integer id = 1;
+        Integer quantity = 20;
+        String location = "C";
+        String note = "Nota";
+        String productDescription = "Description";
+        String barCode = "XYZ123";
+        double pricePerUnit = 12.50;
+        EZProductType myProdType = new EZProductType(id, quantity, location, note, productDescription, barCode, pricePerUnit);
+        productTypes.add(myProdType);
+        
+        return productTypes;
     }
 
     @Override
