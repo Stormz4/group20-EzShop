@@ -10,6 +10,7 @@ import java.util.List;
 public class EZShop implements EZShopInterface {
     List<Customer> customers = new LinkedList<>();
     EZCustomer c1 = new EZCustomer(1, "Ciccio", "00001", 0);
+    SQLiteDB shopDB = new SQLiteDB();
     // populate customers
 
 
@@ -45,11 +46,19 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public User login(String username, String password) throws InvalidUsernameException, InvalidPasswordException {
+        // TODO: remove all this stuff used for SQLite feature development
+        shopDB.connect();
+        shopDB.createCustomerTable();
+        Integer c1 = shopDB.insertCustomer("Pippo", "XYZ123", 512);
+        Integer c2 = shopDB.insertCustomer("Pluto", "", 0);
+        Integer c3 = shopDB.insertCustomer("Paperino", "XYZ456", 260);
+        shopDB.deleteCustomer(2);
         return null;
     }
 
     @Override
     public boolean logout() {
+        shopDB.closeConnection();
         return false;
     }
 
