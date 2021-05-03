@@ -66,7 +66,18 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public List<ProductType> getAllProductTypes() throws UnauthorizedException {
-        return null;
+        List<ProductType> productTypes = null;
+        Integer id = 1;
+        Integer quantity = 20;
+        String location = "C";
+        String note = "Nota";
+        String productDescription = "Description";
+        String barCode = "XYZ123";
+        double pricePerUnit = 12.50;
+        EZProductType myProdType = new EZProductType(id, quantity, location, note, productDescription, barCode, pricePerUnit);
+        productTypes.add(myProdType);
+        
+        return productTypes;
     }
 
     @Override
