@@ -6,6 +6,7 @@ public class EZUser implements User {
     private String password;
     private String role;
 
+
     public EZUser (Integer id, String userName, String password, String role) {
         this.id = id;
         this.userName = userName;
