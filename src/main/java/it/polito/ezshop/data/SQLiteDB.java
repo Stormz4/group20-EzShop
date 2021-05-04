@@ -86,7 +86,7 @@ public class SQLiteDB {
         return lastId;
     }
 
-    /**
+    /** TODO: remove points from Customer (now in Card)
      ** Create a new Customers table
      ** EZCustomer(Integer id, String customerName, String customerCard)
      */
