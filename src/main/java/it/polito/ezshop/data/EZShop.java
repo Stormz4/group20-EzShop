@@ -52,6 +52,7 @@ public class EZShop implements EZShopInterface {
         Integer c1 = shopDB.insertCustomer("Pippo", "XYZ123", 512);
         Integer c2 = shopDB.insertCustomer("Pluto", "", 0);
         Integer c3 = shopDB.insertCustomer("Paperino", "XYZ456", 260);
+        shopDB.updateCustomer(3, "zio Paperone", "XYZ456", 250);
         shopDB.deleteCustomer(2);
         return null;
     }

@@ -188,4 +188,28 @@ public class SQLiteDB {
         }
     }
 
+    /**
+     ** Update Customer record
+     */
+    public void updateCustomer(Integer customerId, String customerName, String customerCard, Integer points) {
+        String sql = "UPDATE customers\n" +
+                     "SET name = ?, card = ?, points = ?\n" +
+                     "WHERE id = ?;";
+
+        // TODO: Should handle this as an exception?
+        if (this.dbConnection == null || customerId == null)
+            return;
+
+        try{
+            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            pstmt.setString(1, customerName);
+            pstmt.setString(2, customerCard);
+            pstmt.setInt(3, points);
+            pstmt.setInt(4, customerId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
 }
