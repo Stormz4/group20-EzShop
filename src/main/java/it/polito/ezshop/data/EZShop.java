@@ -48,7 +48,7 @@ public class EZShop implements EZShopInterface {
     public User login(String username, String password) throws InvalidUsernameException, InvalidPasswordException {
         // TODO: remove all this stuff used for SQLite feature development
         shopDB.connect();
-        shopDB.createCustomerTable();
+        shopDB.createCustomersTable();
         Integer c1 = shopDB.insertCustomer("Pippo", "XYZ123", 512);
         Integer c2 = shopDB.insertCustomer("Pluto", "", 0);
         Integer c3 = shopDB.insertCustomer("Paperino", "XYZ456", 260);

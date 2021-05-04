@@ -92,7 +92,7 @@ public class SQLiteDB {
      ** Create a new Customers table
      ** EZCustomer(Integer id, String customerName, String customerCard, Integer points)
      */
-    public void createCustomerTable() {
+    public void createCustomersTable() {
         // SQL statement for creating a new Customer table
         // TODO: consider having customerCard UNIQUE
         String sql = "CREATE TABLE IF NOT EXISTS Customers (\n"
@@ -216,12 +216,11 @@ public class SQLiteDB {
     }
 
     /**
-     ** Create a new BalanceOperation table
+     ** Create a new BalanceOperations table
      ** EZBalanceOperation (int balanceId, LocalDate date, double money, String type)
      */
-    public void createBalanceOperationTable() {
-        // SQL statement for creating a new Customer table
-        // TODO: consider having customerCard UNIQUE
+    public void createBalanceOperationsTable() {
+        // SQL statement for creating a new BalanceOperations table
         String sql = "CREATE TABLE IF NOT EXISTS BalanceOperations (\n"
                 + " id integer PRIMARY KEY,\n"
                 + " date text,\n"
@@ -320,28 +319,162 @@ public class SQLiteDB {
         }
     }
 
-//    /**
-//     ** Update BalanceOperation record - TODO: check if we could need to update a BalanceOperation
-//     */
-//    public void updateCustomer(Integer customerId, String customerName, String customerCard, Integer points) {
-//        String sql = "UPDATE BalanceOperations\n" +
-//                "SET name = ?, card = ?, points = ?\n" +
-//                "WHERE id = ?;";
-//
-//        // TODO: Should handle this as an exception?
-//        if (this.dbConnection == null || customerId == null)
-//            return;
-//
-//        try{
-//            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
-//            pstmt.setString(1, customerName);
-//            pstmt.setString(2, customerCard);
-//            pstmt.setInt(3, points);
-//            pstmt.setInt(4, customerId);
-//            pstmt.executeUpdate();
-//        } catch (SQLException e) {
-//            System.out.println(e.getMessage());
-//        }
-//    }
+    /**
+     ** Update BalanceOperation record
+     */
+    public void updateBalanceOperation(Integer id, LocalDate date, double money, String type) {
+        String sql = "UPDATE BalanceOperations\n" +
+                     "SET date = ?, money = ?, type = ?\n" +
+                     "WHERE id = ?;";
 
+        // TODO: Should handle this as an exception?
+        if (this.dbConnection == null || id == null)
+            return;
+
+        String strDate = null;
+        if (date != null)
+            strDate = date.toString();
+
+        try{
+            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            pstmt.setString(1, strDate);
+            pstmt.setDouble(2, money);
+            pstmt.setString(3, type);
+            pstmt.setInt(4, id);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     ** Create a new Orders table
+     ** EZOrder (Integer orderId, Integer balanceId, String productCode, double pricePerUnit, int quantity, String status)
+     */
+    public void createOrdersTable() {
+        // SQL statement for creating a new Orders table
+        String sql = "CREATE TABLE IF NOT EXISTS Orders (\n"
+                + " id integer PRIMARY KEY,\n"
+                + " balanceId integer,\n"
+                + " productCode text,\n"
+                + " pricePerUnit real\n"
+                + " quantity integer\n"
+                + " status text\n"
+                + ");";
+
+        // TODO: Should handle this as an exception?
+        if (this.dbConnection == null)
+            return;
+
+        try{
+            Statement stmt = this.dbConnection.createStatement();
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     ** Select all Orders records
+     */
+    public HashMap<Integer, EZOrder> selectAllOrders(){
+        HashMap<Integer, EZOrder> orders = new HashMap<>();
+        String sql = "SELECT * FROM Orders";
+
+        try {
+            Statement stmt  = this.dbConnection.createStatement();
+            ResultSet rs    = stmt.executeQuery(sql);
+
+            // loop through the result set
+            while (rs.next()) {
+                Integer id = rs.getInt("id");
+                Integer balanceId = rs.getInt("balanceId");
+                String productCode = rs.getString("productCode");
+                double pricePerUnit = rs.getDouble("pricePerUnit");
+                Integer quantity = rs.getInt("quantity");
+                String status = rs.getString("status");
+                orders.put(id, new EZOrder(id, balanceId, productCode, pricePerUnit, quantity, status));
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return orders;
+    }
+
+    /**
+     ** Insert new Order record
+     */
+    public Integer insertOrder(Integer balanceId, String productCode, double pricePerUnit, int quantity, String status) {
+        String sql = "INSERT INTO Orders(balanceId, productCode, pricePerUnit, quantity, status) VALUES(?,?,?,?,?)";
+        Integer orderId = null;
+
+        // TODO: Should handle this as an exception?
+        if (this.dbConnection == null)
+            return null;
+
+        try{
+            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            pstmt.setInt(1, balanceId);
+            pstmt.setString(2, productCode);
+            pstmt.setDouble(3, pricePerUnit);
+            pstmt.setInt(4, quantity);
+            pstmt.setString(5, status);
+            pstmt.executeUpdate();
+
+            orderId = this.lastInsertRowId();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return orderId;
+    }
+
+    /**
+     ** Delete Order record with given id
+     */
+    public void deleteOrder(Integer id) {
+        String sql = "DELETE FROM Orders WHERE id=?";
+
+        // TODO: Should handle this as an exception?
+        if (this.dbConnection == null)
+            return;
+
+        if (id == null)
+            return;
+
+        try{
+            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     ** Update Order record
+     */
+    public void updateOrder(Integer id, Integer balanceId, String productCode, double pricePerUnit, int quantity, String status) {
+        String sql = "UPDATE Orders\n" +
+                     "SET balanceId = ?, productCode = ?, pricePerUnit = ?, quantity = ?, status = ?\n" +
+                     "WHERE id = ?;";
+
+        // TODO: Should handle this as an exception?
+        if (this.dbConnection == null || id == null)
+            return;
+
+        try{
+            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            pstmt.setInt(1, balanceId);
+            pstmt.setString(2, productCode);
+            pstmt.setDouble(3, pricePerUnit);
+            pstmt.setInt(4, quantity);
+            pstmt.setString(5, status);
+            pstmt.setInt(6, id);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 }
