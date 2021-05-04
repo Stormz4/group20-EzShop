@@ -7,6 +7,8 @@ import java.util.LinkedList;
 import java.util.HashMap;
 import java.util.Collections;
 import java.util.List;
+import java.lang.StringBuilder;
+import java.lang.Math;
 
 
 public class EZShop implements EZShopInterface {
@@ -18,6 +20,9 @@ public class EZShop implements EZShopInterface {
     HashMap<Integer, Customer> customers = new HashMap<>();
     HashMap<Integer, User> users = new HashMap<>();
 
+    // TODO verify is this map is needed
+    HashMap<Integer, String> loyaltyCards = new HashMap<>();
+
 
     @Override
     public void reset() {
@@ -26,35 +31,22 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public Integer createUser(String username, String password, String role) throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
-        try{
-            if (username == null || username.isEmpty() ) {
-                throw new InvalidUsernameException();
-            }
-        } catch (InvalidUsernameException e){
-            System.out.println("Username not valid");
-            e.printStackTrace();
+        if (username == null || username.isEmpty() ) {
+            throw new InvalidUsernameException();
         }
-        try{
-            if (password == null || password.isEmpty()) {
-                throw new InvalidPasswordException();
-            }
-        } catch (InvalidPasswordException e){
-            System.out.println("Password not valid");
-            e.printStackTrace();
+        if (password == null || password.isEmpty()) {
+            throw new InvalidPasswordException();
         }
-        try{
-            if(role.isEmpty() || !(role.equals("Administrator") || role.equals("Cashier") || role.equals("ShopManager"))){
-                throw new InvalidRoleException();
-            }
-        } catch (InvalidRoleException e){
-            System.out.println("Role not valid");
-            e.printStackTrace();
+        if(role.isEmpty() || !(role.equals("Administrator") || role.equals("Cashier") || role.equals("ShopManager"))){
+            throw new InvalidRoleException();
         }
+
         for (User user : users.values()) {
             if (user.getUsername().equals(username)) {
                 return -1;
             }
         }
+        // TODO return -1 is there is an error while saving the user
         // Get the highest ID from the DB
         int maxKey = Collections.max(users.keySet());
         Integer id = maxKey+1;
@@ -70,39 +62,27 @@ public class EZShop implements EZShopInterface {
         if (!users.containsKey(id)) {
             return false;
         }
-        try{
-            if (id == null || id <=0) {
-                throw new InvalidUserIdException();
-            }
-        } catch (InvalidUserIdException e){
-            System.out.println("Id not valid");
-            e.printStackTrace();
+        if (id == null || id <=0) {
+            throw new InvalidUserIdException();
         }
 
-        try{
-            if(!currUser.getRole().equals("Administrator") || currUser == null){
-                throw new UnauthorizedException();
-            }
-        } catch (UnauthorizedException e ){
-            System.out.println("Not authorized");
-            e.printStackTrace();
+        if(!currUser.getRole().equals("Administrator") || currUser == null){
+            throw new UnauthorizedException();
         }
 
         users.remove(id);
+
+        // TODO delete from DB
         return true;
     }
 
     @Override
     public List<User> getAllUsers() throws UnauthorizedException {
-        try{
-            if(!currUser.getRole().equals("Administrator") || currUser == null){
-                throw new UnauthorizedException();
-            }
-        } catch (UnauthorizedException e ){
-            System.out.println("Not authorized");
-            e.printStackTrace();
+        if(!currUser.getRole().equals("Administrator") || currUser == null){
+            throw new UnauthorizedException();
         }
-        List<User> usersList = new LinkedList<User>(users.values());
+
+        List<User> usersList = new LinkedList<>(users.values());
         return usersList;
     }
 
@@ -111,21 +91,12 @@ public class EZShop implements EZShopInterface {
         if (!users.containsKey(id)) {
             return null;
         }
-        try{
-            if (id <=0 || id==null) {
-                throw new InvalidUserIdException();
-            }
-        } catch (InvalidUserIdException e){
-            System.out.println("Id not valid");
-            e.printStackTrace();
+        if (id == null || id <=0) {
+            throw new InvalidUserIdException();
         }
-        try{
-            if(!currUser.getRole().equals("Administrator") || currUser == null){
-                throw new UnauthorizedException();
-            }
-        } catch (UnauthorizedException e ){
-            System.out.println("Not authorized");
-            e.printStackTrace();
+
+        if(!currUser.getRole().equals("Administrator") || currUser == null){
+            throw new UnauthorizedException();
         }
 
         User user = users.get(id);
@@ -151,29 +122,14 @@ public class EZShop implements EZShopInterface {
         if (!users.containsKey(id)) {
             return false;
         }
-        try{
-            if (id==null || id <=0) {
-                throw new InvalidUserIdException();
-            }
-        } catch (InvalidUserIdException e){
-            System.out.println("Id not valid");
-            e.printStackTrace();
+        if (id==null || id <=0) {
+            throw new InvalidUserIdException();
         }
-        try{
-            if (role.isEmpty() || !(role.equals("Administrator") || role.equals("Cashier") || role.equals("ShopManager"))) {
-                throw new InvalidRoleException();
-            }
-        } catch (InvalidRoleException e){
-            System.out.println("Role not valid");
-            e.printStackTrace();
+        if (role.isEmpty() || !(role.equals("Administrator") || role.equals("Cashier") || role.equals("ShopManager"))) {
+            throw new InvalidRoleException();
         }
-        try{
-            if(!currUser.getRole().equals("Administrator") || currUser == null){
-                throw new UnauthorizedException();
-            }
-        } catch (UnauthorizedException e ){
-            System.out.println("Not authorized");
-            e.printStackTrace();
+        if(!currUser.getRole().equals("Administrator") || currUser == null){
+            throw new UnauthorizedException();
         }
 
         User user = users.get(id);
@@ -195,23 +151,15 @@ public class EZShop implements EZShopInterface {
          * @throws InvalidUsernameException if the username is empty or null
          * @throws InvalidPasswordException if the password is empty or null
          */
+        if (username == null || username.isEmpty()){
+            throw new InvalidUsernameException();
+        }
+        if (password == null || password.isEmpty()){
+            throw new InvalidPasswordException();
 
-        try{
-            if (username == null || username.isEmpty()){
-                throw new InvalidUsernameException();
-            }
-        }catch (InvalidUsernameException e){
-            System.out.println("Username not valid");
-            e.printStackTrace();
         }
-        try{
-            if (password == null || password.isEmpty()){
-                throw new InvalidPasswordException();
-            }
-        }catch (InvalidPasswordException e){
-            System.out.println("Password not valid");
-            e.printStackTrace();
-        }
+
+        //
         // Iterate the map and search the user
         for (User user : users.values()) {
             if (user.getPassword().equals(password) && user.getUsername().equals(username)){
@@ -219,6 +167,7 @@ public class EZShop implements EZShopInterface {
             }
         }
 
+        // TODO return null if DB problems?
         return null;
     }
 
@@ -320,38 +269,39 @@ public class EZShop implements EZShopInterface {
      */
     @Override
     public Integer defineCustomer(String customerName) throws InvalidCustomerNameException, UnauthorizedException {
-        try{
-            if (customerName == null || customerName.isEmpty()){
-                throw new InvalidCustomerNameException();
-            }
-        }catch(InvalidCustomerNameException e){
-            System.out.println("Name not valid");
-            e.printStackTrace();
+        if (customerName == null || customerName.isEmpty()){
+            throw new InvalidCustomerNameException();
         }
-        try{
-            if(currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager"))){
-                throw new UnauthorizedException();
-            }
-        } catch (UnauthorizedException e){
-            System.out.println("Role not valid");
-            e.printStackTrace();
+        if(currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager"))){
+            throw new UnauthorizedException();
         }
+
         for (Customer customer : customers.values()) {
             if (customer.getCustomerName().equals(customerName)) {
+                // Name should be unique
                 return -1;
             }
         }
 
+        // Name is not present in the DB
         // Get the highest ID from the DB
         int maxKey = Collections.max(customers.keySet());
         Integer id = maxKey+1;
         EZCustomer customer = new EZCustomer(id, customerName, null, null);
 
+        // TODO insert in the DB
         customers.put(id, customer);
 
         return id;
     }
 
+
+    public boolean checkLoyalty(String card){
+        if (card.length() != 10 || card.matches("[0-9]{10}")){
+            return true;
+        }
+        return false;
+    }
 
     /**
      * This method updates the data of a customer with given <id>. This method can be used to assign/delete a card to a
@@ -375,32 +325,26 @@ public class EZShop implements EZShopInterface {
      */
     @Override
     public boolean modifyCustomer(Integer id, String newCustomerName, String newCustomerCard) throws InvalidCustomerNameException, InvalidCustomerCardException, InvalidCustomerIdException, UnauthorizedException {
-        try{
-            if (newCustomerName.isEmpty() || newCustomerName == null){
-                throw new InvalidCustomerNameException();
-            }
-        }catch(InvalidCustomerNameException e){
-            System.out.println("Customer name not valid");
-            e.printStackTrace();
+        // TODO Should we call the excepiont AND remove the card from the DB if the string is empty?
+
+        if (newCustomerName == null || newCustomerName.isEmpty() ){
+            throw new InvalidCustomerNameException();
         }
-        try{
-            //TODO Add a control to verify if it's string with 10 digits!
-            if (newCustomerCard == null || newCustomerCard.isEmpty() ){
-                throw new InvalidCustomerCardException();
-            }
-        }catch(InvalidCustomerCardException e){
-            System.out.println("Customer card not valid");
-            e.printStackTrace();
+        if (newCustomerCard == null || checkLoyalty(newCustomerCard) ){
+            throw new InvalidCustomerCardException();
         }
-        try{
-            if(currUser==null || !currUser.getRole().equals("Administrator") || !currUser.getRole().equals("Cashier") || !currUser.getRole().equals("ShopManager")){
+        if(currUser==null || !currUser.getRole().equals("Administrator") || !currUser.getRole().equals("Cashier") || !currUser.getRole().equals("ShopManager")){
                 throw new UnauthorizedException();
-            }
-        } catch (UnauthorizedException e){
-            System.out.println("Not authorized");
-            e.printStackTrace();
+
         }
         Customer customer = customers.get(id);
+        if (newCustomerCard.isEmpty()){
+            //if it is an empty string then any
+            // existing card code connected to the
+            // customer will be removed. Remove also from the DB?
+            customer.setCustomerCard(null);
+            customer.setPoints(0);
+        }
         customer.setCustomerName(newCustomerName);
         customer.setCustomerCard(newCustomerCard);
         customers.replace(id, customer);
@@ -413,24 +357,15 @@ public class EZShop implements EZShopInterface {
         if (!customers.containsKey(id)) {
             return false;
         }
-        try{
-            if (id == null || id <=0 ) {
-                throw new InvalidCustomerIdException();
-            }
-        } catch (InvalidCustomerIdException e){
-            System.out.println("Id not valid");
-            e.printStackTrace();
+        if (id == null || id <=0 ) {
+            throw new InvalidCustomerIdException();
         }
 
-        try{
-            if(currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager"))){
-                throw new UnauthorizedException();
-            }
-        } catch (UnauthorizedException e ){
-            System.out.println("Not authorized");
-            e.printStackTrace();
+        if(currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager"))){
+            throw new UnauthorizedException();
         }
 
+        // TODO false if we have problems to reach the DB
         users.remove(id);
         return true;
     }
@@ -440,23 +375,12 @@ public class EZShop implements EZShopInterface {
         if (!customers.containsKey(id)) {
             return null;
         }
-        try{
-            if ( id==null || id <=0) {
-                throw new InvalidCustomerIdException();
-            }
-        } catch (InvalidCustomerIdException e){
-            System.out.println("Id not valid");
-            e.printStackTrace();
+        if ( id==null || id <=0) {
+            throw new InvalidCustomerIdException();
         }
-        try{
-            if(currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager"))){
-                throw new UnauthorizedException();
-            }
-        } catch (UnauthorizedException e ){
-            System.out.println("Not authorized");
-            e.printStackTrace();
+        if(currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager"))){
+            throw new UnauthorizedException();
         }
-
 
         Customer customer = customers.get(id);
         return customer;
@@ -464,19 +388,14 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public List<Customer> getAllCustomers() throws UnauthorizedException {
-        try{
-            if(currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager"))){
-                throw new UnauthorizedException();
-            }
-        } catch (UnauthorizedException e ){
-            System.out.println("Not authorized");
-            e.printStackTrace();
+        if(currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager"))){
+            throw new UnauthorizedException();
         }
+
         List<Customer> customerList = new LinkedList<Customer>(customers.values());
         return customerList;
     }
 
-    // TODO Finish methods
     /**
      * This method returns a string containing the code of a new assignable card.
      * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
@@ -487,16 +406,19 @@ public class EZShop implements EZShopInterface {
      */
     @Override
     public String createCard() throws UnauthorizedException {
-        // TODO search how to generate a string of 10 digits
-        try{
-            if(currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager"))){
-                throw new UnauthorizedException();
-            }
-        } catch (UnauthorizedException e ){
-            System.out.println("Not authorized");
-            e.printStackTrace();
+        if(currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager"))){
+            throw new UnauthorizedException();
         }
-        return null;
+
+        // Template since we're not sure how to implements
+        String s = "";
+
+        loyaltyCards.put(1, s);
+
+
+        // TODO get a string from the DB which isn't' related to a customer yet or generate one?
+        //      https://www.geeksforgeeks.org/generate-random-string-of-given-size-in-java/ how to generate one
+        return s;
     }
 
     /**
@@ -516,38 +438,32 @@ public class EZShop implements EZShopInterface {
      */
     @Override
     public boolean attachCardToCustomer(String customerCard, Integer customerId) throws InvalidCustomerIdException, InvalidCustomerCardException, UnauthorizedException {
-        if (!customers.containsKey(customerId)) {
-            return false;
-        }
-        try{
-            if (customerId == null || customerId <=0){
-                throw new InvalidCustomerIdException();
-            }
-        }catch (InvalidCustomerIdException e){
-            System.out.println("Id not valid");
-            e.printStackTrace();
-        }
-        try{
-            //TODO Add a control to verify if it's string with 10 digits!
-            if (customerCard == null || customerCard.isEmpty()){
-                throw new InvalidCustomerCardException();
-            }
-        }catch(InvalidCustomerCardException e){
-            System.out.println("Customer card not valid");
-            e.printStackTrace();
-        }
-        try{
-            if(currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager"))){
-                throw new UnauthorizedException();
-            }
-        } catch (UnauthorizedException e ){
-            System.out.println("Not authorized");
-            e.printStackTrace();
+
+        if (customerId == null || customerId <=0){
+            throw new InvalidCustomerIdException();
         }
 
-        // TODO check if the card is already assigned to another user,
-        Customer c = getCustomer(customerId);
-        return false;
+        //verify if it's string with 10 digits!
+        if (customerCard == null || checkLoyalty(customerCard)){
+            throw new InvalidCustomerCardException();
+        }
+
+        if(currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager"))){
+            throw new UnauthorizedException();
+        }
+
+        Customer c = getCustomer(customerId); // This functions checks if the customers map contains the ID.
+        if (c==null){
+            return false;
+        }
+        for (Customer customer : customers.values()) {
+            if (customer.getCustomerCard().equals(customerCard)){
+                return false; //There is a customer with the given card
+            }
+        }
+
+        c.setCustomerCard(customerCard);
+        return true;
     }
 
     /**
@@ -568,6 +484,24 @@ public class EZShop implements EZShopInterface {
      */
     @Override
     public boolean modifyPointsOnCard(String customerCard, int pointsToBeAdded) throws InvalidCustomerCardException, UnauthorizedException {
+
+        if (customerCard == null || checkLoyalty(customerCard)){
+            throw new InvalidCustomerCardException();
+        }
+
+        if(currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager"))){
+            throw new UnauthorizedException();
+        }
+
+        for (Customer customer : customers.values()) {
+            if (customer.getCustomerCard().equals(customerCard)){
+                if ((pointsToBeAdded > 0) || (pointsToBeAdded < 0 && customer.getPoints() > Math.abs(pointsToBeAdded))){
+                    // If i need to remove 50 points (pointsToBeAdded = -50), i must have points > abs(50).
+                    customer.setPoints(pointsToBeAdded);
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
