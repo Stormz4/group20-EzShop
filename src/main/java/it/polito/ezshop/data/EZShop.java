@@ -23,6 +23,8 @@ public class EZShop implements EZShopInterface {
     // TODO verify is this map is needed
     HashMap<Integer, String> loyaltyCards = new HashMap<>();
 
+    EZAccountBook accountingBook = new EZAccountBook(0);
+    List<BalanceOperation> allBalanceOperations = new LinkedList<>();
 
     @Override
     public void reset() {
@@ -571,14 +573,89 @@ public class EZShop implements EZShopInterface {
         return false;
     }
 
+    static boolean verifyUserRights(User currUser, UserRoleEnum requestedLevel)
+    {
+        switch (requestedLevel)
+        {
+            /*
+                Cashier             privilege level: 1      Access to sale level functions only
+                ShopManager         privilege level: 2      Access to sale and higher level functions
+                Administrator       privilege level: 3      All the rights
+            */
+            case Cashier:
+                return currUser != null &&
+                        (currUser.getRole().equals("Administrator") ||
+                                currUser.getRole().equals("ShopManager") ||
+                                currUser.getRole().equals("Cashier"));
+            case ShopManager:
+                return currUser != null &&
+                        (currUser.getRole().equals("Administrator") ||
+                                currUser.getRole().equals("ShopManager"));
+            case Administrator:
+                return currUser != null &&
+                        currUser.getRole().equals("Administrator");
+            default:
+                System.out.println("Privileges verification error.");
+                return false;
+        }
+    }
+
+    static boolean verifyByLuhnAlgo(String ccNumber)
+    {
+        int sum = 0;
+        boolean alternate = false;
+        for (int i = ccNumber.length() - 1; i >= 0; i--)
+        {
+            int n = Integer.parseInt(ccNumber.substring(i, i + 1));
+            if (alternate)
+            {
+                n *= 2;
+                if (n > 9)
+                    n = (n % 10) + 1;
+            }
+            sum += n;
+            alternate = !alternate;
+        }
+        return (sum % 10 == 0);
+    }
+
+
     @Override
     public double receiveCashPayment(Integer ticketNumber, double cash) throws InvalidTransactionIdException, InvalidPaymentException, UnauthorizedException {
-        return 0;
+
+        SaleTransaction sale = getSaleTransaction(ticketNumber);
+
+        if(!verifyUserRights(currUser, Cashier)) throw new UnauthorizedException();
+
+        if(ticketNumber == null || ticketNumber <= 0) throw new InvalidTransactionIdException();
+
+        if(cash <= 0) throw new InvalidPaymentException();
+
+        if(sale == null || cash < sale.getPrice())
+            return -1; // TODO: + RITORNA -1 ANCHE SE HAI AVUTO PROBLEMI DI CONNESSIONE AL DB
+
+        recordBalanceUpdate(sale.getPrice());
+
+        return (cash - sale.getPrice());
     }
 
     @Override
     public boolean receiveCreditCardPayment(Integer ticketNumber, String creditCard) throws InvalidTransactionIdException, InvalidCreditCardException, UnauthorizedException {
-        return false;
+
+        SaleTransaction sale = getSaleTransaction(ticketNumber);
+
+        if(!verifyUserRights(currUser, Cashier)) throw new UnauthorizedException();
+
+        if(ticketNumber == null || ticketNumber <= 0) throw new InvalidTransactionIdException();
+
+        if(!verifyByLuhnAlgo(creditCard)) throw new InvalidCreditCardException();
+
+        if(sale == null ||
+            getCreditCardFromDB(ticketNumber) == null ||
+            !verifyCreditCardBalance(ticketNumber, creditCard))
+            return false; // TODO: + RITORNA false ANCHE SE HAI AVUTO PROBLEMI DI CONNESSIONE AL DB
+
+        return recordBalanceUpdate(sale.getPrice());
     }
 
     @Override
@@ -593,16 +670,37 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean recordBalanceUpdate(double toBeAdded) throws UnauthorizedException {
-        return false;
+
+        if(!verifyUserRights(currUser, ShopManager)) throw new UnauthorizedException();
+
+        return accountingBook.updateBalance(toBeAdded);
     }
 
     @Override
     public List<BalanceOperation> getCreditsAndDebits(LocalDate from, LocalDate to) throws UnauthorizedException {
-        return null;
+
+        LocalDate tmp = from;
+        List<BalanceOperation> filteredBalanceOperations;
+
+        if(!verifyUserRights(currUser, ShopManager)) throw new UnauthorizedException(); // IT IS NOT SPECIFIED IN API!!!
+
+        if(from.isAfter(to))
+        {   // swap the dates:
+            from = to;
+            to = tmp;
+        }
+
+        filteredBalanceOperations = allBalanceOperations.stream().filter(); //todo: filter per dates (remember null values)
+
+
+        return filteredBalanceOperations;
     }
 
     @Override
     public double computeBalance() throws UnauthorizedException {
-        return 0;
+
+        if(!verifyUserRights(currUser, ShopManager)) throw new UnauthorizedException(); // IT IS NOT SPECIFIED IN API!!!
+
+        return accountingBook.currentBalance;
     }
 }
