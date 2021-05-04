@@ -88,7 +88,7 @@ public class SQLiteDB {
 
     /**
      ** Create a new Customers table
-     ** EZCustomer(Integer id, String customerName, String customerCard, Integer points)
+     ** EZCustomer(Integer id, String customerName, String customerCard)
      */
     public void createCustomersTable() {
         // SQL statement for creating a new Customer table
@@ -619,6 +619,130 @@ public class SQLiteDB {
             pstmt.setString(2, password);
             pstmt.setString(3, role);
             pstmt.setInt(4, id);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+
+    /** ---------------------------------------------------------------------------------------------------------------
+     ** Create a new Cards table
+     ** Card (String cardCode, Integer customerId, Integer points)
+     */
+    public void createCardsTable() {
+        // SQL statement for creating a new Cards table
+        String sql = "CREATE TABLE IF NOT EXISTS Cards (\n"
+                + " id integer PRIMARY KEY,\n"
+                + " customerId integer,\n"
+                + " points integer\n"
+                + ");";
+
+        // TODO: Should handle this as an exception?
+        if (this.dbConnection == null)
+            return;
+
+        try{
+            Statement stmt = this.dbConnection.createStatement();
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     ** Select all Cards records
+     */
+    public HashMap<String, EZCard> selectAllCards(){
+        HashMap<String, EZCard> cards = new HashMap<>();
+        String sql = "SELECT * FROM Cards";
+
+        try {
+            Statement stmt  = this.dbConnection.createStatement();
+            ResultSet rs    = stmt.executeQuery(sql);
+
+            // loop through the result set
+            while (rs.next()) {
+                Integer id = rs.getInt("id");
+                String strId = String.format("%10d", id);
+                Integer customerId = rs.getInt("customerId");
+                Integer points = rs.getInt("points");
+                cards.put(strId, new EZCard(strId, customerId, points));
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return cards;
+    }
+
+    /**
+     ** Insert new Card record
+     */
+    public String insertCard(Integer customerId, Integer points) {
+        String sql = "INSERT INTO Cards(customerId, points) VALUES(?,?)";
+        String cardCode = null;
+
+        // TODO: Should handle this as an exception?
+        if (this.dbConnection == null)
+            return null;
+
+        try{
+            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            pstmt.setInt(1, customerId);
+            pstmt.setInt(2, points);
+            pstmt.executeUpdate();
+
+            Integer cardId = this.lastInsertRowId();
+            cardCode = String.format("%10d", cardId).replace(' ', '0');
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return cardCode;
+    }
+
+    /**
+     ** Delete Card record with given cardCode
+     */
+    public void deleteCard(String cardCode) {
+        String sql = "DELETE FROM Cards WHERE id=?";
+
+        // TODO: Should handle this as an exception?
+        if (this.dbConnection == null)
+            return;
+
+        if (cardCode == null || cardCode.length() == 0)
+            return;
+
+        int cardId = Integer.parseInt(cardCode);
+        try{
+            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            pstmt.setInt(1, cardId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     ** Update Card record
+     */
+    public void updateCard(String cardCode, Integer customerId, Integer points) {
+        String sql = "UPDATE Cards\n" +
+                "SET customerId = ?, points = ?\n" +
+                "WHERE id = ?;";
+
+        // TODO: Should handle this as an exception?
+        if (this.dbConnection == null || cardCode == null)
+            return;
+
+        int cardId = Integer.parseInt(cardCode);
+        try{
+            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            pstmt.setInt(1, customerId);
+            pstmt.setInt(2, points);
+            pstmt.setInt(3, cardId);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
