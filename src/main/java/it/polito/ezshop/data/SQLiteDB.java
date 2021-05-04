@@ -213,7 +213,7 @@ public class SQLiteDB {
         }
     }
 
-    /**
+    /** ---------------------------------------------------------------------------------------------------------------
      ** Create a new BalanceOperations table
      ** EZBalanceOperation (int balanceId, LocalDate date, double money, String type)
      */
@@ -340,6 +340,30 @@ public class SQLiteDB {
             pstmt.setString(3, type);
             pstmt.setInt(4, id);
             pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     ** Select totalBalance
+     */
+    public void selectTotalBalance() {
+        String sql = "SELECT SUM(money) as totalBalance\n" +
+                     "FROM BalanceOperations;";
+
+        // TODO: Should handle this as an exception?
+        if (this.dbConnection == null)
+            return;
+
+        double totalBalance = 0;
+
+        try{
+            Statement stmt  = this.dbConnection.createStatement();
+            ResultSet rs    = stmt.executeQuery(sql);
+
+            if (rs.next())
+                totalBalance = rs.getDouble("totalBalance");
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
