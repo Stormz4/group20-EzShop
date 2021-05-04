@@ -1,7 +1,5 @@
 package it.polito.ezshop.data;
 
-import sun.util.resources.LocaleData;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -14,15 +12,15 @@ import java.util.HashMap;
 
 public class SQLiteDB {
     Connection dbConnection = null;
-    private final String dbName = "EZShopDB.db";
 
     /**
      ** Connect to the DB
      */
     public void connect() {
+        String dbName = "EZShopDB.db";
         try {
             // db parameters
-            String url = "jdbc:sqlite:src/" + this.dbName;
+            String url = "jdbc:sqlite:src/" + dbName;
 
             // create a connection to the database
             this.dbConnection = DriverManager.getConnection(url);
@@ -30,7 +28,7 @@ public class SQLiteDB {
             System.out.println("Connection to SQLite has been established.");
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-            this.createNewDatabase(this.dbName);
+            this.createNewDatabase(dbName);
         }
     }
 
