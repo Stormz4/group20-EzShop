@@ -497,7 +497,8 @@ public class EZShop implements EZShopInterface {
             if (customer.getCustomerCard().equals(customerCard)){
                 if ((pointsToBeAdded > 0) || (pointsToBeAdded < 0 && customer.getPoints() > Math.abs(pointsToBeAdded))){
                     // If i need to remove 50 points (pointsToBeAdded = -50), i must have points > abs(50).
-                    customer.setPoints(pointsToBeAdded);
+                    int p = customer.getPoints();
+                    customer.setPoints(pointsToBeAdded+p);
                     return true;
                 }
             }
