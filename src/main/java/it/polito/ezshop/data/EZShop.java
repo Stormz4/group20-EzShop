@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import java.lang.StringBuilder;
 import java.lang.Math;
+import java.util.stream.Collectors;
 
 
 public class EZShop implements EZShopInterface {
@@ -680,7 +681,7 @@ public class EZShop implements EZShopInterface {
     public List<BalanceOperation> getCreditsAndDebits(LocalDate from, LocalDate to) throws UnauthorizedException {
 
         LocalDate tmp = from;
-        List<BalanceOperation> filteredBalanceOperations;
+        List<BalanceOperation> filteredBalanceOperations = allBalanceOperations;
 
         if(!verifyUserRights(currUser, ShopManager)) throw new UnauthorizedException(); // IT IS NOT SPECIFIED IN API!!!
 
@@ -690,8 +691,28 @@ public class EZShop implements EZShopInterface {
             to = tmp;
         }
 
-        filteredBalanceOperations = allBalanceOperations.stream().filter(); //todo: filter per dates (remember null values)
+        LocalDate startingDate = from;
+        LocalDate endingDate = to;
 
+        if(startingDate != null && endingDate != null) //todo: review this if --> why they are always true?
+        {
+            filteredBalanceOperations = allBalanceOperations.stream()
+                    .filter( op -> op.getDate().isAfter(startingDate) && op.getDate().isBefore(endingDate))
+                    .collect(Collectors.toList());
+        }
+        else if(startingDate != null && endingDate == null)
+        {
+            filteredBalanceOperations = allBalanceOperations.stream()
+                    .filter( op -> op.getDate().isAfter(startingDate))
+                    .collect(Collectors.toList());
+        }
+        else if(startingDate == null && endingDate != null)
+        {
+            filteredBalanceOperations = allBalanceOperations.stream()
+                    .filter( op -> op.getDate().isBefore(endingDate))
+                    .collect(Collectors.toList());
+        }
+        //else --> both startingDate and endingDate are null
 
         return filteredBalanceOperations;
     }
