@@ -345,7 +345,8 @@ public class SQLiteDB {
         }
     }
 
-    /**
+
+    /** ---------------------------------------------------------------------------------------------------------------
      ** Create a new Orders table
      ** EZOrder (Integer orderId, Integer balanceId, String productCode, double pricePerUnit, int quantity, String status)
      */
@@ -470,6 +471,130 @@ public class SQLiteDB {
             pstmt.setInt(4, quantity);
             pstmt.setString(5, status);
             pstmt.setInt(6, id);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+
+    /** ---------------------------------------------------------------------------------------------------------------
+     ** Create a new Users table
+     ** EZUser (Integer id, String userName, String password, String role)
+     */
+    public void createUsersTable() {
+        // SQL statement for creating a new Orders table
+        String sql = "CREATE TABLE IF NOT EXISTS Users (\n"
+                + " id integer PRIMARY KEY,\n"
+                + " userName text,\n"
+                + " password text,\n"
+                + " role text\n"
+                + ");";
+
+        // TODO: Should handle this as an exception?
+        if (this.dbConnection == null)
+            return;
+
+        try{
+            Statement stmt = this.dbConnection.createStatement();
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     ** Select all Users records
+     */
+    public HashMap<Integer, EZUser> selectAllUsers(){
+        HashMap<Integer, EZUser> users = new HashMap<>();
+        String sql = "SELECT * FROM Users";
+
+        try {
+            Statement stmt  = this.dbConnection.createStatement();
+            ResultSet rs    = stmt.executeQuery(sql);
+
+            // loop through the result set
+            while (rs.next()) {
+                Integer id = rs.getInt("id");
+                String userName = rs.getString("userName");
+                String password = rs.getString("password");
+                String role = rs.getString("role");
+                users.put(id, new EZUser(id, userName, password, role));
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return users;
+    }
+
+    /**
+     ** Insert new User record
+     */
+    public Integer insertUser(String userName, String password, String role) {
+        String sql = "INSERT INTO Users(userName, password, role) VALUES(?,?,?)";
+        Integer userId = null;
+
+        // TODO: Should handle this as an exception?
+        if (this.dbConnection == null)
+            return null;
+
+        try{
+            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            pstmt.setString(1, userName);
+            pstmt.setString(2, password);
+            pstmt.setString(3, role);
+            pstmt.executeUpdate();
+
+            userId = this.lastInsertRowId();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return userId;
+    }
+
+    /**
+     ** Delete User record with given id
+     */
+    public void deleteUser(Integer id) {
+        String sql = "DELETE FROM Users WHERE id=?";
+
+        // TODO: Should handle this as an exception?
+        if (this.dbConnection == null)
+            return;
+
+        if (id == null)
+            return;
+
+        try{
+            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     ** Update User record
+     */
+    public void updateUser(Integer id, String userName, String password, String role) {
+        String sql = "UPDATE Users\n" +
+                     "SET userName = ?, password = ?, role = ?\n" +
+                     "WHERE id = ?;";
+
+        // TODO: Should handle this as an exception?
+        if (this.dbConnection == null || id == null)
+            return;
+
+        try{
+            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            pstmt.setString(1, userName);
+            pstmt.setString(2, password);
+            pstmt.setString(3, role);
+            pstmt.setInt(4, id);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
