@@ -366,7 +366,7 @@ public class EZShop implements EZShopInterface {
         }
         //The position has the following format :
         //<aisleNumber>-<rackAlphabeticIdentifier>-<levelNumber>
-        if (!(newPos.matches("[0-9]+-[0-9]+-[0-9]+"))){
+        if (!(newPos.matches("[0-9]+-[a-zA-z]+-[0-9]+"))){
             // If it doens't match:
             throw new InvalidLocationException();
         }
