@@ -748,4 +748,144 @@ public class SQLiteDB {
             System.out.println(e.getMessage());
         }
     }
+
+
+    /** ---------------------------------------------------------------------------------------------------------------
+     ** Create a new ProductTypes table
+     ** Card EZProductType (Integer id, Integer quantity, String location, String note, String productDescription, String barCode, double pricePerUnit)
+     */
+    public void createProductTypesTable() {
+        // SQL statement for creating a new ProductTypes table
+        String sql = "CREATE TABLE IF NOT EXISTS ProductTypes (\n"
+                + " id integer PRIMARY KEY,\n"
+                + " quantity integer,\n"
+                + " location text\n"
+                + " note text\n"
+                + " productDescription text\n"
+                + " barCode text\n"
+                + " pricePerUnit real\n"
+                + ");";
+
+        // TODO: Should handle this as an exception?
+        if (this.dbConnection == null)
+            return;
+
+        try{
+            Statement stmt = this.dbConnection.createStatement();
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     ** Select all ProductTypes records
+     */
+    public HashMap<Integer, EZProductType> selectAllProductTypes(){
+        HashMap<Integer, EZProductType> productTypes = new HashMap<>();
+        String sql = "SELECT * FROM ProductTypes";
+
+        try {
+            Statement stmt  = this.dbConnection.createStatement();
+            ResultSet rs    = stmt.executeQuery(sql);
+
+            // loop through the result set
+            while (rs.next()) {
+                Integer id = rs.getInt("id");
+                Integer quantity = rs.getInt("quantity");
+                String location = rs.getString("location");
+                String note = rs.getString("note");
+                String productDescription = rs.getString("productDescription");
+                String barCode = rs.getString("barCode");
+                double pricePerUnit = rs.getDouble("pricePerUnit");
+
+                productTypes.put(id, new EZProductType(id, quantity, location, note, productDescription, barCode, pricePerUnit));
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return productTypes;
+    }
+
+    /**
+     ** Insert new ProductType record
+     */
+    public Integer insertProductType(Integer quantity, String location, String note, String productDescription, String barCode, double pricePerUnit) {
+        String sql = "INSERT INTO ProductTypes(quantity, location, note, productDescription, barCode, pricePerUnit) \n"
+                   + "VALUES(?,?,?,?,?,?);";
+        Integer id = null;
+
+        // TODO: Should handle this as an exception?
+        if (this.dbConnection == null)
+            return null;
+
+        try{
+            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            pstmt.setInt(1, quantity);
+            pstmt.setString(2, location);
+            pstmt.setString(3, note);
+            pstmt.setString(4, productDescription);
+            pstmt.setString(5, barCode);
+            pstmt.setDouble(6, pricePerUnit);
+            pstmt.executeUpdate();
+
+            id = this.lastInsertRowId();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return id;
+    }
+
+    /**
+     ** Delete ProductType record with given id
+     */
+    public void deleteProductType(Integer id) {
+        String sql = "DELETE FROM ProductTypes WHERE id=?";
+
+        // TODO: Should handle this as an exception?
+        if (this.dbConnection == null)
+            return;
+
+        if (id == null)
+            return;
+
+        try{
+            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     ** Update ProductType record
+     */
+    public void updateCard(Integer id, Integer quantity, String location, String note, String productDescription, String barCode, double pricePerUnit) {
+        String sql = "UPDATE ProductTypes\n" +
+                     "SET quantity = ?, location = ?, note = ?, productDescription = ?, barCode = ?, pricePerUnit = ?\n" +
+                     "WHERE id = ?;";
+
+        // TODO: Should handle this as an exception?
+        if (this.dbConnection == null)
+            return;
+
+        if (id == null)
+            return;
+
+        try{
+            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            pstmt.setInt(1, quantity);
+            pstmt.setString(2, location);
+            pstmt.setString(3, note);
+            pstmt.setString(4, productDescription);
+            pstmt.setString(5, barCode);
+            pstmt.setDouble(6, pricePerUnit);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 }
