@@ -754,31 +754,18 @@ public class EZShop implements EZShopInterface {
         return false;
     }
 
-    static boolean verifyUserRights(User currUser, UserRoleEnum requestedLevel)
+    static boolean verifyUserRights(User currUser, UserRoleEnum... requestedRoles)
     {
-        switch (requestedLevel)
+        if(currUser == null)
+            return false;
+
+        for (UserRoleEnum role : requestedRoles)
         {
-            /*
-                Cashier             privilege level: 1      Access to sale level functions only
-                ShopManager         privilege level: 2      Access to sale and higher level functions
-                Administrator       privilege level: 3      All the rights
-            */
-            case Cashier:
-                return currUser != null &&
-                        (currUser.getRole().equals("Administrator") ||
-                                currUser.getRole().equals("ShopManager") ||
-                                currUser.getRole().equals("Cashier"));
-            case ShopManager:
-                return currUser != null &&
-                        (currUser.getRole().equals("Administrator") ||
-                                currUser.getRole().equals("ShopManager"));
-            case Administrator:
-                return currUser != null &&
-                        currUser.getRole().equals("Administrator");
-            default:
-                System.out.println("Privileges verification error.");
-                return false;
+            if(currUser.getRole().equals(role.toString()))
+                return true;
         }
+
+        return false;
     }
 
     static boolean verifyByLuhnAlgo(String ccNumber)
@@ -806,7 +793,7 @@ public class EZShop implements EZShopInterface {
 
         SaleTransaction sale = getSaleTransaction(ticketNumber);
 
-        if(!verifyUserRights(currUser, Cashier)) throw new UnauthorizedException();
+        if(!verifyUserRights(currUser, Administrator, ShopManager, Cashier)) throw new UnauthorizedException();
 
         if(ticketNumber == null || ticketNumber <= 0) throw new InvalidTransactionIdException();
 
@@ -825,7 +812,7 @@ public class EZShop implements EZShopInterface {
 
         SaleTransaction sale = getSaleTransaction(ticketNumber);
 
-        if(!verifyUserRights(currUser, Cashier)) throw new UnauthorizedException();
+        if(!verifyUserRights(currUser, Administrator, ShopManager, Cashier)) throw new UnauthorizedException();
 
         if(ticketNumber == null || ticketNumber <= 0) throw new InvalidTransactionIdException();
 
@@ -852,7 +839,7 @@ public class EZShop implements EZShopInterface {
     @Override
     public boolean recordBalanceUpdate(double toBeAdded) throws UnauthorizedException {
 
-        if(!verifyUserRights(currUser, ShopManager)) throw new UnauthorizedException();
+        if(!verifyUserRights(currUser, Administrator, ShopManager)) throw new UnauthorizedException();
 
         return accountingBook.updateBalance(toBeAdded);
     }
@@ -863,7 +850,7 @@ public class EZShop implements EZShopInterface {
         LocalDate tmp = from;
         List<BalanceOperation> filteredBalanceOperations = allBalanceOperations;
 
-        if(!verifyUserRights(currUser, ShopManager)) throw new UnauthorizedException(); // IT IS NOT SPECIFIED IN API!!!
+        if(!verifyUserRights(currUser, Administrator, ShopManager)) throw new UnauthorizedException(); // IT IS NOT SPECIFIED IN API!!!
 
         if(from.isAfter(to))
         {   // swap the dates:
@@ -900,7 +887,7 @@ public class EZShop implements EZShopInterface {
     @Override
     public double computeBalance() throws UnauthorizedException {
 
-        if(!verifyUserRights(currUser, ShopManager)) throw new UnauthorizedException(); // IT IS NOT SPECIFIED IN API!!!
+        if(!verifyUserRights(currUser, Administrator, ShopManager)) throw new UnauthorizedException(); // IT IS NOT SPECIFIED IN API!!!
 
         return accountingBook.currentBalance;
     }
