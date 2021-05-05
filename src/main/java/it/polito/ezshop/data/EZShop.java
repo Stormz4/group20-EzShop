@@ -726,24 +726,62 @@ public class EZShop implements EZShopInterface {
 
         if(ticketNumber == null || ticketNumber <= 0) throw new InvalidTransactionIdException();
 
-        if(!verifyByLuhnAlgo(creditCard)) throw new InvalidCreditCardException();
+        if(!verifyByLuhnAlgo(creditCard) || creditCard.equals("") || creditCard == null) throw new InvalidCreditCardException();
 
         if(sale == null ||
             getCreditCardFromDB(ticketNumber) == null ||
             !verifyCreditCardBalance(ticketNumber, creditCard))
             return false; // TODO: + RITORNA false ANCHE SE HAI AVUTO PROBLEMI DI CONNESSIONE AL DB
 
+        // todo: keep money from credit card
         return recordBalanceUpdate(sale.getPrice());
     }
 
     @Override
     public double returnCashPayment(Integer returnId) throws InvalidTransactionIdException, UnauthorizedException {
-        return 0;
+
+        if(!verifyUserRights(currUser, Administrator, ShopManager, Cashier)) throw new UnauthorizedException();
+
+        if(returnId <= 0) throw new InvalidTransactionIdException(); // not "returnId == null ||" ???
+
+        EZReturnTransaction retTr = getReturnTransactionById(returnId);
+
+        if(!retTr.isClosed()) return -1;
+
+        if(retTr == null) return -1;
+
+        // TODO: + RITORNA -1 ANCHE SE HAI AVUTO PROBLEMI DI CONNESSIONE AL DB
+
+        double returnedMoney = retTr.getMoney();
+
+        recordBalanceUpdate(-returnedMoney);
+
+        return returnedMoney;
+
     }
 
     @Override
     public double returnCreditCardPayment(Integer returnId, String creditCard) throws InvalidTransactionIdException, InvalidCreditCardException, UnauthorizedException {
-        return 0;
+
+        if(!verifyUserRights(currUser, Administrator, ShopManager, Cashier)) throw new UnauthorizedException();
+
+        if(returnId <= 0) throw new InvalidTransactionIdException(); // not "returnId == null ||" ???
+
+        if(!verifyByLuhnAlgo(creditCard) || creditCard.equals("") || creditCard == null) throw new InvalidCreditCardException();
+
+        EZReturnTransaction retTr = getReturnTransactionById(returnId);
+
+        if(!retTr.isClosed()) return -1;
+        if(retTr == null) return -1;
+        if(getCreditCardFromDB(ticketNumber) == null) return -1;
+        // TODO: + RITORNA -1 ANCHE SE HAI AVUTO PROBLEMI DI CONNESSIONE AL DB
+
+        double returnedMoney = retTr.getMoney();
+
+        recordBalanceUpdate(-returnedMoney);
+        // todo: give money to credit card
+
+        return returnedMoney;
     }
 
     @Override
