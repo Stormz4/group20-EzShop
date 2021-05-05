@@ -9,6 +9,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 public class SQLiteDB {
     Connection dbConnection = null;
@@ -380,8 +382,8 @@ public class SQLiteDB {
                 + " id integer PRIMARY KEY,\n"
                 + " balanceId integer,\n"
                 + " productCode text,\n"
-                + " pricePerUnit real\n"
-                + " quantity integer\n"
+                + " pricePerUnit real,\n"
+                + " quantity integer,\n"
                 + " status text\n"
                 + ");";
 
@@ -759,11 +761,11 @@ public class SQLiteDB {
         String sql = "CREATE TABLE IF NOT EXISTS ProductTypes (\n"
                 + " id integer PRIMARY KEY,\n"
                 + " quantity integer,\n"
-                + " location text\n"
-                + " note text\n"
-                + " productDescription text\n"
-                + " barCode text\n"
-                + " pricePerUnit real\n"
+                + " location text,\n"
+                + " note text,\n"
+                + " productDescription text,\n"
+                + " barCode text,\n"
+                + " pricePerUnit real,\n"
                 + ");";
 
         // TODO: Should handle this as an exception?
@@ -883,6 +885,159 @@ public class SQLiteDB {
             pstmt.setString(4, productDescription);
             pstmt.setString(5, barCode);
             pstmt.setDouble(6, pricePerUnit);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+
+    /** ---------------------------------------------------------------------------------------------------------------
+     ** Create a new SaleTransactions table
+     ** EZSaleTransaction (Integer ticketNumber, List<TicketEntry> entries, double discountRate, double price)
+     */
+    public void createSaleTransactionsTable() {
+        // SQL statement for creating a new SaleTransactions table
+        String sql = "CREATE TABLE IF NOT EXISTS SaleTransactions (\n"
+                + " id integer PRIMARY KEY,\n"
+                + " discountRate real,\n"
+                + " price real\n"
+                + ");";
+
+        // TODO: Should handle this as an exception?
+        if (this.dbConnection == null)
+            return;
+
+        try{
+            Statement stmt = this.dbConnection.createStatement();
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     ** Select all SaleTransactions records
+     */
+    public HashMap<Integer, EZSaleTransaction> selectAllSaleTransactions(){
+        HashMap<Integer, EZSaleTransaction> saleTransactions = new HashMap<>();
+        String sql = "SELECT * FROM SaleTransactions";
+
+        try {
+            Statement stmt  = this.dbConnection.createStatement();
+            ResultSet rs1    = stmt.executeQuery(sql);
+
+            // loop through the result set
+            while (rs1.next()) {
+                Integer transactionID = rs1.getInt("id");
+                double saleDiscountRate = rs1.getDouble("discountRate");
+                double price = rs1.getDouble("price");
+
+                // Internal query to retrieve ticketEntry (productPerSale)
+                LinkedList<TicketEntry> entries = new LinkedList<>();
+                String sql2 = "SELECT barCode, amount, discountRate, productDescription, pricePerUnit \n"
+                            + "FROM ProductsPerSale \n"
+                            + "INNER JOIN ProductTypes ON ProductsPerSale.barCode = ProductTypes.barCode \n"
+                            + "WHERE ProductsPerSale.id = ? ;";
+
+                PreparedStatement pstmt = this.dbConnection.prepareStatement(sql2);
+                pstmt.setInt(1, transactionID);
+                ResultSet rs2 = pstmt.executeQuery();
+
+                while (rs2.next()) {
+                    String barCode = rs2.getString("barCode");
+                    int amount = rs2.getInt("amount");
+                    double pDiscountRate = rs2.getDouble("discountRate");
+                    String productDescription = rs2.getString("productDescription");
+                    double pricePerUnit = rs2.getDouble("pricePerUnit");
+
+                    EZTicketEntry product = new EZTicketEntry(barCode, productDescription, amount, pricePerUnit, pDiscountRate);
+                    entries.add(product);
+                }
+
+                saleTransactions.put(transactionID, new EZSaleTransaction(transactionID, entries, saleDiscountRate, price));
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return saleTransactions;
+    }
+
+    /**
+     ** Insert new SaleTransaction record
+     */
+    public Integer insertSaleTransaction(List<TicketEntry> entries, double discountRate, double price) {
+        String sql = "INSERT INTO SaleTransactions(discountRate, price) \n"
+                   + "VALUES(?,?);";
+        Integer transactionID = null;
+
+        // TODO: Should handle this as an exception?
+        if (this.dbConnection == null)
+            return null;
+
+        try{
+            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            pstmt.setDouble(1, discountRate);
+            pstmt.setDouble(2, price);
+            pstmt.executeUpdate();
+
+            transactionID = this.lastInsertRowId();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        for (TicketEntry entry : entries) {
+            // TODO: insertProductPerSale
+        }
+
+        return transactionID;
+    }
+
+    /**
+     ** Delete SaleTransaction record with given id
+     */
+    public void deleteSaleTransaction(Integer transactionID) {
+        String sql = "DELETE FROM SaleTransactions WHERE id=?";
+
+        // TODO: Should handle this as an exception?
+        if (this.dbConnection == null)
+            return;
+
+        if (transactionID == null)
+            return;
+
+        try{
+            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            pstmt.setInt(1, transactionID);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        // TODO: delete all productPerSale relied to this transaction
+    }
+
+    /**
+     ** Update SaleTransaction record
+     */
+    public void updateSaleTransaction(Integer transactionID, double discountRate, double price) {
+        String sql = "UPDATE SaleTransactions\n" +
+                     "SET discountRate = ?, price = ?\n" +
+                     "WHERE id = ?;";
+
+        // TODO: Should handle this as an exception?
+        if (this.dbConnection == null)
+            return;
+
+        if (transactionID == null)
+            return;
+
+        try{
+            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            pstmt.setDouble(1, discountRate);
+            pstmt.setDouble(2, price);
+            pstmt.setInt(3, transactionID);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
