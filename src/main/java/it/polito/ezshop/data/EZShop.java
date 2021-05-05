@@ -26,6 +26,8 @@ public class EZShop implements EZShopInterface {
 
     EZAccountBook accountingBook = new EZAccountBook(0);
     List<BalanceOperation> allBalanceOperations = new LinkedList<>();
+    HashMap<Integer, SaleTransaction> saleTransactions = new HashMap<>();
+    HashMap<Integer, EZReturnTransaction> returnTransactions = new HashMap<>();
 
     @Override
     public void reset() {
@@ -554,24 +556,112 @@ public class EZShop implements EZShopInterface {
         return null;
     }
 
+    public BalanceOperation getBalanceOpById(Integer balanceId)
+    {
+        return allBalanceOperations.get(balanceId);
+    }
+
     @Override
     public Integer startReturnTransaction(Integer saleNumber) throws /*InvalidTicketNumberException,*/InvalidTransactionIdException, UnauthorizedException {
-        return null;
+
+        BalanceOperation op = getBalanceOpById(saleNumber); //or SaleTransaction?
+
+        if(!verifyUserRights(currUser, Administrator, ShopManager, Cashier)) throw new UnauthorizedException();
+
+        if(saleNumber == null || saleNumber <= 0) throw new InvalidTransactionIdException();
+
+        //EZReturnTransaction retTr = new EZReturnTransaction(saleNumber, op.getDate(), ); // ???
+        //returnTransactions.put(saleNumber, retTr);
+        //TODO: Start a return transaction (just start it), related to a specific Sale Transaction and save it in the list of
+        // returned transactions and also in the list of Balance operations !?
+
+        return saleNumber;
+        // or return -1 if transaction with ID saleNumber doesn't exist!!!
+    }
+
+    public EZReturnTransaction getReturnTransactionById(Integer returnId)
+    {
+        return returnTransactions.get(returnId);
     }
 
     @Override
     public boolean returnProduct(Integer returnId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
-        return false;
+
+        if(!verifyUserRights(currUser, Administrator, ShopManager, Cashier)) throw new UnauthorizedException();
+
+        if(returnId == null || returnId <= 0) throw new InvalidTransactionIdException();
+
+        if(productCode.length() == 0 || productCode == null || !verifyBarCode(productCode)) throw new InvalidProductCodeException();
+
+        if(amount <= 0) throw new InvalidQuantityException();
+
+        EZReturnTransaction retTr = getReturnTransactionById(returnId);
+        ProductType product = getProductTypeByBarCode(productCode);
+
+        if(product == null)
+            return false;
+        //     if( product is not in the transaction (not the returnTransaction) ) return false;  //     HOW ???
+        //     if( product amount in the transaction is lower than 'amount' ) return false;  //     HOW ???
+        //     if( the transaction does not exist ) return false;  //     HOW ???
+
+        if(amount <= product.getQuantity())
+        {
+            retTr.setReturnedProduct(product);
+            retTr.setQuantity(amount);
+        }
+
+
+
+
+        return true;
     }
 
     @Override
     public boolean endReturnTransaction(Integer returnId, boolean commit) throws InvalidTransactionIdException, UnauthorizedException {
-        return false;
+
+        if(!verifyUserRights(currUser, Administrator, ShopManager, Cashier)) throw new UnauthorizedException();
+
+        if(returnId == null || returnId <= 0) throw new InvalidTransactionIdException();
+
+        EZReturnTransaction retTr = getReturnTransactionById(returnId);
+
+        if(retTr == null || retTr.isClosed())
+            return false;
+
+        if(commit)
+        {
+            //TODO: update DB
+
+            //if(problems with DB) return false;
+        }
+        else
+        {
+            //rollback ---?---> deleteReturnTransaction? (only CLOSED return transaction can be deleted)  ???
+        }
+
+        return true;
     }
 
     @Override
     public boolean deleteReturnTransaction(Integer returnId) throws InvalidTransactionIdException, UnauthorizedException {
-        return false;
+
+        if(!verifyUserRights(currUser, Administrator, ShopManager, Cashier)) throw new UnauthorizedException();
+
+        if(returnId == null || returnId <= 0) throw new InvalidTransactionIdException();
+
+        EZReturnTransaction retTr = getReturnTransactionById(returnId);
+
+        if(retTr == null) return false;
+
+        // if(retTr.isPayed()) return false;
+
+        // todo: delete return transaction with ID == returnId from DB
+        /* "This method deletes a closed return transaction. It affects the quantity of product sold in the connected sale transaction
+         * (and consequently its price) and the quantity of product available on the shelves." */
+
+        // if(problems with DB) return false;
+
+        return true;
     }
 
     static boolean verifyUserRights(User currUser, UserRoleEnum... requestedRoles)

@@ -19,11 +19,11 @@ public class EZAccountBook {
     {
         if(toBeAdded >= 0)
         {
-            // TODO: Add this balance operation as a CREDIT
+            // TODO: Add this balance operation as a CREDIT in DB
         }
         else
         {
-            // TODO: Add this balance operation as a DEBIT
+            // TODO: Add this balance operation as a DEBIT in DB
         }
 
         return !((toBeAdded + this.currentBalance) < 0);
