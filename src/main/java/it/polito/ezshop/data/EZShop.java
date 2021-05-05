@@ -20,6 +20,7 @@ public class EZShop implements EZShopInterface {
 
     HashMap<Integer, Customer> customers = new HashMap<>();
     HashMap<Integer, User> users = new HashMap<>();
+    HashMap<Integer, ProductType> products = new HashMap<>();
 
     // TODO verify is this map is needed
     HashMap<Integer, String> loyaltyCards = new HashMap<>();
@@ -62,11 +63,12 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean deleteUser(Integer id) throws InvalidUserIdException, UnauthorizedException {
-        if (!users.containsKey(id)) {
-            return false;
-        }
         if (id == null || id <=0) {
             throw new InvalidUserIdException();
+        }
+
+        if (!users.containsKey(id)) {
+            return false;
         }
 
         if(!currUser.getRole().equals("Administrator") || currUser == null){
@@ -183,55 +185,214 @@ public class EZShop implements EZShopInterface {
         return true;
     }
 
+    public boolean checkBarCode(String barCode){
+        return barCode.matches("[0-9]{12,14}");
+    }
+
     @Override
     public Integer createProductType(String description, String productCode, double pricePerUnit, String note) throws InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException {
-        return null;
+        if (description == null || description.isEmpty() ) {
+            throw new InvalidProductDescriptionException();
+        }
+        // TODO insert a check" if it is not a number or if it is not a valid barcode": check if its unique
+        if (productCode == null || productCode.isEmpty() || checkBarCode(productCode)) {
+            throw new InvalidProductCodeException();
+        }
+        if(pricePerUnit <=0){
+            throw new InvalidPricePerUnitException();
+        }
+        if(!(currUser.getRole().equals("Administrator") || currUser.getRole().equals("ShopManager")) || currUser == null){
+            throw new UnauthorizedException();
+        }
+
+        // Check if the Barcode is unique
+        for (ProductType product : products.values()) {
+            if (product.getBarCode().equals(productCode)) {
+                return -1;
+            }
+        }
+        // TODO return -1 is there is an error while saving the user
+        // Get the highest ID from the DB
+        int maxKey = Collections.max(products.keySet());
+        Integer id = maxKey+1;
+
+        EZProductType prodType;
+        if (note==null){
+            prodType = new EZProductType(id, 0, "", "", description, productCode, pricePerUnit);
+        }
+        else {
+            prodType = new EZProductType(id, 0, "", note, description, productCode, pricePerUnit);
+        }
+
+        products.put(id, prodType);
+
+        return id;
     }
 
     @Override
     public boolean updateProduct(Integer id, String newDescription, String newCode, double newPrice, String newNote) throws InvalidProductIdException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException {
-        return false;
+
+        if (id == null || id<=0){
+            throw new InvalidProductIdException();
+        }
+
+        if (!products.containsKey(id)) {
+            return false;
+        }
+
+        if (newDescription == null || newDescription.isEmpty() ) {
+            throw new InvalidProductDescriptionException();
+        }
+        if (newCode == null || newCode.isEmpty() || checkBarCode(newCode)) {
+            throw new InvalidProductCodeException();
+        }
+        if(newPrice <=0){
+            throw new InvalidPricePerUnitException();
+        }
+        if(!(currUser.getRole().equals("Administrator") || currUser.getRole().equals("ShopManager")) || currUser == null){
+            throw new UnauthorizedException();
+        }
+
+        // Check if the Barcode is unique
+        for (ProductType product : products.values()) {
+            if (product.getBarCode().equals(newCode)) {
+                return false;
+            }
+        }
+
+        // TODO update in the db
+        ProductType prodType = products.get(id);
+        prodType.setProductDescription(newDescription);
+        prodType.setBarCode(newCode);
+        prodType.setPricePerUnit(newPrice);
+        prodType.setNote(newNote);
+        products.replace(id, prodType);
+        return true;
     }
 
     @Override
     public boolean deleteProductType(Integer id) throws InvalidProductIdException, UnauthorizedException {
+        if (id == null || id<=0){
+            throw new InvalidProductIdException();
+        }
+        if (!products.containsKey(id)) {
+            return false;
+        }
+        if(!(currUser.getRole().equals("Administrator") || currUser.getRole().equals("ShopManager")) || currUser == null){
+            throw new UnauthorizedException();
+        }
+
+        products.remove(id);
+
         return false;
     }
 
     @Override
     public List<ProductType> getAllProductTypes() throws UnauthorizedException {
-        List<ProductType> productTypes = new LinkedList<>();
-        Integer id = 1;
-        Integer quantity = 20;
-        String location = "C";
-        String note = "Nota";
-        String productDescription = "Description";
-        String barCode = "XYZ123";
-        double pricePerUnit = 12.50;
-        EZProductType myProdType = new EZProductType(id, quantity, location, note, productDescription, barCode, pricePerUnit);
-        productTypes.add(myProdType);
-        
-        return productTypes;
+        if(!(currUser.getRole().equals("Administrator") || currUser.getRole().equals("ShopManager")) || currUser == null){
+            throw new UnauthorizedException();
+        }
+
+        // TODO get it from the DB
+        List<ProductType> prodList = new LinkedList<>(products.values());
+        return prodList;
     }
 
     @Override
     public ProductType getProductTypeByBarCode(String barCode) throws InvalidProductCodeException, UnauthorizedException {
+        if (barCode == null || barCode.isEmpty() || checkBarCode(barCode)) {
+            throw new InvalidProductCodeException();
+        }
+
+        if(!(currUser.getRole().equals("Administrator") || currUser.getRole().equals("ShopManager")) || currUser == null){
+            throw new UnauthorizedException();
+        }
+
+        for (ProductType product : products.values()) {
+            if (product.getBarCode().equals(barCode)) {
+                return product;
+            }
+        }
         return null;
     }
 
     @Override
     public List<ProductType> getProductTypesByDescription(String description) throws UnauthorizedException {
-        return null;
+
+        if(!(currUser.getRole().equals("Administrator") || currUser.getRole().equals("ShopManager")) || currUser == null){
+            throw new UnauthorizedException();
+        }
+
+        List<ProductType> filteredList = getAllProductTypes();
+
+        // Doesn't match the description: remove.
+        filteredList.removeIf(product -> !(product.getProductDescription().equals(description)));
+        return filteredList;
     }
 
     @Override
     public boolean updateQuantity(Integer productId, int toBeAdded) throws InvalidProductIdException, UnauthorizedException {
+        if (productId == null || productId<=0){
+            throw new InvalidProductIdException();
+        }
+        if (!products.containsKey(productId)) {
+            return false;
+        }
+        if(!(currUser.getRole().equals("Administrator") || currUser.getRole().equals("ShopManager")) || currUser == null){
+            throw new UnauthorizedException();
+        }
+
+        ProductType product = products.get(productId);
+        if ((toBeAdded > 0) || (toBeAdded < 0 && product.getQuantity() > Math.abs(toBeAdded))){
+                    // If i need to remove 50 quantity (oBeAdded = -50), i must have quanity > abs(50).
+            int q = product.getQuantity();
+            product.setQuantity(toBeAdded+q);
+            products.replace(productId, product);
+            // TODO update in the DB
+            return true;
+        }
+
+
         return false;
     }
 
     @Override
     public boolean updatePosition(Integer productId, String newPos) throws InvalidProductIdException, InvalidLocationException, UnauthorizedException {
-        return false;
+        if (productId == null || productId<=0){
+            throw new InvalidProductIdException();
+        }
+        if (!products.containsKey(productId)) {
+            return false;
+        }
+        //The position has the following format :
+        //<aisleNumber>-<rackAlphabeticIdentifier>-<levelNumber>
+        if (!(newPos.matches("[0-9]+-[0-9]+-[0-9]+"))){
+            // If it doens't match:
+            throw new InvalidLocationException();
+        }
+        if(!(currUser.getRole().equals("Administrator") || currUser.getRole().equals("ShopManager")) || currUser == null){
+            throw new UnauthorizedException();
+        }
+
+        if (newPos.isEmpty()){
+            ProductType prodType = products.get(productId);
+            prodType.setLocation("");
+            products.replace(productId, prodType);
+            return false;
+            // TODO update in the DB
+        }
+        else {
+            // position has to be unique: check if it is
+            for (ProductType product : products.values()) {
+                if (product.getLocation().equals(newPos)) {
+                    return false;
+                }
+            }
+        }
+        ProductType prodType = products.get(productId);
+        prodType.setLocation(newPos);
+        products.replace(productId, prodType);
+        return true;
     }
 
     @Override
@@ -300,10 +461,7 @@ public class EZShop implements EZShopInterface {
 
 
     public boolean checkLoyalty(String card){
-        if (card.length() != 10 || card.matches("[0-9]{10}")){
-            return true;
-        }
-        return false;
+        return card.length() != 10 || card.matches("[0-9]{10}");
     }
 
     /**
