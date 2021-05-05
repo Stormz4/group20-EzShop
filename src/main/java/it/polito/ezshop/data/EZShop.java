@@ -186,7 +186,29 @@ public class EZShop implements EZShopInterface {
     }
 
     public boolean checkBarCode(String barCode){
-        return barCode.matches("[0-9]{12,14}");
+
+        if (barCode.matches("[0-9]{12,14}")){
+            int sum=0;
+            int number=0;
+            for(int i=0; i<barCode.length()-1; i++){
+                number=Integer.parseInt(Character.toString(barCode.charAt(i)));
+                System.out.println(Integer.parseInt(Character.toString(barCode.charAt(i))));
+                if (!(i%2==0)){
+                    number=number*3;
+                }
+                // else number = number*1;
+                sum = sum+number;
+            }
+            // Now find the nearest multiple of 10 and subtract sum from it
+
+            // Return of closest of two
+            int result = (10-sum%10)+sum;
+            if ((result-sum)==Integer.parseInt(Character.toString(barCode.charAt(barCode.length()-1)))){
+                return true;
+            }
+        }
+        return false;
+
     }
 
     @Override
