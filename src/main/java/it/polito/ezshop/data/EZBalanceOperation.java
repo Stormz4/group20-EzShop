@@ -2,6 +2,10 @@ package it.polito.ezshop.data;
 
 import java.time.LocalDate;
 
+enum BalanceOpTypeEnum {
+    //todo: add enum
+}
+
 public class EZBalanceOperation implements BalanceOperation {
     private int balanceId;
     private LocalDate date;
