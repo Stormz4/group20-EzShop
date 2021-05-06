@@ -13,24 +13,22 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class SQLiteDB {
+    static final String JDBC_DB_NAME = "EZShopDB.db";
+    static final String JDBC_DB_URL = "jdbc:sqlite:src/" + JDBC_DB_NAME;
     Connection dbConnection = null;
 
     /**
      ** Connect to the DB
      */
     public void connect() {
-        String dbName = "EZShopDB.db";
         try {
-            // db parameters
-            String url = "jdbc:sqlite:src/" + dbName;
-
             // create a connection to the database
-            this.dbConnection = DriverManager.getConnection(url);
+            this.dbConnection = DriverManager.getConnection(JDBC_DB_URL);
 
             System.out.println("Connection to SQLite has been established.");
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-            this.createNewDatabase(dbName);
+            this.createNewDatabase();
         }
     }
 
@@ -47,15 +45,13 @@ public class SQLiteDB {
     /**
      ** Create the DB
      */
-    private void createNewDatabase(String dbName) {
-        String url = "jdbc:sqlite:C:src/" + dbName;
-
+    private void createNewDatabase() {
         // TODO: Should handle this as an exception?
         if (this.dbConnection == null)
             return;
 
         try {
-            this.dbConnection = DriverManager.getConnection(url);
+            this.dbConnection = DriverManager.getConnection(JDBC_DB_URL);
             if (this.dbConnection != null) {
                 DatabaseMetaData meta = this.dbConnection.getMetaData();
                 System.out.println("The driver name is " + meta.getDriverName());
@@ -66,6 +62,24 @@ public class SQLiteDB {
         }
     }
 
+    /**
+     ** Initialize DB
+     */
+    public void initDatabase() {
+        // Create tables if they do not exist already
+        this.createBalanceOperationsTable();//
+        this.createCardsTable();//
+        this.createCustomersTable();//
+        this.createOrdersTable();
+        this.createProductsPerSaleTable();
+        this.createProductTypesTable();
+        this.createSaleTransactionsTable();
+        this.createUsersTable();
+    }
+
+    /**
+     ** Returns the id of the last inserted row, no matter the table
+     */
     public Integer lastInsertRowId() {
         String sql = "SELECT last_insert_rowid() AS id;";
         Integer lastId = null;
@@ -765,7 +779,7 @@ public class SQLiteDB {
                 + " note text,\n"
                 + " productDescription text,\n"
                 + " barCode text,\n"
-                + " pricePerUnit real,\n"
+                + " pricePerUnit real\n"
                 + ");";
 
         // TODO: Should handle this as an exception?
