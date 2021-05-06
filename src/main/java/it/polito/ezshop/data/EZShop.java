@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 
 public class EZShop implements EZShopInterface {
+    private final SQLiteDB shopDB = new SQLiteDB();
 
     EZCustomer c1 = new EZCustomer(1, "Ciccio", "00001", 0);
     User currUser = null;
@@ -1018,5 +1019,29 @@ public class EZShop implements EZShopInterface {
         if(!verifyUserRights(currUser, "Administrator", "ShopManager")) throw new UnauthorizedException(); //todo: verify from access rights table!!!
 
         return accountingBook.currentBalance;
+    }
+
+    private void testDB() {
+        // TODO: remove all this stuff used for SQLite feature development
+        shopDB.connect();
+        shopDB.initDatabase();
+
+        EZCustomer c1 = new EZCustomer(-1, "Pippo", "XYZ123", 512);
+        Integer idC1 = shopDB.insertCustomer(c1.getCustomerName(), c1.getCustomerCard(), c1.getPoints());
+        Integer c2 = shopDB.insertCustomer("Pluto", "", 0);
+        Integer c3 = shopDB.insertCustomer("Paperino", "XYZ456", 260);
+        shopDB.updateCustomer(3, "zio Paperone", "XYZ456", 250);
+        shopDB.deleteCustomer(2);
+
+        String card1 = shopDB.insertCard(c1.getId(), c1.getPoints());
+        System.out.println("Questa è la carta 1: " + card1);
+        String card2 = shopDB.insertCard(c1.getId()+1, c1.getPoints() + 30);
+        System.out.println("Questa è la carta 2: " + card2);
+        String card3 = shopDB.insertCard(c1.getId()+2, c1.getPoints() + 50);
+        System.out.println("Questa è la carta 3: " + card3);
+        shopDB.deleteCard(card2);
+        System.out.println("Rimossa carta " + card2);
+        shopDB.createSaleTransactionsTable();
+        shopDB.createProductsPerSaleTable();
     }
 }
