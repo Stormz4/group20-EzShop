@@ -15,6 +15,8 @@ import java.util.List;
 public class SQLiteDB {
     static final String JDBC_DB_NAME = "EZShopDB.db";
     static final String JDBC_DB_URL = "jdbc:sqlite:src/" + JDBC_DB_NAME;
+    static final int defaultID = -1;
+    static final int defaultValue = 0;
     Connection dbConnection = null;
 
     /**
@@ -705,8 +707,8 @@ public class SQLiteDB {
 
         try{
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
-            pstmt.setInt(1, customerId);
-            pstmt.setInt(2, points);
+            pstmt.setInt(1, customerId != null ? customerId : defaultID);
+            pstmt.setInt(2, points != null ? points : defaultValue);
             pstmt.executeUpdate();
 
             Integer cardId = this.lastInsertRowId();
