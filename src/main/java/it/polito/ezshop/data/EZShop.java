@@ -771,7 +771,7 @@ public class EZShop implements EZShopInterface {
 
         if(returnId == null || returnId <= 0) throw new InvalidTransactionIdException();
 
-        if(productCode.length() == 0 || productCode == null || !isValidBarCode(productCode)) throw new InvalidProductCodeException();
+        //todo: isValidBarCode() still missing/// if(productCode.length() == 0 || productCode == null || !isValidBarCode(productCode)) throw new InvalidProductCodeException();
 
         if(amount <= 0) throw new InvalidQuantityException();
 
@@ -833,7 +833,7 @@ public class EZShop implements EZShopInterface {
 
         if(retTr == null) return false;
 
-        // if(retTr.isPayed()) return false;
+        // if(retTr.isPayed()) return false;   -OR-   // if(retTr.getStatus().equals("PAYED")) return false;
 
         // todo: delete return transaction with ID == returnId from DB
         /* "This method deletes a closed return transaction. It affects the quantity of product sold in the connected sale transaction

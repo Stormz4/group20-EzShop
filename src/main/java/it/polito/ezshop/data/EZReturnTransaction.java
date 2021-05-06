@@ -8,6 +8,7 @@ public class EZReturnTransaction extends EZBalanceOperation{
     private double returnedValue;
     private boolean isClosed;
     private ProductType returnedProduct;
+    private String status; //PAYED, ... ???
 
     public EZReturnTransaction(int balanceId, LocalDate date, double money, String type)
     {   // 'type' shouldn't be of type "BalanceOpTypeEnum" ???
