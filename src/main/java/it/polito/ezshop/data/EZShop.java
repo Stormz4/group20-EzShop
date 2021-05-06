@@ -4,11 +4,32 @@ import it.polito.ezshop.exceptions.*;
 
 import java.time.LocalDate;
 import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
+import java.lang.StringBuilder;
+import java.lang.Math;
+import java.util.stream.Collectors;
 
 
 public class EZShop implements EZShopInterface {
     private final SQLiteDB shopDB = new SQLiteDB();
+
+    EZCustomer c1 = new EZCustomer(1, "Ciccio", "00001", 0);
+    User currUser = null;
+    // populate customers
+
+    HashMap<Integer, Customer> customers = new HashMap<>();
+    HashMap<Integer, User> users = new HashMap<>();
+    HashMap<Integer, ProductType> products = new HashMap<>();
+
+    // TODO verify is this map is needed
+    HashMap<Integer, String> loyaltyCards = new HashMap<>();
+
+    EZAccountBook accountingBook = new EZAccountBook(0);
+    List<BalanceOperation> allBalanceOperations = new LinkedList<>();
+    HashMap<Integer, SaleTransaction> saleTransactions = new HashMap<>();
+    HashMap<Integer, EZReturnTransaction> returnTransactions = new HashMap<>();
 
     @Override
     public void reset() {
@@ -17,90 +38,386 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public Integer createUser(String username, String password, String role) throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
-        return null;
+        if (username == null || username.isEmpty() ) {
+            throw new InvalidUsernameException();
+        }
+        if (password == null || password.isEmpty()) {
+            throw new InvalidPasswordException();
+        }
+        if(role.isEmpty() || !(role.equals("Administrator") || role.equals("Cashier") || role.equals("ShopManager"))){
+            throw new InvalidRoleException();
+        }
+
+        for (User user : users.values()) {
+            if (user.getUsername().equals(username)) {
+                return -1;
+            }
+        }
+        // TODO return -1 is there is an error while saving the user
+        // Get the highest ID from the DB
+        int maxKey = Collections.max(users.keySet());
+        Integer id = maxKey+1;
+        EZUser user = new EZUser(id, username, password, role);
+
+        users.put(id, user);
+
+        return id;
     }
 
     @Override
     public boolean deleteUser(Integer id) throws InvalidUserIdException, UnauthorizedException {
-        return false;
+        if (id == null || id <=0) {
+            throw new InvalidUserIdException();
+        }
+
+        if (!users.containsKey(id)) {
+            return false;
+        }
+
+        if(!currUser.getRole().equals("Administrator") || currUser == null){
+            throw new UnauthorizedException();
+        }
+
+        users.remove(id);
+
+        // TODO delete from DB
+        return true;
     }
 
     @Override
     public List<User> getAllUsers() throws UnauthorizedException {
-        return null;
+        if(!currUser.getRole().equals("Administrator") || currUser == null){
+            throw new UnauthorizedException();
+        }
+
+        List<User> usersList = new LinkedList<>(users.values());
+        return usersList;
     }
 
     @Override
     public User getUser(Integer id) throws InvalidUserIdException, UnauthorizedException {
-        return null;
+        if (!users.containsKey(id)) {
+            return null;
+        }
+        if (id == null || id <=0) {
+            throw new InvalidUserIdException();
+        }
+
+        if(!currUser.getRole().equals("Administrator") || currUser == null){
+            throw new UnauthorizedException();
+        }
+
+        User user = users.get(id);
+        return user;
+
     }
 
     @Override
     public boolean updateUserRights(Integer id, String role) throws InvalidUserIdException, InvalidRoleException, UnauthorizedException {
-        return false;
+        /**
+         * This method updates the role of a user with given id. It can be invoked only after a user with role "Administrator" is
+         * logged in.
+         *
+         * @param id the id of the user
+         * @param role the new role the user should be assigned to
+         *
+         * @return true if the update was successful, false if the user does not exist
+         *
+         * @throws InvalidUserIdException   if the user Id is less than or equal to 0 or if it is null
+         * @throws InvalidRoleException     if the new role is empty, null or not among one of the following : {"Administrator", "Cashier", "ShopManager"}
+         * @throws UnauthorizedException    if there is no logged user or if it has not the rights to perform the operation
+         */
+        if (!users.containsKey(id)) {
+            return false;
+        }
+        if (id==null || id <=0) {
+            throw new InvalidUserIdException();
+        }
+        if (role.isEmpty() || !(role.equals("Administrator") || role.equals("Cashier") || role.equals("ShopManager"))) {
+            throw new InvalidRoleException();
+        }
+        if(!currUser.getRole().equals("Administrator") || currUser == null){
+            throw new UnauthorizedException();
+        }
+
+        User user = users.get(id);
+        user.setRole(role);
+        users.replace(id, user);
+        return true;
     }
 
     @Override
     public User login(String username, String password) throws InvalidUsernameException, InvalidPasswordException {
+        /**
+         * This method lets a user with given username and password login into the system
+         *
+         * @param username the username of the user
+         * @param password the password of the user
+         *
+         * @return an object of class User filled with the logged user's data if login is successful, null otherwise ( wrong credentials or db problems)
+         *
+         * @throws InvalidUsernameException if the username is empty or null
+         * @throws InvalidPasswordException if the password is empty or null
+         */
+        if (username == null || username.isEmpty()){
+            throw new InvalidUsernameException();
+        }
+        if (password == null || password.isEmpty()){
+            throw new InvalidPasswordException();
 
+        }
+
+        //
+        // Iterate the map and search the user
+        for (User user : users.values()) {
+            if (user.getPassword().equals(password) && user.getUsername().equals(username)){
+                currUser = user;
+            }
+        }
+
+        // TODO return null if DB problems?
         return null;
     }
 
     @Override
     public boolean logout() {
-        shopDB.closeConnection();
+        if (currUser == null){
+            return false;
+        }
+        currUser = null;
+        return true;
+    }
+
+    public boolean checkBarCode(String barCode){
+
+        if (barCode.matches("[0-9]{12,14}")){
+            int sum=0;
+            int number=0;
+            for(int i=0; i<barCode.length()-1; i++){
+                number=Integer.parseInt(Character.toString(barCode.charAt(i)));
+                System.out.println(Integer.parseInt(Character.toString(barCode.charAt(i))));
+                if (!(i%2==0)){
+                    number=number*3;
+                }
+                // else number = number*1;
+                sum = sum+number;
+            }
+            // Now find the nearest multiple of 10 and subtract sum from it
+
+            // Return of closest of two
+            int result = (10-sum%10)+sum;
+            if ((result-sum)==Integer.parseInt(Character.toString(barCode.charAt(barCode.length()-1)))){
+                return true;
+            }
+        }
         return false;
+
     }
 
     @Override
     public Integer createProductType(String description, String productCode, double pricePerUnit, String note) throws InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException {
-        return null;
+        if (description == null || description.isEmpty() ) {
+            throw new InvalidProductDescriptionException();
+        }
+        // TODO insert a check" if it is not a number or if it is not a valid barcode": check if its unique
+        if (productCode == null || productCode.isEmpty() || checkBarCode(productCode)) {
+            throw new InvalidProductCodeException();
+        }
+        if(pricePerUnit <=0){
+            throw new InvalidPricePerUnitException();
+        }
+        if(!(currUser.getRole().equals("Administrator") || currUser.getRole().equals("ShopManager")) || currUser == null){
+            throw new UnauthorizedException();
+        }
+
+        // Check if the Barcode is unique
+        for (ProductType product : products.values()) {
+            if (product.getBarCode().equals(productCode)) {
+                return -1;
+            }
+        }
+        // TODO return -1 is there is an error while saving the user
+        // Get the highest ID from the DB
+        int maxKey = Collections.max(products.keySet());
+        Integer id = maxKey+1;
+
+        EZProductType prodType;
+        if (note==null){
+            prodType = new EZProductType(id, 0, "", "", description, productCode, pricePerUnit);
+        }
+        else {
+            prodType = new EZProductType(id, 0, "", note, description, productCode, pricePerUnit);
+        }
+
+        products.put(id, prodType);
+
+        return id;
     }
 
     @Override
     public boolean updateProduct(Integer id, String newDescription, String newCode, double newPrice, String newNote) throws InvalidProductIdException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException {
-        return false;
+
+        if (id == null || id<=0){
+            throw new InvalidProductIdException();
+        }
+
+        if (!products.containsKey(id)) {
+            return false;
+        }
+
+        if (newDescription == null || newDescription.isEmpty() ) {
+            throw new InvalidProductDescriptionException();
+        }
+        if (newCode == null || newCode.isEmpty() || checkBarCode(newCode)) {
+            throw new InvalidProductCodeException();
+        }
+        if(newPrice <=0){
+            throw new InvalidPricePerUnitException();
+        }
+        if(!(currUser.getRole().equals("Administrator") || currUser.getRole().equals("ShopManager")) || currUser == null){
+            throw new UnauthorizedException();
+        }
+
+        // Check if the Barcode is unique
+        for (ProductType product : products.values()) {
+            if (product.getBarCode().equals(newCode)) {
+                return false;
+            }
+        }
+
+        // TODO update in the db
+        ProductType prodType = products.get(id);
+        prodType.setProductDescription(newDescription);
+        prodType.setBarCode(newCode);
+        prodType.setPricePerUnit(newPrice);
+        prodType.setNote(newNote);
+        products.replace(id, prodType);
+        return true;
     }
 
     @Override
     public boolean deleteProductType(Integer id) throws InvalidProductIdException, UnauthorizedException {
+        if (id == null || id<=0){
+            throw new InvalidProductIdException();
+        }
+        if (!products.containsKey(id)) {
+            return false;
+        }
+        if(!(currUser.getRole().equals("Administrator") || currUser.getRole().equals("ShopManager")) || currUser == null){
+            throw new UnauthorizedException();
+        }
+
+        products.remove(id);
+
         return false;
     }
 
     @Override
     public List<ProductType> getAllProductTypes() throws UnauthorizedException {
-        List<ProductType> productTypes = new LinkedList<>();
-        Integer id = 1;
-        Integer quantity = 20;
-        String location = "C";
-        String note = "Nota";
-        String productDescription = "Description";
-        String barCode = "XYZ123";
-        double pricePerUnit = 12.50;
-        EZProductType myProdType = new EZProductType(id, quantity, location, note, productDescription, barCode, pricePerUnit);
-        productTypes.add(myProdType);
-        
-        return productTypes;
+        if(!(currUser.getRole().equals("Administrator") || currUser.getRole().equals("ShopManager")) || currUser == null){
+            throw new UnauthorizedException();
+        }
+
+        // TODO get it from the DB
+        List<ProductType> prodList = new LinkedList<>(products.values());
+        return prodList;
     }
 
     @Override
     public ProductType getProductTypeByBarCode(String barCode) throws InvalidProductCodeException, UnauthorizedException {
+        if (barCode == null || barCode.isEmpty() || checkBarCode(barCode)) {
+            throw new InvalidProductCodeException();
+        }
+
+        if(!(currUser.getRole().equals("Administrator") || currUser.getRole().equals("ShopManager")) || currUser == null){
+            throw new UnauthorizedException();
+        }
+
+        for (ProductType product : products.values()) {
+            if (product.getBarCode().equals(barCode)) {
+                return product;
+            }
+        }
         return null;
     }
 
     @Override
     public List<ProductType> getProductTypesByDescription(String description) throws UnauthorizedException {
-        return null;
+
+        if(!(currUser.getRole().equals("Administrator") || currUser.getRole().equals("ShopManager")) || currUser == null){
+            throw new UnauthorizedException();
+        }
+
+        List<ProductType> filteredList = getAllProductTypes();
+
+        // Doesn't match the description: remove.
+        filteredList.removeIf(product -> !(product.getProductDescription().equals(description)));
+        return filteredList;
     }
 
     @Override
     public boolean updateQuantity(Integer productId, int toBeAdded) throws InvalidProductIdException, UnauthorizedException {
+        if (productId == null || productId<=0){
+            throw new InvalidProductIdException();
+        }
+        if (!products.containsKey(productId)) {
+            return false;
+        }
+        if(!(currUser.getRole().equals("Administrator") || currUser.getRole().equals("ShopManager")) || currUser == null){
+            throw new UnauthorizedException();
+        }
+
+        ProductType product = products.get(productId);
+        if ((toBeAdded > 0) || (toBeAdded < 0 && product.getQuantity() > Math.abs(toBeAdded))){
+                    // If i need to remove 50 quantity (oBeAdded = -50), i must have quanity > abs(50).
+            int q = product.getQuantity();
+            product.setQuantity(toBeAdded+q);
+            products.replace(productId, product);
+            // TODO update in the DB
+            return true;
+        }
+
+
         return false;
     }
 
     @Override
     public boolean updatePosition(Integer productId, String newPos) throws InvalidProductIdException, InvalidLocationException, UnauthorizedException {
-        return false;
+        if (productId == null || productId<=0){
+            throw new InvalidProductIdException();
+        }
+        if (!products.containsKey(productId)) {
+            return false;
+        }
+        //The position has the following format :
+        //<aisleNumber>-<rackAlphabeticIdentifier>-<levelNumber>
+        if (!(newPos.matches("[0-9]+-[a-zA-z]+-[0-9]+"))){
+            // If it doens't match:
+            throw new InvalidLocationException();
+        }
+        if(!(currUser.getRole().equals("Administrator") || currUser.getRole().equals("ShopManager")) || currUser == null){
+            throw new UnauthorizedException();
+        }
+
+        if (newPos.isEmpty()){
+            ProductType prodType = products.get(productId);
+            prodType.setLocation("");
+            products.replace(productId, prodType);
+            return false;
+            // TODO update in the DB
+        }
+        else {
+            // position has to be unique: check if it is
+            for (ProductType product : products.values()) {
+                if (product.getLocation().equals(newPos)) {
+                    return false;
+                }
+            }
+        }
+        ProductType prodType = products.get(productId);
+        prodType.setLocation(newPos);
+        products.replace(productId, prodType);
+        return true;
     }
 
     @Override
@@ -128,43 +445,250 @@ public class EZShop implements EZShopInterface {
         return null;
     }
 
+    /**
+     * This method saves a new customer into the system. The customer's name should be unique.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param customerName the name of the customer to be registered
+     *
+     * @return the id (>0) of the new customer if successful, -1 otherwise
+     *
+     * @throws InvalidCustomerNameException if the customer name is empty or null
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public Integer defineCustomer(String customerName) throws InvalidCustomerNameException, UnauthorizedException {
-        return null;
+        if (customerName == null || customerName.isEmpty()){
+            throw new InvalidCustomerNameException();
+        }
+        if(currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager"))){
+            throw new UnauthorizedException();
+        }
+
+        for (Customer customer : customers.values()) {
+            if (customer.getCustomerName().equals(customerName)) {
+                // Name should be unique
+                return -1;
+            }
+        }
+
+        // Name is not present in the DB
+        // Get the highest ID from the DB
+        int maxKey = Collections.max(customers.keySet());
+        Integer id = maxKey+1;
+        EZCustomer customer = new EZCustomer(id, customerName, null, null);
+
+        // TODO insert in the DB
+        customers.put(id, customer);
+
+        return id;
     }
 
+
+    public boolean checkLoyalty(String card){
+        return card.length() != 10 || card.matches("[0-9]{10}");
+    }
+
+    /**
+     * This method updates the data of a customer with given <id>. This method can be used to assign/delete a card to a
+     * customer. If <newCustomerCard> has a numeric value than this value will be assigned as new card code, if it is an
+     * empty string then any existing card code connected to the customer will be removed and, finally, it it assumes the
+     * null value then the card code related to the customer should not be affected from the update. The card code should
+     * be unique and should be a string of 10 digits.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param id the id of the customer to be updated
+     * @param newCustomerName the new name to be assigned
+     * @param newCustomerCard the new card code to be assigned. If it is empty it means that the card must be deleted,
+     *                        if it is null then we don't want to update the cardNumber
+     *
+     * @return true if the update is successful
+     *          false if the update fails ( cardCode assigned to another user, db unreacheable)
+     *
+     * @throws InvalidCustomerNameException if the customer name is empty or null
+     * @throws InvalidCustomerCardException if the customer card is empty, null or if it is not in a valid format (string with 10 digits)
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public boolean modifyCustomer(Integer id, String newCustomerName, String newCustomerCard) throws InvalidCustomerNameException, InvalidCustomerCardException, InvalidCustomerIdException, UnauthorizedException {
-        return false;
+        // TODO Should we call the excepiont AND remove the card from the DB if the string is empty?
+
+        if (newCustomerName == null || newCustomerName.isEmpty() ){
+            throw new InvalidCustomerNameException();
+        }
+        if (newCustomerCard == null || checkLoyalty(newCustomerCard) ){
+            throw new InvalidCustomerCardException();
+        }
+        if(currUser==null || !currUser.getRole().equals("Administrator") || !currUser.getRole().equals("Cashier") || !currUser.getRole().equals("ShopManager")){
+                throw new UnauthorizedException();
+
+        }
+        Customer customer = customers.get(id);
+        if (newCustomerCard.isEmpty()){
+            //if it is an empty string then any
+            // existing card code connected to the
+            // customer will be removed. Remove also from the DB?
+            customer.setCustomerCard(null);
+            customer.setPoints(0);
+        }
+        customer.setCustomerName(newCustomerName);
+        customer.setCustomerCard(newCustomerCard);
+        customers.replace(id, customer);
+        return true;
+
     }
 
     @Override
     public boolean deleteCustomer(Integer id) throws InvalidCustomerIdException, UnauthorizedException {
-        return false;
+        if (!customers.containsKey(id)) {
+            return false;
+        }
+        if (id == null || id <=0 ) {
+            throw new InvalidCustomerIdException();
+        }
+
+        if(currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager"))){
+            throw new UnauthorizedException();
+        }
+
+        // TODO false if we have problems to reach the DB
+        users.remove(id);
+        return true;
     }
 
     @Override
     public Customer getCustomer(Integer id) throws InvalidCustomerIdException, UnauthorizedException {
-        return null;
+        if (!customers.containsKey(id)) {
+            return null;
+        }
+        if ( id==null || id <=0) {
+            throw new InvalidCustomerIdException();
+        }
+        if(currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager"))){
+            throw new UnauthorizedException();
+        }
+
+        Customer customer = customers.get(id);
+        return customer;
     }
 
     @Override
     public List<Customer> getAllCustomers() throws UnauthorizedException {
-        return null;
+        if(currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager"))){
+            throw new UnauthorizedException();
+        }
+
+        List<Customer> customerList = new LinkedList<Customer>(customers.values());
+        return customerList;
     }
 
+    /**
+     * This method returns a string containing the code of a new assignable card.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @return the code of a new available card. An empty string if the db is unreachable
+     *
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public String createCard() throws UnauthorizedException {
-        return null;
+        if(currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager"))){
+            throw new UnauthorizedException();
+        }
+
+        // Template since we're not sure how to implements
+        String s = "";
+
+        loyaltyCards.put(1, s);
+
+
+        // TODO get a string from the DB which isn't' related to a customer yet or generate one?
+        //      https://www.geeksforgeeks.org/generate-random-string-of-given-size-in-java/ how to generate one
+        return s;
     }
 
+    /**
+     * This method assigns a card with given card code to a customer with given identifier. A card with given card code
+     * can be assigned to one customer only.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param customerCard the number of the card to be attached to a customer
+     * @param customerId the id of the customer the card should be assigned to
+     *
+     * @return true if the operation was successful
+     *          false if the card is already assigned to another user, if there is no customer with given id, if the db is unreachable
+     *
+     * @throws InvalidCustomerIdException if the id is null, less than or equal to 0.
+     * @throws InvalidCustomerCardException if the card is null, empty or in an invalid format
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public boolean attachCardToCustomer(String customerCard, Integer customerId) throws InvalidCustomerIdException, InvalidCustomerCardException, UnauthorizedException {
-        return false;
+
+        if (customerId == null || customerId <=0){
+            throw new InvalidCustomerIdException();
+        }
+
+        //verify if it's string with 10 digits!
+        if (customerCard == null || checkLoyalty(customerCard)){
+            throw new InvalidCustomerCardException();
+        }
+
+        if(currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager"))){
+            throw new UnauthorizedException();
+        }
+
+        Customer c = getCustomer(customerId); // This functions checks if the customers map contains the ID.
+        if (c==null){
+            return false;
+        }
+        for (Customer customer : customers.values()) {
+            if (customer.getCustomerCard().equals(customerCard)){
+                return false; //There is a customer with the given card
+            }
+        }
+
+        c.setCustomerCard(customerCard);
+        return true;
     }
 
+    /**
+     * This method updates the points on a card adding to the number of points available on the card the value assumed by
+     * <pointsToBeAdded>. The points on a card should always be greater than or equal to 0.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param customerCard the card the points should be added to
+     * @param pointsToBeAdded the points to be added or subtracted ( this could assume a negative value)
+     *
+     * @return true if the operation is successful
+     *          false   if there is no card with given code,
+     *                  if pointsToBeAdded is negative and there were not enough points on that card before this operation,
+     *                  if we cannot reach the db.
+     *
+     * @throws InvalidCustomerCardException if the card is null, empty or in an invalid format
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public boolean modifyPointsOnCard(String customerCard, int pointsToBeAdded) throws InvalidCustomerCardException, UnauthorizedException {
+
+        if (customerCard == null || checkLoyalty(customerCard)){
+            throw new InvalidCustomerCardException();
+        }
+
+        if(currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager"))){
+            throw new UnauthorizedException();
+        }
+
+        for (Customer customer : customers.values()) {
+            if (customer.getCustomerCard().equals(customerCard)){
+                if ((pointsToBeAdded > 0) || (pointsToBeAdded < 0 && customer.getPoints() > Math.abs(pointsToBeAdded))){
+                    // If i need to remove 50 points (pointsToBeAdded = -50), i must have points > abs(50).
+                    int p = customer.getPoints();
+                    customer.setPoints(pointsToBeAdded+p);
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -213,59 +737,288 @@ public class EZShop implements EZShopInterface {
         return null;
     }
 
+    public BalanceOperation getBalanceOpById(Integer balanceId)
+    {
+        return allBalanceOperations.get(balanceId);
+    }
+
     @Override
     public Integer startReturnTransaction(Integer saleNumber) throws /*InvalidTicketNumberException,*/InvalidTransactionIdException, UnauthorizedException {
-        return null;
+
+        BalanceOperation op = getBalanceOpById(saleNumber); //or SaleTransaction?
+
+        if(!verifyUserRights(currUser, "Administrator", "ShopManager", "Cashier")) throw new UnauthorizedException();
+
+        if(saleNumber == null || saleNumber <= 0) throw new InvalidTransactionIdException();
+
+        //EZReturnTransaction retTr = new EZReturnTransaction(saleNumber, op.getDate(), ); // ???
+        //returnTransactions.put(saleNumber, retTr);
+        //TODO: Start a return transaction (just start it), related to a specific Sale Transaction and save it in the list of
+        // returned transactions and also in the list of Balance operations !?
+
+        return saleNumber;
+        // or return -1 if transaction with ID saleNumber doesn't exist!!!
+    }
+
+    public EZReturnTransaction getReturnTransactionById(Integer returnId)
+    {
+        return returnTransactions.get(returnId);
     }
 
     @Override
     public boolean returnProduct(Integer returnId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
-        return false;
+
+        if(!verifyUserRights(currUser, "Administrator", "ShopManager", "Cashier")) throw new UnauthorizedException();
+
+        if(returnId == null || returnId <= 0) throw new InvalidTransactionIdException();
+
+        //todo: isValidBarCode() still missing/// if(productCode.length() == 0 || productCode == null || !isValidBarCode(productCode)) throw new InvalidProductCodeException();
+
+        if(amount <= 0) throw new InvalidQuantityException();
+
+        EZReturnTransaction retTr = getReturnTransactionById(returnId);
+        ProductType product = getProductTypeByBarCode(productCode);
+
+        if(product == null)
+            return false;
+        //     if( product is not in the transaction (not the returnTransaction) ) return false;  //     HOW ???
+        //     if( product amount in the transaction is lower than 'amount' ) return false;  //     HOW ???
+        //     if( the transaction does not exist ) return false;  //     HOW ???
+
+        if(amount <= product.getQuantity())
+        {
+            retTr.setReturnedProduct(product);
+            retTr.setQuantity(amount);
+        }
+
+
+
+
+        return true;
     }
 
     @Override
     public boolean endReturnTransaction(Integer returnId, boolean commit) throws InvalidTransactionIdException, UnauthorizedException {
-        return false;
+
+        if(!verifyUserRights(currUser, "Administrator", "ShopManager", "Cashier")) throw new UnauthorizedException();
+
+        if(returnId == null || returnId <= 0) throw new InvalidTransactionIdException();
+
+        EZReturnTransaction retTr = getReturnTransactionById(returnId);
+
+        if(retTr == null || retTr.isClosed())
+            return false;
+
+        if(commit)
+        {
+            //TODO: update DB
+
+            //if(problems with DB) return false;
+        }
+        else
+        {
+            //rollback ---?---> deleteReturnTransaction? (only CLOSED return transaction can be deleted)  ???
+        }
+
+        return true;
     }
 
     @Override
     public boolean deleteReturnTransaction(Integer returnId) throws InvalidTransactionIdException, UnauthorizedException {
+
+        if(!verifyUserRights(currUser, "Administrator", "ShopManager", "Cashier")) throw new UnauthorizedException();
+
+        if(returnId == null || returnId <= 0) throw new InvalidTransactionIdException();
+
+        EZReturnTransaction retTr = getReturnTransactionById(returnId);
+
+        if(retTr == null) return false;
+
+        // if(retTr.isPayed()) return false;   -OR-   // if(retTr.getStatus().equals("PAYED")) return false;
+
+        // todo: delete return transaction with ID == returnId from DB
+        /* "This method deletes a closed return transaction. It affects the quantity of product sold in the connected sale transaction
+         * (and consequently its price) and the quantity of product available on the shelves." */
+
+        // if(problems with DB) return false;
+
+        return true;
+    }
+
+    static boolean verifyUserRights(User currUser, String... requestedRoles)
+    {
+        if(currUser == null)
+            return false;
+
+        for (String role : requestedRoles)
+        {
+            if(currUser.getRole().equals(role))
+                return true;
+        }
+
         return false;
     }
 
+    static boolean verifyByLuhnAlgo(String ccNumber)
+    {
+        int sum = 0;
+        boolean alternate = false;
+        for (int i = ccNumber.length() - 1; i >= 0; i--)
+        {
+            int n = Integer.parseInt(ccNumber.substring(i, i + 1));
+            if (alternate)
+            {
+                n *= 2;
+                if (n > 9)
+                    n = (n % 10) + 1;
+            }
+            sum += n;
+            alternate = !alternate;
+        }
+        return (sum % 10 == 0);
+    }
+
+
     @Override
     public double receiveCashPayment(Integer ticketNumber, double cash) throws InvalidTransactionIdException, InvalidPaymentException, UnauthorizedException {
-        return 0;
+
+        SaleTransaction sale = getSaleTransaction(ticketNumber);
+
+        if(!verifyUserRights(currUser, "Administrator", "ShopManager", "Cashier")) throw new UnauthorizedException();
+
+        if(ticketNumber == null || ticketNumber <= 0) throw new InvalidTransactionIdException();
+
+        if(cash <= 0) throw new InvalidPaymentException();
+
+        if(sale == null || cash < sale.getPrice())
+            return -1; // TODO: + RITORNA -1 ANCHE SE HAI AVUTO PROBLEMI DI CONNESSIONE AL DB
+
+        recordBalanceUpdate(sale.getPrice());
+
+        return (cash - sale.getPrice());
     }
 
     @Override
     public boolean receiveCreditCardPayment(Integer ticketNumber, String creditCard) throws InvalidTransactionIdException, InvalidCreditCardException, UnauthorizedException {
-        return false;
+
+        SaleTransaction sale = getSaleTransaction(ticketNumber);
+
+        if(!verifyUserRights(currUser, "Administrator", "ShopManager", "Cashier")) throw new UnauthorizedException();
+
+        if(ticketNumber == null || ticketNumber <= 0) throw new InvalidTransactionIdException();
+
+        if(!verifyByLuhnAlgo(creditCard) || creditCard.equals("") || creditCard == null) throw new InvalidCreditCardException();
+
+        /*if(sale == null ||
+            getCreditCardFromDB(ticketNumber) == null ||
+            !verifyCreditCardBalance(ticketNumber, creditCard))
+            return false;*/ // TODO: + RITORNA false ANCHE SE HAI AVUTO PROBLEMI DI CONNESSIONE AL DB
+
+        // todo: keep money from credit card
+        return recordBalanceUpdate(sale.getPrice());
     }
 
     @Override
     public double returnCashPayment(Integer returnId) throws InvalidTransactionIdException, UnauthorizedException {
-        return 0;
+
+        if(!verifyUserRights(currUser, "Administrator", "ShopManager", "Cashier")) throw new UnauthorizedException();
+
+        if(returnId <= 0) throw new InvalidTransactionIdException(); // not "returnId == null ||" ???
+
+        EZReturnTransaction retTr = getReturnTransactionById(returnId);
+
+        if(!retTr.isClosed()) return -1;
+
+        if(retTr == null) return -1;
+
+        // TODO: + RITORNA -1 ANCHE SE HAI AVUTO PROBLEMI DI CONNESSIONE AL DB
+
+        double returnedMoney = retTr.getMoney();
+
+        recordBalanceUpdate(-returnedMoney);
+
+        return returnedMoney;
+
     }
 
     @Override
     public double returnCreditCardPayment(Integer returnId, String creditCard) throws InvalidTransactionIdException, InvalidCreditCardException, UnauthorizedException {
-        return 0;
+
+        if(!verifyUserRights(currUser, "Administrator", "ShopManager", "Cashier")) throw new UnauthorizedException();
+
+        if(returnId <= 0) throw new InvalidTransactionIdException(); // not "returnId == null ||" ???
+
+        if(!verifyByLuhnAlgo(creditCard) || creditCard.equals("") || creditCard == null) throw new InvalidCreditCardException();
+
+        EZReturnTransaction retTr = getReturnTransactionById(returnId);
+
+        if(!retTr.isClosed()) return -1;
+        if(retTr == null) return -1;
+        //if(getCreditCardFromDB(ticketNumber) == null) return -1;
+        // TODO: + RITORNA -1 ANCHE SE HAI AVUTO PROBLEMI DI CONNESSIONE AL DB
+
+        double returnedMoney = retTr.getMoney();
+
+        recordBalanceUpdate(-returnedMoney);
+        // todo: give money to credit card
+
+        return returnedMoney;
     }
 
     @Override
     public boolean recordBalanceUpdate(double toBeAdded) throws UnauthorizedException {
-        return false;
+
+        if(!verifyUserRights(currUser, "Administrator", "ShopManager")) throw new UnauthorizedException();
+
+        return accountingBook.updateBalance(toBeAdded);
     }
 
     @Override
     public List<BalanceOperation> getCreditsAndDebits(LocalDate from, LocalDate to) throws UnauthorizedException {
-        return null;
+
+        LocalDate tmp = from;
+        List<BalanceOperation> filteredBalanceOperations = allBalanceOperations;
+
+        if(!verifyUserRights(currUser, "Administrator", "ShopManager")) throw new UnauthorizedException();
+
+        if(from.isAfter(to))
+        {   // swap the dates:
+            from = to;
+            to = tmp;
+        }
+
+        LocalDate startingDate = from;
+        LocalDate endingDate = to;
+
+        if(startingDate != null && endingDate != null) //todo: review this if --> why they are always true?
+        {
+            filteredBalanceOperations = allBalanceOperations.stream()
+                    .filter( op -> op.getDate().isAfter(startingDate) && op.getDate().isBefore(endingDate))
+                    .collect(Collectors.toList());
+        }
+        else if(startingDate != null && endingDate == null)
+        {
+            filteredBalanceOperations = allBalanceOperations.stream()
+                    .filter( op -> op.getDate().isAfter(startingDate))
+                    .collect(Collectors.toList());
+        }
+        else if(startingDate == null && endingDate != null)
+        {
+            filteredBalanceOperations = allBalanceOperations.stream()
+                    .filter( op -> op.getDate().isBefore(endingDate))
+                    .collect(Collectors.toList());
+        }
+        //else --> both startingDate and endingDate are null
+
+        return filteredBalanceOperations;
     }
 
     @Override
     public double computeBalance() throws UnauthorizedException {
-        return 0;
+
+        if(!verifyUserRights(currUser, "Administrator", "ShopManager")) throw new UnauthorizedException(); //todo: verify from access rights table!!!
+
+        return accountingBook.currentBalance;
     }
 
     private void testDB() {

@@ -52,4 +52,5 @@ public class EZCustomer implements Customer {
     public void setPoints(Integer points) {
         this.points = points;
     }
+
 }
