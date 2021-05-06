@@ -566,7 +566,7 @@ public class EZShop implements EZShopInterface {
 
         BalanceOperation op = getBalanceOpById(saleNumber); //or SaleTransaction?
 
-        if(!verifyUserRights(currUser, Administrator, ShopManager, Cashier)) throw new UnauthorizedException();
+        if(!verifyUserRights(currUser, "Administrator", "ShopManager", "Cashier")) throw new UnauthorizedException();
 
         if(saleNumber == null || saleNumber <= 0) throw new InvalidTransactionIdException();
 
@@ -587,11 +587,11 @@ public class EZShop implements EZShopInterface {
     @Override
     public boolean returnProduct(Integer returnId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
 
-        if(!verifyUserRights(currUser, Administrator, ShopManager, Cashier)) throw new UnauthorizedException();
+        if(!verifyUserRights(currUser, "Administrator", "ShopManager", "Cashier")) throw new UnauthorizedException();
 
         if(returnId == null || returnId <= 0) throw new InvalidTransactionIdException();
 
-        if(productCode.length() == 0 || productCode == null || !verifyBarCode(productCode)) throw new InvalidProductCodeException();
+        if(productCode.length() == 0 || productCode == null || !isValidBarCode(productCode)) throw new InvalidProductCodeException();
 
         if(amount <= 0) throw new InvalidQuantityException();
 
@@ -619,7 +619,7 @@ public class EZShop implements EZShopInterface {
     @Override
     public boolean endReturnTransaction(Integer returnId, boolean commit) throws InvalidTransactionIdException, UnauthorizedException {
 
-        if(!verifyUserRights(currUser, Administrator, ShopManager, Cashier)) throw new UnauthorizedException();
+        if(!verifyUserRights(currUser, "Administrator", "ShopManager", "Cashier")) throw new UnauthorizedException();
 
         if(returnId == null || returnId <= 0) throw new InvalidTransactionIdException();
 
@@ -645,7 +645,7 @@ public class EZShop implements EZShopInterface {
     @Override
     public boolean deleteReturnTransaction(Integer returnId) throws InvalidTransactionIdException, UnauthorizedException {
 
-        if(!verifyUserRights(currUser, Administrator, ShopManager, Cashier)) throw new UnauthorizedException();
+        if(!verifyUserRights(currUser, "Administrator", "ShopManager", "Cashier")) throw new UnauthorizedException();
 
         if(returnId == null || returnId <= 0) throw new InvalidTransactionIdException();
 
@@ -664,14 +664,14 @@ public class EZShop implements EZShopInterface {
         return true;
     }
 
-    static boolean verifyUserRights(User currUser, UserRoleEnum... requestedRoles)
+    static boolean verifyUserRights(User currUser, String... requestedRoles)
     {
         if(currUser == null)
             return false;
 
-        for (UserRoleEnum role : requestedRoles)
+        for (String role : requestedRoles)
         {
-            if(currUser.getRole().equals(role.toString()))
+            if(currUser.getRole().equals(role))
                 return true;
         }
 
@@ -703,7 +703,7 @@ public class EZShop implements EZShopInterface {
 
         SaleTransaction sale = getSaleTransaction(ticketNumber);
 
-        if(!verifyUserRights(currUser, Administrator, ShopManager, Cashier)) throw new UnauthorizedException();
+        if(!verifyUserRights(currUser, "Administrator", "ShopManager", "Cashier")) throw new UnauthorizedException();
 
         if(ticketNumber == null || ticketNumber <= 0) throw new InvalidTransactionIdException();
 
@@ -722,16 +722,16 @@ public class EZShop implements EZShopInterface {
 
         SaleTransaction sale = getSaleTransaction(ticketNumber);
 
-        if(!verifyUserRights(currUser, Administrator, ShopManager, Cashier)) throw new UnauthorizedException();
+        if(!verifyUserRights(currUser, "Administrator", "ShopManager", "Cashier")) throw new UnauthorizedException();
 
         if(ticketNumber == null || ticketNumber <= 0) throw new InvalidTransactionIdException();
 
         if(!verifyByLuhnAlgo(creditCard) || creditCard.equals("") || creditCard == null) throw new InvalidCreditCardException();
 
-        if(sale == null ||
+        /*if(sale == null ||
             getCreditCardFromDB(ticketNumber) == null ||
             !verifyCreditCardBalance(ticketNumber, creditCard))
-            return false; // TODO: + RITORNA false ANCHE SE HAI AVUTO PROBLEMI DI CONNESSIONE AL DB
+            return false;*/ // TODO: + RITORNA false ANCHE SE HAI AVUTO PROBLEMI DI CONNESSIONE AL DB
 
         // todo: keep money from credit card
         return recordBalanceUpdate(sale.getPrice());
@@ -740,7 +740,7 @@ public class EZShop implements EZShopInterface {
     @Override
     public double returnCashPayment(Integer returnId) throws InvalidTransactionIdException, UnauthorizedException {
 
-        if(!verifyUserRights(currUser, Administrator, ShopManager, Cashier)) throw new UnauthorizedException();
+        if(!verifyUserRights(currUser, "Administrator", "ShopManager", "Cashier")) throw new UnauthorizedException();
 
         if(returnId <= 0) throw new InvalidTransactionIdException(); // not "returnId == null ||" ???
 
@@ -763,7 +763,7 @@ public class EZShop implements EZShopInterface {
     @Override
     public double returnCreditCardPayment(Integer returnId, String creditCard) throws InvalidTransactionIdException, InvalidCreditCardException, UnauthorizedException {
 
-        if(!verifyUserRights(currUser, Administrator, ShopManager, Cashier)) throw new UnauthorizedException();
+        if(!verifyUserRights(currUser, "Administrator", "ShopManager", "Cashier")) throw new UnauthorizedException();
 
         if(returnId <= 0) throw new InvalidTransactionIdException(); // not "returnId == null ||" ???
 
@@ -773,7 +773,7 @@ public class EZShop implements EZShopInterface {
 
         if(!retTr.isClosed()) return -1;
         if(retTr == null) return -1;
-        if(getCreditCardFromDB(ticketNumber) == null) return -1;
+        //if(getCreditCardFromDB(ticketNumber) == null) return -1;
         // TODO: + RITORNA -1 ANCHE SE HAI AVUTO PROBLEMI DI CONNESSIONE AL DB
 
         double returnedMoney = retTr.getMoney();
@@ -787,7 +787,7 @@ public class EZShop implements EZShopInterface {
     @Override
     public boolean recordBalanceUpdate(double toBeAdded) throws UnauthorizedException {
 
-        if(!verifyUserRights(currUser, Administrator, ShopManager)) throw new UnauthorizedException();
+        if(!verifyUserRights(currUser, "Administrator", "ShopManager")) throw new UnauthorizedException();
 
         return accountingBook.updateBalance(toBeAdded);
     }
@@ -798,7 +798,7 @@ public class EZShop implements EZShopInterface {
         LocalDate tmp = from;
         List<BalanceOperation> filteredBalanceOperations = allBalanceOperations;
 
-        if(!verifyUserRights(currUser, Administrator, ShopManager)) throw new UnauthorizedException(); // IT IS NOT SPECIFIED IN API!!!
+        if(!verifyUserRights(currUser, "Administrator", "ShopManager")) throw new UnauthorizedException();
 
         if(from.isAfter(to))
         {   // swap the dates:
@@ -835,7 +835,7 @@ public class EZShop implements EZShopInterface {
     @Override
     public double computeBalance() throws UnauthorizedException {
 
-        if(!verifyUserRights(currUser, Administrator, ShopManager)) throw new UnauthorizedException(); // IT IS NOT SPECIFIED IN API!!!
+        if(!verifyUserRights(currUser, "Administrator", "ShopManager")) throw new UnauthorizedException(); //todo: verify from access rights table!!!
 
         return accountingBook.currentBalance;
     }
