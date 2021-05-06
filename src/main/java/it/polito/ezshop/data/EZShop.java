@@ -996,33 +996,30 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public List<BalanceOperation> getCreditsAndDebits(LocalDate from, LocalDate to) throws UnauthorizedException {
-
-        LocalDate tmp = from;
         LinkedList<BalanceOperation> balanceOperations = new LinkedList<>(ezBalanceOperations.values());
         List<BalanceOperation> filteredBalanceOperations = new LinkedList<>();
 
-        if(!verifyUserRights(currUser, "Administrator", "ShopManager")) throw new UnauthorizedException();
+        if(!verifyUserRights(currUser, "Administrator", "ShopManager"))
+            throw new UnauthorizedException();
 
-        if(from.isAfter(to)) {   // swap the dates:
-            from = to;
-            to = tmp;
-        }
+        LocalDate startingDate;
+        LocalDate endingDate;
+        if(from != null && to != null) {
+            startingDate = from.isAfter(to) ? to : from;
+            endingDate = from.isAfter(to) ? from : to;
 
-        LocalDate startingDate = from;
-        LocalDate endingDate = to;
-
-        //todo: review this if --> why they are always true?
-        if(startingDate != null && endingDate != null) {
             filteredBalanceOperations = balanceOperations.stream()
                     .filter( op -> op.getDate().isAfter(startingDate) && op.getDate().isBefore(endingDate))
                     .collect(Collectors.toList());
         }
-        else if(startingDate != null && endingDate == null) {
+        else if(from != null) {
+            startingDate = from;
             filteredBalanceOperations = balanceOperations.stream()
                     .filter( op -> op.getDate().isAfter(startingDate))
                     .collect(Collectors.toList());
         }
-        else if(startingDate == null && endingDate != null) {
+        else if(to != null) {
+            endingDate = to;
             filteredBalanceOperations = balanceOperations.stream()
                     .filter( op -> op.getDate().isBefore(endingDate))
                     .collect(Collectors.toList());
@@ -1035,7 +1032,8 @@ public class EZShop implements EZShopInterface {
     @Override
     public double computeBalance() throws UnauthorizedException {
 
-        if(!verifyUserRights(currUser, "Administrator", "ShopManager")) throw new UnauthorizedException(); //todo: verify from access rights table!!!
+        if(!verifyUserRights(currUser, "Administrator", "ShopManager"))
+            throw new UnauthorizedException(); //todo: verify from access rights table!!!
 
         return accountingBook.currentBalance;
     }
