@@ -7,29 +7,46 @@ import java.util.LinkedList;
 import java.util.HashMap;
 import java.util.Collections;
 import java.util.List;
-import java.lang.StringBuilder;
 import java.lang.Math;
 import java.util.stream.Collectors;
 
 
 public class EZShop implements EZShopInterface {
     private final SQLiteDB shopDB = new SQLiteDB();
+    private User currUser = null;
 
-    EZCustomer c1 = new EZCustomer(1, "Ciccio", "00001", 0);
-    User currUser = null;
-    // populate customers
-
-    HashMap<Integer, Customer> customers = new HashMap<>();
-    HashMap<Integer, User> users = new HashMap<>();
-    HashMap<Integer, ProductType> products = new HashMap<>();
+    private HashMap<Integer, EZCustomer> ezCustomers;
+    private HashMap<Integer, EZUser> ezUsers;
+    private HashMap<Integer, EZProductType> ezProducts;
 
     // TODO verify is this map is needed
-    HashMap<Integer, String> loyaltyCards = new HashMap<>();
+    private HashMap<String, EZCard> ezCards;
 
-    EZAccountBook accountingBook = new EZAccountBook(0);
-    List<BalanceOperation> allBalanceOperations = new LinkedList<>();
-    HashMap<Integer, SaleTransaction> saleTransactions = new HashMap<>();
-    HashMap<Integer, EZReturnTransaction> returnTransactions = new HashMap<>();
+    private EZAccountBook accountingBook;
+    private HashMap<Integer, EZBalanceOperation> ezBalanceOperations;
+    private HashMap<Integer, EZSaleTransaction> ezSaleTransactions;
+    private HashMap<Integer, EZReturnTransaction> ezReturnTransactions;
+
+    public void loadDataFromDB() {
+
+        if (ezBalanceOperations == null)
+            ezBalanceOperations = shopDB.selectAllBalanceOperations();
+
+        if (ezCards == null)
+            ezCards = shopDB.selectAllCards();
+
+        if (ezCustomers == null)
+            ezCustomers = shopDB.selectAllCustomers();
+
+        if (ezUsers == null)
+            ezUsers = shopDB.selectAllUsers();
+
+        if (ezProducts == null)
+            ezProducts = shopDB.selectAllProductTypes();
+
+        if (ezSaleTransactions == null)
+            ezSaleTransactions = shopDB.selectAllSaleTransactions();
+    }
 
     @Override
     public void reset() {
@@ -48,18 +65,18 @@ public class EZShop implements EZShopInterface {
             throw new InvalidRoleException();
         }
 
-        for (User user : users.values()) {
+        for (User user : ezUsers.values()) {
             if (user.getUsername().equals(username)) {
                 return -1;
             }
         }
         // TODO return -1 is there is an error while saving the user
         // Get the highest ID from the DB
-        int maxKey = Collections.max(users.keySet());
+        int maxKey = Collections.max(ezUsers.keySet());
         Integer id = maxKey+1;
         EZUser user = new EZUser(id, username, password, role);
 
-        users.put(id, user);
+        ezUsers.put(id, user);
 
         return id;
     }
@@ -70,7 +87,7 @@ public class EZShop implements EZShopInterface {
             throw new InvalidUserIdException();
         }
 
-        if (!users.containsKey(id)) {
+        if (!ezUsers.containsKey(id)) {
             return false;
         }
 
@@ -78,7 +95,7 @@ public class EZShop implements EZShopInterface {
             throw new UnauthorizedException();
         }
 
-        users.remove(id);
+        ezUsers.remove(id);
 
         // TODO delete from DB
         return true;
@@ -90,13 +107,13 @@ public class EZShop implements EZShopInterface {
             throw new UnauthorizedException();
         }
 
-        List<User> usersList = new LinkedList<>(users.values());
+        List<User> usersList = new LinkedList<>(ezUsers.values());
         return usersList;
     }
 
     @Override
     public User getUser(Integer id) throws InvalidUserIdException, UnauthorizedException {
-        if (!users.containsKey(id)) {
+        if (!ezUsers.containsKey(id)) {
             return null;
         }
         if (id == null || id <=0) {
@@ -107,9 +124,8 @@ public class EZShop implements EZShopInterface {
             throw new UnauthorizedException();
         }
 
-        User user = users.get(id);
+        User user = ezUsers.get(id);
         return user;
-
     }
 
     @Override
@@ -127,7 +143,7 @@ public class EZShop implements EZShopInterface {
          * @throws InvalidRoleException     if the new role is empty, null or not among one of the following : {"Administrator", "Cashier", "ShopManager"}
          * @throws UnauthorizedException    if there is no logged user or if it has not the rights to perform the operation
          */
-        if (!users.containsKey(id)) {
+        if (!ezUsers.containsKey(id)) {
             return false;
         }
         if (id==null || id <=0) {
@@ -140,9 +156,9 @@ public class EZShop implements EZShopInterface {
             throw new UnauthorizedException();
         }
 
-        User user = users.get(id);
+        EZUser user = ezUsers.get(id);
         user.setRole(role);
-        users.replace(id, user);
+        ezUsers.replace(id, user);
         return true;
     }
 
@@ -159,6 +175,10 @@ public class EZShop implements EZShopInterface {
          * @throws InvalidUsernameException if the username is empty or null
          * @throws InvalidPasswordException if the password is empty or null
          */
+
+        this.testDB();
+        this.loadDataFromDB();
+
         if (username == null || username.isEmpty()){
             throw new InvalidUsernameException();
         }
@@ -167,16 +187,18 @@ public class EZShop implements EZShopInterface {
 
         }
 
+
+
         //
         // Iterate the map and search the user
-        for (User user : users.values()) {
+        for (User user : ezUsers.values()) {
             if (user.getPassword().equals(password) && user.getUsername().equals(username)){
                 currUser = user;
             }
         }
 
         // TODO return null if DB problems?
-        return null;
+        return currUser;
     }
 
     @Override
@@ -188,7 +210,7 @@ public class EZShop implements EZShopInterface {
         return true;
     }
 
-    public boolean checkBarCode(String barCode){
+    public boolean isValidBarCode(String barCode){
 
         if (barCode.matches("[0-9]{12,14}")){
             int sum=0;
@@ -210,8 +232,8 @@ public class EZShop implements EZShopInterface {
                 return true;
             }
         }
-        return false;
 
+        return false;
     }
 
     @Override
@@ -220,7 +242,7 @@ public class EZShop implements EZShopInterface {
             throw new InvalidProductDescriptionException();
         }
         // TODO insert a check" if it is not a number or if it is not a valid barcode": check if its unique
-        if (productCode == null || productCode.isEmpty() || checkBarCode(productCode)) {
+        if (productCode == null || productCode.isEmpty() || isValidBarCode(productCode)) {
             throw new InvalidProductCodeException();
         }
         if(pricePerUnit <=0){
@@ -231,14 +253,14 @@ public class EZShop implements EZShopInterface {
         }
 
         // Check if the Barcode is unique
-        for (ProductType product : products.values()) {
+        for (ProductType product : ezProducts.values()) {
             if (product.getBarCode().equals(productCode)) {
                 return -1;
             }
         }
         // TODO return -1 is there is an error while saving the user
         // Get the highest ID from the DB
-        int maxKey = Collections.max(products.keySet());
+        int maxKey = Collections.max(ezProducts.keySet());
         Integer id = maxKey+1;
 
         EZProductType prodType;
@@ -249,7 +271,7 @@ public class EZShop implements EZShopInterface {
             prodType = new EZProductType(id, 0, "", note, description, productCode, pricePerUnit);
         }
 
-        products.put(id, prodType);
+        ezProducts.put(id, prodType);
 
         return id;
     }
@@ -261,14 +283,14 @@ public class EZShop implements EZShopInterface {
             throw new InvalidProductIdException();
         }
 
-        if (!products.containsKey(id)) {
+        if (!ezProducts.containsKey(id)) {
             return false;
         }
 
         if (newDescription == null || newDescription.isEmpty() ) {
             throw new InvalidProductDescriptionException();
         }
-        if (newCode == null || newCode.isEmpty() || checkBarCode(newCode)) {
+        if (newCode == null || newCode.isEmpty() || isValidBarCode(newCode)) {
             throw new InvalidProductCodeException();
         }
         if(newPrice <=0){
@@ -279,19 +301,18 @@ public class EZShop implements EZShopInterface {
         }
 
         // Check if the Barcode is unique
-        for (ProductType product : products.values()) {
-            if (product.getBarCode().equals(newCode)) {
+        for (EZProductType product : ezProducts.values()) {
+            if (product.getBarCode().equals(newCode))
                 return false;
-            }
         }
 
         // TODO update in the db
-        ProductType prodType = products.get(id);
+        EZProductType prodType = ezProducts.get(id);
         prodType.setProductDescription(newDescription);
         prodType.setBarCode(newCode);
         prodType.setPricePerUnit(newPrice);
         prodType.setNote(newNote);
-        products.replace(id, prodType);
+        ezProducts.replace(id, prodType);
         return true;
     }
 
@@ -300,14 +321,14 @@ public class EZShop implements EZShopInterface {
         if (id == null || id<=0){
             throw new InvalidProductIdException();
         }
-        if (!products.containsKey(id)) {
+        if (!ezProducts.containsKey(id)) {
             return false;
         }
         if(!(currUser.getRole().equals("Administrator") || currUser.getRole().equals("ShopManager")) || currUser == null){
             throw new UnauthorizedException();
         }
 
-        products.remove(id);
+        ezProducts.remove(id);
 
         return false;
     }
@@ -319,13 +340,13 @@ public class EZShop implements EZShopInterface {
         }
 
         // TODO get it from the DB
-        List<ProductType> prodList = new LinkedList<>(products.values());
+        List<ProductType> prodList = new LinkedList<>(ezProducts.values());
         return prodList;
     }
 
     @Override
     public ProductType getProductTypeByBarCode(String barCode) throws InvalidProductCodeException, UnauthorizedException {
-        if (barCode == null || barCode.isEmpty() || checkBarCode(barCode)) {
+        if (barCode == null || barCode.isEmpty() || isValidBarCode(barCode)) {
             throw new InvalidProductCodeException();
         }
 
@@ -333,7 +354,7 @@ public class EZShop implements EZShopInterface {
             throw new UnauthorizedException();
         }
 
-        for (ProductType product : products.values()) {
+        for (ProductType product : ezProducts.values()) {
             if (product.getBarCode().equals(barCode)) {
                 return product;
             }
@@ -360,19 +381,19 @@ public class EZShop implements EZShopInterface {
         if (productId == null || productId<=0){
             throw new InvalidProductIdException();
         }
-        if (!products.containsKey(productId)) {
+        if (!ezProducts.containsKey(productId)) {
             return false;
         }
         if(!(currUser.getRole().equals("Administrator") || currUser.getRole().equals("ShopManager")) || currUser == null){
             throw new UnauthorizedException();
         }
 
-        ProductType product = products.get(productId);
+        EZProductType product = ezProducts.get(productId);
         if ((toBeAdded > 0) || (toBeAdded < 0 && product.getQuantity() > Math.abs(toBeAdded))){
                     // If i need to remove 50 quantity (oBeAdded = -50), i must have quanity > abs(50).
             int q = product.getQuantity();
             product.setQuantity(toBeAdded+q);
-            products.replace(productId, product);
+            ezProducts.replace(productId, product);
             // TODO update in the DB
             return true;
         }
@@ -386,7 +407,7 @@ public class EZShop implements EZShopInterface {
         if (productId == null || productId<=0){
             throw new InvalidProductIdException();
         }
-        if (!products.containsKey(productId)) {
+        if (!ezProducts.containsKey(productId)) {
             return false;
         }
         //The position has the following format :
@@ -400,23 +421,23 @@ public class EZShop implements EZShopInterface {
         }
 
         if (newPos.isEmpty()){
-            ProductType prodType = products.get(productId);
+            EZProductType prodType = ezProducts.get(productId);
             prodType.setLocation("");
-            products.replace(productId, prodType);
+            ezProducts.replace(productId, prodType);
             return false;
             // TODO update in the DB
         }
         else {
             // position has to be unique: check if it is
-            for (ProductType product : products.values()) {
+            for (ProductType product : ezProducts.values()) {
                 if (product.getLocation().equals(newPos)) {
                     return false;
                 }
             }
         }
-        ProductType prodType = products.get(productId);
+        EZProductType prodType = ezProducts.get(productId);
         prodType.setLocation(newPos);
-        products.replace(productId, prodType);
+        ezProducts.replace(productId, prodType);
         return true;
     }
 
@@ -465,7 +486,7 @@ public class EZShop implements EZShopInterface {
             throw new UnauthorizedException();
         }
 
-        for (Customer customer : customers.values()) {
+        for (Customer customer : ezCustomers.values()) {
             if (customer.getCustomerName().equals(customerName)) {
                 // Name should be unique
                 return -1;
@@ -474,12 +495,12 @@ public class EZShop implements EZShopInterface {
 
         // Name is not present in the DB
         // Get the highest ID from the DB
-        int maxKey = Collections.max(customers.keySet());
+        int maxKey = Collections.max(ezCustomers.keySet());
         Integer id = maxKey+1;
         EZCustomer customer = new EZCustomer(id, customerName, null, null);
 
         // TODO insert in the DB
-        customers.put(id, customer);
+        ezCustomers.put(id, customer);
 
         return id;
     }
@@ -521,9 +542,9 @@ public class EZShop implements EZShopInterface {
         }
         if(currUser==null || !currUser.getRole().equals("Administrator") || !currUser.getRole().equals("Cashier") || !currUser.getRole().equals("ShopManager")){
                 throw new UnauthorizedException();
-
         }
-        Customer customer = customers.get(id);
+
+        EZCustomer customer = ezCustomers.get(id);
         if (newCustomerCard.isEmpty()){
             //if it is an empty string then any
             // existing card code connected to the
@@ -533,14 +554,14 @@ public class EZShop implements EZShopInterface {
         }
         customer.setCustomerName(newCustomerName);
         customer.setCustomerCard(newCustomerCard);
-        customers.replace(id, customer);
+        ezCustomers.replace(id, customer);
         return true;
 
     }
 
     @Override
     public boolean deleteCustomer(Integer id) throws InvalidCustomerIdException, UnauthorizedException {
-        if (!customers.containsKey(id)) {
+        if (!ezCustomers.containsKey(id)) {
             return false;
         }
         if (id == null || id <=0 ) {
@@ -552,13 +573,13 @@ public class EZShop implements EZShopInterface {
         }
 
         // TODO false if we have problems to reach the DB
-        users.remove(id);
+        ezUsers.remove(id);
         return true;
     }
 
     @Override
     public Customer getCustomer(Integer id) throws InvalidCustomerIdException, UnauthorizedException {
-        if (!customers.containsKey(id)) {
+        if (!ezCustomers.containsKey(id)) {
             return null;
         }
         if ( id==null || id <=0) {
@@ -568,7 +589,7 @@ public class EZShop implements EZShopInterface {
             throw new UnauthorizedException();
         }
 
-        Customer customer = customers.get(id);
+        Customer customer = ezCustomers.get(id);
         return customer;
     }
 
@@ -578,7 +599,7 @@ public class EZShop implements EZShopInterface {
             throw new UnauthorizedException();
         }
 
-        List<Customer> customerList = new LinkedList<Customer>(customers.values());
+        List<Customer> customerList = new LinkedList<Customer>(ezCustomers.values());
         return customerList;
     }
 
@@ -597,14 +618,14 @@ public class EZShop implements EZShopInterface {
         }
 
         // Template since we're not sure how to implements
-        String s = "";
-
-        loyaltyCards.put(1, s);
+        String cardCode = shopDB.insertCard(null, null);
+        EZCard card = new EZCard(cardCode, null, null);
+        ezCards.put(cardCode, card);
 
 
         // TODO get a string from the DB which isn't' related to a customer yet or generate one?
         //      https://www.geeksforgeeks.org/generate-random-string-of-given-size-in-java/ how to generate one
-        return s;
+        return cardCode;
     }
 
     /**
@@ -642,7 +663,7 @@ public class EZShop implements EZShopInterface {
         if (c==null){
             return false;
         }
-        for (Customer customer : customers.values()) {
+        for (Customer customer : ezCustomers.values()) {
             if (customer.getCustomerCard().equals(customerCard)){
                 return false; //There is a customer with the given card
             }
@@ -679,7 +700,7 @@ public class EZShop implements EZShopInterface {
             throw new UnauthorizedException();
         }
 
-        for (Customer customer : customers.values()) {
+        for (Customer customer : ezCustomers.values()) {
             if (customer.getCustomerCard().equals(customerCard)){
                 if ((pointsToBeAdded > 0) || (pointsToBeAdded < 0 && customer.getPoints() > Math.abs(pointsToBeAdded))){
                     // If i need to remove 50 points (pointsToBeAdded = -50), i must have points > abs(50).
@@ -739,7 +760,7 @@ public class EZShop implements EZShopInterface {
 
     public BalanceOperation getBalanceOpById(Integer balanceId)
     {
-        return allBalanceOperations.get(balanceId);
+        return ezBalanceOperations.get(balanceId);
     }
 
     @Override
@@ -762,7 +783,7 @@ public class EZShop implements EZShopInterface {
 
     public EZReturnTransaction getReturnTransactionById(Integer returnId)
     {
-        return returnTransactions.get(returnId);
+        return ezReturnTransactions.get(returnId);
     }
 
     @Override
@@ -977,12 +998,12 @@ public class EZShop implements EZShopInterface {
     public List<BalanceOperation> getCreditsAndDebits(LocalDate from, LocalDate to) throws UnauthorizedException {
 
         LocalDate tmp = from;
-        List<BalanceOperation> filteredBalanceOperations = allBalanceOperations;
+        LinkedList<BalanceOperation> balanceOperations = new LinkedList<>(ezBalanceOperations.values());
+        List<BalanceOperation> filteredBalanceOperations = new LinkedList<>();
 
         if(!verifyUserRights(currUser, "Administrator", "ShopManager")) throw new UnauthorizedException();
 
-        if(from.isAfter(to))
-        {   // swap the dates:
+        if(from.isAfter(to)) {   // swap the dates:
             from = to;
             to = tmp;
         }
@@ -990,21 +1011,19 @@ public class EZShop implements EZShopInterface {
         LocalDate startingDate = from;
         LocalDate endingDate = to;
 
-        if(startingDate != null && endingDate != null) //todo: review this if --> why they are always true?
-        {
-            filteredBalanceOperations = allBalanceOperations.stream()
+        //todo: review this if --> why they are always true?
+        if(startingDate != null && endingDate != null) {
+            filteredBalanceOperations = balanceOperations.stream()
                     .filter( op -> op.getDate().isAfter(startingDate) && op.getDate().isBefore(endingDate))
                     .collect(Collectors.toList());
         }
-        else if(startingDate != null && endingDate == null)
-        {
-            filteredBalanceOperations = allBalanceOperations.stream()
+        else if(startingDate != null && endingDate == null) {
+            filteredBalanceOperations = balanceOperations.stream()
                     .filter( op -> op.getDate().isAfter(startingDate))
                     .collect(Collectors.toList());
         }
-        else if(startingDate == null && endingDate != null)
-        {
-            filteredBalanceOperations = allBalanceOperations.stream()
+        else if(startingDate == null && endingDate != null) {
+            filteredBalanceOperations = balanceOperations.stream()
                     .filter( op -> op.getDate().isBefore(endingDate))
                     .collect(Collectors.toList());
         }
@@ -1022,7 +1041,7 @@ public class EZShop implements EZShopInterface {
     }
 
     private void testDB() {
-        // TODO: remove all this stuff used for SQLite feature development
+        // TODO: remove all this stuff before delivery
         shopDB.connect();
         shopDB.initDatabase();
 
@@ -1043,5 +1062,7 @@ public class EZShop implements EZShopInterface {
         System.out.println("Rimossa carta " + card2);
         shopDB.createSaleTransactionsTable();
         shopDB.createProductsPerSaleTable();
+
+        shopDB.insertUser("admin", "admin", "Administrator");
     }
 }
