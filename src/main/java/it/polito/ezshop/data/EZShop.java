@@ -28,7 +28,6 @@ public class EZShop implements EZShopInterface {
     private HashMap<Integer, EZReturnTransaction> ezReturnTransactions;
 
     public void loadDataFromDB() {
-
         if (ezBalanceOperations == null)
             ezBalanceOperations = shopDB.selectAllBalanceOperations();
 
@@ -1035,7 +1034,10 @@ public class EZShop implements EZShopInterface {
         if(!verifyUserRights(currUser, "Administrator", "ShopManager"))
             throw new UnauthorizedException(); //todo: verify from access rights table!!!
 
-        return accountingBook.currentBalance;
+        if (accountingBook != null)
+            return accountingBook.currentBalance;
+
+        return 0;
     }
 
     private void testDB() {
