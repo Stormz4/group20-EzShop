@@ -987,9 +987,9 @@ public class SQLiteDB {
             System.out.println(e.getMessage());
         }
 
-        for (TicketEntry entry : entries) {
-            // TODO: insertProductPerSale
-        }
+        // Save on DB all the entries of the sale
+        for (TicketEntry entry : entries)
+            this.insertProductPerSale(entry.getBarCode(), transactionID, entry.getAmount(), entry.getDiscountRate());
 
         return transactionID;
     }
@@ -1015,7 +1015,8 @@ public class SQLiteDB {
             System.out.println(e.getMessage());
         }
 
-        // TODO: delete all productPerSale relied to this transaction
+        // Delete all productPerSale relied to this transaction
+        this.deleteAllProductsPerSale(transactionID);
     }
 
     /**
@@ -1038,6 +1039,135 @@ public class SQLiteDB {
             pstmt.setDouble(1, discountRate);
             pstmt.setDouble(2, price);
             pstmt.setInt(3, transactionID);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+
+    /** ---------------------------------------------------------------------------------------------------------------
+     ** Create a new ProductsPerSale table
+     ** EZTicketEntry (String barCode, String productDescription, int amount, double pricePerUnit, double discountRate)
+     */
+    public void createProductsPerSaleTable() {
+        // SQL statement for creating a new ProductsPerSale table
+        String sql = "CREATE TABLE IF NOT EXISTS ProductsPerSale (\n"
+                   + " barCode text NOT NULL, \n"
+                   + " transactionID integer NOT NULL, \n"
+                   + " amount integer, \n"
+                   + " discountRate real, \n"
+                   + "CONSTRAINT PK_ProductPerSale PRIMARY KEY (barCode, transactionID), \n"
+                   + "FOREIGN KEY(barCode) REFERENCES ProductTypes(barCode),  \n"
+                   + "FOREIGN KEY(transactionID) REFERENCES SaleTransactions(id) \n"
+                   + ");";
+
+        // TODO: Should handle this as an exception?
+        if (this.dbConnection == null)
+            return;
+
+        try{
+            Statement stmt = this.dbConnection.createStatement();
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            System.out.println("createProductsPerSaleTable" + e.getMessage());
+        }
+    }
+
+    /**
+     ** Insert new ProductPerSale record
+     */
+    public boolean insertProductPerSale(String barCode, Integer transactionID, int amount, double discountRate) {
+        String sql = "INSERT INTO ProductsPerSale(barCode, transactionID, amount, discountRate) \n"
+                   + "VALUES(?,?,?,?,?);";
+        boolean inserted = false;
+
+        // TODO: Should handle this as an exception?
+        if (this.dbConnection == null)
+            return false;
+
+        try{
+            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            pstmt.setString(1, barCode);
+            pstmt.setInt(2, transactionID);
+            pstmt.setInt(3, amount);
+            pstmt.setDouble(4, discountRate);
+            pstmt.executeUpdate();
+
+            inserted = true;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return inserted;
+    }
+
+    /**
+     ** Delete ProductPerSale record with given id
+     */
+    public void deleteProductPerSale(String barCode, Integer transactionID) {
+        String sql = "DELETE FROM ProductsPerSale WHERE barCode=? AND transactionID=?";
+
+        // TODO: Should handle this as an exception?
+        if (this.dbConnection == null)
+            return;
+
+        if (transactionID == null)
+            return;
+
+        try{
+            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            pstmt.setString(1, barCode);
+            pstmt.setInt(2, transactionID);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     ** Delete all ProductsPerSale records related to the sale with given transactionID
+     */
+    public void deleteAllProductsPerSale(Integer transactionID) {
+        String sql = "DELETE FROM ProductsPerSale WHERE transactionID=?";
+
+        // TODO: Should handle this as an exception?
+        if (this.dbConnection == null)
+            return;
+
+        if (transactionID == null)
+            return;
+
+        try{
+            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            pstmt.setInt(1, transactionID);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     ** Update ProductPerSale record
+     */
+    public void updateProductPerSale(String barCode, Integer transactionID, int amount, double discountRate) {
+        String sql = "UPDATE ProductsPerSale\n" +
+                     "SET amount = ?, discountRate = ?\n" +
+                     "WHERE barCode = ? AND transactionID = ?;";
+
+        // TODO: Should handle this as an exception?
+        if (this.dbConnection == null)
+            return;
+
+        if (transactionID == null)
+            return;
+
+        try{
+            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            pstmt.setInt(1, amount);
+            pstmt.setDouble(2, discountRate);
+            pstmt.setString(3, barCode);
+            pstmt.setInt(4, transactionID);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println(e.getMessage());

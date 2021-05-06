@@ -66,6 +66,8 @@ public class EZShop implements EZShopInterface {
         System.out.println("Questa è la carta 3: " + card3);
         shopDB.deleteCard(card2);
         System.out.println("Rimossa carta " + card2);
+        shopDB.createSaleTransactionsTable();
+        shopDB.createProductsPerSaleTable();
 
         return null;
     }
