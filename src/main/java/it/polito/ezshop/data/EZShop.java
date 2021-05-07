@@ -505,8 +505,11 @@ public class EZShop implements EZShopInterface {
     }
 
 
-    public boolean checkLoyalty(String card){
-        return card.length() != 10 || card.matches("[0-9]{10}");
+    public boolean isValidCard(String card){
+        if (card == null)
+            return false;
+
+        return card.matches("\\b[0-9]{10}\\b");
     }
 
     /**
@@ -533,23 +536,23 @@ public class EZShop implements EZShopInterface {
     public boolean modifyCustomer(Integer id, String newCustomerName, String newCustomerCard) throws InvalidCustomerNameException, InvalidCustomerCardException, InvalidCustomerIdException, UnauthorizedException {
         // TODO Should we call the excepiont AND remove the card from the DB if the string is empty?
 
-        if (newCustomerName == null || newCustomerName.isEmpty() ){
+        if ( newCustomerName == null || newCustomerName.isEmpty() ){
             throw new InvalidCustomerNameException();
         }
-        if (newCustomerCard == null || checkLoyalty(newCustomerCard) ){
+        if ( newCustomerCard == null || (!newCustomerCard.isEmpty() && !isValidCard(newCustomerCard)) ){
             throw new InvalidCustomerCardException();
         }
-        if(currUser==null || !currUser.getRole().equals("Administrator") || !currUser.getRole().equals("Cashier") || !currUser.getRole().equals("ShopManager")){
+        if( currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager")) ){
                 throw new UnauthorizedException();
         }
 
         EZCustomer customer = ezCustomers.get(id);
-        if (newCustomerCard.isEmpty()){
-            //if it is an empty string then any
-            // existing card code connected to the
-            // customer will be removed. Remove also from the DB?
-            customer.setCustomerCard(null);
+        if (newCustomerCard.isEmpty()) {
+            customer.setCustomerCard(null); // consider having a Card object inside Customer, instead of cardCode and Points
             customer.setPoints(0);
+
+            if (customer.getCustomerCard() != null && !customer.getCustomerCard().isEmpty())
+                shopDB.deleteCard(customer.getCustomerCard());
         }
         customer.setCustomerName(newCustomerName);
         customer.setCustomerCard(newCustomerCard);
@@ -650,7 +653,7 @@ public class EZShop implements EZShopInterface {
         }
 
         //verify if it's string with 10 digits!
-        if (customerCard == null || checkLoyalty(customerCard)){
+        if (customerCard == null || isValidCard(customerCard)){
             throw new InvalidCustomerCardException();
         }
 
@@ -691,7 +694,7 @@ public class EZShop implements EZShopInterface {
     @Override
     public boolean modifyPointsOnCard(String customerCard, int pointsToBeAdded) throws InvalidCustomerCardException, UnauthorizedException {
 
-        if (customerCard == null || checkLoyalty(customerCard)){
+        if (customerCard == null || isValidCard(customerCard)){
             throw new InvalidCustomerCardException();
         }
 
