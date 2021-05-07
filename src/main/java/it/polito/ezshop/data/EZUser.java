@@ -1,15 +1,15 @@
 package it.polito.ezshop.data;
 
 public class EZUser implements User {
-    public static final int URNoRole = 0;
-    public static final int URAdministrator = 1;
-    public static final int URShopManager = 2;
-    public static final int URCashier = 4; // skipping 3 because the compare we do looks for bits
+    public static final String URNoRole = "";
+    public static final String URAdministrator = "Administrator";
+    public static final String URShopManager = "ShopManager";
+    public static final String URCashier = "Cashier";
 
     private Integer id;
     private String userName;
     private String password;
-    private int role;
+    private String role;
 
 
     public EZUser (Integer id, String userName, String password, String role) {
@@ -69,29 +69,19 @@ public class EZUser implements User {
 
     @Override
     public void setRole(String role) {
-        if (role == null) {
-            this.role = URNoRole;
-            return;
-        }
 
-        switch (role) {
-            case "Administrator":
-                this.role = URAdministrator;
-                break;
-            case "ShopManager":
-                this.role = URShopManager;
-                break;
-            case "Cashier":
-                this.role = URCashier;
-                break;
-
-            default:
-                this.role = URNoRole;
-        }
+        this.role = role;
     }
 
-    public boolean hasRequiredRole(int requiredRole) {
+    public boolean hasRequiredRole(String ...requiredRoles) {
+        if (requiredRoles == null)
+            return false;
 
-        return (requiredRole & this.role) != 0;
+        for (String role : requiredRoles ) {
+            if (role.equals(this.role))
+                return true;
+        }
+
+        return false;
     }
 }
