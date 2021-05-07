@@ -1048,6 +1048,8 @@ public class EZShop implements EZShopInterface {
     private void testDB() throws InvalidPasswordException, InvalidRoleException, InvalidUsernameException {
         // TODO: remove all this stuff before delivery
 
+        this.shopDB.insertUser("mattia", "pwd", URShopManager);
+
         this.createUser("christian", "pwd", "Cashier");
 
         EZCustomer c1 = new EZCustomer(-1, "Pippo", "XYZ123", 512);

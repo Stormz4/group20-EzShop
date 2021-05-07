@@ -527,9 +527,9 @@ public class SQLiteDB {
         // SQL statement for creating a new Orders table
         String sql = "CREATE TABLE IF NOT EXISTS Users (\n"
                 + " id integer PRIMARY KEY,\n"
-                + " userName text,\n"
-                + " password text,\n"
-                + " role text\n"
+                + " userName text NOT NULL UNIQUE,\n"
+                + " password text NOT NULL,\n"
+                + " role text NOT NULL\n"
                 + ");";
 
         // TODO: Should handle this as an exception?
