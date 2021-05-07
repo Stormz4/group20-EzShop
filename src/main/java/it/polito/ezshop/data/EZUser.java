@@ -16,7 +16,7 @@ public class EZUser implements User {
         this.id = id;
         this.userName = userName;
         this.password = password;
-        this.setRole(role);
+        this.role = role;
     }
 
     @Override
