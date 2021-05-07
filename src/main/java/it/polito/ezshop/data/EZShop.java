@@ -10,10 +10,12 @@ import java.util.List;
 import java.lang.Math;
 import java.util.stream.Collectors;
 
+import static it.polito.ezshop.data.EZUser.*;
+
 
 public class EZShop implements EZShopInterface {
     private final SQLiteDB shopDB = new SQLiteDB();
-    private User currUser = null;
+    private EZUser currUser = null;
 
     private HashMap<Integer, EZCustomer> ezCustomers;
     private HashMap<Integer, EZUser> ezUsers;
@@ -193,9 +195,9 @@ public class EZShop implements EZShopInterface {
 
         //
         // Iterate the map and search the user
-        for (User user : ezUsers.values()) {
+        for (EZUser user : ezUsers.values()) {
             if (user.getPassword().equals(password) && user.getUsername().equals(username)){
-                currUser = user;
+                this.currUser = user;
             }
         }
 
@@ -618,9 +620,9 @@ public class EZShop implements EZShopInterface {
      */
     @Override
     public String createCard() throws UnauthorizedException {
-        if(currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager"))){
+        int requiredRoles = URAdministrator | URShopManager | URCashier;
+        if( this.currUser != null && !this.currUser.hasRequiredRole(requiredRoles) )
             throw new UnauthorizedException();
-        }
 
         // Template since we're not sure how to implements
         String cardCode = shopDB.insertCard(null, null);
@@ -763,8 +765,7 @@ public class EZShop implements EZShopInterface {
         return null;
     }
 
-    public BalanceOperation getBalanceOpById(Integer balanceId)
-    {
+    public BalanceOperation getBalanceOpById(Integer balanceId) {
         return ezBalanceOperations.get(balanceId);
     }
 
@@ -773,7 +774,9 @@ public class EZShop implements EZShopInterface {
 
         BalanceOperation op = getBalanceOpById(saleNumber); //or SaleTransaction?
 
-        if(!verifyUserRights(currUser, "Administrator", "ShopManager", "Cashier")) throw new UnauthorizedException();
+        int requiredRoles = URAdministrator | URShopManager | URCashier;
+        if( this.currUser != null && !this.currUser.hasRequiredRole(requiredRoles) )
+            throw new UnauthorizedException();
 
         if(saleNumber == null || saleNumber <= 0) throw new InvalidTransactionIdException();
 
@@ -786,15 +789,15 @@ public class EZShop implements EZShopInterface {
         // or return -1 if transaction with ID saleNumber doesn't exist!!!
     }
 
-    public EZReturnTransaction getReturnTransactionById(Integer returnId)
-    {
+    public EZReturnTransaction getReturnTransactionById(Integer returnId) {
         return ezReturnTransactions.get(returnId);
     }
 
     @Override
     public boolean returnProduct(Integer returnId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
-
-        if(!verifyUserRights(currUser, "Administrator", "ShopManager", "Cashier")) throw new UnauthorizedException();
+        int requiredRoles = URAdministrator | URShopManager | URCashier;
+        if( this.currUser != null && !this.currUser.hasRequiredRole(requiredRoles) )
+            throw new UnauthorizedException();
 
         if(returnId == null || returnId <= 0) throw new InvalidTransactionIdException();
 
@@ -825,8 +828,9 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean endReturnTransaction(Integer returnId, boolean commit) throws InvalidTransactionIdException, UnauthorizedException {
-
-        if(!verifyUserRights(currUser, "Administrator", "ShopManager", "Cashier")) throw new UnauthorizedException();
+        int requiredRoles = URAdministrator | URShopManager | URCashier;
+        if( this.currUser != null && !this.currUser.hasRequiredRole(requiredRoles) )
+            throw new UnauthorizedException();
 
         if(returnId == null || returnId <= 0) throw new InvalidTransactionIdException();
 
@@ -835,8 +839,7 @@ public class EZShop implements EZShopInterface {
         if(retTr == null || retTr.isClosed())
             return false;
 
-        if(commit)
-        {
+        if(commit) {
             //TODO: update DB
 
             //if(problems with DB) return false;
@@ -851,8 +854,9 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean deleteReturnTransaction(Integer returnId) throws InvalidTransactionIdException, UnauthorizedException {
-
-        if(!verifyUserRights(currUser, "Administrator", "ShopManager", "Cashier")) throw new UnauthorizedException();
+        int requiredRoles = URAdministrator | URShopManager | URCashier;
+        if( this.currUser != null && !this.currUser.hasRequiredRole(requiredRoles) )
+            throw new UnauthorizedException();
 
         if(returnId == null || returnId <= 0) throw new InvalidTransactionIdException();
 
@@ -869,20 +873,6 @@ public class EZShop implements EZShopInterface {
         // if(problems with DB) return false;
 
         return true;
-    }
-
-    static boolean verifyUserRights(User currUser, String... requestedRoles)
-    {
-        if(currUser == null)
-            return false;
-
-        for (String role : requestedRoles)
-        {
-            if(currUser.getRole().equals(role))
-                return true;
-        }
-
-        return false;
     }
 
     static boolean verifyByLuhnAlgo(String ccNumber)
@@ -910,7 +900,9 @@ public class EZShop implements EZShopInterface {
 
         SaleTransaction sale = getSaleTransaction(ticketNumber);
 
-        if(!verifyUserRights(currUser, "Administrator", "ShopManager", "Cashier")) throw new UnauthorizedException();
+        int requiredRoles = URAdministrator | URShopManager | URCashier;
+        if( this.currUser != null && !this.currUser.hasRequiredRole(requiredRoles) )
+            throw new UnauthorizedException();
 
         if(ticketNumber == null || ticketNumber <= 0) throw new InvalidTransactionIdException();
 
@@ -929,7 +921,9 @@ public class EZShop implements EZShopInterface {
 
         SaleTransaction sale = getSaleTransaction(ticketNumber);
 
-        if(!verifyUserRights(currUser, "Administrator", "ShopManager", "Cashier")) throw new UnauthorizedException();
+        int requiredRoles = URAdministrator | URShopManager | URCashier;
+        if( this.currUser != null && !this.currUser.hasRequiredRole(requiredRoles) )
+            throw new UnauthorizedException();
 
         if(ticketNumber == null || ticketNumber <= 0) throw new InvalidTransactionIdException();
 
@@ -947,7 +941,9 @@ public class EZShop implements EZShopInterface {
     @Override
     public double returnCashPayment(Integer returnId) throws InvalidTransactionIdException, UnauthorizedException {
 
-        if(!verifyUserRights(currUser, "Administrator", "ShopManager", "Cashier")) throw new UnauthorizedException();
+        int requiredRoles = URAdministrator | URShopManager | URCashier;
+        if( this.currUser != null && !this.currUser.hasRequiredRole(requiredRoles) )
+            throw new UnauthorizedException();
 
         if(returnId <= 0) throw new InvalidTransactionIdException(); // not "returnId == null ||" ???
 
@@ -970,7 +966,9 @@ public class EZShop implements EZShopInterface {
     @Override
     public double returnCreditCardPayment(Integer returnId, String creditCard) throws InvalidTransactionIdException, InvalidCreditCardException, UnauthorizedException {
 
-        if(!verifyUserRights(currUser, "Administrator", "ShopManager", "Cashier")) throw new UnauthorizedException();
+        int requiredRoles = URAdministrator | URShopManager | URCashier;
+        if( this.currUser != null && !this.currUser.hasRequiredRole(requiredRoles) )
+            throw new UnauthorizedException();
 
         if(returnId <= 0) throw new InvalidTransactionIdException(); // not "returnId == null ||" ???
 
@@ -994,7 +992,9 @@ public class EZShop implements EZShopInterface {
     @Override
     public boolean recordBalanceUpdate(double toBeAdded) throws UnauthorizedException {
 
-        if(!verifyUserRights(currUser, "Administrator", "ShopManager")) throw new UnauthorizedException();
+        int requiredRoles = URAdministrator | URShopManager;
+        if( this.currUser != null && !this.currUser.hasRequiredRole(requiredRoles) )
+            throw new UnauthorizedException();
 
         return accountingBook.updateBalance(toBeAdded);
     }
@@ -1004,7 +1004,8 @@ public class EZShop implements EZShopInterface {
         LinkedList<BalanceOperation> balanceOperations = new LinkedList<>(ezBalanceOperations.values());
         List<BalanceOperation> filteredBalanceOperations = new LinkedList<>();
 
-        if(!verifyUserRights(currUser, "Administrator", "ShopManager"))
+        int requiredRoles = URAdministrator | URShopManager;
+        if( this.currUser != null && !this.currUser.hasRequiredRole(requiredRoles) )
             throw new UnauthorizedException();
 
         LocalDate startingDate;
@@ -1037,8 +1038,9 @@ public class EZShop implements EZShopInterface {
     @Override
     public double computeBalance() throws UnauthorizedException {
 
-        if(!verifyUserRights(currUser, "Administrator", "ShopManager"))
-            throw new UnauthorizedException(); //todo: verify from access rights table!!!
+        int requiredRoles = URAdministrator | URShopManager;
+        if( this.currUser != null && !this.currUser.hasRequiredRole(requiredRoles) )
+            throw new UnauthorizedException();
 
         if (accountingBook != null)
             return accountingBook.currentBalance;

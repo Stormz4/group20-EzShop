@@ -1,17 +1,22 @@
 package it.polito.ezshop.data;
 
 public class EZUser implements User {
+    public static final int URNoRole = 0;
+    public static final int URAdministrator = 1;
+    public static final int URShopManager = 2;
+    public static final int URCashier = 4; // skipping 3 because the compare we do looks for bits
+
     private Integer id;
     private String userName;
     private String password;
-    private String role;
+    private int role;
 
 
     public EZUser (Integer id, String userName, String password, String role) {
         this.id = id;
         this.userName = userName;
         this.password = password;
-        this.role = role;
+        this.setRole(role);
     }
 
     @Override
@@ -46,11 +51,47 @@ public class EZUser implements User {
 
     @Override
     public String getRole() {
-        return this.role;
+
+        switch (this.role) {
+            case URAdministrator:
+                return "Administrator";
+
+            case URShopManager:
+                return "ShopManager";
+
+            case URCashier:
+                return "Cashier";
+
+            default:
+                return "";
+        }
     }
 
     @Override
     public void setRole(String role) {
-        this.role = role;
+        if (role == null) {
+            this.role = URNoRole;
+            return;
+        }
+
+        switch (role) {
+            case "Administrator":
+                this.role = URAdministrator;
+                break;
+            case "ShopManager":
+                this.role = URShopManager;
+                break;
+            case "Cashier":
+                this.role = URCashier;
+                break;
+
+            default:
+                this.role = URNoRole;
+        }
+    }
+
+    public boolean hasRequiredRole(int requiredRole) {
+
+        return (requiredRole & this.role) != 0;
     }
 }
