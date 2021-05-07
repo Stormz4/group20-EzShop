@@ -52,19 +52,7 @@ public class EZUser implements User {
     @Override
     public String getRole() {
 
-        switch (this.role) {
-            case URAdministrator:
-                return "Administrator";
-
-            case URShopManager:
-                return "ShopManager";
-
-            case URCashier:
-                return "Cashier";
-
-            default:
-                return "";
-        }
+        return this.role;
     }
 
     @Override
