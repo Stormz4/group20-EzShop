@@ -1,6 +1,11 @@
 package it.polito.ezshop.data;
 
 public class EZUser implements User {
+    public static final String URNoRole = "";
+    public static final String URAdministrator = "Administrator";
+    public static final String URShopManager = "ShopManager";
+    public static final String URCashier = "Cashier";
+
     private Integer id;
     private String userName;
     private String password;
@@ -46,11 +51,27 @@ public class EZUser implements User {
 
     @Override
     public String getRole() {
+
         return this.role;
     }
 
     @Override
     public void setRole(String role) {
+        if (role == null)
+            this.role = URNoRole;
+
         this.role = role;
+    }
+
+    public boolean hasRequiredRole(String ...requiredRoles) {
+        if (requiredRoles == null)
+            return false;
+
+        for (String role : requiredRoles ) {
+            if (role.equals(this.role))
+                return true;
+        }
+
+        return false;
     }
 }
