@@ -10,6 +10,7 @@ import java.util.List;
 import java.lang.Math;
 import java.util.stream.Collectors;
 
+import static it.polito.ezshop.data.EZOrder.*;
 import static it.polito.ezshop.data.EZUser.*;
 import static it.polito.ezshop.data.SQLiteDB.defaultID;
 
@@ -70,9 +71,9 @@ public class EZShop implements EZShopInterface {
         if (password == null || password.isEmpty()) {
             throw new InvalidPasswordException();
         }
-        if(role.isEmpty() || !(role.equals("Administrator") || role.equals("Cashier") || role.equals("ShopManager"))){
-            throw new InvalidRoleException();
-        }
+
+        if( this.currUser != null && !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier) )
+            return defaultID;
 
         for (User user : ezUsers.values()) {
             if (user.getUsername().equals(username)) {
@@ -482,7 +483,12 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public List<Order> getAllOrders() throws UnauthorizedException {
-        return null;
+        if (this.ezOrders == null)
+            return new LinkedList<>();
+
+        List<Order> orders = new LinkedList<>(this.ezOrders.values());
+
+        return orders;
     }
 
     /**
@@ -1045,33 +1051,31 @@ public class EZShop implements EZShopInterface {
         return 0;
     }
 
-    private void testDB() throws InvalidPasswordException, InvalidRoleException, InvalidUsernameException {
+    private void testDB() {
         // TODO: remove all this stuff before delivery
 
-        this.shopDB.insertUser("mattia", "pwd", URShopManager);
+        this.shopDB.insertUser("sheldon", "pwd", URAdministrator);
+        this.shopDB.insertUser("aldo", "pwd", URShopManager);
+        this.shopDB.insertUser("giovanni", "pwd", URCashier);
+        this.shopDB.insertUser("giacomo", "pwd", URCashier);
 
-        this.createUser("christian", "pwd", "Cashier");
+        String card = this.shopDB.insertCard(defaultID, 1200);
+        String card2 = this.shopDB.insertCard(defaultID, 0);
+        this.shopDB.insertCustomer("Leonard", card, 1200);
+        this.shopDB.insertCustomer("Penny", "", 0);
+        this.shopDB.insertCustomer("Raj", card2, 300);
 
-        EZCustomer c1 = new EZCustomer(-1, "Pippo", "XYZ123", 512);
-        Integer idC1 = shopDB.insertCustomer(c1.getCustomerName(), c1.getCustomerCard(), c1.getPoints());
-        c1.setId(idC1);
 
-        Integer c2 = shopDB.insertCustomer("Pluto", "", 0);
-        Integer c3 = shopDB.insertCustomer("Paperino", "XYZ456", 260);
+        EZProductType prod1 = new EZProductType(defaultID, 5, "", "A simple note",
+                "First product", "A0070Z", 12.50);
+        prod1.setId( this.shopDB.insertProductType(prod1.getQuantity(), prod1.getLocation(), prod1.getNote(),
+                        prod1.getProductDescription(), prod1.getBarCode(), prod1.getPricePerUnit()) );
 
-        String card1 = shopDB.insertCard(c1.getId(), c1.getPoints());
-        System.out.println("Questa è la carta 1: " + card1);
-        String card2 = shopDB.insertCard(c1.getId()+1, c1.getPoints() + 30);
-        System.out.println("Questa è la carta 2: " + card2);
-        String card3 = shopDB.insertCard(c1.getId()+2, c1.getPoints() + 50);
-        System.out.println("Questa è la carta 3: " + card3);
-        shopDB.deleteCard(card2);
-        System.out.println("Rimossa carta " + card2);
-        shopDB.createSaleTransactionsTable();
-        shopDB.createProductsPerSaleTable();
+        EZProductType prod2 = new EZProductType(defaultID, 5, "", "A simple note",
+                "First product", "A0070Z", 12.50);
+        prod2.setId( this.shopDB.insertProductType(prod2.getQuantity(), prod2.getLocation(), prod2.getNote(),
+                prod2.getProductDescription(), prod2.getBarCode(), prod2.getPricePerUnit()) );
 
-        EZUser newUser = new EZUser(-1, "admin", "admin", "Cashier");
-        newUser.setId(shopDB.insertUser("admin", "admin", "Administrator"));
-        this.ezUsers.put(newUser.getId(), newUser);
+        this.shopDB.insertOrder(defaultID, prod2.getBarCode(), prod2.getPricePerUnit(), prod2.getQuantity(), OSPayed);
     }
 }
