@@ -1,6 +1,11 @@
 package it.polito.ezshop.data;
 
 public class EZOrder implements Order {
+    public static final String OSIssued = "Issued";
+    public static final String OSOrdered = "Ordered";
+    public static final String OSPayed = "Payed";
+    public static final String OSCompleted = "Completed";
+
     private Integer orderId;
     private Integer balanceId;
     private String productCode;

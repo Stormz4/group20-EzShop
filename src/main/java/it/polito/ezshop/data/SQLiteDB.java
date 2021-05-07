@@ -82,13 +82,13 @@ public class SQLiteDB {
     /**
      ** Returns the id of the last inserted row, no matter the table
      */
-    public Integer lastInsertRowId() {
+    private int lastInsertRowId() {
         String sql = "SELECT last_insert_rowid() AS id;";
-        Integer lastId = null;
+        Integer lastId = defaultID;
 
         // TODO: Should handle this as an exception?
         if (this.dbConnection == null)
-            return null;
+            return lastId;
 
         try{
             Statement stmt  = this.dbConnection.createStatement();
@@ -113,7 +113,7 @@ public class SQLiteDB {
         // TODO: consider having customerCard UNIQUE
         String sql = "CREATE TABLE IF NOT EXISTS Customers (\n"
                 + " id integer PRIMARY KEY,\n"
-                + " name text NOT NULL,\n"
+                + " name text NOT NULL UNIQUE,\n"
                 + " card text UNIQUE,\n"
                 + " points integer\n"
                 + ");";
@@ -448,19 +448,18 @@ public class SQLiteDB {
      */
     public Integer insertOrder(Integer balanceId, String productCode, double pricePerUnit, int quantity, String status) {
         String sql = "INSERT INTO Orders(balanceId, productCode, pricePerUnit, quantity, status) VALUES(?,?,?,?,?)";
-        Integer orderId = null;
+        int orderId = defaultID;
 
-        // TODO: Should handle this as an exception?
         if (this.dbConnection == null)
-            return null;
+            return defaultID;
 
         try{
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
-            pstmt.setInt(1, balanceId);
-            pstmt.setString(2, productCode);
+            pstmt.setInt(1, balanceId != null ? balanceId : defaultID);
+            pstmt.setString(2, productCode != null ? productCode : "");
             pstmt.setDouble(3, pricePerUnit);
             pstmt.setInt(4, quantity);
-            pstmt.setString(5, status);
+            pstmt.setString(5, status != null ? status : "");
             pstmt.executeUpdate();
 
             orderId = this.lastInsertRowId();

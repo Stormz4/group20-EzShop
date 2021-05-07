@@ -11,6 +11,7 @@ import java.lang.Math;
 import java.util.stream.Collectors;
 
 import static it.polito.ezshop.data.EZUser.*;
+import static it.polito.ezshop.data.SQLiteDB.defaultID;
 
 
 public class EZShop implements EZShopInterface {
@@ -20,6 +21,7 @@ public class EZShop implements EZShopInterface {
     private HashMap<Integer, EZCustomer> ezCustomers;
     private HashMap<Integer, EZUser> ezUsers;
     private HashMap<Integer, EZProductType> ezProducts;
+    private HashMap<Integer, EZOrder> ezOrders;
 
     // TODO verify is this map is needed
     private HashMap<String, EZCard> ezCards;
@@ -42,14 +44,17 @@ public class EZShop implements EZShopInterface {
         if (ezCustomers == null)
             ezCustomers = shopDB.selectAllCustomers();
 
-        if (ezUsers == null)
-            ezUsers = shopDB.selectAllUsers();
+        if (ezOrders == null)
+            ezOrders = shopDB.selectAllOrders();
 
         if (ezProducts == null)
             ezProducts = shopDB.selectAllProductTypes();
 
         if (ezSaleTransactions == null)
             ezSaleTransactions = shopDB.selectAllSaleTransactions();
+
+        if (ezUsers == null)
+            ezUsers = shopDB.selectAllUsers();
     }
 
     @Override
@@ -447,7 +452,17 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public Integer issueOrder(String productCode, int quantity, double pricePerUnit) throws InvalidProductCodeException, InvalidQuantityException, InvalidPricePerUnitException, UnauthorizedException {
-        return null;
+        if (this.ezOrders == null)
+            this.ezOrders = this.shopDB.selectAllOrders();
+
+        int orderID = shopDB.insertOrder(defaultID, productCode, pricePerUnit, quantity, EZOrder.OSIssued);
+        if (orderID == defaultID)
+            return orderID;
+
+        EZOrder newOrder = new EZOrder(orderID, -1, productCode, pricePerUnit, quantity, EZOrder.OSIssued);
+        this.ezOrders.put(orderID, newOrder);
+
+        return orderID;
     }
 
     @Override
@@ -1033,7 +1048,7 @@ public class EZShop implements EZShopInterface {
     private void testDB() throws InvalidPasswordException, InvalidRoleException, InvalidUsernameException {
         // TODO: remove all this stuff before delivery
 
-        this.createUser("christian", "pwd", "Administrator");
+        this.createUser("christian", "pwd", "Cashier");
 
         EZCustomer c1 = new EZCustomer(-1, "Pippo", "XYZ123", 512);
         Integer idC1 = shopDB.insertCustomer(c1.getCustomerName(), c1.getCustomerCard(), c1.getPoints());
