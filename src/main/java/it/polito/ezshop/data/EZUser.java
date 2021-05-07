@@ -69,6 +69,8 @@ public class EZUser implements User {
 
     @Override
     public void setRole(String role) {
+        if (role == null)
+            this.role = URNoRole;
 
         this.role = role;
     }
