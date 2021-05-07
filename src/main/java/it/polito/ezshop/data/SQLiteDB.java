@@ -114,7 +114,7 @@ public class SQLiteDB {
         String sql = "CREATE TABLE IF NOT EXISTS Customers (\n"
                 + " id integer PRIMARY KEY,\n"
                 + " name text NOT NULL,\n"
-                + " card text,\n"
+                + " card text UNIQUE,\n"
                 + " points integer\n"
                 + ");";
 
@@ -161,7 +161,7 @@ public class SQLiteDB {
      */
     public Integer insertCustomer(String customerName, String customerCard, Integer points) {
         String sql = "INSERT INTO Customers(name, card, points) VALUES(?,?,?)";
-        Integer customerId = null;
+        Integer customerId = defaultID;
 
         // TODO: Should handle this as an exception?
         if (this.dbConnection == null)
