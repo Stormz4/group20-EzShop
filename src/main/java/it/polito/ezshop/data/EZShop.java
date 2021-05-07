@@ -28,6 +28,9 @@ public class EZShop implements EZShopInterface {
     private HashMap<Integer, EZReturnTransaction> ezReturnTransactions;
 
     public void loadDataFromDB() {
+        shopDB.connect();
+        shopDB.initDatabase();
+
         if (ezBalanceOperations == null)
             ezBalanceOperations = shopDB.selectAllBalanceOperations();
 
@@ -175,8 +178,8 @@ public class EZShop implements EZShopInterface {
          * @throws InvalidPasswordException if the password is empty or null
          */
 
-        this.testDB();
         this.loadDataFromDB();
+        // this.testDB();
 
         if (username == null || username.isEmpty()){
             throw new InvalidUsernameException();
@@ -1043,17 +1046,17 @@ public class EZShop implements EZShopInterface {
         return 0;
     }
 
-    private void testDB() {
+    private void testDB() throws InvalidPasswordException, InvalidRoleException, InvalidUsernameException {
         // TODO: remove all this stuff before delivery
-        shopDB.connect();
-        shopDB.initDatabase();
+
+        this.createUser("christian", "pwd", "Administrator");q
 
         EZCustomer c1 = new EZCustomer(-1, "Pippo", "XYZ123", 512);
         Integer idC1 = shopDB.insertCustomer(c1.getCustomerName(), c1.getCustomerCard(), c1.getPoints());
+        c1.setId(idC1);
+
         Integer c2 = shopDB.insertCustomer("Pluto", "", 0);
         Integer c3 = shopDB.insertCustomer("Paperino", "XYZ456", 260);
-        shopDB.updateCustomer(3, "zio Paperone", "XYZ456", 250);
-        shopDB.deleteCustomer(2);
 
         String card1 = shopDB.insertCard(c1.getId(), c1.getPoints());
         System.out.println("Questa è la carta 1: " + card1);
@@ -1066,6 +1069,8 @@ public class EZShop implements EZShopInterface {
         shopDB.createSaleTransactionsTable();
         shopDB.createProductsPerSaleTable();
 
-        shopDB.insertUser("admin", "admin", "Administrator");
+        EZUser newUser = new EZUser(-1, "admin", "admin", "Cashier");
+        newUser.setId(shopDB.insertUser("admin", "admin", "Administrator"));
+        this.ezUsers.put(newUser.getId(), newUser);
     }
 }
