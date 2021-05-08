@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import static it.polito.ezshop.data.EZOrder.*;
 import static it.polito.ezshop.data.EZUser.*;
 import static it.polito.ezshop.data.SQLiteDB.defaultID;
+import static it.polito.ezshop.data.SQLiteDB.defaultValue;
 
 
 public class EZShop implements EZShopInterface {
@@ -72,18 +73,20 @@ public class EZShop implements EZShopInterface {
             throw new InvalidPasswordException();
         }
 
-        if( this.currUser != null && !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier) )
-            return defaultID;
+        if (role.isEmpty() || !(role.equals("Administrator") || role.equals("Cashier") || role.equals("ShopManager"))) {
+            throw new InvalidRoleException();
+        }
 
         for (User user : ezUsers.values()) {
             if (user.getUsername().equals(username)) {
                 return -1;
             }
         }
-        // TODO return -1 is there is an error while saving the user
+        Integer id = shopDB.insertUser(username, password, role);
         // Get the highest ID from the DB
-        int maxKey = Collections.max(ezUsers.keySet());
-        Integer id = maxKey+1;
+        if (id == -1)
+            return id;
+
         EZUser user = new EZUser(id, username, password, role);
 
         ezUsers.put(id, user);
@@ -101,19 +104,22 @@ public class EZShop implements EZShopInterface {
             return false;
         }
 
-        if(!currUser.getRole().equals("Administrator") || currUser == null){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator)){
             throw new UnauthorizedException();
         }
 
+        boolean success = shopDB.deleteUser(id);
+        if (!success)
+            return false;
+
         ezUsers.remove(id);
 
-        // TODO delete from DB
         return true;
     }
 
     @Override
     public List<User> getAllUsers() throws UnauthorizedException {
-        if(!currUser.getRole().equals("Administrator") || currUser == null){
+        if(this.currUser != null && !this.currUser.hasRequiredRole(URAdministrator)){
             throw new UnauthorizedException();
         }
 
@@ -130,7 +136,7 @@ public class EZShop implements EZShopInterface {
             throw new InvalidUserIdException();
         }
 
-        if(!currUser.getRole().equals("Administrator") || currUser == null){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator)){
             throw new UnauthorizedException();
         }
 
@@ -162,11 +168,16 @@ public class EZShop implements EZShopInterface {
         if (role.isEmpty() || !(role.equals("Administrator") || role.equals("Cashier") || role.equals("ShopManager"))) {
             throw new InvalidRoleException();
         }
-        if(!currUser.getRole().equals("Administrator") || currUser == null){
+        if((this.currUser == null) || (!this.currUser.hasRequiredRole(URAdministrator))){
             throw new UnauthorizedException();
         }
-
         EZUser user = ezUsers.get(id);
+
+        boolean success = shopDB.updateUser(id, user.getUsername(), user.getPassword(), role);
+        if (!success)
+            return false;
+
+        // TODO check if the update went well
         user.setRole(role);
         ezUsers.replace(id, user);
         return true;
@@ -187,7 +198,7 @@ public class EZShop implements EZShopInterface {
          */
 
         this.loadDataFromDB();
-        // this.testDB();
+        //this.testDB();
 
         if (username == null || username.isEmpty()){
             throw new InvalidUsernameException();
@@ -196,8 +207,6 @@ public class EZShop implements EZShopInterface {
             throw new InvalidPasswordException();
 
         }
-
-
 
         //
         // Iterate the map and search the user
@@ -251,14 +260,13 @@ public class EZShop implements EZShopInterface {
         if (description == null || description.isEmpty() ) {
             throw new InvalidProductDescriptionException();
         }
-        // TODO insert a check" if it is not a number or if it is not a valid barcode": check if its unique
-        if (productCode == null || productCode.isEmpty() || isValidBarCode(productCode)) {
+        if (productCode == null || productCode.isEmpty() || !isValidBarCode(productCode)) {
             throw new InvalidProductCodeException();
         }
         if(pricePerUnit <=0){
             throw new InvalidPricePerUnitException();
         }
-        if(!(currUser.getRole().equals("Administrator") || currUser.getRole().equals("ShopManager")) || currUser == null){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
             throw new UnauthorizedException();
         }
 
@@ -268,18 +276,18 @@ public class EZShop implements EZShopInterface {
                 return -1;
             }
         }
-        // TODO return -1 is there is an error while saving the user
+        if (note == null){
+            note="";
+        }
+        Integer id = shopDB.insertProductType(0, "", note, description, productCode, pricePerUnit);
         // Get the highest ID from the DB
-        int maxKey = Collections.max(ezProducts.keySet());
-        Integer id = maxKey+1;
+
+        // Return -1 if there is an error with the DB
+        if (id == -1)
+            return id;
 
         EZProductType prodType;
-        if (note==null){
-            prodType = new EZProductType(id, 0, "", "", description, productCode, pricePerUnit);
-        }
-        else {
-            prodType = new EZProductType(id, 0, "", note, description, productCode, pricePerUnit);
-        }
+        prodType = new EZProductType(id, 0, "", note, description, productCode, pricePerUnit);
 
         ezProducts.put(id, prodType);
 
@@ -300,13 +308,13 @@ public class EZShop implements EZShopInterface {
         if (newDescription == null || newDescription.isEmpty() ) {
             throw new InvalidProductDescriptionException();
         }
-        if (newCode == null || newCode.isEmpty() || isValidBarCode(newCode)) {
+        if (newCode == null || newCode.isEmpty() || !isValidBarCode(newCode)) {
             throw new InvalidProductCodeException();
         }
         if(newPrice <=0){
             throw new InvalidPricePerUnitException();
         }
-        if(!(currUser.getRole().equals("Administrator") || currUser.getRole().equals("ShopManager")) || currUser == null){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
             throw new UnauthorizedException();
         }
 
@@ -316,8 +324,13 @@ public class EZShop implements EZShopInterface {
                 return false;
         }
 
-        // TODO update in the db
         EZProductType prodType = ezProducts.get(id);
+        // TODO CALL PRODUCT UPDATE PRODUCT TYPE
+        boolean success = shopDB.updateProductType(id, prodType.getQuantity(), prodType.getLocation(), newNote, newDescription, newCode,newPrice);
+
+        if (!success)
+            return false;
+
         prodType.setProductDescription(newDescription);
         prodType.setBarCode(newCode);
         prodType.setPricePerUnit(newPrice);
@@ -334,18 +347,22 @@ public class EZShop implements EZShopInterface {
         if (!ezProducts.containsKey(id)) {
             return false;
         }
-        if(!(currUser.getRole().equals("Administrator") || currUser.getRole().equals("ShopManager")) || currUser == null){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
             throw new UnauthorizedException();
         }
 
+        boolean success=shopDB.deleteProductType(id);
+        if (!success)
+            return false;
+
         ezProducts.remove(id);
 
-        return false;
+        return true;
     }
 
     @Override
     public List<ProductType> getAllProductTypes() throws UnauthorizedException {
-        if(!(currUser.getRole().equals("Administrator") || currUser.getRole().equals("ShopManager")) || currUser == null){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
             throw new UnauthorizedException();
         }
 
@@ -356,11 +373,11 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public ProductType getProductTypeByBarCode(String barCode) throws InvalidProductCodeException, UnauthorizedException {
-        if (barCode == null || barCode.isEmpty() || isValidBarCode(barCode)) {
+        if (barCode == null || barCode.isEmpty() || !isValidBarCode(barCode)) {
             throw new InvalidProductCodeException();
         }
 
-        if(!(currUser.getRole().equals("Administrator") || currUser.getRole().equals("ShopManager")) || currUser == null){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
             throw new UnauthorizedException();
         }
 
@@ -369,16 +386,16 @@ public class EZShop implements EZShopInterface {
                 return product;
             }
         }
+
         return null;
     }
 
     @Override
     public List<ProductType> getProductTypesByDescription(String description) throws UnauthorizedException {
 
-        if(!(currUser.getRole().equals("Administrator") || currUser.getRole().equals("ShopManager")) || currUser == null){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
             throw new UnauthorizedException();
         }
-
         List<ProductType> filteredList = getAllProductTypes();
 
         // Doesn't match the description: remove.
@@ -394,17 +411,23 @@ public class EZShop implements EZShopInterface {
         if (!ezProducts.containsKey(productId)) {
             return false;
         }
-        if(!(currUser.getRole().equals("Administrator") || currUser.getRole().equals("ShopManager")) || currUser == null){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
             throw new UnauthorizedException();
         }
 
-        EZProductType product = ezProducts.get(productId);
-        if ((toBeAdded > 0) || (toBeAdded < 0 && product.getQuantity() > Math.abs(toBeAdded))){
+        EZProductType prodType = ezProducts.get(productId);
+        if ((toBeAdded > 0) || (toBeAdded < 0 && prodType.getQuantity() > Math.abs(toBeAdded))){
                     // If i need to remove 50 quantity (oBeAdded = -50), i must have quanity > abs(50).
-            int q = product.getQuantity();
-            product.setQuantity(toBeAdded+q);
-            ezProducts.replace(productId, product);
-            // TODO update in the DB
+            int q = prodType.getQuantity();
+
+
+            boolean success = shopDB.updateProductType(productId, toBeAdded, prodType.getLocation(), prodType.getNote(), prodType.getProductDescription(), prodType.getBarCode(), prodType.getPricePerUnit());
+            if (!success)
+                return false;
+
+            prodType.setQuantity(toBeAdded+q);
+            ezProducts.replace(productId, prodType);
+
             return true;
         }
 
@@ -420,22 +443,19 @@ public class EZShop implements EZShopInterface {
         if (!ezProducts.containsKey(productId)) {
             return false;
         }
-        //The position has the following format :
-        //<aisleNumber>-<rackAlphabeticIdentifier>-<levelNumber>
-        if (!(newPos.matches("[0-9]+-[a-zA-z]+-[0-9]+"))){
-            // If it doens't match:
-            throw new InvalidLocationException();
-        }
-        if(!(currUser.getRole().equals("Administrator") || currUser.getRole().equals("ShopManager")) || currUser == null){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
             throw new UnauthorizedException();
         }
 
-        if (newPos.isEmpty()){
+        if (newPos == null || newPos.isEmpty()){
+            // Reset the location if null or empty
             EZProductType prodType = ezProducts.get(productId);
+            boolean success = shopDB.updateProductType(productId, prodType.getQuantity(), "", prodType.getNote(), prodType.getProductDescription(), prodType.getBarCode(), prodType.getPricePerUnit());
+            if (!success)
+                return false;
             prodType.setLocation("");
             ezProducts.replace(productId, prodType);
-            return false;
-            // TODO update in the DB
+            return true;
         }
         else {
             // position has to be unique: check if it is
@@ -445,7 +465,18 @@ public class EZShop implements EZShopInterface {
                 }
             }
         }
+
+        //The position has the following format :
+        //<aisleNumber>-<rackAlphabeticIdentifier>-<levelNumber>
+        if (!(newPos.matches("[0-9]+-[a-zA-z]+-[0-9]+"))){
+            // If it doens't match:
+            throw new InvalidLocationException();
+        }
+
         EZProductType prodType = ezProducts.get(productId);
+        boolean success = shopDB.updateProductType(productId, prodType.getQuantity(), newPos, prodType.getNote(), prodType.getProductDescription(), prodType.getBarCode(), prodType.getPricePerUnit());
+        if (!success)
+            return false;
         prodType.setLocation(newPos);
         ezProducts.replace(productId, prodType);
         return true;
@@ -507,7 +538,7 @@ public class EZShop implements EZShopInterface {
         if (customerName == null || customerName.isEmpty()){
             throw new InvalidCustomerNameException();
         }
-        if(currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager"))){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URCashier, URShopManager)){
             throw new UnauthorizedException();
         }
 
@@ -518,13 +549,13 @@ public class EZShop implements EZShopInterface {
             }
         }
 
-        // Name is not present in the DB
+        Integer id = shopDB.insertCustomer(customerName, "", defaultValue);
         // Get the highest ID from the DB
-        int maxKey = Collections.max(ezCustomers.keySet());
-        Integer id = maxKey+1;
-        EZCustomer customer = new EZCustomer(id, customerName, null, null);
+        if (id == -1)
+            return -1;
 
-        // TODO insert in the DB
+        EZCustomer customer = new EZCustomer(id, customerName, "", defaultValue);
+
         ezCustomers.put(id, customer);
 
         return id;
@@ -568,20 +599,25 @@ public class EZShop implements EZShopInterface {
         if ( newCustomerCard == null || (!newCustomerCard.isEmpty() && !isValidCard(newCustomerCard)) ){
             throw new InvalidCustomerCardException();
         }
-        if( currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager")) ){
-                throw new UnauthorizedException();
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URCashier, URShopManager)){
+            throw new UnauthorizedException();
         }
 
         EZCustomer customer = ezCustomers.get(id);
         if (newCustomerCard.isEmpty()) {
-            customer.setCustomerCard(null); // consider having a Card object inside Customer, instead of cardCode and Points
+            customer.setCustomerCard(null);
+            // FIXME consider having a Card object inside Customer, instead of cardCode and Points
             customer.setPoints(0);
-
-            if (customer.getCustomerCard() != null && !customer.getCustomerCard().isEmpty())
-                shopDB.deleteCard(customer.getCustomerCard());
         }
+        if (customer.getCustomerCard() != null && !customer.getCustomerCard().isEmpty())
+                shopDB.deleteCard(customer.getCustomerCard());
         customer.setCustomerName(newCustomerName);
         customer.setCustomerCard(newCustomerCard);
+
+        boolean success = shopDB.updateCustomer(id, newCustomerName, newCustomerCard, 0);
+        if (!success)
+            return false;
+
         ezCustomers.replace(id, customer);
         return true;
 
@@ -592,15 +628,18 @@ public class EZShop implements EZShopInterface {
         if (!ezCustomers.containsKey(id)) {
             return false;
         }
-        if (id == null || id <=0 ) {
+        if (id == null || id <=0 ){
             throw new InvalidCustomerIdException();
         }
 
-        if(currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager"))){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URCashier, URShopManager)){
             throw new UnauthorizedException();
         }
 
-        // TODO false if we have problems to reach the DB
+        boolean success = shopDB.deleteCustomer(id);
+        if (!success)
+            return false;
+
         ezUsers.remove(id);
         return true;
     }
@@ -613,7 +652,7 @@ public class EZShop implements EZShopInterface {
         if ( id==null || id <=0) {
             throw new InvalidCustomerIdException();
         }
-        if(currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager"))){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URCashier, URShopManager)){
             throw new UnauthorizedException();
         }
 
@@ -623,7 +662,7 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public List<Customer> getAllCustomers() throws UnauthorizedException {
-        if(currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager"))){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URCashier, URShopManager)){
             throw new UnauthorizedException();
         }
 
@@ -641,17 +680,13 @@ public class EZShop implements EZShopInterface {
      */
     @Override
     public String createCard() throws UnauthorizedException {
-        if( this.currUser != null && !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier) )
+        if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier) )
             throw new UnauthorizedException();
 
-        // Template since we're not sure how to implements
-        String cardCode = shopDB.insertCard(null, null);
-        EZCard card = new EZCard(cardCode, null, null);
+        String cardCode = shopDB.insertCard(defaultID, defaultValue);
+        EZCard card = new EZCard(cardCode, defaultID, defaultValue);
         ezCards.put(cardCode, card);
 
-
-        // TODO get a string from the DB which isn't' related to a customer yet or generate one?
-        //      https://www.geeksforgeeks.org/generate-random-string-of-given-size-in-java/ how to generate one
         return cardCode;
     }
 
@@ -677,14 +712,14 @@ public class EZShop implements EZShopInterface {
             throw new InvalidCustomerIdException();
         }
 
+        // TODO test this method
         //verify if it's string with 10 digits!
-        if (customerCard == null || isValidCard(customerCard)){
+        if (customerCard == null || !isValidCard(customerCard)){
             throw new InvalidCustomerCardException();
         }
 
-        if(currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager"))){
+        if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier))
             throw new UnauthorizedException();
-        }
 
         Customer c = getCustomer(customerId); // This functions checks if the customers map contains the ID.
         if (c==null){
@@ -695,8 +730,19 @@ public class EZShop implements EZShopInterface {
                 return false; //There is a customer with the given card
             }
         }
-
+        boolean success = shopDB.updateCustomer(c.getId(), c.getCustomerName(), customerCard, customerId);
+        if (!success)
+            return false;
+        EZCard card = ezCards.get(customerCard);
+        success = shopDB.updateCard(customerCard, customerId, card.getPoints());
+        // TODO rollback of the precedent operation?
+        if (!success)
+            return false;
+        card.setCustomerId(customerId);
         c.setCustomerCard(customerCard);
+
+        ezCards.replace(customerCard, card);
+        ezCustomers.replace(customerId, (EZCustomer) c );
         return true;
     }
 
@@ -719,13 +765,12 @@ public class EZShop implements EZShopInterface {
     @Override
     public boolean modifyPointsOnCard(String customerCard, int pointsToBeAdded) throws InvalidCustomerCardException, UnauthorizedException {
 
-        if (customerCard == null || isValidCard(customerCard)){
+        if (customerCard == null || !isValidCard(customerCard)){
             throw new InvalidCustomerCardException();
         }
 
-        if(currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager"))){
+        if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier))
             throw new UnauthorizedException();
-        }
 
         for (Customer customer : ezCustomers.values()) {
             if (customer.getCustomerCard().equals(customerCard)){
@@ -733,6 +778,8 @@ public class EZShop implements EZShopInterface {
                     // If i need to remove 50 points (pointsToBeAdded = -50), i must have points > abs(50).
                     int p = customer.getPoints();
                     customer.setPoints(pointsToBeAdded+p);
+
+
                     return true;
                 }
             }
