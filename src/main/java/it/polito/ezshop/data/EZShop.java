@@ -26,14 +26,14 @@ public class EZShop implements EZShopInterface {
     private HashMap<Integer, EZOrder> ezOrders;
 
     // TODO verify is this map is needed
-    private HashMap<String, EZCard> ezCards;
+    private List<String> ezCards;
 
     private EZAccountBook accountingBook;
     private HashMap<Integer, EZBalanceOperation> ezBalanceOperations;
     private HashMap<Integer, EZSaleTransaction> ezSaleTransactions;
     private HashMap<Integer, EZReturnTransaction> ezReturnTransactions;
 
-    public void loadDataFromDB() {
+    public void  loadDataFromDB() {
         shopDB.connect();
         shopDB.initDatabase();
 
@@ -549,14 +549,12 @@ public class EZShop implements EZShopInterface {
             }
         }
 
-        Integer id = shopDB.insertCustomer(customerName, "", defaultValue);
-        // Get the highest ID from the DB
-        if (id == -1)
-            return -1;
+        Integer id = shopDB.insertCustomer(customerName, "");
+        if (id != defaultID) {
+            EZCustomer customer = new EZCustomer(id, customerName, "", defaultValue);
 
-        EZCustomer customer = new EZCustomer(id, customerName, "", defaultValue);
-
-        ezCustomers.put(id, customer);
+            ezCustomers.put(id, customer);
+        }
 
         return id;
     }
@@ -614,12 +612,12 @@ public class EZShop implements EZShopInterface {
         customer.setCustomerName(newCustomerName);
         customer.setCustomerCard(newCustomerCard);
 
-        boolean success = shopDB.updateCustomer(id, newCustomerName, newCustomerCard, 0);
-        if (!success)
-            return false;
+        boolean updated = shopDB.updateCustomer(id, newCustomerName, newCustomerCard);
+        if (updated)
+            ezCustomers.replace(id, customer);
 
-        ezCustomers.replace(id, customer);
-        return true;
+
+        return updated;
 
     }
 
@@ -683,9 +681,7 @@ public class EZShop implements EZShopInterface {
         if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier) )
             throw new UnauthorizedException();
 
-        String cardCode = shopDB.insertCard(defaultID, defaultValue);
-        EZCard card = new EZCard(cardCode, defaultID, defaultValue);
-        ezCards.put(cardCode, card);
+        String cardCode = shopDB.insertCard(defaultValue);
 
         return cardCode;
     }
@@ -721,29 +717,21 @@ public class EZShop implements EZShopInterface {
         if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier))
             throw new UnauthorizedException();
 
-        Customer c = getCustomer(customerId); // This functions checks if the customers map contains the ID.
-        if (c==null){
-            return false;
-        }
-        for (Customer customer : ezCustomers.values()) {
-            if (customer.getCustomerCard().equals(customerCard)){
-                return false; //There is a customer with the given card
-            }
-        }
-        boolean success = shopDB.updateCustomer(c.getId(), c.getCustomerName(), customerCard, customerId);
-        if (!success)
-            return false;
-        EZCard card = ezCards.get(customerCard);
-        success = shopDB.updateCard(customerCard, customerId, card.getPoints());
-        // TODO rollback of the precedent operation?
-        if (!success)
-            return false;
-        card.setCustomerId(customerId);
-        c.setCustomerCard(customerCard);
+        boolean attached = false;
+        Customer customer = getCustomer(customerId); // This functions checks if the customers map contains the ID.
 
-        ezCards.replace(customerCard, card);
-        ezCustomers.replace(customerId, (EZCustomer) c );
-        return true;
+        if (customer != null){
+            for (Customer cstmr : ezCustomers.values()) {
+                if (cstmr.getCustomerCard().equals(customerCard))
+                    return false; //There is a customer with the given card
+            }
+
+            attached = this.shopDB.updateCustomer(customerId, customer.getCustomerName(), customerCard);
+            if (attached)
+                customer.setCustomerCard(customerCard);
+        }
+
+        return attached;
     }
 
     /**
@@ -778,8 +766,7 @@ public class EZShop implements EZShopInterface {
                     // If i need to remove 50 points (pointsToBeAdded = -50), i must have points > abs(50).
                     int p = customer.getPoints();
                     customer.setPoints(pointsToBeAdded+p);
-
-
+                    shopDB.updateCard(customerCard, customer.getPoints());
                     return true;
                 }
             }
@@ -1106,11 +1093,11 @@ public class EZShop implements EZShopInterface {
         this.shopDB.insertUser("giovanni", "pwd", URCashier);
         this.shopDB.insertUser("giacomo", "pwd", URCashier);
 
-        String card = this.shopDB.insertCard(defaultID, 1200);
-        String card2 = this.shopDB.insertCard(defaultID, 0);
-        this.shopDB.insertCustomer("Leonard", card, 1200);
-        this.shopDB.insertCustomer("Penny", "", 0);
-        this.shopDB.insertCustomer("Raj", card2, 300);
+        String card = this.shopDB.insertCard(1200);
+        String card2 = this.shopDB.insertCard(defaultValue);
+        this.shopDB.insertCustomer("Leonard", card);
+        this.shopDB.insertCustomer("Penny", card2);
+        this.shopDB.insertCustomer("Raj", null);
 
 
         EZProductType prod1 = new EZProductType(defaultID, 5, "", "A simple note",
