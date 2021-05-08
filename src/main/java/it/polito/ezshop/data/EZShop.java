@@ -807,10 +807,35 @@ public class EZShop implements EZShopInterface {
      * @throws InvalidQuantityException if the quantity is less than 0
      * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
      */
-
     @Override
     public boolean deleteProductFromSale(Integer transactionId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
-        return false;
+        EZSaleTransaction saleTransaction;
+        ProductType productToRemove;
+        TicketEntry ticketToUpdate;
+        boolean result = false;
+        if (this.currUser == null || !this.currUser.hasRequiredRole("Administrator", "ShopManager", "Cashier"))
+            throw new UnauthorizedException();
+        if (amount < 0) // TODO should amount == 0 raise an exception?
+            throw new InvalidQuantityException();
+        try {
+            saleTransaction = (EZSaleTransaction) this.getSaleTransaction(transactionId);
+            ticketToUpdate = saleTransaction.getEntries().stream().filter(product -> product.getBarCode().equals(productCode))
+                    .findFirst().orElse(null);
+            productToRemove = this.getProductTypeByBarCode(productCode);
+            if (ticketToUpdate != null && ticketToUpdate.getAmount() >= amount && !saleTransaction.getIsPayed()) {
+                if (ticketToUpdate.getAmount() == amount) { // we have to remove all the products of this type
+                    saleTransaction.getEntries().remove(ticketToUpdate);
+                }
+                if (ticketToUpdate.getAmount() > amount) {
+                    ticketToUpdate.setAmount(ticketToUpdate.getAmount() - amount);
+                }
+                this.updateQuantity(productToRemove.getId(), amount);
+                result = true;
+            }
+        }
+        catch (InvalidProductIdException e) { // if the Product Code is correct, the Product Id is correct too
+        }
+        return result;
     }
 
     /**
@@ -834,7 +859,22 @@ public class EZShop implements EZShopInterface {
      */
     @Override
     public boolean applyDiscountRateToProduct(Integer transactionId, String productCode, double discountRate) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidDiscountRateException, UnauthorizedException {
-        return false;
+        EZSaleTransaction saleTransaction;
+        TicketEntry ticketToUpdate;
+        boolean result = false;
+        if (this.currUser == null || !this.currUser.hasRequiredRole("Administrator", "ShopManager", "Cashier"))
+            throw new UnauthorizedException();
+        if (discountRate < 0 || discountRate > 1)
+            throw new InvalidDiscountRateException();
+        this.getProductTypeByBarCode(productCode); //used to check if product code is valid (otherwise, InvalidProductCodeException is raised)
+        saleTransaction = (EZSaleTransaction) this.getSaleTransaction(transactionId);
+        ticketToUpdate = saleTransaction.getEntries().stream().filter(product -> product.getBarCode().equals(productCode))
+                .findFirst().orElse(null);
+        if (ticketToUpdate != null && !saleTransaction.getIsPayed()) {
+            ticketToUpdate.setDiscountRate(discountRate);
+            result = true;
+        }
+        return result;
     }
 
     /**
