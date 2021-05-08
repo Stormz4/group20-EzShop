@@ -17,6 +17,7 @@ public class SQLiteDB {
     static final String JDBC_DB_URL = "jdbc:sqlite:src/" + JDBC_DB_NAME;
     static final int defaultID = -1;
     static final int defaultValue = 0;
+    private static final int INTEGER = 4; // see https://docs.oracle.com/javase/8/docs/api/constant-values.html#java.sql.Types.INTEGER
     Connection dbConnection = null;
 
     /**
@@ -102,7 +103,7 @@ public class SQLiteDB {
         return lastId;
     }
 
-    /** TODO: remove points from Customer (now in Card)
+    /**
      ** Create a new Customers table
      ** EZCustomer(Integer id, String customerName, String customerCard)
      */
@@ -112,11 +113,11 @@ public class SQLiteDB {
 
         // SQL statement for creating a new Customer table
         String sql = "CREATE TABLE IF NOT EXISTS Customers (\n"
-                + " id integer PRIMARY KEY,\n"
-                + " name text NOT NULL UNIQUE,\n"
-                + " card text UNIQUE,\n"
-                + " points integer\n"
-                + ");";
+                   + " id integer PRIMARY KEY,\n"
+                   + " name text NOT NULL,\n"
+                   + " card integer UNIQUE,\n"
+                   + "FOREIGN KEY(card) REFERENCES Cards(id)\n"
+                   + ");";
 
         try{
             Statement stmt = this.dbConnection.createStatement();
@@ -131,7 +132,9 @@ public class SQLiteDB {
      */
     public HashMap<Integer, EZCustomer> selectAllCustomers(){
         HashMap<Integer, EZCustomer> customers = new HashMap<>();
-        String sql = "SELECT * FROM Customers";
+        String sql = "SELECT Customers.id, name, card, points \n"
+                   + "FROM Customers \n"
+                   + "LEFT JOIN Cards ON Customers.card = Cards.id;";
 
         try {
             Statement stmt  = this.dbConnection.createStatement();
@@ -141,9 +144,10 @@ public class SQLiteDB {
             while (rs.next()) {
                 Integer id = rs.getInt("id");
                 String name = rs.getString("name");
-                String card = rs.getString("card");
+                Integer card = rs.getInt("card");
+                String cardCode = card != 0 ? String.format("%10d", card).replace(' ', '0') : "";
                 Integer points = rs.getInt("points");
-                customers.put(id, new EZCustomer(id, name, card, points));
+                customers.put(id, new EZCustomer(id, name, cardCode, points));
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -155,18 +159,23 @@ public class SQLiteDB {
     /**
      ** Insert new Customer record
      */
-    public Integer insertCustomer(String customerName, String customerCard, Integer points) {
+    public Integer insertCustomer(String customerName, String customerCard) {
         if (this.dbConnection == null || customerName == null)
             return defaultID;
 
-        String sql = "INSERT INTO Customers(name, card, points) VALUES(?,?,?)";
+        if (customerCard == null)
+            customerCard = "";
+
+        String sql = "INSERT INTO Customers(name, card) VALUES(?,?)";
         int customerId = defaultID;
 
         try{
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
             pstmt.setString(1, customerName);
-            pstmt.setString(2, customerCard);
-            pstmt.setInt(3, points);
+            if (customerCard.isEmpty())
+                pstmt.setNull(2, INTEGER);
+            else
+                pstmt.setInt(2, Integer.parseInt(customerCard));
             pstmt.executeUpdate();
 
             customerId = this.lastInsertRowId();
@@ -202,21 +211,26 @@ public class SQLiteDB {
     /**
      ** Update Customer record
      */
-    public boolean updateCustomer(Integer customerId, String customerName, String customerCard, Integer points) {
+    public boolean updateCustomer(Integer customerId, String customerName, String customerCard) {
         if (this.dbConnection == null || customerId == null)
             return false;
 
+        if (customerCard == null)
+            customerCard = "";
+
         boolean updated = false;
         String sql = "UPDATE Customers\n" +
-                     "SET name = ?, card = ?, points = ?\n" +
+                     "SET name = ?, card = ?\n" +
                      "WHERE id = ?;";
 
         try{
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
             pstmt.setString(1, customerName);
-            pstmt.setString(2, customerCard);
-            pstmt.setInt(3, points);
-            pstmt.setInt(4, customerId);
+            if (customerCard.isEmpty())
+                pstmt.setNull(2, INTEGER);
+            else
+                pstmt.setInt(2, Integer.parseInt(customerCard));
+            pstmt.setInt(3, customerId);
             pstmt.executeUpdate();
             updated = true;
         } catch (SQLException e) {
@@ -390,6 +404,9 @@ public class SQLiteDB {
      ** EZOrder (Integer orderId, Integer balanceId, String productCode, double pricePerUnit, int quantity, String status)
      */
     private void createOrdersTable() {
+        if (this.dbConnection == null)
+            return;
+
         // SQL statement for creating a new Orders table
         String sql = "CREATE TABLE IF NOT EXISTS Orders (\n"
                 + " id integer PRIMARY KEY,\n"
@@ -399,10 +416,6 @@ public class SQLiteDB {
                 + " quantity integer,\n"
                 + " status text\n"
                 + ");";
-
-        // TODO: Should handle this as an exception?
-        if (this.dbConnection == null)
-            return;
 
         try{
             Statement stmt = this.dbConnection.createStatement();
@@ -655,7 +668,6 @@ public class SQLiteDB {
         // SQL statement for creating a new Cards table
         String sql = "CREATE TABLE IF NOT EXISTS Cards (\n"
                 + " id integer PRIMARY KEY,\n"
-                + " customerId integer,\n"
                 + " points integer\n"
                 + ");";
 
@@ -670,9 +682,9 @@ public class SQLiteDB {
     /**
      ** Select all Cards records
      */
-    public HashMap<String, EZCard> selectAllCards(){
-        HashMap<String, EZCard> cards = new HashMap<>();
-        String sql = "SELECT * FROM Cards";
+    public List<String> selectAllCards(){
+        List<String> cards = new LinkedList<>();
+        String sql = "SELECT id FROM Cards";
 
         try {
             Statement stmt  = this.dbConnection.createStatement();
@@ -682,9 +694,7 @@ public class SQLiteDB {
             while (rs.next()) {
                 Integer id = rs.getInt("id");
                 String strId = String.format("%10d", id);
-                Integer customerId = rs.getInt("customerId");
-                Integer points = rs.getInt("points");
-                cards.put(strId, new EZCard(strId, customerId, points));
+                cards.add(strId);
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -696,17 +706,16 @@ public class SQLiteDB {
     /**
      ** Insert new Card record
      */
-    public String insertCard(Integer customerId, Integer points) {
+    public String insertCard(Integer points) {
         if (this.dbConnection == null)
             return "";
 
-        String sql = "INSERT INTO Cards(customerId, points) VALUES(?,?)";
+        String sql = "INSERT INTO Cards(points) VALUES(?)";
         String cardCode = "";
 
         try{
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
-            pstmt.setInt(1, customerId != null ? customerId : defaultID);
-            pstmt.setInt(2, points != null ? points : defaultValue);
+            pstmt.setInt(1, points != null ? points : defaultValue);
             pstmt.executeUpdate();
 
             Integer cardId = this.lastInsertRowId();
@@ -726,12 +735,11 @@ public class SQLiteDB {
             return false;
 
         boolean deleted = false;
-        int cardId = Integer.parseInt(cardCode);
         String sql = "DELETE FROM Cards WHERE id=?";
 
         try{
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
-            pstmt.setInt(1, cardId);
+            pstmt.setInt(1, Integer.parseInt(cardCode));
             pstmt.executeUpdate();
             deleted = true;
         } catch (SQLException e) {
@@ -744,21 +752,20 @@ public class SQLiteDB {
     /**
      ** Update Card record
      */
-    public boolean updateCard(String cardCode, Integer customerId, Integer points) {
-        if (this.dbConnection == null || cardCode == null)
+    public boolean updateCard(String cardCode, Integer points) {
+        if (this.dbConnection == null || cardCode == null || cardCode.isEmpty())
             return false;
 
         boolean deleted = false;
         int cardId = Integer.parseInt(cardCode);
         String sql = "UPDATE Cards\n" +
-                "SET customerId = ?, points = ?\n" +
+                "SET points = ?\n" +
                 "WHERE id = ?;";
 
         try{
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
-            pstmt.setInt(1, customerId);
-            pstmt.setInt(2, points);
-            pstmt.setInt(3, cardId);
+            pstmt.setInt(1, points);
+            pstmt.setInt(2, cardId);
             pstmt.executeUpdate();
             deleted = true;
         } catch (SQLException e) {
