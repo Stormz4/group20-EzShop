@@ -28,6 +28,7 @@ public class EZShop implements EZShopInterface {
     private HashMap<Integer, EZBalanceOperation> ezBalanceOperations;
     private HashMap<Integer, EZSaleTransaction> ezSaleTransactions;
     private HashMap<Integer, EZReturnTransaction> ezReturnTransactions;
+    private EZSaleTransaction tmpSaleTransaction;
 
     public void loadDataFromDB() {
         shopDB.connect();
@@ -294,7 +295,7 @@ public class EZShop implements EZShopInterface {
         if (newDescription == null || newDescription.isEmpty() ) {
             throw new InvalidProductDescriptionException();
         }
-        if (newCode == null || newCode.isEmpty() || isValidBarCode(newCode)) {
+        if (newCode == null || newCode.isEmpty() || !isValidBarCode(newCode)) {
             throw new InvalidProductCodeException();
         }
         if(newPrice <=0){
@@ -702,9 +703,8 @@ public class EZShop implements EZShopInterface {
             throw new InvalidCustomerCardException();
         }
 
-        if(currUser==null || !(currUser.getRole().equals("Administrator") || currUser.getRole().equals("Cashier") || currUser.getRole().equals("ShopManager"))){
+        if (this.currUser == null || !this.currUser.hasRequiredRole("Administrator", "ShopManager", "Cashier"))
             throw new UnauthorizedException();
-        }
 
         for (Customer customer : ezCustomers.values()) {
             if (customer.getCustomerCard().equals(customerCard)){
@@ -719,46 +719,214 @@ public class EZShop implements EZShopInterface {
         return false;
     }
 
-    @Override
-    public Integer startSaleTransaction() throws UnauthorizedException {
-        return null;
-    }
+    /**
+     * This method starts a new sale transaction and returns its unique identifier.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @return the id of the transaction (greater than or equal to 0)
+     */
 
     @Override
-    public boolean addProductToSale(Integer transactionId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
-        return false;
+    public Integer startSaleTransaction() throws UnauthorizedException {
+        Integer nextTicketNumber;
+        if (this.currUser == null || !this.currUser.hasRequiredRole("Administrator", "ShopManager", "Cashier"))
+            throw new UnauthorizedException();
+
+        if (ezSaleTransactions.isEmpty()) {
+            nextTicketNumber = 0;
+        }
+        else {
+            nextTicketNumber = Collections.max(this.ezSaleTransactions.keySet()) + 1;
+        }
+        tmpSaleTransaction = new EZSaleTransaction(nextTicketNumber);
+        return nextTicketNumber;
     }
+
+    /**
+     * This method adds a product to a sale transaction decreasing the temporary amount of product available on the
+     * shelves for other customers.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param transactionId the id of the Sale transaction
+     * @param productCode the barcode of the product to be added
+     * @param amount the quantity of product to be added
+     * @return  true if the operation is successful
+     *          false   if the product code does not exist,
+     *                  if the quantity of product cannot satisfy the request,
+     *                  if the transaction id does not identify a started and open transaction.
+     *
+     * @throws InvalidTransactionIdException if the transaction id less than or equal to 0 or if it is null
+     * @throws InvalidProductCodeException if the product code is empty, null or invalid
+     * @throws InvalidQuantityException if the quantity is less than 0
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
+    @Override
+    public boolean addProductToSale(Integer transactionId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
+        EZTicketEntry ticketEntryToAdd;
+        ProductType scannedProduct;
+        EZSaleTransaction currentSaleTransaction;
+        boolean result = false;
+
+        if (this.currUser == null | !this.currUser.hasRequiredRole("Administrator", "ShopManager", "Cashier"))
+            throw new UnauthorizedException();
+        if (amount < 0)
+            throw new InvalidQuantityException();
+        try {
+            scannedProduct = this.getProductTypeByBarCode(productCode); // TODO check if a Cashier could call this method (in that case, getProductTypeByBarCode cannot be used
+            if (this.updateQuantity(scannedProduct.getId(), -amount)) { // true if the requested amount of product is available
+             // TODO manage case where this method returns false (product not existing, quantity would become negative
+                currentSaleTransaction = (EZSaleTransaction) this.getSaleTransaction(transactionId); // TODO the SaleTransaction should be the temporary one: modify getSaleTransaction accordingly
+                if (!currentSaleTransaction.getIsPayed()) {
+                    ticketEntryToAdd = new EZTicketEntry(productCode, scannedProduct.getProductDescription(), amount, scannedProduct.getPricePerUnit(), 0);
+                    currentSaleTransaction.getEntries().add(ticketEntryToAdd);
+                    result = true;
+                }
+            }
+        }
+        catch (InvalidProductIdException e) { // the method returns false (does not modify result)
+        }
+        return result;
+    }
+
+    /**
+     * This method deletes a product from a sale transaction increasing the temporary amount of product available on the
+     * shelves for other customers.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param transactionId the id of the Sale transaction
+     * @param productCode the barcode of the product to be deleted
+     * @param amount the quantity of product to be deleted
+     *
+     * @return  true if the operation is successful
+     *          false   if the product code does not exist,
+     *                  if the quantity of product cannot satisfy the request,
+     *                  if the transaction id does not identify a started and open transaction.
+     *
+     * @throws InvalidTransactionIdException if the transaction id less than or equal to 0 or if it is null
+     * @throws InvalidProductCodeException if the product code is empty, null or invalid
+     * @throws InvalidQuantityException if the quantity is less than 0
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
 
     @Override
     public boolean deleteProductFromSale(Integer transactionId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
         return false;
     }
 
+    /**
+     * This method applies a discount rate to all units of a product type with given type in a sale transaction. The
+     * discount rate should be greater than or equal to 0 and less than 1.
+     * The sale transaction should be started and open.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param transactionId the id of the Sale transaction
+     * @param productCode the barcode of the product to be discounted
+     * @param discountRate the discount rate of the product
+     *
+     * @return  true if the operation is successful
+     *          false   if the product code does not exist,
+     *                  if the transaction id does not identify a started and open transaction.
+     *
+     * @throws InvalidTransactionIdException if the transaction id less than or equal to 0 or if it is null
+     * @throws InvalidProductCodeException if the product code is empty, null or invalid
+     * @throws InvalidDiscountRateException if the discount rate is less than 0 or if it greater than or equal to 1.00
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public boolean applyDiscountRateToProduct(Integer transactionId, String productCode, double discountRate) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidDiscountRateException, UnauthorizedException {
         return false;
     }
 
+    /**
+     * This method applies a discount rate to the whole sale transaction.
+     * The discount rate should be greater than or equal to 0 and less than 1.
+     * The sale transaction can be either started or closed but not already payed.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param transactionId the id of the Sale transaction
+     * @param discountRate the discount rate of the sale
+     *
+     * @return  true if the operation is successful
+     *          false if the transaction does not exists
+     *
+     * @throws InvalidTransactionIdException if the transaction id less than or equal to 0 or if it is null
+     * @throws InvalidDiscountRateException if the discount rate is less than 0 or if it greater than or equal to 1.00
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public boolean applyDiscountRateToSale(Integer transactionId, double discountRate) throws InvalidTransactionIdException, InvalidDiscountRateException, UnauthorizedException {
         return false;
     }
 
+    /**
+     * This method returns the number of points granted by a specific sale transaction.
+     * Every 10€ the number of points is increased by 1 (i.e. 19.99€ returns 1 point, 20.00€ returns 2 points).
+     * If the transaction with given id does not exist then the number of points returned should be -1.
+     * The transaction may be in any state (open, closed, payed).
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param transactionId the id of the Sale transaction
+     *
+     * @return the points of the sale (1 point for each 10€) or -1 if the transaction does not exists
+     *
+     * @throws InvalidTransactionIdException if the transaction id less than or equal to 0 or if it is null
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public int computePointsForSale(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
         return 0;
     }
 
+    /**
+     * This method closes an opened transaction. After this operation the
+     * transaction is persisted in the system's memory.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param transactionId the id of the Sale transaction
+     *
+     * @return  true    if the transaction was successfully closed
+     *          false   if the transaction does not exist,
+     *                  if it has already been closed,
+     *                  if there was a problem in registering the data
+     *
+     * @throws InvalidTransactionIdException if the transaction id less than or equal to 0 or if it is null
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public boolean endSaleTransaction(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
         return false;
     }
 
+    /**
+     * This method deletes a sale transaction with given unique identifier from the system's data store.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param transactionId the number of the transaction to be deleted
+     *
+     * @return  true if the transaction has been successfully deleted,
+     *          false   if the transaction doesn't exist,
+     *                  if it has been payed,
+     *                  if there are some problems with the db
+     *
+     * @throws InvalidTransactionIdException if the transaction id number is less than or equal to 0 or if it is null
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public boolean deleteSaleTransaction(Integer saleNumber) throws InvalidTransactionIdException, UnauthorizedException {
         return false;
     }
 
+    /**
+     * This method returns  a closed sale transaction.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param transactionId the id of the CLOSED Sale transaction
+     *
+     * @return the transaction if it is available (transaction closed), null otherwise
+     *
+     * @throws InvalidTransactionIdException if the transaction id less than or equal to 0 or if it is null
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public SaleTransaction getSaleTransaction(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
         return null;

@@ -7,12 +7,19 @@ public class EZSaleTransaction implements SaleTransaction {
     private List<TicketEntry> entries;
     private double discountRate;
     private double price;
+    private boolean isPayed;
+
+    public EZSaleTransaction (Integer ticketNumber){
+        this.ticketNumber = ticketNumber;
+        this.isPayed = false;
+    }
 
     public EZSaleTransaction (Integer ticketNumber, List<TicketEntry> entries, double discountRate, double price) {
         this.ticketNumber = ticketNumber;
         this.entries = entries;
         this.discountRate = discountRate;
         this.price = price;
+        this.isPayed = false;
     }
 
     @Override
@@ -53,5 +60,13 @@ public class EZSaleTransaction implements SaleTransaction {
     @Override
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public boolean getIsPayed(){
+        return this.isPayed;
+    }
+
+    public void setIsPayed(boolean isPayed){
+        this.isPayed = isPayed;
     }
 }

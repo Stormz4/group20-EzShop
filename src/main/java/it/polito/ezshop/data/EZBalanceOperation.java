@@ -54,4 +54,5 @@ public class EZBalanceOperation implements BalanceOperation {
     public void setType(String type) {
         this.type = type;
     }
+
 }
