@@ -84,8 +84,8 @@ public class EZShop implements EZShopInterface {
         }
         Integer id = shopDB.insertUser(username, password, role);
         // Get the highest ID from the DB
-        if (id == null)
-            return -1;
+        if (id == -1)
+            return id;
 
         EZUser user = new EZUser(id, username, password, role);
 
@@ -108,11 +108,12 @@ public class EZShop implements EZShopInterface {
             throw new UnauthorizedException();
         }
 
-        shopDB.deleteUser(id);
+        boolean success = shopDB.deleteUser(id);
+        if (!success)
+            return false;
 
         ezUsers.remove(id);
 
-        // TODO delete from DB
         return true;
     }
 
@@ -172,7 +173,9 @@ public class EZShop implements EZShopInterface {
         }
         EZUser user = ezUsers.get(id);
 
-        shopDB.updateUser(id, user.getUsername(), user.getPassword(), role);
+        boolean success = shopDB.updateUser(id, user.getUsername(), user.getPassword(), role);
+        if (!success)
+            return false;
 
         // TODO check if the update went well
         user.setRole(role);
@@ -280,8 +283,8 @@ public class EZShop implements EZShopInterface {
         // Get the highest ID from the DB
 
         // Return -1 if there is an error with the DB
-        if (id == null)
-            return -1;
+        if (id == -1)
+            return id;
 
         EZProductType prodType;
         prodType = new EZProductType(id, 0, "", note, description, productCode, pricePerUnit);
@@ -323,9 +326,11 @@ public class EZShop implements EZShopInterface {
 
         EZProductType prodType = ezProducts.get(id);
         // TODO CALL PRODUCT UPDATE PRODUCT TYPE
-        //shopDB.updateProductType();
+        boolean success = shopDB.updateProductType(id, prodType.getQuantity(), prodType.getLocation(), newNote, newDescription, newCode,newPrice);
 
-        // TODO check if the update went well
+        if (!success)
+            return false;
+
         prodType.setProductDescription(newDescription);
         prodType.setBarCode(newCode);
         prodType.setPricePerUnit(newPrice);
@@ -346,9 +351,9 @@ public class EZShop implements EZShopInterface {
             throw new UnauthorizedException();
         }
 
-        shopDB.deleteProductType(id);
-
-        // TODO check if the delete happened
+        boolean success=shopDB.deleteProductType(id);
+        if (!success)
+            return false;
 
         ezProducts.remove(id);
 
@@ -410,14 +415,18 @@ public class EZShop implements EZShopInterface {
             throw new UnauthorizedException();
         }
 
-        EZProductType product = ezProducts.get(productId);
-        if ((toBeAdded > 0) || (toBeAdded < 0 && product.getQuantity() > Math.abs(toBeAdded))){
+        EZProductType prodType = ezProducts.get(productId);
+        if ((toBeAdded > 0) || (toBeAdded < 0 && prodType.getQuantity() > Math.abs(toBeAdded))){
                     // If i need to remove 50 quantity (oBeAdded = -50), i must have quanity > abs(50).
-            int q = product.getQuantity();
+            int q = prodType.getQuantity();
 
-            // TODO update in the DB with UpdateProductType
-            product.setQuantity(toBeAdded+q);
-            ezProducts.replace(productId, product);
+
+            boolean success = shopDB.updateProductType(productId, toBeAdded, prodType.getLocation(), prodType.getNote(), prodType.getProductDescription(), prodType.getBarCode(), prodType.getPricePerUnit());
+            if (!success)
+                return false;
+
+            prodType.setQuantity(toBeAdded+q);
+            ezProducts.replace(productId, prodType);
 
             return true;
         }
@@ -434,20 +443,16 @@ public class EZShop implements EZShopInterface {
         if (!ezProducts.containsKey(productId)) {
             return false;
         }
-        //The position has the following format :
-        //<aisleNumber>-<rackAlphabeticIdentifier>-<levelNumber>
-        if (!(newPos.matches("[0-9]+-[a-zA-z]+-[0-9]+"))){
-            // If it doens't match:
-            throw new InvalidLocationException();
-        }
         if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
             throw new UnauthorizedException();
         }
 
         if (newPos == null || newPos.isEmpty()){
-            // Reset the location
-            // TODO update in the DB with updateProductType()
+            // Reset the location if null or empty
             EZProductType prodType = ezProducts.get(productId);
+            boolean success = shopDB.updateProductType(productId, prodType.getQuantity(), "", prodType.getNote(), prodType.getProductDescription(), prodType.getBarCode(), prodType.getPricePerUnit());
+            if (!success)
+                return false;
             prodType.setLocation("");
             ezProducts.replace(productId, prodType);
             return true;
@@ -460,7 +465,18 @@ public class EZShop implements EZShopInterface {
                 }
             }
         }
+
+        //The position has the following format :
+        //<aisleNumber>-<rackAlphabeticIdentifier>-<levelNumber>
+        if (!(newPos.matches("[0-9]+-[a-zA-z]+-[0-9]+"))){
+            // If it doens't match:
+            throw new InvalidLocationException();
+        }
+
         EZProductType prodType = ezProducts.get(productId);
+        boolean success = shopDB.updateProductType(productId, prodType.getQuantity(), newPos, prodType.getNote(), prodType.getProductDescription(), prodType.getBarCode(), prodType.getPricePerUnit());
+        if (!success)
+            return false;
         prodType.setLocation(newPos);
         ezProducts.replace(productId, prodType);
         return true;
@@ -535,7 +551,7 @@ public class EZShop implements EZShopInterface {
 
         Integer id = shopDB.insertCustomer(customerName, "", defaultValue);
         // Get the highest ID from the DB
-        if (id == null)
+        if (id == -1)
             return -1;
 
         EZCustomer customer = new EZCustomer(id, customerName, "", defaultValue);
@@ -589,7 +605,8 @@ public class EZShop implements EZShopInterface {
 
         EZCustomer customer = ezCustomers.get(id);
         if (newCustomerCard.isEmpty()) {
-            customer.setCustomerCard(null); // consider having a Card object inside Customer, instead of cardCode and Points
+            customer.setCustomerCard(null);
+            // FIXME consider having a Card object inside Customer, instead of cardCode and Points
             customer.setPoints(0);
         }
         if (customer.getCustomerCard() != null && !customer.getCustomerCard().isEmpty())
@@ -597,9 +614,10 @@ public class EZShop implements EZShopInterface {
         customer.setCustomerName(newCustomerName);
         customer.setCustomerCard(newCustomerCard);
 
-        shopDB.updateCustomer(id, newCustomerName, newCustomerCard, 0);
+        boolean success = shopDB.updateCustomer(id, newCustomerName, newCustomerCard, 0);
+        if (!success)
+            return false;
 
-        // TODO handle errors in backend
         ezCustomers.replace(id, customer);
         return true;
 
@@ -618,9 +636,10 @@ public class EZShop implements EZShopInterface {
             throw new UnauthorizedException();
         }
 
-        shopDB.deleteCustomer(id);
+        boolean success = shopDB.deleteCustomer(id);
+        if (!success)
+            return false;
 
-        // TODO false if we have problems to reach the DB
         ezUsers.remove(id);
         return true;
     }
@@ -664,8 +683,6 @@ public class EZShop implements EZShopInterface {
         if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier) )
             throw new UnauthorizedException();
 
-        // TODO test this method
-        // Template since we're not sure how to implements
         String cardCode = shopDB.insertCard(defaultID, defaultValue);
         EZCard card = new EZCard(cardCode, defaultID, defaultValue);
         ezCards.put(cardCode, card);
@@ -713,9 +730,14 @@ public class EZShop implements EZShopInterface {
                 return false; //There is a customer with the given card
             }
         }
-        shopDB.updateCustomer(c.getId(), c.getCustomerName(), customerCard, customerId);
+        boolean success = shopDB.updateCustomer(c.getId(), c.getCustomerName(), customerCard, customerId);
+        if (!success)
+            return false;
         EZCard card = ezCards.get(customerCard);
-        shopDB.updateCard(customerCard, customerId, card.getPoints());
+        success = shopDB.updateCard(customerCard, customerId, card.getPoints());
+        // TODO rollback of the precedent operation?
+        if (!success)
+            return false;
         card.setCustomerId(customerId);
         c.setCustomerCard(customerCard);
 
