@@ -776,9 +776,10 @@ public class EZShop implements EZShopInterface {
             if (this.updateQuantity(scannedProduct.getId(), -amount)) { // true if the requested amount of product is available
              // TODO manage case where this method returns false (product not existing, quantity would become negative
                 currentSaleTransaction = (EZSaleTransaction) this.getSaleTransaction(transactionId); // TODO the SaleTransaction should be the temporary one: modify getSaleTransaction accordingly
-                if (!currentSaleTransaction.getIsPayed()) {
+                if (currentSaleTransaction != null && currentSaleTransaction.hasRequiredStatus("open")) {
                     ticketEntryToAdd = new EZTicketEntry(productCode, scannedProduct.getProductDescription(), amount, scannedProduct.getPricePerUnit(), 0);
                     currentSaleTransaction.getEntries().add(ticketEntryToAdd);
+                    currentSaleTransaction.setPrice(currentSaleTransaction.getPrice() + scannedProduct.getPricePerUnit()*amount); // update total price
                     result = true;
                 }
             }
@@ -819,18 +820,21 @@ public class EZShop implements EZShopInterface {
             throw new InvalidQuantityException();
         try {
             saleTransaction = (EZSaleTransaction) this.getSaleTransaction(transactionId);
-            ticketToUpdate = saleTransaction.getEntries().stream().filter(product -> product.getBarCode().equals(productCode))
-                    .findFirst().orElse(null);
-            productToRemove = this.getProductTypeByBarCode(productCode);
-            if (ticketToUpdate != null && ticketToUpdate.getAmount() >= amount && !saleTransaction.getIsPayed()) {
-                if (ticketToUpdate.getAmount() == amount) { // we have to remove all the products of this type
-                    saleTransaction.getEntries().remove(ticketToUpdate);
+            if (saleTransaction != null) {
+                ticketToUpdate = saleTransaction.getEntries().stream().filter(product -> product.getBarCode().equals(productCode))
+                        .findFirst().orElse(null);
+                productToRemove = this.getProductTypeByBarCode(productCode);
+                if (ticketToUpdate != null && ticketToUpdate.getAmount() >= amount && saleTransaction.hasRequiredStatus("open")) {
+                    if (ticketToUpdate.getAmount() == amount) { // we have to remove all the products of this type
+                        saleTransaction.getEntries().remove(ticketToUpdate);
+                    }
+                    if (ticketToUpdate.getAmount() > amount) {
+                        ticketToUpdate.setAmount(ticketToUpdate.getAmount() - amount);
+                    }
+                    saleTransaction.setPrice(saleTransaction.getPrice() - productToRemove.getPricePerUnit()*amount); // update total price
+                    this.updateQuantity(productToRemove.getId(), amount);
+                    result = true;
                 }
-                if (ticketToUpdate.getAmount() > amount) {
-                    ticketToUpdate.setAmount(ticketToUpdate.getAmount() - amount);
-                }
-                this.updateQuantity(productToRemove.getId(), amount);
-                result = true;
             }
         }
         catch (InvalidProductIdException e) { // if the Product Code is correct, the Product Id is correct too
@@ -864,15 +868,17 @@ public class EZShop implements EZShopInterface {
         boolean result = false;
         if (this.currUser == null || !this.currUser.hasRequiredRole("Administrator", "ShopManager", "Cashier"))
             throw new UnauthorizedException();
-        if (discountRate < 0 || discountRate > 1)
+        if (discountRate < 0 || discountRate >= 1)
             throw new InvalidDiscountRateException();
         this.getProductTypeByBarCode(productCode); //used to check if product code is valid (otherwise, InvalidProductCodeException is raised)
         saleTransaction = (EZSaleTransaction) this.getSaleTransaction(transactionId);
-        ticketToUpdate = saleTransaction.getEntries().stream().filter(product -> product.getBarCode().equals(productCode))
-                .findFirst().orElse(null);
-        if (ticketToUpdate != null && !saleTransaction.getIsPayed()) {
-            ticketToUpdate.setDiscountRate(discountRate);
-            result = true;
+        if (saleTransaction != null) {
+            ticketToUpdate = saleTransaction.getEntries().stream().filter(product -> product.getBarCode().equals(productCode))
+                    .findFirst().orElse(null);
+            if (ticketToUpdate != null && saleTransaction.hasRequiredStatus("open")) {
+                ticketToUpdate.setDiscountRate(discountRate);
+                result = true;
+            }
         }
         return result;
     }
@@ -895,7 +901,18 @@ public class EZShop implements EZShopInterface {
      */
     @Override
     public boolean applyDiscountRateToSale(Integer transactionId, double discountRate) throws InvalidTransactionIdException, InvalidDiscountRateException, UnauthorizedException {
-        return false;
+        EZSaleTransaction saleTransaction;
+        boolean result = false;
+        if (this.currUser == null || !this.currUser.hasRequiredRole("Administrator", "ShopManager", "Cashier"))
+            throw new UnauthorizedException();
+        if (discountRate < 0 || discountRate >= 1)
+            throw new InvalidDiscountRateException();
+        saleTransaction = (EZSaleTransaction) this.getSaleTransaction(transactionId);
+        if (saleTransaction != null && saleTransaction.hasRequiredStatus("open", "closed")) {
+            saleTransaction.setDiscountRate(discountRate);
+            result = true;
+        }
+        return result;
     }
 
     /**
@@ -914,7 +931,15 @@ public class EZShop implements EZShopInterface {
      */
     @Override
     public int computePointsForSale(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
-        return 0;
+        EZSaleTransaction saleTransaction;
+        int pointsToAdd = -1;
+        if (this.currUser == null || !this.currUser.hasRequiredRole("Administrator", "ShopManager", "Cashier"))
+            throw new UnauthorizedException();
+        saleTransaction = (EZSaleTransaction) this.getSaleTransaction(transactionId);
+        if (saleTransaction != null) {
+            pointsToAdd = (int) Math.floor(saleTransaction.getPrice()/10);
+        }
+        return pointsToAdd;
     }
 
     /**

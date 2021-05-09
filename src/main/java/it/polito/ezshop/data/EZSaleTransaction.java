@@ -7,11 +7,11 @@ public class EZSaleTransaction implements SaleTransaction {
     private List<TicketEntry> entries;
     private double discountRate;
     private double price;
-    private boolean isPayed;
+    private String status; //accepted values: "open", "closed", "payed"
 
     public EZSaleTransaction (Integer ticketNumber){
         this.ticketNumber = ticketNumber;
-        this.isPayed = false;
+        this.status = "open";
     }
 
     public EZSaleTransaction (Integer ticketNumber, List<TicketEntry> entries, double discountRate, double price) {
@@ -19,7 +19,7 @@ public class EZSaleTransaction implements SaleTransaction {
         this.entries = entries;
         this.discountRate = discountRate;
         this.price = price;
-        this.isPayed = false;
+        this.status = "open";
     }
 
     @Override
@@ -62,11 +62,23 @@ public class EZSaleTransaction implements SaleTransaction {
         this.price = price;
     }
 
-    public boolean getIsPayed(){
-        return this.isPayed;
+    public String getStatus(){
+        return this.status;
     }
 
-    public void setIsPayed(boolean isPayed){
-        this.isPayed = isPayed;
+    public void setStatus(String status){
+        this.status = status;
+    }
+
+    public boolean hasRequiredStatus(String ...requiredStatus) {
+        if (requiredStatus == null)
+            return false;
+
+        for (String role : requiredStatus ) {
+            if (role.equals(this.status))
+                return true;
+        }
+
+        return false;
     }
 }
