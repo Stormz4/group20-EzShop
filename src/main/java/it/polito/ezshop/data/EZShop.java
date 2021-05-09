@@ -2,6 +2,8 @@ package it.polito.ezshop.data;
 
 import it.polito.ezshop.exceptions.*;
 
+import it.polito.ezshop.creditCards.*;
+
 import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.HashMap;
@@ -852,7 +854,7 @@ public class EZShop implements EZShopInterface {
     @Override
     public Integer startReturnTransaction(Integer saleNumber) throws /*InvalidTicketNumberException,*/InvalidTransactionIdException, UnauthorizedException {
 
-        EZSaleTransaction sale = getSaleTransactionById(saleNumber); //take from list: should we also take from DB ???
+        EZSaleTransaction sale = getSaleTransactionById(saleNumber);
 
         if(sale == null)
             return -1;
@@ -887,16 +889,16 @@ public class EZShop implements EZShopInterface {
 
         if(amount <= 0) throw new InvalidQuantityException();
 
-        ProductType product = getProductTypeByBarCode(productCode);//take from list: should we also take from DB ???
+        ProductType product = getProductTypeByBarCode(productCode);
 
         if(product == null)
             return false;
 
-        EZSaleTransaction sale = getSaleTransactionById(tmpRetTr.getItsSaleTransactionId());//take from list: should we also take from DB ???
+        EZSaleTransaction sale = getSaleTransactionById(tmpRetTr.getItsSaleTransactionId());
         if(sale == null)
             return false;
 
-        EZTicketEntry saleTicket = sale.getTicketEntryByBarCode(productCode);//take from list: should we also take from DB ???
+        EZTicketEntry saleTicket = sale.getTicketEntryByBarCode(productCode);
         if(saleTicket == null)
             return false;
 
@@ -925,7 +927,7 @@ public class EZShop implements EZShopInterface {
 
         if(commit)
         {
-            EZSaleTransaction sale = getSaleTransactionById(tmpRetTr.getItsSaleTransactionId());//take from list: should we also take from DB ???
+            EZSaleTransaction sale = getSaleTransactionById(tmpRetTr.getItsSaleTransactionId());
 
             EZReturnTransaction retToBeStored = new EZReturnTransaction(tmpRetTr); //copy the temporary return transaction
 
@@ -939,18 +941,27 @@ public class EZShop implements EZShopInterface {
             for ( TicketEntry ticket: tmpRetTr.getEntries())
             {
                 ezticket = (EZTicketEntry) ticket;
-                //todo //ProductType product = getProductTypeByBarCode(ezticket.getBarCode());
+                EZProductType product = null;
+                for (EZProductType p : ezProducts.values())
+                {
+                    if(p.getBarCode().equals(ezticket.getBarCode()))
+                    {
+                        product = p;
+                        break;
+                    }
+                }
 
+                assert product != null;
                 // update (increase) quantity on the shelves
-                /*if(shopDB.updateCard(product.getId(), product.getQuantity()+ezticket.amount, product.getLocation(),
-                    product.getNote(), product.getProductDescription(), product.getBarCode(), product.getPricePerUnit()) == false)
-                    return false;*/
-                //todo //updateQuantity(product.getId(), +ezticket.getAmount()); //re-place products on shelves
+                if(!shopDB.updateProductType(product.getId(), product.getQuantity()+ezticket.amount, product.getLocation(),
+                    product.getNote(), product.getProductDescription(), product.getBarCode(), product.getPricePerUnit()))
+                    return false;
+                product.editQuantity(+ezticket.getAmount());//re-place products on shelves
 
                 // update (decrease) number of sold products (in related sale transaction)
                 EZTicketEntry oldSaleTicket = getSaleTransactionById(tmpRetTr.getItsSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode());
-                /*if(shopDB.updateProductPerSale(product.getBarCode(), sale.getTicketNumber(), oldSaleTicket.getAmount()-ezticket.getAmount(), oldSaleTicket.getDiscountRate());//)
-                    return false;*/
+                if(shopDB.updateProductPerSale(product.getBarCode(), sale.getTicketNumber(), oldSaleTicket.getAmount()-ezticket.getAmount(), oldSaleTicket.getDiscountRate()))
+                    return false;
                 getSaleTransactionById(tmpRetTr.getItsSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode()).updateAmount(-ezticket.getAmount()) ;
 
 
@@ -990,7 +1001,7 @@ public class EZShop implements EZShopInterface {
 
         if(returnId == null || returnId <= 0) throw new InvalidTransactionIdException();
 
-        EZReturnTransaction retTr = getReturnTransactionById(returnId);//take from list: should we also take from DB ???
+        EZReturnTransaction retTr = getReturnTransactionById(returnId);
 
         if(retTr == null) return false;
 
@@ -999,24 +1010,34 @@ public class EZShop implements EZShopInterface {
         /* "This method deletes a CLOSED (but not PAYED) return transaction. It affects the quantity of product sold in
          the connected sale transaction (and consequently its price) and the quantity of product available on the shelves." */
 
-        EZSaleTransaction sale = getSaleTransactionById(getReturnTransactionById(returnId).getItsSaleTransactionId());//take from list: should we also take from DB ???
+        EZSaleTransaction sale = getSaleTransactionById(getReturnTransactionById(returnId).getItsSaleTransactionId());
         EZTicketEntry ezticket;
 
         for (TicketEntry ticket: retTr.getEntries())
         {
             ezticket = (EZTicketEntry) ticket;
-            //todo //EZProductType product = getProductTypeByBarCode(ezticket.getBarCode());
+            EZProductType product = null; //getProductTypeByBarCode(ezticket.getBarCode());
+            for (EZProductType p : ezProducts.values())
+            {
+                if(p.getBarCode().equals(ezticket.getBarCode()))
+                {
+                    product = p;
+                    break;
+                }
+            }
 
+            assert product != null;
             // re-update (decrease) quantity on the shelves
-            /*if(shopDB.updateCard(product.getId(), product.getQuantity()-ezticket.getAmount(), product.getLocation(),
-                product.getNote(), product.getProductDescription(), product.getBarCode(), product.getPricePerUnit()) == false)
-                return false;*/
+            if(!shopDB.updateProductType(product.getId(), product.getQuantity()-ezticket.getAmount(), product.getLocation(),
+                product.getNote(), product.getProductDescription(), product.getBarCode(), product.getPricePerUnit()))
+                return false;
             //todo //updateQuantity(product.getId(), -ezticket.getAmount());
+            product.editQuantity(-ezticket.getAmount());
 
             // re-update (increase) number of sold products (in related sale transaction)
             EZTicketEntry oldSaleTicket = getSaleTransactionById(retTr.getItsSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode());
-            /*if(shopDB.updateProductPerSale(product.getBarCode(), sale.getTicketNumber(), oldSaleTicket.getAmount()+ezticket.getAmount(), oldSaleTicket.getDiscountRate());//)
-                return false;*/
+            if(shopDB.updateProductPerSale(product.getBarCode(), sale.getTicketNumber(), oldSaleTicket.getAmount()+ezticket.getAmount(), oldSaleTicket.getDiscountRate()))
+                return false;
             getSaleTransactionById(tmpRetTr.getItsSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode()).updateAmount(+ezticket.getAmount()) ;
 
             // re-update (increase) final price of related sale transaction
@@ -1064,7 +1085,7 @@ public class EZShop implements EZShopInterface {
     @Override
     public double receiveCashPayment(Integer ticketNumber, double cash) throws InvalidTransactionIdException, InvalidPaymentException, UnauthorizedException {
 
-        SaleTransaction sale = getSaleTransaction(ticketNumber);//take from list: should we also take from DB ???
+        SaleTransaction sale = getSaleTransaction(ticketNumber);
 
         if( this.currUser != null && !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier) )
             throw new UnauthorizedException();
@@ -1085,7 +1106,7 @@ public class EZShop implements EZShopInterface {
     @Override
     public boolean receiveCreditCardPayment(Integer ticketNumber, String creditCard) throws InvalidTransactionIdException, InvalidCreditCardException, UnauthorizedException {
 
-        SaleTransaction sale = getSaleTransaction(ticketNumber);//take from list: should we also take from DB ???
+        SaleTransaction sale = getSaleTransaction(ticketNumber);
 
         if( this.currUser != null && !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier) )
             throw new UnauthorizedException();
@@ -1114,7 +1135,7 @@ public class EZShop implements EZShopInterface {
 
         if(returnId <= 0) throw new InvalidTransactionIdException(); // not "returnId == null ||" ???
 
-        EZReturnTransaction retTr = getReturnTransactionById(returnId);//take from list: should we also take from DB ???
+        EZReturnTransaction retTr = getReturnTransactionById(returnId);
 
         if(retTr == null) return -1;
 
@@ -1138,7 +1159,7 @@ public class EZShop implements EZShopInterface {
 
         if(creditCard == null || !verifyByLuhnAlgo(creditCard) || creditCard.equals("")) throw new InvalidCreditCardException();
 
-        EZReturnTransaction retTr = getReturnTransactionById(returnId);//take from list: should we also take from DB ???
+        EZReturnTransaction retTr = getReturnTransactionById(returnId);
 
         if(retTr == null) return -1;
         if(!retTr.isClosed()) return -1;
@@ -1246,6 +1267,7 @@ public class EZShop implements EZShopInterface {
         this.shopDB.insertCustomer("Leonard", card);
         this.shopDB.insertCustomer("Penny", card2);
         this.shopDB.insertCustomer("Raj", null);
+        this.shopDB.insertCustomer("Cheerios", null);
 
 
         EZProductType prod1 = new EZProductType(defaultID, 5, "", "A simple note",

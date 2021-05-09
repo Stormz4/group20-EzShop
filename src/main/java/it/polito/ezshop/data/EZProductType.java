@@ -88,4 +88,6 @@ public class EZProductType implements ProductType {
     public void setId(Integer id) {
         this.id = id;
     }
+
+    public void editQuantity(int toBeAdded) { this.quantity += toBeAdded; }
 }
