@@ -79,6 +79,34 @@ public class SQLiteDB {
         this.createUsersTable();
     }
 
+    public boolean clearDatabase() {
+        if (this.dbConnection == null)
+            return false;
+
+        this.clearTable("BalanceOperations");
+        this.clearTable("Cards");
+        this.clearTable("Customers");
+        this.clearTable("Orders");
+        this.clearTable("ProductsPerSale");
+        this.clearTable("ProductTypes");
+        this.clearTable("SaleTransactions");
+        //this.clearTable("Users"); // We chose not to delete Users... shuold ask Morisio
+        // this.clearTable("ReturnTransactions"); // TODO: need this?
+
+        return true;
+  }
+
+  private void clearTable(String tableName) {
+      String sql =  "DELETE FROM " + tableName + " ;";
+
+      try{
+          Statement stmt = this.dbConnection.createStatement();
+          stmt.execute(sql);
+      } catch (SQLException e) {
+          System.out.println(e.getMessage());
+      }
+  }
+
     /**
      ** Returns the id of the last inserted row, no matter the table
      */
@@ -277,7 +305,7 @@ public class SQLiteDB {
 
             // loop through the result set
             while (rs.next()) {
-                Integer id = rs.getInt("id");
+                int id = rs.getInt("id");
                 String strDate = rs.getString("date");
                 LocalDate date = (strDate != null) ? LocalDate.parse(strDate) : null;
                 double money = rs.getDouble("money");

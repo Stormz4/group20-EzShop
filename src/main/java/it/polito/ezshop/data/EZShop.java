@@ -40,8 +40,16 @@ public class EZShop implements EZShopInterface {
     private HashMap<Integer, EZSaleTransaction> ezSaleTransactions;
     private HashMap<Integer, EZReturnTransaction> ezReturnTransactions;
 
+    public EZShop() {
+        this.loadDataFromDB();
+
+        // TODO: remove before delivery
+        this.testDB();
+    }
+
     public void  loadDataFromDB() {
-        shopDB.connect();
+        if (this.shopDB.dbConnection == null)
+            shopDB.connect();
         shopDB.initDatabase();
 
         if (ezBalanceOperations == null)
@@ -66,9 +74,23 @@ public class EZShop implements EZShopInterface {
             ezUsers = shopDB.selectAllUsers();
     }
 
+    private void clearData() {
+        ezBalanceOperations = null;
+        ezCards = null;
+        ezCustomers = null;
+        ezOrders = null;
+        ezProducts = null;
+        ezSaleTransactions = null;
+        // ezUsers = null; // We chose not to delete Users... shuold ask Morisio
+    }
+
     @Override
     public void reset() {
+        if (this.shopDB.dbConnection == null)
+            this.shopDB.connect();
 
+        if (this.shopDB.clearDatabase())
+            this.clearData();
     }
 
     @Override
@@ -84,10 +106,12 @@ public class EZShop implements EZShopInterface {
             throw new InvalidRoleException();
         }
 
-        for (User user : ezUsers.values()) {
-            if (user.getUsername().equals(username)) {
-                return -1;
-            }
+        if (this.ezUsers == null)
+            return defaultID;
+
+        for (EZUser user : ezUsers.values()) {
+            if (user.getUsername().equals(username))
+                return defaultID;
         }
         Integer id = shopDB.insertUser(username, password, role);
         // Get the highest ID from the DB
@@ -202,18 +226,11 @@ public class EZShop implements EZShopInterface {
          * @throws InvalidUsernameException if the username is empty or null
          * @throws InvalidPasswordException if the password is empty or null
          */
-
-        this.loadDataFromDB();
-
-        if(USE_TEST_DB)
-          this.testDB();
-
         if (username == null || username.isEmpty()){
             throw new InvalidUsernameException();
         }
         if (password == null || password.isEmpty()){
             throw new InvalidPasswordException();
-
         }
 
         //
@@ -1354,6 +1371,8 @@ public class EZShop implements EZShopInterface {
 
     private void testDB() {
         // TODO: remove all this stuff before delivery
+        if (!USE_TEST_DB)
+            return;
 
         this.shopDB.insertUser("admin", "admin", URAdministrator);
         this.shopDB.insertUser("sheldon", "pwd", URAdministrator);
