@@ -76,12 +76,9 @@ public class EZShop implements EZShopInterface {
 
     private void clearData() {
         ezBalanceOperations = null;
-        ezCards = null;
-        ezCustomers = null;
         ezOrders = null;
         ezProducts = null;
         ezSaleTransactions = null;
-        // ezUsers = null; // We chose not to delete Users... shuold ask Morisio
     }
 
     @Override

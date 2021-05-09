@@ -84,13 +84,10 @@ public class SQLiteDB {
             return false;
 
         this.clearTable("BalanceOperations");
-        this.clearTable("Cards");
-        this.clearTable("Customers");
         this.clearTable("Orders");
         this.clearTable("ProductsPerSale");
         this.clearTable("ProductTypes");
         this.clearTable("SaleTransactions");
-        //this.clearTable("Users"); // We chose not to delete Users... shuold ask Morisio
         // this.clearTable("ReturnTransactions"); // TODO: need this?
 
         return true;
