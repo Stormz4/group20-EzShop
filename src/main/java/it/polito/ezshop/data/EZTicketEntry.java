@@ -1,7 +1,8 @@
 package it.polito.ezshop.data;
 
-public class EZTicketEntry implements  TicketEntry {
+public class EZTicketEntry implements TicketEntry {
     String barCode;
+    //Integer productId;
     String productDescription;
     int amount;
     double pricePerUnit;
@@ -24,6 +25,14 @@ public class EZTicketEntry implements  TicketEntry {
     public void setBarCode(String barCode) {
         this.barCode = barCode;
     }
+
+//    public Integer getProductId() {
+//        return productId;
+//    }
+//
+//    public void setProductId(Integer productId) {
+//        this.productId = productId;
+//    }
 
     @Override
     public String getProductDescription() {
@@ -63,5 +72,14 @@ public class EZTicketEntry implements  TicketEntry {
     @Override
     public void setDiscountRate(double discountRate) {
         this.discountRate = discountRate;
+    }
+    public double getTotal()
+    {
+        return (discountRate * pricePerUnit * amount);
+    }
+
+    public void updateAmount(int toBeAdded)
+    {
+        this.amount += toBeAdded;
     }
 }
