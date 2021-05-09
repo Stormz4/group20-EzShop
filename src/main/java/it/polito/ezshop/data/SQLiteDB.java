@@ -132,7 +132,7 @@ public class SQLiteDB {
      */
     public HashMap<Integer, EZCustomer> selectAllCustomers(){
         HashMap<Integer, EZCustomer> customers = new HashMap<>();
-        String sql = "SELECT Customers.id, name, card, points \n"
+        String sql = "SELECT Customers.id, name, card, Cards.points \n"
                    + "FROM Customers \n"
                    + "LEFT JOIN Cards ON Customers.card = Cards.id;";
 

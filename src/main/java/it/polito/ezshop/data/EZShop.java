@@ -561,7 +561,7 @@ public class EZShop implements EZShopInterface {
         if (card == null)
             return false;
 
-        return card.matches("\\b[0-9]{10}\\b");
+        return ( card.isEmpty() || card.matches("\\b[0-9]{10}\\b") );
     }
 
     /**
@@ -599,7 +599,7 @@ public class EZShop implements EZShopInterface {
         }
 
         for (Customer c : ezCustomers.values()) {
-            if (c.getCustomerCard().equals(newCustomerCard) || c.getCustomerName().equals(newCustomerName)) {
+            if ( !newCustomerCard.isEmpty() && c.getCustomerCard().equals(newCustomerCard)) {
                 // if the update fails ( cardCode assigned to another user)
                 // also the name must be unique
                 return false;
