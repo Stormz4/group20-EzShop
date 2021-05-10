@@ -1052,7 +1052,7 @@ public class EZShop implements EZShopInterface {
         try {
             // TODO remove getProductTypeByBarCode if Cashier cannot use it
             scannedProduct = this.getProductTypeByBarCode(productCode);
-            currentSaleTransaction = (EZSaleTransaction) this.getSaleTransactionById(transactionId);
+            currentSaleTransaction = this.getSaleTransactionById(transactionId);
             if (scannedProduct != null && currentSaleTransaction != null && currentSaleTransaction.hasRequiredStatus(EZSaleTransaction.STOpened)) {
                 if(this.updateQuantity(scannedProduct.getId(), -amount)) {
                     ticketEntryToAdd = new EZTicketEntry(productCode, scannedProduct.getProductDescription(), amount, scannedProduct.getPricePerUnit(), 0);
@@ -1226,7 +1226,7 @@ public class EZShop implements EZShopInterface {
             throw new InvalidTransactionIdException();
         // TODO remove getProductTypeByBarCode if Cashier cannot use it
         this.getProductTypeByBarCode(productCode); //used to check if product code is valid (otherwise, InvalidProductCodeException is raised)
-        saleTransaction = (EZSaleTransaction) this.getSaleTransactionById(transactionId);
+        saleTransaction = this.getSaleTransactionById(transactionId);
         if (saleTransaction != null && saleTransaction.hasRequiredStatus(EZSaleTransaction.STOpened)) {
             ticketToUpdate = saleTransaction.getEntries().stream().filter(product -> product.getBarCode().equals(productCode))
                     .findFirst().orElse(null);
@@ -1264,8 +1264,7 @@ public class EZShop implements EZShopInterface {
             throw new InvalidDiscountRateException();
         if (transactionId == null || transactionId <= 0)
             throw new InvalidTransactionIdException();
-        saleTransaction = (EZSaleTransaction) this.getSaleTransactionById(transactionId);
-        // TODO Manage case where saleTransaction is closed (implies DB update)
+        saleTransaction = this.getSaleTransactionById(transactionId);
         if (saleTransaction != null && saleTransaction.hasRequiredStatus(EZSaleTransaction.STOpened, EZSaleTransaction.STClosed)) {
             if(this.shopDB.updateSaleTransaction(transactionId, discountRate, saleTransaction.getPrice(), saleTransaction.getStatus())){
                 saleTransaction.setDiscountRate(discountRate); // Does this propagate to the list?
@@ -1297,7 +1296,7 @@ public class EZShop implements EZShopInterface {
             throw new UnauthorizedException();
         if (transactionId == null || transactionId <= 0)
             throw new InvalidTransactionIdException();
-        saleTransaction = (EZSaleTransaction) this.getSaleTransactionById(transactionId);
+        saleTransaction = this.getSaleTransactionById(transactionId);
         if (saleTransaction != null && saleTransaction.hasRequiredStatus(EZSaleTransaction.STOpened, EZSaleTransaction.STClosed, EZSaleTransaction.STPayed)) {
             pointsToAdd = (int) Math.floor(saleTransaction.getPrice()/10);
         }
@@ -1327,7 +1326,7 @@ public class EZShop implements EZShopInterface {
             throw new UnauthorizedException();
         if (transactionId == null || transactionId <= 0)
             throw new InvalidTransactionIdException();
-        saleTransaction = (EZSaleTransaction) this.getSaleTransactionById(transactionId);
+        saleTransaction = this.getSaleTransactionById(transactionId);
         if (saleTransaction != null && saleTransaction.hasRequiredStatus(EZSaleTransaction.STOpened)) {
             if (this.shopDB.updateSaleTransaction(transactionId, saleTransaction.getDiscountRate(), saleTransaction.getPrice(), EZSaleTransaction.STClosed)) {
                 saleTransaction.setStatus(EZSaleTransaction.STClosed);
@@ -1369,7 +1368,7 @@ public class EZShop implements EZShopInterface {
     // TODO modify all methods where an opened saleTransaction is obtained by calling this method (it's an error)
     @Override
     public SaleTransaction getSaleTransaction(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
-        EZSaleTransaction saleTransaction = null;
+        EZSaleTransaction saleTransaction;
         if (this.currUser == null || !this.currUser.hasRequiredRole("Administrator", "ShopManager", "Cashier"))
             throw new UnauthorizedException();
         if (transactionId == null || transactionId <= 0)
@@ -1631,51 +1630,115 @@ public class EZShop implements EZShopInterface {
         return (sum % 10 == 0);
     }
 
-
+    /**
+     * This method record the payment of a sale transaction with cash and returns the change (if present).
+     * This method affects the balance of the system.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param transactionId the number of the transaction that the customer wants to pay
+     * @param cash the cash received by the cashier
+     *
+     * @return the change (cash - sale price)
+     *         -1   if the sale does not exists,
+     *              if the cash is not enough,
+     *              if there are problems with the db
+     *
+     * @throws InvalidTransactionIdException if the number is less than or equal to 0 or if it is null
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     * @throws InvalidPaymentException if the cash is less than or equal to 0
+     */
     @Override
     public double receiveCashPayment(Integer ticketNumber, double cash) throws InvalidTransactionIdException, InvalidPaymentException, UnauthorizedException {
 
-        if(ticketNumber == null || ticketNumber <= 0) throw new InvalidTransactionIdException();
-
         SaleTransaction sale = getSaleTransaction(ticketNumber);
+        double toBePayed;
 
-        if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier) )
-            throw new UnauthorizedException();
+        if(ticketNumber == null || ticketNumber <= 0) throw new InvalidTransactionIdException();
 
         if(cash <= 0) throw new InvalidPaymentException();
 
-        if(sale == null || cash < sale.getPrice())
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier) )
+            throw new UnauthorizedException();
+
+        if(sale == null)
             return -1;
 
-        if(!recordBalanceUpdate(sale.getPrice()))
-            return -1; // return -1 if DB connection problems occur
+        toBePayed = sale.getPrice()*(1-sale.getDiscountRate());
 
-        return (cash - sale.getPrice());
+        if (cash < toBePayed)
+            return -1;
+
+        if(!this.shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), sale.getPrice(), EZSaleTransaction.STPayed))
+            return -1;
+
+        if(!recordBalanceUpdate(toBePayed)) {
+            this.shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), sale.getPrice(), EZSaleTransaction.STClosed);
+            return -1; // return -1 if DB connection problems occur
+        }
+
+        return (cash - toBePayed);
     }
 
+    /**
+     * This method record the payment of a sale with credit card. If the card has not enough money the payment should
+     * be refused.
+     * The credit card number validity should be checked. It should follow the luhn algorithm.
+     * The credit card should be registered in the system.
+     * This method affects the balance of the system.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param transactionId the number of the sale that the customer wants to pay
+     * @param creditCard the credit card number of the customer
+     *
+     * @return  true if the operation is successful
+     *          false   if the sale does not exists,
+     *                  if the card has not enough money,
+     *                  if the card is not registered,
+     *                  if there is some problem with the db connection
+     *
+     * @throws InvalidTransactionIdException if the sale number is less than or equal to 0 or if it is null
+     * @throws InvalidCreditCardException if the credit card number is empty, null or if luhn algorithm does not
+     *                                      validate the credit card
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
     @Override
     public boolean receiveCreditCardPayment(Integer ticketNumber, String creditCard) throws InvalidTransactionIdException, InvalidCreditCardException, UnauthorizedException {
 
+        EZSaleTransaction sale;
+        double toBePayed;
+
         if(ticketNumber == null || ticketNumber <= 0) throw new InvalidTransactionIdException();
 
-        SaleTransaction sale = getSaleTransaction(ticketNumber);
-
-        if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier) )
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier) )
             throw new UnauthorizedException();
-
 
         if(creditCard == null || !verifyByLuhnAlgo(creditCard) || creditCard.equals("")) throw new InvalidCreditCardException();
 
-        /*if(sale == null ||
-            getCreditCardFromTXT(ticketNumber) == null ||
-            !verifyCreditCardBalance(ticketNumber, creditCard))
-            return false;*/
+        sale = (EZSaleTransaction) getSaleTransaction(ticketNumber);
 
-        // todo: keep money from credit card (from txt/JSON (?))
+        if (sale == null || !sale.hasRequiredStatus(EZSaleTransaction.STClosed)) return false;
 
+        toBePayed = sale.getPrice()*(1-sale.getDiscountRate());
 
-        if(!recordBalanceUpdate(sale.getPrice()))
+        if(!this.shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), sale.getPrice(), EZSaleTransaction.STPayed))
+            return false;
+
+        /*
+        if(getCreditCardFromTXT(creditCard) == null ||
+            !verifyCreditCardBalance(creditCard, toBePayed) ||
+            !getMoneyFromCreditCard(creditCard, toBePayed) {
+                this.shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), sale.getPrice(), EZSaleTransaction.STClosed)
+                return false;
+            }
+        */
+
+        // TODO: keep money from credit card (from txt/JSON (?))
+
+        if(!recordBalanceUpdate(toBePayed)) { // rollback
+            this.shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), sale.getPrice(), EZSaleTransaction.STClosed);
+            // TODO ??? giveMoneyToCreditCard(creditCard, toBePayed); ???
             return false; // return false if DB connection problems occur
+        }
 
         return true;
     }
