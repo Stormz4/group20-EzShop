@@ -3,15 +3,21 @@ package it.polito.ezshop.data;
 import java.util.List;
 
 public class EZSaleTransaction implements SaleTransaction {
+    public static final String STOpened = "OPENED";
+    public static final String STClosed = "CLOSED";
+    public static final String STPayed = "PAYED";
+
     private Integer ticketNumber;
     private List<TicketEntry> entries;
     private double discountRate;
     private double price;
-    private String status; //accepted values: "open", "closed", "payed"
+    private String status; //accepted values: "OPENED", "CLOSED", "PAYED"
+    private EZCard attachedCard;
 
     public EZSaleTransaction (Integer ticketNumber){
         this.ticketNumber = ticketNumber;
         this.status = "open";
+        this.attachedCard = null;
     }
 
     public EZSaleTransaction (Integer ticketNumber, List<TicketEntry> entries, double discountRate, double price) {
@@ -19,7 +25,8 @@ public class EZSaleTransaction implements SaleTransaction {
         this.entries = entries;
         this.discountRate = discountRate;
         this.price = price;
-        this.status = "open";
+        this.status = EZSaleTransaction.STOpened;
+        this.attachedCard = null;
     }
 
     @Override
@@ -80,5 +87,13 @@ public class EZSaleTransaction implements SaleTransaction {
         }
 
         return false;
+    }
+
+    public EZCard getAttachedCard() {
+        return this.attachedCard;
+    }
+
+    public void setAttachedCard(EZCard attachedCard) {
+        this.attachedCard = attachedCard;
     }
 }

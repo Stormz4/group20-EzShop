@@ -767,16 +767,18 @@ public class EZShop implements EZShopInterface {
         EZSaleTransaction currentSaleTransaction;
         boolean result = false;
 
-        if (this.currUser == null | !this.currUser.hasRequiredRole("Administrator", "ShopManager", "Cashier"))
+        if (this.currUser == null || !this.currUser.hasRequiredRole("Administrator", "ShopManager", "Cashier"))
             throw new UnauthorizedException();
         if (amount < 0)
             throw new InvalidQuantityException();
+        if (transactionId == null || transactionId <= 0)
+            throw new InvalidTransactionIdException();
         try {
             scannedProduct = this.getProductTypeByBarCode(productCode); // TODO check if a Cashier could call this method (in that case, getProductTypeByBarCode cannot be used
             if (this.updateQuantity(scannedProduct.getId(), -amount)) { // true if the requested amount of product is available
              // TODO manage case where this method returns false (product not existing, quantity would become negative
                 currentSaleTransaction = (EZSaleTransaction) this.getSaleTransaction(transactionId); // TODO the SaleTransaction should be the temporary one: modify getSaleTransaction accordingly
-                if (currentSaleTransaction != null && currentSaleTransaction.hasRequiredStatus("open")) {
+                if (currentSaleTransaction != null && currentSaleTransaction.hasRequiredStatus(EZSaleTransaction.STOpened)) {
                     ticketEntryToAdd = new EZTicketEntry(productCode, scannedProduct.getProductDescription(), amount, scannedProduct.getPricePerUnit(), 0);
                     currentSaleTransaction.getEntries().add(ticketEntryToAdd);
                     currentSaleTransaction.setPrice(currentSaleTransaction.getPrice() + scannedProduct.getPricePerUnit()*amount); // update total price
@@ -818,13 +820,15 @@ public class EZShop implements EZShopInterface {
             throw new UnauthorizedException();
         if (amount < 0) // TODO should amount == 0 raise an exception?
             throw new InvalidQuantityException();
+        if (transactionId == null || transactionId <= 0)
+            throw new InvalidTransactionIdException();
         try {
             saleTransaction = (EZSaleTransaction) this.getSaleTransaction(transactionId);
             if (saleTransaction != null) {
                 ticketToUpdate = saleTransaction.getEntries().stream().filter(product -> product.getBarCode().equals(productCode))
                         .findFirst().orElse(null);
                 productToRemove = this.getProductTypeByBarCode(productCode);
-                if (ticketToUpdate != null && ticketToUpdate.getAmount() >= amount && saleTransaction.hasRequiredStatus("open")) {
+                if (ticketToUpdate != null && ticketToUpdate.getAmount() >= amount && saleTransaction.hasRequiredStatus(EZSaleTransaction.STOpened)) {
                     if (ticketToUpdate.getAmount() == amount) { // we have to remove all the products of this type
                         saleTransaction.getEntries().remove(ticketToUpdate);
                     }
@@ -870,12 +874,14 @@ public class EZShop implements EZShopInterface {
             throw new UnauthorizedException();
         if (discountRate < 0 || discountRate >= 1)
             throw new InvalidDiscountRateException();
+        if (transactionId == null || transactionId <= 0)
+            throw new InvalidTransactionIdException();
         this.getProductTypeByBarCode(productCode); //used to check if product code is valid (otherwise, InvalidProductCodeException is raised)
-        saleTransaction = (EZSaleTransaction) this.getSaleTransaction(transactionId);
+        saleTransaction = (EZSaleTransaction) this.getSaleTransactionById(transactionId);
         if (saleTransaction != null) {
             ticketToUpdate = saleTransaction.getEntries().stream().filter(product -> product.getBarCode().equals(productCode))
                     .findFirst().orElse(null);
-            if (ticketToUpdate != null && saleTransaction.hasRequiredStatus("open")) {
+            if (ticketToUpdate != null && saleTransaction.hasRequiredStatus(EZSaleTransaction.STOpened)) {
                 ticketToUpdate.setDiscountRate(discountRate);
                 result = true;
             }
@@ -907,8 +913,11 @@ public class EZShop implements EZShopInterface {
             throw new UnauthorizedException();
         if (discountRate < 0 || discountRate >= 1)
             throw new InvalidDiscountRateException();
-        saleTransaction = (EZSaleTransaction) this.getSaleTransaction(transactionId);
-        if (saleTransaction != null && saleTransaction.hasRequiredStatus("open", "closed")) {
+        if (transactionId == null || transactionId <= 0)
+            throw new InvalidTransactionIdException();
+        saleTransaction = (EZSaleTransaction) this.getSaleTransactionById(transactionId);
+        // TODO Manage case where saleTransaction is closed (implies DB update)
+        if (saleTransaction != null && saleTransaction.hasRequiredStatus(EZSaleTransaction.STOpened, EZSaleTransaction.STClosed)) {
             saleTransaction.setDiscountRate(discountRate);
             result = true;
         }
@@ -935,7 +944,9 @@ public class EZShop implements EZShopInterface {
         int pointsToAdd = -1;
         if (this.currUser == null || !this.currUser.hasRequiredRole("Administrator", "ShopManager", "Cashier"))
             throw new UnauthorizedException();
-        saleTransaction = (EZSaleTransaction) this.getSaleTransaction(transactionId);
+        if (transactionId == null || transactionId <= 0)
+            throw new InvalidTransactionIdException();
+        saleTransaction = (EZSaleTransaction) this.getSaleTransactionById(transactionId);
         if (saleTransaction != null) {
             pointsToAdd = (int) Math.floor(saleTransaction.getPrice()/10);
         }
@@ -957,9 +968,24 @@ public class EZShop implements EZShopInterface {
      * @throws InvalidTransactionIdException if the transaction id less than or equal to 0 or if it is null
      * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
      */
+    // TODO where is the Opened SaleTransaction (in the DB or not) ????
     @Override
     public boolean endSaleTransaction(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
-        return false;
+        EZSaleTransaction saleTransaction;
+        boolean result = false;
+        if (this.currUser == null || !this.currUser.hasRequiredRole("Administrator", "ShopManager", "Cashier"))
+            throw new UnauthorizedException();
+        if (transactionId == null || transactionId <= 0)
+            throw new InvalidTransactionIdException();
+        saleTransaction = (EZSaleTransaction) this.getSaleTransactionById(transactionId);
+        if (saleTransaction != null && saleTransaction.hasRequiredStatus(EZSaleTransaction.STOpened)) {
+            saleTransaction.setStatus(EZSaleTransaction.STClosed);
+            if (this.shopDB.insertSaleTransaction(saleTransaction.getEntries(), saleTransaction.getDiscountRate(), saleTransaction.getPrice()) != null) {
+                this.ezSaleTransactions.put(saleTransaction.getTicketNumber(), saleTransaction);
+                result = true;
+            }
+        }
+        return result;
     }
 
     /**
@@ -978,7 +1004,20 @@ public class EZShop implements EZShopInterface {
      */
     @Override
     public boolean deleteSaleTransaction(Integer saleNumber) throws InvalidTransactionIdException, UnauthorizedException {
-        return false;
+        EZSaleTransaction saleTransaction;
+        boolean result = false;
+        if (this.currUser == null || !this.currUser.hasRequiredRole("Administrator", "ShopManager", "Cashier"))
+            throw new UnauthorizedException();
+        if (saleNumber == null || saleNumber <= 0)
+            throw new InvalidTransactionIdException();
+        saleTransaction = (EZSaleTransaction) this.getSaleTransactionById(saleNumber);
+        if (saleTransaction != null && saleTransaction.hasRequiredStatus(EZSaleTransaction.STClosed)){
+            if (this.shopDB.deleteSaleTransaction(saleNumber)){ // try to remove the SaleTransaction from the DB
+                this.ezSaleTransactions.remove(saleNumber); // delete the SaleTransaction in the local collection
+                result = true;
+            }
+        }
+        return result;
     }
 
     /**
@@ -992,13 +1031,24 @@ public class EZShop implements EZShopInterface {
      * @throws InvalidTransactionIdException if the transaction id less than or equal to 0 or if it is null
      * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
      */
+    // TODO modify all methods where an opened saleTransaction is obtained by calling this method (it's an error)
     @Override
     public SaleTransaction getSaleTransaction(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
-        return null;
+        EZSaleTransaction saleTransaction = null;
+        if (this.currUser == null || !this.currUser.hasRequiredRole("Administrator", "ShopManager", "Cashier"))
+            throw new UnauthorizedException();
+        if (transactionId == null || transactionId <= 0)
+            throw new InvalidTransactionIdException();
+        saleTransaction = this.shopDB.selectAllSaleTransactions().get(transactionId); // TODO should I use getSaleTransactionById instead?
+        return saleTransaction;
     }
 
     public BalanceOperation getBalanceOpById(Integer balanceId) {
         return ezBalanceOperations.get(balanceId);
+    }
+
+    public EZSaleTransaction getSaleTransactionById(Integer saleNumber) {
+        return  ezSaleTransactions.get(saleNumber);
     }
 
     @Override

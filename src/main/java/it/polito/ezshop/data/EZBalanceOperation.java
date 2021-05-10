@@ -3,6 +3,9 @@ package it.polito.ezshop.data;
 import java.time.LocalDate;
 
 public class EZBalanceOperation implements BalanceOperation {
+    public static final String Credit = "CREDIT";
+    public static final String Debit = "DEBIT";
+
     private int balanceId;
     private LocalDate date;
     private double money;
