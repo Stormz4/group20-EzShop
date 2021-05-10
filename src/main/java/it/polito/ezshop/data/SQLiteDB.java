@@ -972,7 +972,7 @@ public class SQLiteDB {
         HashMap<Integer, EZSaleTransaction> saleTransactions = new HashMap<>();
         String sql = "SELECT id, discountRate, price, status \n"
                    + "FROM Transactions \n"
-                   + "WHERE status <> OPENED;";
+                   + "WHERE status <> \"OPENED\";";
 
         try {
             Statement stmt  = this.dbConnection.createStatement();
@@ -1024,7 +1024,7 @@ public class SQLiteDB {
         String sql = "SELECT id, price, saleID, status \n"
                    + "FROM Transactions \n"
                    + "WHERE saleID IS NOT NULL \n"
-                   + "  AND status <> OPENED;";
+                   + "  AND status <> \"OPENED\";";
 
         try {
             Statement stmt  = this.dbConnection.createStatement();
