@@ -70,7 +70,6 @@ public class EZSaleTransaction implements SaleTransaction {
         this.price = price;
     }
 
-<<<<<<< src/main/java/it/polito/ezshop/data/EZSaleTransaction.java
     public String getStatus(){
         return this.status;
     }
@@ -98,7 +97,7 @@ public class EZSaleTransaction implements SaleTransaction {
     public void setAttachedCard(EZCard attachedCard) {
         this.attachedCard = attachedCard;
     }
-=======
+
     public List<EZReturnTransaction> getReturns() { return returns; }
 
     public void setReturns(List<EZReturnTransaction> returns) { this.returns = returns; }
@@ -116,6 +115,4 @@ public class EZSaleTransaction implements SaleTransaction {
     {
         this.price += toBeAdded;
     }
-
->>>>>>> src/main/java/it/polito/ezshop/data/EZSaleTransaction.java
 }

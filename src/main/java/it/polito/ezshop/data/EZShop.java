@@ -1358,7 +1358,7 @@ public class EZShop implements EZShopInterface {
             throw new InvalidTransactionIdException();
         saleTransaction = (EZSaleTransaction) this.getSaleTransactionById(saleNumber);
         if (saleTransaction != null && saleTransaction.hasRequiredStatus(EZSaleTransaction.STClosed)){
-            if (this.shopDB.deleteSaleTransaction(saleNumber)){ // try to remove the SaleTransaction from the DB
+            if (this.shopDB.deleteTransaction(saleNumber)){ // try to remove the SaleTransaction from the DB
                 this.ezSaleTransactions.remove(saleNumber); // delete the SaleTransaction in the local collection
                 result = true;
             }
@@ -1394,10 +1394,6 @@ public class EZShop implements EZShopInterface {
     public BalanceOperation getBalanceOpById(Integer balanceId) {
         return ezBalanceOperations.get(balanceId);
     } // serve???
-
-    public EZSaleTransaction getSaleTransactionById(Integer saleNumber) {
-        return  ezSaleTransactions.get(saleNumber);
-    }
 
     public EZSaleTransaction getSaleTransactionById(Integer saleNumber) {
         /*
