@@ -2,7 +2,7 @@ package it.polito.ezshop.data;
 
 import it.polito.ezshop.exceptions.*;
 
-import it.polito.ezshop.utils.*;
+//import it.polito.ezshop.utils.*; //???
 
 import java.io.*;
 
@@ -1310,6 +1310,23 @@ public class EZShop implements EZShopInterface {
 
         return true;
     }
+
+public static void main(String[] args) {
+    try {
+        FileReader reader = new FileReader("MyFile.txt");
+        BufferedReader bufferedReader = new BufferedReader(reader);
+
+        String line;
+
+        while ((line = bufferedReader.readLine()) != null) {
+            System.out.println(line);
+        }
+        reader.close();
+
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
 
     @Override
     public double returnCashPayment(Integer returnId) throws InvalidTransactionIdException, UnauthorizedException {
