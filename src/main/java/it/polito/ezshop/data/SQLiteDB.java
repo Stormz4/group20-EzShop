@@ -75,7 +75,7 @@ public class SQLiteDB {
         this.createOrdersTable();
         this.createProductsPerSaleTable();
         this.createProductTypesTable();
-        this.createSaleTransactionsTable();
+        this.createTransactionsTable();
         this.createUsersTable();
     }
 
@@ -87,7 +87,7 @@ public class SQLiteDB {
         this.clearTable("Orders");
         this.clearTable("ProductsPerSale");
         this.clearTable("ProductTypes");
-        this.clearTable("SaleTransactions");
+        this.clearTable("Transactions");
         // this.clearTable("ReturnTransactions"); // TODO: need this?
 
         return true;
@@ -941,20 +941,20 @@ public class SQLiteDB {
 
 
     /** ---------------------------------------------------------------------------------------------------------------
-     ** Create a new SaleTransactions table
+     ** Create a new Transactions table
      ** EZSaleTransaction (Integer ticketNumber, List<TicketEntry> entries, double discountRate, double price)
      */
-    private void createSaleTransactionsTable() {
-        // SQL statement for creating a new SaleTransactions table
-        String sql = "CREATE TABLE IF NOT EXISTS SaleTransactions (\n"
+    private void createTransactionsTable() {
+        if (this.dbConnection == null)
+            return;
+
+        // SQL statement for creating a new Transactions table
+        String sql = "CREATE TABLE IF NOT EXISTS Transactions (\n"
                 + " id integer PRIMARY KEY,\n"
                 + " discountRate real,\n"
                 + " price real\n"
+                + " saleID integer\n"
                 + ");";
-
-        // TODO: Should handle this as an exception?
-        if (this.dbConnection == null)
-            return;
 
         try{
             Statement stmt = this.dbConnection.createStatement();
@@ -969,7 +969,7 @@ public class SQLiteDB {
      */
     public HashMap<Integer, EZSaleTransaction> selectAllSaleTransactions(){
         HashMap<Integer, EZSaleTransaction> saleTransactions = new HashMap<>();
-        String sql = "SELECT * FROM SaleTransactions";
+        String sql = "SELECT id, discountRate, price FROM Transactions";
 
         try {
             Statement stmt  = this.dbConnection.createStatement();
@@ -1013,6 +1013,56 @@ public class SQLiteDB {
     }
 
     /**
+     ** Select all ReturnTransactions records
+     */
+    public HashMap<Integer, EZReturnTransaction> selectAllReturnTransactions(){
+        HashMap<Integer, EZReturnTransaction> returnTransactions = new HashMap<>();
+        String sql = "SELECT id, price, saleID \n"
+                   + "FROM Transactions \n"
+                   + "WHERE saleID IS NOT NULL;";
+
+        try {
+            Statement stmt  = this.dbConnection.createStatement();
+            ResultSet rs1    = stmt.executeQuery(sql);
+
+            // loop through the result set
+            while (rs1.next()) {
+                Integer transactionID = rs1.getInt("id");
+                double price = rs1.getDouble("price");
+                int saleID = rs1.getInt("saleID");
+
+                // Internal query to retrieve ticketEntry (productPerSale)
+                LinkedList<TicketEntry> entries = new LinkedList<>();
+                String sql2 = "SELECT barCode, amount, discountRate, productDescription, pricePerUnit \n"
+                        + "FROM ProductsPerSale \n"
+                        + "INNER JOIN ProductTypes ON ProductsPerSale.barCode = ProductTypes.barCode \n"
+                        + "WHERE ProductsPerSale.id = ? ;";
+
+                PreparedStatement pstmt = this.dbConnection.prepareStatement(sql2);
+                pstmt.setInt(1, transactionID);
+                ResultSet rs2 = pstmt.executeQuery();
+
+                while (rs2.next()) {
+                    String barCode = rs2.getString("barCode");
+                    int amount = rs2.getInt("amount");
+                    double pDiscountRate = rs2.getDouble("discountRate");
+                    String productDescription = rs2.getString("productDescription");
+                    double pricePerUnit = rs2.getDouble("pricePerUnit");
+
+                    EZTicketEntry product = new EZTicketEntry(barCode, productDescription, amount, pricePerUnit, pDiscountRate);
+                    entries.add(product);
+                }
+
+                returnTransactions.put(transactionID, new EZReturnTransaction(transactionID, saleID, entries, price));
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return returnTransactions;
+    }
+
+    /**
      ** Insert new SaleTransaction record
      */
     public Integer insertSaleTransaction(List<TicketEntry> entries, double discountRate, double price) {
@@ -1020,7 +1070,7 @@ public class SQLiteDB {
             return defaultID;
 
         int transactionID = defaultID;
-        String sql = "INSERT INTO SaleTransactions(discountRate, price) \n"
+        String sql = "INSERT INTO Transactions(discountRate, price) \n"
                    + "VALUES(?,?);";
 
         try{
@@ -1030,38 +1080,67 @@ public class SQLiteDB {
             pstmt.executeUpdate();
 
             transactionID = this.lastInsertRowId();
+
+            // Save in DB all the entries of the sale
+            for (TicketEntry entry : entries)
+                this.insertProductPerSale(entry.getBarCode(), transactionID, entry.getAmount(), entry.getDiscountRate());
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-
-        // Save on DB all the entries of the sale
-        for (TicketEntry entry : entries)
-            this.insertProductPerSale(entry.getBarCode(), transactionID, entry.getAmount(), entry.getDiscountRate());
 
         return transactionID;
     }
 
     /**
-     ** Delete SaleTransaction record with given id
+     ** Insert new SaleTransaction record
      */
-    public boolean deleteSaleTransaction(Integer transactionID) {
+    public Integer insertReturnTransaction(List<TicketEntry> entries, int saleID, double price) {
+        if (this.dbConnection == null)
+            return defaultID;
+
+        int transactionID = defaultID;
+        String sql = "INSERT INTO Transactions(saleID, price) \n"
+                + "VALUES(?,?);";
+
+        try{
+            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            pstmt.setInt(1, saleID);
+            pstmt.setDouble(2, price);
+            pstmt.executeUpdate();
+
+            transactionID = this.lastInsertRowId();
+
+            // Save in DB all the entries of the sale
+            for (TicketEntry entry : entries)
+                this.insertProductPerSale(entry.getBarCode(), transactionID, entry.getAmount(), entry.getDiscountRate());
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return transactionID;
+    }
+
+    /**
+     ** Delete Transaction record with given id
+     */
+    public boolean deleteTransaction(Integer transactionID) {
         if (this.dbConnection == null || transactionID == null)
             return false;
 
         boolean deleted = false;
-        String sql = "DELETE FROM SaleTransactions WHERE id=?";
+        String sql = "DELETE FROM Transactions WHERE id=?";
 
         try{
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
             pstmt.setInt(1, transactionID);
             pstmt.executeUpdate();
             deleted = true;
+
+            // Delete all productPerSale relied to this transaction
+            this.deleteAllProductsPerSale(transactionID);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-
-        // Delete all productPerSale relied to this transaction
-        this.deleteAllProductsPerSale(transactionID);
 
         return deleted;
     }
@@ -1074,13 +1153,39 @@ public class SQLiteDB {
             return false;
 
         boolean updated = false;
-        String sql = "UPDATE SaleTransactions\n" +
+        String sql = "UPDATE Transactions\n" +
                      "SET discountRate = ?, price = ?\n" +
                      "WHERE id = ?;";
 
         try{
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
             pstmt.setDouble(1, discountRate);
+            pstmt.setDouble(2, price);
+            pstmt.setInt(3, transactionID);
+            pstmt.executeUpdate();
+            updated = true;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return updated;
+    }
+
+    /**
+     ** Update SaleTransaction record
+     */
+    public boolean updateReturnTransaction(Integer transactionID, int saleID, double price) {
+        if (this.dbConnection == null || transactionID == null)
+            return false;
+
+        boolean updated = false;
+        String sql = "UPDATE Transactions\n" +
+                     "SET discountRate = ?, price = ?\n" +
+                     "WHERE id = ?;";
+
+        try{
+            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            pstmt.setInt(1, saleID);
             pstmt.setDouble(2, price);
             pstmt.setInt(3, transactionID);
             pstmt.executeUpdate();
@@ -1109,7 +1214,7 @@ public class SQLiteDB {
                    + " discountRate real, \n"
                    + "CONSTRAINT PK_ProductPerSale PRIMARY KEY (barCode, transactionID), \n"
                    + "FOREIGN KEY(barCode) REFERENCES ProductTypes(barCode),  \n"
-                   + "FOREIGN KEY(transactionID) REFERENCES SaleTransactions(id) \n"
+                   + "FOREIGN KEY(transactionID) REFERENCES Transactions(id) \n"
                    + ");";
 
         try{
