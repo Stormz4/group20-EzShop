@@ -707,9 +707,9 @@ public class SQLiteDB {
     /**
      ** Select all Cards records
      */
-    public List<String> selectAllCards(){
-        List<String> cards = new LinkedList<>();
-        String sql = "SELECT id FROM Cards";
+    public HashMap<String, Integer> selectAllCards(){
+        HashMap<String, Integer> cards = new HashMap<>();
+        String sql = "SELECT * FROM Cards";
 
         try {
             Statement stmt  = this.dbConnection.createStatement();
@@ -719,7 +719,8 @@ public class SQLiteDB {
             while (rs.next()) {
                 Integer id = rs.getInt("id");
                 String strId = String.format("%10d", id);
-                cards.add(strId);
+                Integer points = rs.getInt("points");
+                cards.put(strId, points);
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());

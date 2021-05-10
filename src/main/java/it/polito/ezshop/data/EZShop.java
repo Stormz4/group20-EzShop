@@ -27,15 +27,13 @@ public class EZShop implements EZShopInterface {
     private final SQLiteDB shopDB = new SQLiteDB();
     private EZUser currUser = null;
 
+    private HashMap<String, Integer> ezCards;
     private HashMap<Integer, EZCustomer> ezCustomers;
-    private HashMap<Integer, EZUser> ezUsers;
-    private HashMap<Integer, EZProductType> ezProducts;
     private HashMap<Integer, EZOrder> ezOrders;
+    private HashMap<Integer, EZProductType> ezProducts;
+    private HashMap<Integer, EZUser> ezUsers;
     private EZReturnTransaction tmpRetTr;
     private int nextBalanceId;
-
-    // TODO verify is this map is needed
-    private List<String> ezCards;
 
     private EZAccountBook accountingBook;
     private HashMap<Integer, EZBalanceOperation> ezBalanceOperations;
@@ -803,7 +801,6 @@ public class EZShop implements EZShopInterface {
             if (deleted) {
                 customer.setCustomerCard("");
                 customer.setPoints(0);
-                ezCustomers.replace(id, customer);
             }
             return deleted;
             //if (customer.getCustomerCard() != null && !customer.getCustomerCard().isEmpty())
@@ -814,7 +811,9 @@ public class EZShop implements EZShopInterface {
         if (updated){
             customer.setCustomerName(newCustomerName);
             customer.setCustomerCard(newCustomerCard);
-            ezCustomers.replace(id, customer);
+
+            Integer points = this.ezCards.get(newCustomerCard);
+            customer.setPoints(points);
         }
 
         return updated;
@@ -882,6 +881,8 @@ public class EZShop implements EZShopInterface {
             throw new UnauthorizedException();
 
         String cardCode = shopDB.insertCard(defaultValue);
+        if (!cardCode.isEmpty())
+           this.ezCards.put(cardCode, defaultValue);
 
         return cardCode;
     }
@@ -969,13 +970,14 @@ public class EZShop implements EZShopInterface {
             if (customer.getCustomerCard().equals(customerCard)){
                 if ((pointsToBeAdded > 0) || (pointsToBeAdded < 0 && customer.getPoints() > Math.abs(pointsToBeAdded))){
                     // If i need to remove 50 points (pointsToBeAdded = -50), i must have points > abs(50).
-                    int p = customer.getPoints();
-                    customer.setPoints(pointsToBeAdded+p);
-                    boolean success = shopDB.updateCard(customerCard, customer.getPoints());
-                    if (success)
-                        ezCustomers.replace(customer.getPoints(), (EZCustomer) customer);
-                    return success;
+                    int newPoints = customer.getPoints() + pointsToBeAdded;
+                    if ( shopDB.updateCard(customerCard, newPoints) ) {
+                        customer.setPoints(newPoints);
+                        this.ezCards.replace(customerCard, newPoints);
+                    }
+                    return true;
                 }
+                return false;
             }
         }
         return false;
