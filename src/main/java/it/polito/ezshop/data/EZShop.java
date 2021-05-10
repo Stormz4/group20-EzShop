@@ -2,8 +2,6 @@ package it.polito.ezshop.data;
 
 import it.polito.ezshop.exceptions.*;
 
-//import it.polito.ezshop.utils.*; //???
-
 import java.io.*;
 
 import java.time.LocalDate;
@@ -23,6 +21,8 @@ import static it.polito.ezshop.data.SQLiteDB.defaultValue;
 
 public class EZShop implements EZShopInterface {
     final boolean USE_TEST_DB = false;
+
+    final static String creditCardsFile = "src/main/java/it/polito/ezshop/utils/CreditCards.txt";
 
     private final SQLiteDB shopDB = new SQLiteDB();
     private EZUser currUser = null;
@@ -278,6 +278,31 @@ public class EZShop implements EZShopInterface {
 
         return false;
     }
+
+
+    /*
+
+    Some valid barCodes (12 digits):
+    1345334543427
+    4532344529689
+    5839274928315
+    4838283913450
+    4778293942845
+    8397489193845
+    1627482847283
+    3738456849238
+    4482847392351
+    7293829484929
+    4738294729395
+    4627828478338
+    4892937849335
+    4839947221225
+    1881930382935
+    4908382312833
+    2141513141144
+
+    */
+
 
     @Override
     public Integer createProductType(String description, String productCode, double pricePerUnit, String note) throws InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException {
@@ -1297,36 +1322,100 @@ public class EZShop implements EZShopInterface {
 
         if(creditCard == null || !verifyByLuhnAlgo(creditCard) || creditCard.equals("")) throw new InvalidCreditCardException();
 
-        /*if(sale == null ||
-            getCreditCardFromTXT(ticketNumber) == null ||
-            !verifyCreditCardBalance(ticketNumber, creditCard))
-            return false;*/
+        if(sale == null ||
+                getCreditInTXTbyCardNumber(creditCard) == -1 ||
+                !isValidCreditCard(creditCard))
+            return false;
 
-        // todo: keep money from credit card (from txt/JSON (?))
+        double cardBalance = getCreditInTXTbyCardNumber(ticketNumber.toString());
 
+        if(cardBalance < (sale.getPrice() * sale.getDiscountRate()))
+            return false; // return false if there aren't enough money in the selected credit card
 
         if(!recordBalanceUpdate(sale.getPrice()))
             return false; // return false if DB connection problems occur
 
+        if(!updateCreditInTXTbyCardNumber(creditCard, -(sale.getPrice() * (1 - sale.getDiscountRate()))))
+            return false;
+
         return true;
     }
 
-public static void main(String[] args) {
-    try {
-        FileReader reader = new FileReader("MyFile.txt");
-        BufferedReader bufferedReader = new BufferedReader(reader);
-
-        String line;
-
-        while ((line = bufferedReader.readLine()) != null) {
-            System.out.println(line);
-        }
-        reader.close();
-
-    } catch (IOException e) {
-        e.printStackTrace();
+    public static boolean isValidCreditCard(String cardNumber)
+    {
+        return cardNumber.matches("^(?:4[0-9]{12}(?:[0-9]{3})?|[25][1-7][0-9]{14}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\\d{3})\\d{11})$");
     }
-}
+
+    public static double getCreditInTXTbyCardNumber(String cardNumber)
+    {
+        double cardBalance = -1;
+
+        try {
+            FileReader reader = new FileReader(creditCardsFile);
+            BufferedReader bufferedReader = new BufferedReader(reader);
+
+            String line;
+
+            while ((line = bufferedReader.readLine()) != null) {
+                if(line.matches(cardNumber+" [0-9]*.[0-9]*"))
+                {
+                    if(!isValidCreditCard(cardNumber))
+                        return -1;
+                    String creditAsString = line.split(" ")[1];
+                    cardBalance = Double.parseDouble(creditAsString);
+                    break;
+                }
+            }
+            reader.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return cardBalance;
+    }
+
+    public static boolean updateCreditInTXTbyCardNumber(String cardNumber, double toBeAdded) {
+        Double cardBalance;
+
+        try {
+            FileReader reader = new FileReader(creditCardsFile);
+            BufferedReader bufferedReader = new BufferedReader(reader);
+            // input the (modified) file content to the StringBuffer "input"
+            BufferedReader file = new BufferedReader(new FileReader(creditCardsFile));
+            StringBuffer inputBuffer = new StringBuffer();
+            String line, newLine, newValue;
+
+            while ((line = file.readLine()) != null) {
+                if(line.matches(cardNumber+" [0-9]*.[0-9]*"))
+                {
+                    if(!isValidCreditCard(cardNumber))
+                        return false;
+
+                    String creditAsString = line.split(" ")[1];
+                    cardBalance = Double.parseDouble(creditAsString);
+
+                    cardBalance += toBeAdded;
+                    newValue = cardBalance.toString();
+
+                    newLine = line.split(" ")[0] + newValue;
+                    inputBuffer.append(newLine);
+                    inputBuffer.append('\n');
+                    break;
+                }
+            }
+            file.close();
+
+            // write the new string with the replaced line OVER the same file
+            FileOutputStream fileOut = new FileOutputStream(creditCardsFile);
+            fileOut.write(inputBuffer.toString().getBytes());
+            fileOut.close();
+
+        } catch (Exception e) {
+            System.out.println("Problem reading file.");
+        }
+        return true;
+    }
 
     @Override
     public double returnCashPayment(Integer returnId) throws InvalidTransactionIdException, UnauthorizedException {
@@ -1365,14 +1454,16 @@ public static void main(String[] args) {
         if(retTr == null) return -1;
         if(!retTr.getStatus().equals(RTClosed)) return -1;
 
-        //if(getCreditCardFromTXT(ticketNumber) == null) return -1;
+        if(getCreditInTXTbyCardNumber(creditCard) == -1 || !isValidCreditCard(creditCard))
+            return -1;
 
         double returnedMoney = retTr.getReturnedValue();
 
         if(!recordBalanceUpdate(-returnedMoney))
             return -1; // return -1 if DB connection problems occur
 
-        // todo: give money to credit card
+        if(!updateCreditInTXTbyCardNumber(creditCard, +(retTr.getReturnedValue())))
+            return -1;
 
         return returnedMoney;
     }
