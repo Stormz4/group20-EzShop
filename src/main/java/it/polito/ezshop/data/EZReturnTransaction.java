@@ -1,27 +1,38 @@
 package it.polito.ezshop.data;
 
-import java.time.LocalDate;
-import java.util.HashMap;
+import java.util.List;
 
-public class EZReturnTransaction extends EZBalanceOperation{
-    private int quantity;
-    private double returnedValue;
-    private boolean isClosed;
-    private ProductType returnedProduct;
-    private String status; //PAYED, ... ???
+public class EZReturnTransaction{
+    public static final String RTOpened = "OPENED";
+    public static final String RTClosed = "CLOSED";
+    public static final String RTPayed = "PAYED";
 
-    public EZReturnTransaction(int balanceId, LocalDate date, double money, String type)
-    {   // 'type' shouldn't be of type "BalanceOpTypeEnum" ???
-        super(balanceId, date, money, type);
+    private Integer returnId;
+    private double returnedValue; //   > 0
+    private Integer saleTransactionId;
+    private List<TicketEntry> entries;
+    //private boolean isPayed;
+    //private boolean isClosed;
+    private String status;
+
+    public EZReturnTransaction(Integer returnId, Integer saleTransactionId, List<TicketEntry> entries, double returnedValue) {
+        this.returnId = returnId;
+        this.saleTransactionId = saleTransactionId;
+        this.returnedValue = 0;
+        this.status = RTOpened;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public EZReturnTransaction(EZReturnTransaction tmpRetTr) { // necessary??? (used to copy object)
+        this.returnId = tmpRetTr.returnId;
+        this.saleTransactionId = tmpRetTr.saleTransactionId;
+        this.returnedValue = tmpRetTr.returnedValue;
+        this.entries = tmpRetTr.entries;
+        this.status = tmpRetTr.status;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
+    public Integer getReturnId() { return returnId; }
+
+    public void setReturnId(Integer returnId) { this.returnId = returnId; }
 
     public double getReturnedValue() {
         return returnedValue;
@@ -31,19 +42,19 @@ public class EZReturnTransaction extends EZBalanceOperation{
         this.returnedValue = returnedValue;
     }
 
-    public boolean isClosed() {
-        return isClosed;
+    public void updateReturnedValue(double toBeAdded) {
+        this.returnedValue += toBeAdded;
     }
 
-    public void setClosed(boolean closed) {
-        isClosed = closed;
-    }
+    public Integer getItsSaleTransactionId() { return saleTransactionId; }
 
-    public ProductType getReturnedProduct() {
-        return returnedProduct;
-    }
+    public void setItsSaleTransactionId(Integer itsSaleTransactionId) { this.saleTransactionId = itsSaleTransactionId; }
 
-    public void setReturnedProduct(ProductType returnedProduct) {
-        this.returnedProduct = returnedProduct;
-    }
+    public List<TicketEntry> getEntries() { return entries; }
+
+    public void setEntries(List<TicketEntry> entries) { this.entries = entries; }
+
+    public String getStatus() { return status; }
+
+    public void setStatus(String status) { this.status = status; }
 }

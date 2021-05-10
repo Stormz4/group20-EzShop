@@ -11,6 +11,7 @@ public class EZSaleTransaction implements SaleTransaction {
     private List<TicketEntry> entries;
     private double discountRate;
     private double price;
+    private List<EZReturnTransaction> returns;
     private String status; //accepted values: "OPENED", "CLOSED", "PAYED"
     private EZCard attachedCard;
 
@@ -69,6 +70,7 @@ public class EZSaleTransaction implements SaleTransaction {
         this.price = price;
     }
 
+<<<<<<< src/main/java/it/polito/ezshop/data/EZSaleTransaction.java
     public String getStatus(){
         return this.status;
     }
@@ -96,4 +98,24 @@ public class EZSaleTransaction implements SaleTransaction {
     public void setAttachedCard(EZCard attachedCard) {
         this.attachedCard = attachedCard;
     }
+=======
+    public List<EZReturnTransaction> getReturns() { return returns; }
+
+    public void setReturns(List<EZReturnTransaction> returns) { this.returns = returns; }
+
+    public EZTicketEntry getTicketEntryByBarCode(String barCode)
+    {
+        for (TicketEntry entry : entries) {
+            if (entry.getBarCode().equals(barCode))
+                return (EZTicketEntry) entry;
+        }
+        return null;
+    }
+
+    public void updatePrice(double toBeAdded)
+    {
+        this.price += toBeAdded;
+    }
+
+>>>>>>> src/main/java/it/polito/ezshop/data/EZSaleTransaction.java
 }
