@@ -3,17 +3,31 @@ package it.polito.ezshop.data;
 import java.util.List;
 
 public class EZSaleTransaction implements SaleTransaction {
+    public static final String STOpened = "OPENED";
+    public static final String STClosed = "CLOSED";
+    public static final String STPayed = "PAYED";
+
     private Integer ticketNumber;
     private List<TicketEntry> entries;
     private double discountRate;
     private double price;
     private List<EZReturnTransaction> returns;
+    private String status; //accepted values: "OPENED", "CLOSED", "PAYED"
+    private EZCard attachedCard;
+
+    public EZSaleTransaction (Integer ticketNumber){
+        this.ticketNumber = ticketNumber;
+        this.status = EZSaleTransaction.STOpened;
+        this.attachedCard = null;
+    }
 
     public EZSaleTransaction (Integer ticketNumber, List<TicketEntry> entries, double discountRate, double price) {
         this.ticketNumber = ticketNumber;
         this.entries = entries;
         this.discountRate = discountRate;
         this.price = price;
+        this.status = EZSaleTransaction.STOpened;
+        this.attachedCard = null;
     }
 
     @Override
@@ -56,6 +70,35 @@ public class EZSaleTransaction implements SaleTransaction {
         this.price = price;
     }
 
+<<<<<<< src/main/java/it/polito/ezshop/data/EZSaleTransaction.java
+    public String getStatus(){
+        return this.status;
+    }
+
+    public void setStatus(String status){
+        this.status = status;
+    }
+
+    public boolean hasRequiredStatus(String ...requiredStatus) {
+        if (requiredStatus == null)
+            return false;
+
+        for (String role : requiredStatus ) {
+            if (role.equals(this.status))
+                return true;
+        }
+
+        return false;
+    }
+
+    public EZCard getAttachedCard() {
+        return this.attachedCard;
+    }
+
+    public void setAttachedCard(EZCard attachedCard) {
+        this.attachedCard = attachedCard;
+    }
+=======
     public List<EZReturnTransaction> getReturns() { return returns; }
 
     public void setReturns(List<EZReturnTransaction> returns) { this.returns = returns; }
@@ -74,4 +117,5 @@ public class EZSaleTransaction implements SaleTransaction {
         this.price += toBeAdded;
     }
 
+>>>>>>> src/main/java/it/polito/ezshop/data/EZSaleTransaction.java
 }
