@@ -2,18 +2,19 @@ package it.polito.ezshop.data;
 
 import it.polito.ezshop.exceptions.*;
 
-//import it.polito.ezshop.creditCards.*;
+import it.polito.ezshop.utils.*;
+
+import java.io.*;
 
 import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.HashMap;
-import java.util.Collections;
 import java.util.List;
 import java.lang.Math;
 import java.util.stream.Collectors;
 
-import static it.polito.ezshop.data.EZBalanceOperation.Credit;
-import static it.polito.ezshop.data.EZBalanceOperation.Debit;
+import static it.polito.ezshop.data.EZBalanceOperation.*;
+import static it.polito.ezshop.data.EZReturnTransaction.*;
 import static it.polito.ezshop.data.EZOrder.*;
 import static it.polito.ezshop.data.EZUser.*;
 import static it.polito.ezshop.data.SQLiteDB.defaultID;
@@ -31,6 +32,7 @@ public class EZShop implements EZShopInterface {
     private HashMap<Integer, EZProductType> ezProducts;
     private HashMap<Integer, EZOrder> ezOrders;
     private EZReturnTransaction tmpRetTr;
+    private int nextBalanceId;
 
     // TODO verify is this map is needed
     private List<String> ezCards;
@@ -519,6 +521,10 @@ public class EZShop implements EZShopInterface {
             throw new UnauthorizedException();
         }
 
+        List<ProductType> pl = getAllProductTypes().stream().filter(p -> p.getBarCode().equals(productCode)).collect(Collectors.toList());
+        if(pl.size() != 1)
+            return -1;
+
         if (this.ezOrders == null)
             this.ezOrders = this.shopDB.selectAllOrders();
 
@@ -569,7 +575,25 @@ public class EZShop implements EZShopInterface {
             throw new UnauthorizedException();
         }
 
-        return null;
+        List<ProductType> pl = getAllProductTypes().stream().filter(p -> p.getBarCode().equals(productCode)).collect(Collectors.toList());
+        if(pl.size() != 1)
+            return -1;
+
+        if(pricePerUnit*quantity > accountingBook.currentBalance)
+            return -1;
+
+        LocalDate time = LocalDate.now();
+
+        // issue new order:
+        int id = issueOrder(productCode, quantity, pricePerUnit);
+        EZOrder order = ezOrders.get(id);
+
+        if(!recordBalanceUpdate(-pricePerUnit*quantity))
+            return -1;
+
+        shopDB.updateOrder(order.getOrderId(), nextBalanceId, productCode, pricePerUnit, quantity, OSPayed); //todo: to be fixed ???
+
+        return order.getOrderId();
     }
 
     /**
@@ -595,8 +619,20 @@ public class EZShop implements EZShopInterface {
             throw new UnauthorizedException();
         }
 
+        EZOrder order = ezOrders.get(orderId);
 
-        return false;
+        if(order == null || !(order.getStatus().equals(OSIssued)))
+            return false;
+
+        if(!order.getStatus().equals(OSPayed))
+        {
+            if(!recordBalanceUpdate(-(order.getPricePerUnit() * order.getQuantity())))
+                return false;
+
+            shopDB.updateOrder(order.getOrderId(), nextBalanceId, order.getProductCode(), order.getPricePerUnit(), order.getQuantity(), OSPayed); //todo: to be fixed ???
+        }
+
+        return true;
     }
 
     /**
@@ -620,13 +656,42 @@ public class EZShop implements EZShopInterface {
         if (orderId == null || orderId <=0)
             throw new InvalidOrderIdException();
 
-        // TODO InvalidLocationException if the ordered product type has not an assigned location.
+        EZOrder order = ezOrders.get(orderId);
+
+        if(order == null || !(order.getStatus().equals(OSIssued) || order.getStatus().equals(OSCompleted)))
+            return false;
 
         if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
             throw new UnauthorizedException();
         }
 
-        return false;
+        EZProductType prod = null;
+        for(EZProductType product : ezProducts.values())
+        {
+            if(product.getBarCode().equals(order.getProductCode()))
+            {
+                prod = product;
+                break;
+            }
+        }
+        assert prod != null; //???
+        if(prod.getLocation() == null)
+            throw new InvalidLocationException();
+
+        if(!order.getStatus().equals(OSCompleted))
+        {
+           if(!shopDB.updateOrder(order.getOrderId(), order.getBalanceId(), order.getProductCode(), order.getPricePerUnit(),
+                   order.getQuantity(), OSCompleted))
+               return false;
+           order.setStatus(OSCompleted);
+
+           if(!shopDB.updateProductType(prod.getId(), prod.getQuantity()+order.getQuantity(), prod.getLocation(),
+                   prod.getNote(), prod.getProductDescription(), prod.getBarCode(), prod.getPricePerUnit()))
+               return false;
+           prod.editQuantity(order.getQuantity());
+        }
+
+        return true;
     }
 
     @Override
@@ -973,15 +1038,15 @@ public class EZShop implements EZShopInterface {
         EZSaleTransaction sale = getSaleTransactionById(saleNumber);
 
         if(sale == null)
-            return -1;
+            return defaultID;
 
         if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier) )
             throw new UnauthorizedException();
 
-        EZReturnTransaction retTr = new EZReturnTransaction(defaultID, saleNumber);
-        //todo://int id = shopDB.insertReturnTransaction(saleNumber, others null parameters...);
-        //if(id == -1) return -1;
-        //retTr.setReturnId(id);
+        EZReturnTransaction retTr = new EZReturnTransaction(defaultID, saleNumber, null, defaultValue);
+        int id = shopDB.insertReturnTransaction(null, saleNumber, defaultValue);
+        if(id == -1) return -1;
+        retTr.setReturnId(id);
         tmpRetTr = retTr;
         // return transaction is inserted in the proper lists only in endReturnTransaction() method (if commit == true)
         return retTr.getReturnId();
@@ -1036,7 +1101,7 @@ public class EZShop implements EZShopInterface {
 
         if(returnId == null || returnId <= 0) throw new InvalidTransactionIdException();
 
-        if(tmpRetTr == null || tmpRetTr.isClosed())
+        if(tmpRetTr == null || tmpRetTr.getStatus().equals(RTClosed))
             return false;
 
         if(commit)
@@ -1083,7 +1148,10 @@ public class EZShop implements EZShopInterface {
                 /*if(*/shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), sale.getPrice()-ezticket.getTotal());//== false) return false;
                 getSaleTransactionById(tmpRetTr.getItsSaleTransactionId()).updatePrice(-ezticket.getTotal()); //update final price of sale transaction
             }
-            retToBeStored.setClosed(true);
+            retToBeStored.setStatus(RTClosed);
+            // update ReturnTransaction in DB:
+            if(!shopDB.updateReturnTransaction(retToBeStored.getReturnId(), retToBeStored.getItsSaleTransactionId(), retToBeStored.getReturnedValue()))
+                return false;
             // clear the temporary transaction:
             tmpRetTr = null;
         }
@@ -1098,7 +1166,8 @@ public class EZShop implements EZShopInterface {
                     //return false;
             }
 
-            //todo://deleteReturnTransaction(...) from DB
+            if(!shopDB.deleteTransaction(tmpRetTr.getReturnId()))
+                return false;
 
             //clear the temporary transaction:
             tmpRetTr = null;
@@ -1119,7 +1188,7 @@ public class EZShop implements EZShopInterface {
 
         if(retTr == null) return false;
 
-        if(retTr.isPayed() || !retTr.isClosed()) return false;
+        if(retTr.getStatus().equals(RTPayed) || !(retTr.getStatus().equals(RTClosed))) return false;
 
         /* "This method deletes a CLOSED (but not PAYED) return transaction. It affects the quantity of product sold in
          the connected sale transaction (and consequently its price) and the quantity of product available on the shelves." */
@@ -1140,12 +1209,11 @@ public class EZShop implements EZShopInterface {
                 }
             }
 
-            assert product != null;
+            assert product != null; //???
             // re-update (decrease) quantity on the shelves
             if(!shopDB.updateProductType(product.getId(), product.getQuantity()-ezticket.getAmount(), product.getLocation(),
                 product.getNote(), product.getProductDescription(), product.getBarCode(), product.getPricePerUnit()))
                 return false;
-            //todo //updateQuantity(product.getId(), -ezticket.getAmount());
             product.editQuantity(-ezticket.getAmount());
 
             // re-update (increase) number of sold products (in related sale transaction)
@@ -1169,9 +1237,8 @@ public class EZShop implements EZShopInterface {
         // remove ReturnTransaction from return transactions list
         ezReturnTransactions.remove(retTr.getReturnId(), retTr); // todo: verify if it is possible to use this type of remove
 
-
-        // todo: delete return transaction with ID == returnId from DB
-        // if(problems with DB) return false;
+        if(!shopDB.deleteTransaction(retTr.getReturnId()))
+            return false;
 
         return true;
     }
@@ -1235,7 +1302,9 @@ public class EZShop implements EZShopInterface {
             !verifyCreditCardBalance(ticketNumber, creditCard))
             return false;*/
 
-        // todo: keep money from credit card (from txt (?))
+        // todo: keep money from credit card (from txt/JSON (?))
+
+
         if(!recordBalanceUpdate(sale.getPrice()))
             return false; // return false if DB connection problems occur
 
@@ -1254,7 +1323,7 @@ public class EZShop implements EZShopInterface {
 
         if(retTr == null) return -1;
 
-        if(!retTr.isClosed()) return -1;
+        if(!retTr.getStatus().equals(RTClosed)) return -1;
 
         double returnedMoney = retTr.getReturnedValue();
 
@@ -1277,7 +1346,7 @@ public class EZShop implements EZShopInterface {
         EZReturnTransaction retTr = getReturnTransactionById(returnId);
 
         if(retTr == null) return -1;
-        if(!retTr.isClosed()) return -1;
+        if(!retTr.getStatus().equals(RTClosed)) return -1;
 
         //if(getCreditCardFromTXT(ticketNumber) == null) return -1;
 
@@ -1296,26 +1365,25 @@ public class EZShop implements EZShopInterface {
         if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager) )
             throw new UnauthorizedException();
 
+        String type;
+
         if(toBeAdded >= 0)
-        {
-            // create new balance operation
-            EZBalanceOperation op = new EZBalanceOperation(defaultID, LocalDate.now(), toBeAdded, Credit);
-            int id = shopDB.insertBalanceOperation(LocalDate.now(), toBeAdded, Credit);
-            if(id == -1) return false; //return false if DB connection problem occurs
-            op.setBalanceId(id);
-
-            // should do anything else???
-        }
+            type = Credit;
         else
-        {
-            // create new balance operation
-            EZBalanceOperation op = new EZBalanceOperation(defaultID, LocalDate.now(), toBeAdded, Debit);
-            int id = shopDB.insertBalanceOperation(LocalDate.now(), toBeAdded, Debit);
-            if(id == -1) return false; //return false if DB connection problem occurs
-            op.setBalanceId(id);
+            type = Debit;
 
-            // should do anything else???
-        }
+        LocalDate time = LocalDate.now();
+        // create new balance operation
+        EZBalanceOperation op = new EZBalanceOperation(defaultID, time, toBeAdded, type);
+        int id = shopDB.insertBalanceOperation(time, toBeAdded, type);
+        if(id == -1) return false; //return false if DB connection problem occurs
+        op.setBalanceId(id);
+        ezBalanceOperations.put(op.getBalanceId(), op);
+        nextBalanceId = op.getBalanceId(); // used to pay orders ???
+
+        accountingBook.updateBalance(toBeAdded);
+
+        // should do anything else???
 
         return !((toBeAdded + accountingBook.currentBalance) < 0);
     }

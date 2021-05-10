@@ -6,6 +6,8 @@ public class EZBalanceOperation implements BalanceOperation {
     public static final String Credit = "CREDIT";
     public static final String Debit = "DEBIT";
 
+    public static final int tmpBalanceId = -1;
+
     private int balanceId;
     private LocalDate date;
     private double money;

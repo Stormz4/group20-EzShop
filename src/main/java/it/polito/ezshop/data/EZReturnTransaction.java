@@ -3,28 +3,31 @@ package it.polito.ezshop.data;
 import java.util.List;
 
 public class EZReturnTransaction{
+    public static final String RTOpened = "OPENED";
+    public static final String RTClosed = "CLOSED";
+    public static final String RTPayed = "PAYED";
+
     private Integer returnId;
     private double returnedValue; //   > 0
-    private Integer itsSaleTransactionId;
+    private Integer saleTransactionId;
     private List<TicketEntry> entries;
-    private boolean isPayed;
-    private boolean isClosed;
+    //private boolean isPayed;
+    //private boolean isClosed;
+    private String status;
 
-    public EZReturnTransaction(Integer returnId, Integer itsSaleTransactionId) {
+    public EZReturnTransaction(Integer returnId, Integer saleTransactionId, List<TicketEntry> entries, double returnedValue) {
         this.returnId = returnId;
-        this.itsSaleTransactionId = itsSaleTransactionId;
+        this.saleTransactionId = saleTransactionId;
         this.returnedValue = 0;
-        this.isPayed = false;
-        this.isClosed = false;
+        this.status = RTOpened;
     }
 
-    public EZReturnTransaction(EZReturnTransaction tmpRetTr) { // necessary???
+    public EZReturnTransaction(EZReturnTransaction tmpRetTr) { // necessary??? (used to copy object)
         this.returnId = tmpRetTr.returnId;
-        this.itsSaleTransactionId = tmpRetTr.itsSaleTransactionId;
+        this.saleTransactionId = tmpRetTr.saleTransactionId;
         this.returnedValue = tmpRetTr.returnedValue;
         this.entries = tmpRetTr.entries;
-        this.isPayed = tmpRetTr.isPayed;
-        this.isClosed = tmpRetTr.isClosed;
+        this.status = tmpRetTr.status;
     }
 
     public Integer getReturnId() { return returnId; }
@@ -43,19 +46,15 @@ public class EZReturnTransaction{
         this.returnedValue += toBeAdded;
     }
 
-    public Integer getItsSaleTransactionId() { return itsSaleTransactionId; }
+    public Integer getItsSaleTransactionId() { return saleTransactionId; }
 
-    public void setItsSaleTransactionId(Integer itsSaleTransactionId) { this.itsSaleTransactionId = itsSaleTransactionId; }
-
-    public boolean isPayed() { return isPayed; }
-
-    public void setPayed(boolean payed) { isPayed = payed; }
-
-    public boolean isClosed() { return isClosed; }
-
-    public void setClosed(boolean closed) { isClosed = closed; }
+    public void setItsSaleTransactionId(Integer itsSaleTransactionId) { this.saleTransactionId = itsSaleTransactionId; }
 
     public List<TicketEntry> getEntries() { return entries; }
 
     public void setEntries(List<TicketEntry> entries) { this.entries = entries; }
+
+    public String getStatus() { return status; }
+
+    public void setStatus(String status) { this.status = status; }
 }
