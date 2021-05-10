@@ -16,7 +16,7 @@ public class EZSaleTransaction implements SaleTransaction {
 
     public EZSaleTransaction (Integer ticketNumber){
         this.ticketNumber = ticketNumber;
-        this.status = "open";
+        this.status = EZSaleTransaction.STOpened;
         this.attachedCard = null;
     }
 
