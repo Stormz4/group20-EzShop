@@ -22,7 +22,7 @@ import static it.polito.ezshop.data.SQLiteDB.defaultValue;
 
 
 public class EZShop implements EZShopInterface {
-    final boolean USE_TEST_DB = false;
+    final boolean USE_TEST_DB = true;
 
     private final SQLiteDB shopDB = new SQLiteDB();
     private EZUser currUser = null;
@@ -1058,7 +1058,8 @@ public class EZShop implements EZShopInterface {
                     ticketEntryToAdd = new EZTicketEntry(productCode, scannedProduct.getProductDescription(), amount, scannedProduct.getPricePerUnit(), 0);
                     if(this.shopDB.insertProductPerSale(productCode, currentSaleTransaction.getTicketNumber(), amount, 0)) {
                         currentSaleTransaction.getEntries().add(ticketEntryToAdd);
-                        if(this.shopDB.updateSaleTransaction(currentSaleTransaction.getTicketNumber(), 0, currentSaleTransaction.getPrice() + scannedProduct.getPricePerUnit() * amount)) {
+                        double newPrice = currentSaleTransaction.getPrice() + scannedProduct.getPricePerUnit() * amount;
+                        if(this.shopDB.updateSaleTransaction(currentSaleTransaction.getTicketNumber(), 0, newPrice, currentSaleTransaction.getStatus())) {
                             currentSaleTransaction.setPrice(currentSaleTransaction.getPrice() + scannedProduct.getPricePerUnit() * amount); // update total price
                             result = true;
                         }
@@ -1152,13 +1153,15 @@ public class EZShop implements EZShopInterface {
                         }
                     }
                     if (result) {
-                        if (this.shopDB.updateSaleTransaction(transactionId, saleTransaction.getDiscountRate(), saleTransaction.getPrice() - productToRemove.getPricePerUnit()*amount)){
+                        double newPrice = saleTransaction.getPrice() - productToRemove.getPricePerUnit()*amount;
+                        if (this.shopDB.updateSaleTransaction(transactionId, saleTransaction.getDiscountRate(), newPrice, saleTransaction.getStatus())){
                             saleTransaction.setPrice(saleTransaction.getPrice() - productToRemove.getPricePerUnit()*amount); // update total price
                             if (this.updateQuantity(productToRemove.getId(), amount)) {
                                 result = true;
                             }
                             else { // rollback
-                                this.shopDB.updateSaleTransaction(transactionId, saleTransaction.getDiscountRate(), saleTransaction.getPrice() + productToRemove.getPricePerUnit()*amount);
+                                double oldPrice = saleTransaction.getPrice() + productToRemove.getPricePerUnit()*amount;
+                                this.shopDB.updateSaleTransaction(transactionId, saleTransaction.getDiscountRate(), oldPrice, saleTransaction.getStatus());
                                 saleTransaction.setPrice(saleTransaction.getPrice() + productToRemove.getPricePerUnit()*amount);
                                 if (ticketToUpdate.getAmount() == amount) {
                                     this.shopDB.insertProductPerSale(productCode, transactionId, amount, ticketToUpdate.getDiscountRate());
@@ -1334,20 +1337,6 @@ public class EZShop implements EZShopInterface {
         return result;
     }
 
-    /**
-     * This method deletes a sale transaction with given unique identifier from the system's data store.
-     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
-     *
-     * @param transactionId the number of the transaction to be deleted
-     *
-     * @return  true if the transaction has been successfully deleted,
-     *          false   if the transaction doesn't exist,
-     *                  if it has been payed,
-     *                  if there are some problems with the db
-     *
-     * @throws InvalidTransactionIdException if the transaction id number is less than or equal to 0 or if it is null
-     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
-     */
     @Override
     public boolean deleteSaleTransaction(Integer saleNumber) throws InvalidTransactionIdException, UnauthorizedException {
         EZSaleTransaction saleTransaction;
@@ -1421,8 +1410,8 @@ public class EZShop implements EZShopInterface {
         if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier) )
             throw new UnauthorizedException();
 
-        EZReturnTransaction retTr = new EZReturnTransaction(defaultID, saleNumber, null, defaultValue);
-        int id = shopDB.insertReturnTransaction(null, saleNumber, defaultValue);
+        EZReturnTransaction retTr = new EZReturnTransaction(defaultID, saleNumber, null, defaultValue, RTOpened);
+        int id = shopDB.insertReturnTransaction(null, saleNumber, defaultValue, RTOpened);
         if(id == -1) return -1;
         retTr.setReturnId(id);
         tmpRetTr = retTr;
@@ -1451,7 +1440,7 @@ public class EZShop implements EZShopInterface {
         if(product == null)
             return false;
 
-        EZSaleTransaction sale = getSaleTransactionById(tmpRetTr.getItsSaleTransactionId());
+        EZSaleTransaction sale = getSaleTransactionById(tmpRetTr.getSaleTransactionId());
         if(sale == null)
             return false;
 
@@ -1484,7 +1473,7 @@ public class EZShop implements EZShopInterface {
 
         if(commit)
         {
-            EZSaleTransaction sale = getSaleTransactionById(tmpRetTr.getItsSaleTransactionId());
+            EZSaleTransaction sale = getSaleTransactionById(tmpRetTr.getSaleTransactionId());
 
             EZReturnTransaction retToBeStored = new EZReturnTransaction(tmpRetTr); //copy the temporary return transaction
 
@@ -1516,19 +1505,20 @@ public class EZShop implements EZShopInterface {
                 product.editQuantity(+ezticket.getAmount());//re-place products on shelves
 
                 // update (decrease) number of sold products (in related sale transaction)
-                EZTicketEntry oldSaleTicket = getSaleTransactionById(tmpRetTr.getItsSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode());
+                EZTicketEntry oldSaleTicket = getSaleTransactionById(tmpRetTr.getSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode());
                 if(shopDB.updateProductPerSale(product.getBarCode(), sale.getTicketNumber(), oldSaleTicket.getAmount()-ezticket.getAmount(), oldSaleTicket.getDiscountRate()))
                     return false;
-                getSaleTransactionById(tmpRetTr.getItsSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode()).updateAmount(-ezticket.getAmount()) ;
+                getSaleTransactionById(tmpRetTr.getSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode()).updateAmount(-ezticket.getAmount()) ;
 
 
                 // update (decrease) final price of related sale transaction
-                /*if(*/shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), sale.getPrice()-ezticket.getTotal());//== false) return false;
-                getSaleTransactionById(tmpRetTr.getItsSaleTransactionId()).updatePrice(-ezticket.getTotal()); //update final price of sale transaction
+                double newPrice = sale.getPrice()-ezticket.getTotal();
+                /*if(*/shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), newPrice, sale.getStatus());//== false) return false;
+                getSaleTransactionById(tmpRetTr.getSaleTransactionId()).updatePrice(-ezticket.getTotal()); //update final price of sale transaction
             }
             retToBeStored.setStatus(RTClosed);
             // update ReturnTransaction in DB:
-            if(!shopDB.updateReturnTransaction(retToBeStored.getReturnId(), retToBeStored.getItsSaleTransactionId(), retToBeStored.getReturnedValue()))
+            if(!shopDB.updateReturnTransaction(retToBeStored.getReturnId(), retToBeStored.getSaleTransactionId(), retToBeStored.getReturnedValue(), "TODO: complete with correct STATUS"))
                 return false;
             // clear the temporary transaction:
             tmpRetTr = null;
@@ -1571,7 +1561,7 @@ public class EZShop implements EZShopInterface {
         /* "This method deletes a CLOSED (but not PAYED) return transaction. It affects the quantity of product sold in
          the connected sale transaction (and consequently its price) and the quantity of product available on the shelves." */
 
-        EZSaleTransaction sale = getSaleTransactionById(getReturnTransactionById(returnId).getItsSaleTransactionId());
+        EZSaleTransaction sale = getSaleTransactionById(getReturnTransactionById(returnId).getSaleTransactionId());
         EZTicketEntry ezticket;
 
         for (TicketEntry ticket: retTr.getEntries())
@@ -1595,14 +1585,15 @@ public class EZShop implements EZShopInterface {
             product.editQuantity(-ezticket.getAmount());
 
             // re-update (increase) number of sold products (in related sale transaction)
-            EZTicketEntry oldSaleTicket = getSaleTransactionById(retTr.getItsSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode());
+            EZTicketEntry oldSaleTicket = getSaleTransactionById(retTr.getSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode());
             if(shopDB.updateProductPerSale(product.getBarCode(), sale.getTicketNumber(), oldSaleTicket.getAmount()+ezticket.getAmount(), oldSaleTicket.getDiscountRate()))
                 return false;
-            getSaleTransactionById(tmpRetTr.getItsSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode()).updateAmount(+ezticket.getAmount()) ;
+            getSaleTransactionById(tmpRetTr.getSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode()).updateAmount(+ezticket.getAmount()) ;
 
             // re-update (increase) final price of related sale transaction
-            /*if(*/shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), sale.getPrice()+ezticket.getTotal());//== false) return false;
-            getSaleTransactionById(retTr.getItsSaleTransactionId()).setPrice(+ezticket.getTotal());
+            double newPrice = sale.getPrice()+ezticket.getTotal();
+            /*if(*/shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), newPrice, sale.getStatus());//== false) return false;
+            getSaleTransactionById(retTr.getSaleTransactionId()).setPrice(+ezticket.getTotal());
 
             //delete also the return ticket from DB:
             /*if(!*/shopDB.deleteProductPerSale(ezticket.getBarCode(), retTr.getReturnId());//)

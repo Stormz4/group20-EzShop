@@ -21,12 +21,12 @@ public class EZSaleTransaction implements SaleTransaction {
         this.attachedCard = null;
     }
 
-    public EZSaleTransaction (Integer ticketNumber, List<TicketEntry> entries, double discountRate, double price) {
+    public EZSaleTransaction (Integer ticketNumber, List<TicketEntry> entries, double discountRate, double price, String status) {
         this.ticketNumber = ticketNumber;
         this.entries = entries;
         this.discountRate = discountRate;
         this.price = price;
-        this.status = EZSaleTransaction.STOpened;
+        // this.status = EZSaleTransaction.STOpened;
         this.attachedCard = null;
     }
 
