@@ -189,11 +189,11 @@ public class EZShop implements EZShopInterface {
          * @throws InvalidRoleException     if the new role is empty, null or not among one of the following : {"Administrator", "Cashier", "ShopManager"}
          * @throws UnauthorizedException    if there is no logged user or if it has not the rights to perform the operation
          */
-        if (!ezUsers.containsKey(id)) {
-            return false;
-        }
         if (id==null || id <=0) {
             throw new InvalidUserIdException();
+        }
+        if (!ezUsers.containsKey(id)) {
+            return false;
         }
         if (role.isEmpty() || !(role.equals("Administrator") || role.equals("Cashier") || role.equals("ShopManager"))) {
             throw new InvalidRoleException();
@@ -255,14 +255,24 @@ public class EZShop implements EZShopInterface {
 
     public boolean isValidBarCode(String barCode){
 
+        if (barCode == null){
+            return false;
+        }
+
         if (barCode.matches("[0-9]{12,14}")){
             int sum=0;
             int number=0;
             for(int i=0; i<barCode.length()-1; i++){
                 number=Integer.parseInt(Character.toString(barCode.charAt(i)));
-                System.out.println(Integer.parseInt(Character.toString(barCode.charAt(i))));
-                if (!(i%2==0)){
-                    number=number*3;
+                if (barCode.length() == 12 || barCode.length()==14){
+                    if (!(i%2==1)){
+                        number=number*3;
+                    }
+                }
+                else {
+                    if (!(i % 2 == 0)) {
+                        number = number * 3;
+                    }
                 }
                 // else number = number*1;
                 sum = sum+number;
@@ -822,11 +832,12 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean deleteCustomer(Integer id) throws InvalidCustomerIdException, UnauthorizedException {
-        if (!ezCustomers.containsKey(id)) {
-            return false;
-        }
         if (id == null || id <=0 ){
             throw new InvalidCustomerIdException();
+        }
+
+        if (!ezCustomers.containsKey(id)) {
+            return false;
         }
 
         if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URCashier, URShopManager)){
@@ -843,12 +854,14 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public Customer getCustomer(Integer id) throws InvalidCustomerIdException, UnauthorizedException {
-        if (!ezCustomers.containsKey(id)) {
-            return null;
-        }
         if ( id==null || id <=0) {
             throw new InvalidCustomerIdException();
         }
+
+        if (!ezCustomers.containsKey(id)) {
+            return null;
+        }
+
         if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URCashier, URShopManager)){
             throw new UnauthorizedException();
         }
@@ -1618,6 +1631,10 @@ public class EZShop implements EZShopInterface {
 
     static boolean verifyByLuhnAlgo(String ccNumber)
     {
+        if (ccNumber == null){
+            return false;
+        }
+
         int sum = 0;
         boolean alternate = false;
         for (int i = ccNumber.length() - 1; i >= 0; i--)
@@ -1638,10 +1655,11 @@ public class EZShop implements EZShopInterface {
     @Override
     public double receiveCashPayment(Integer ticketNumber, double cash) throws InvalidTransactionIdException, InvalidPaymentException, UnauthorizedException {
 
+        if(ticketNumber == null || ticketNumber <= 0) throw new InvalidTransactionIdException();
+
         SaleTransaction sale = getSaleTransaction(ticketNumber);
         double toBePayed;
 
-        if(ticketNumber == null || ticketNumber <= 0) throw new InvalidTransactionIdException();
 
         if(cash <= 0) throw new InvalidPaymentException();
 
@@ -1709,23 +1727,6 @@ public class EZShop implements EZShopInterface {
 
         return true;
     }
-
-public static void main(String[] args) {
-    try {
-        FileReader reader = new FileReader("MyFile.txt");
-        BufferedReader bufferedReader = new BufferedReader(reader);
-
-        String line;
-
-        while ((line = bufferedReader.readLine()) != null) {
-            System.out.println(line);
-        }
-        reader.close();
-
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
-}
 
     @Override
     public double returnCashPayment(Integer returnId) throws InvalidTransactionIdException, UnauthorizedException {
