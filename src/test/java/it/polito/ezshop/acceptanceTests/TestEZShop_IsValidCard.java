@@ -34,7 +34,7 @@ public class TestEZShop_IsValidCard{
     }
 
     @Test
-    public void testLoyaltyCode_12digits(){
+    public void testLoyaltyCode_10digits(){
         isValid = ez.isValidCard("2332543219");
         assertTrue(isValid);
     }
