@@ -122,6 +122,7 @@ public class TestEZShopFR1 {
         System.out.println(ez.getAllUsers());
     }
 
+    @Test
     public void testgetUser() throws InvalidUsernameException, InvalidPasswordException, InvalidUserIdException, UnauthorizedException{
         EZShop ez = new EZShop();
         try{
