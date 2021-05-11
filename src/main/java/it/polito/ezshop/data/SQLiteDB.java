@@ -1247,7 +1247,7 @@ public class SQLiteDB {
 
         boolean inserted = false;
         String sql = "INSERT INTO ProductsPerSale(barCode, transactionID, amount, discountRate) \n"
-                   + "VALUES(?,?,?,?,?);";
+                   + "VALUES(?,?,?,?);";
 
         try{
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
