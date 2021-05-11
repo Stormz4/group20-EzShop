@@ -1713,7 +1713,6 @@ public class EZShop implements EZShopInterface {
     @Override
     public boolean receiveCreditCardPayment(Integer ticketNumber, String creditCard) throws InvalidTransactionIdException, InvalidCreditCardException, UnauthorizedException {
 
-        EZSaleTransaction sale;
         double toBePayed;
 
         if(ticketNumber == null || ticketNumber <= 0) throw new InvalidTransactionIdException();
@@ -1723,6 +1722,7 @@ public class EZShop implements EZShopInterface {
 
         if(creditCard == null || !verifyByLuhnAlgo(creditCard) || creditCard.equals("")) throw new InvalidCreditCardException();
 
+        EZSaleTransaction sale = (EZSaleTransaction) getSaleTransaction(ticketNumber);
         if(sale == null ||
                 getCreditInTXTbyCardNumber(creditCard) == -1 ||
                 !isValidCreditCard(creditCard))
@@ -1959,7 +1959,7 @@ public class EZShop implements EZShopInterface {
         this.shopDB.insertOrder(defaultID, prod2.getBarCode(), prod2.getPricePerUnit(), prod2.getQuantity(), OSPayed);
 
         List<TicketEntry> ticketList = new LinkedList<TicketEntry>();
-        int tid = this.shopDB.insertSaleTransaction(ticketList, defaultValue, defaultValue);
+        int tid = this.shopDB.insertSaleTransaction(ticketList, defaultValue, defaultValue, EZSaleTransaction.STPayed);
         EZTicketEntry ticket1 = new EZTicketEntry("1345334543427", "prod A", 2, 12.60, 0);
         shopDB.insertProductPerSale("1345334543427", tid, 2, 0);
         EZTicketEntry ticket2 = new EZTicketEntry("4532344529689", "prod B", 6, 3.50, 0.1);
