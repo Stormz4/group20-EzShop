@@ -15,11 +15,11 @@ public class EZReturnTransaction{
     //private boolean isClosed;
     private String status;
 
-    public EZReturnTransaction(Integer returnId, Integer saleTransactionId, List<TicketEntry> entries, double returnedValue) {
+    public EZReturnTransaction(Integer returnId, Integer saleTransactionId, List<TicketEntry> entries, double returnedValue, String status) {
         this.returnId = returnId;
         this.saleTransactionId = saleTransactionId;
         this.returnedValue = 0;
-        this.status = RTOpened;
+        // this.status = RTOpened;
     }
 
     public EZReturnTransaction(EZReturnTransaction tmpRetTr) { // necessary??? (used to copy object)
@@ -46,7 +46,7 @@ public class EZReturnTransaction{
         this.returnedValue += toBeAdded;
     }
 
-    public Integer getItsSaleTransactionId() { return saleTransactionId; }
+    public Integer getSaleTransactionId() { return saleTransactionId; }
 
     public void setItsSaleTransactionId(Integer itsSaleTransactionId) { this.saleTransactionId = itsSaleTransactionId; }
 

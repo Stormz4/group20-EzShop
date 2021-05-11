@@ -7,6 +7,8 @@ public class EZCustomer implements Customer {
     private Integer points;
 
     public EZCustomer(Integer id, String customerName, String customerCard, Integer points){
+        if (this.id != null && this.id == 21)
+            this.id = 21;
         this.id = id;
         this.customerName = customerName;
         this.customerCard = customerCard;

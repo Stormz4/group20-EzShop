@@ -707,9 +707,9 @@ public class SQLiteDB {
     /**
      ** Select all Cards records
      */
-    public List<String> selectAllCards(){
-        List<String> cards = new LinkedList<>();
-        String sql = "SELECT id FROM Cards";
+    public HashMap<String, Integer> selectAllCards(){
+        HashMap<String, Integer> cards = new HashMap<>();
+        String sql = "SELECT * FROM Cards";
 
         try {
             Statement stmt  = this.dbConnection.createStatement();
@@ -719,7 +719,8 @@ public class SQLiteDB {
             while (rs.next()) {
                 Integer id = rs.getInt("id");
                 String strId = String.format("%10d", id);
-                cards.add(strId);
+                Integer points = rs.getInt("points");
+                cards.put(strId, points);
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -952,8 +953,9 @@ public class SQLiteDB {
         String sql = "CREATE TABLE IF NOT EXISTS Transactions (\n"
                 + " id integer PRIMARY KEY,\n"
                 + " discountRate real,\n"
-                + " price real\n"
-                + " saleID integer\n"
+                + " price real,\n"
+                + " saleID integer,\n"
+                + " status text\n"
                 + ");";
 
         try{
@@ -969,7 +971,9 @@ public class SQLiteDB {
      */
     public HashMap<Integer, EZSaleTransaction> selectAllSaleTransactions(){
         HashMap<Integer, EZSaleTransaction> saleTransactions = new HashMap<>();
-        String sql = "SELECT id, discountRate, price FROM Transactions";
+        String sql = "SELECT id, discountRate, price, status \n"
+                   + "FROM Transactions \n"
+                   + "WHERE status <> \"OPENED\";";
 
         try {
             Statement stmt  = this.dbConnection.createStatement();
@@ -980,6 +984,7 @@ public class SQLiteDB {
                 Integer transactionID = rs1.getInt("id");
                 double saleDiscountRate = rs1.getDouble("discountRate");
                 double price = rs1.getDouble("price");
+                String status = rs1.getString("status");
 
                 // Internal query to retrieve ticketEntry (productPerSale)
                 LinkedList<TicketEntry> entries = new LinkedList<>();
@@ -1003,7 +1008,7 @@ public class SQLiteDB {
                     entries.add(product);
                 }
 
-                saleTransactions.put(transactionID, new EZSaleTransaction(transactionID, entries, saleDiscountRate, price));
+                saleTransactions.put(transactionID, new EZSaleTransaction(transactionID, entries, saleDiscountRate, price, status));
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -1017,9 +1022,10 @@ public class SQLiteDB {
      */
     public HashMap<Integer, EZReturnTransaction> selectAllReturnTransactions(){
         HashMap<Integer, EZReturnTransaction> returnTransactions = new HashMap<>();
-        String sql = "SELECT id, price, saleID \n"
+        String sql = "SELECT id, price, saleID, status \n"
                    + "FROM Transactions \n"
-                   + "WHERE saleID IS NOT NULL;";
+                   + "WHERE saleID IS NOT NULL \n"
+                   + "  AND status <> \"OPENED\";";
 
         try {
             Statement stmt  = this.dbConnection.createStatement();
@@ -1030,6 +1036,7 @@ public class SQLiteDB {
                 Integer transactionID = rs1.getInt("id");
                 double price = rs1.getDouble("price");
                 int saleID = rs1.getInt("saleID");
+                String status = rs1.getString("status");
 
                 // Internal query to retrieve ticketEntry (productPerSale)
                 LinkedList<TicketEntry> entries = new LinkedList<>();
@@ -1053,7 +1060,7 @@ public class SQLiteDB {
                     entries.add(product);
                 }
 
-                returnTransactions.put(transactionID, new EZReturnTransaction(transactionID, saleID, entries, price));
+                returnTransactions.put(transactionID, new EZReturnTransaction(transactionID, saleID, entries, price, status));
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -1065,18 +1072,19 @@ public class SQLiteDB {
     /**
      ** Insert new SaleTransaction record
      */
-    public Integer insertSaleTransaction(List<TicketEntry> entries, double discountRate, double price) {
+    public Integer insertSaleTransaction(List<TicketEntry> entries, double discountRate, double price, String status) {
         if (this.dbConnection == null)
             return defaultID;
 
         int transactionID = defaultID;
-        String sql = "INSERT INTO Transactions(discountRate, price) \n"
-                   + "VALUES(?,?);";
+        String sql = "INSERT INTO Transactions(discountRate, price, status) \n"
+                   + "VALUES(?,?,?);";
 
         try{
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
             pstmt.setDouble(1, discountRate);
             pstmt.setDouble(2, price);
+            pstmt.setString(3, status != null ? status : "");
             pstmt.executeUpdate();
 
             transactionID = this.lastInsertRowId();
@@ -1094,25 +1102,28 @@ public class SQLiteDB {
     /**
      ** Insert new SaleTransaction record
      */
-    public Integer insertReturnTransaction(List<TicketEntry> entries, int saleID, double price) {
+    public Integer insertReturnTransaction(List<TicketEntry> entries, int saleID, double price, String status) {
         if (this.dbConnection == null)
             return defaultID;
 
         int transactionID = defaultID;
-        String sql = "INSERT INTO Transactions(saleID, price) \n"
-                + "VALUES(?,?);";
+        String sql = "INSERT INTO Transactions(saleID, price, status) \n"
+                   + "VALUES(?,?,?);";
 
         try{
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
             pstmt.setInt(1, saleID);
             pstmt.setDouble(2, price);
+            pstmt.setString(3, status != null ? status : "");
             pstmt.executeUpdate();
 
             transactionID = this.lastInsertRowId();
 
             // Save in DB all the entries of the sale
-            for (TicketEntry entry : entries)
-                this.insertProductPerSale(entry.getBarCode(), transactionID, entry.getAmount(), entry.getDiscountRate());
+            if (entries != null && !entries.isEmpty()) {
+                for (TicketEntry entry : entries)
+                    this.insertProductPerSale(entry.getBarCode(), transactionID, entry.getAmount(), entry.getDiscountRate());
+            }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
@@ -1148,20 +1159,21 @@ public class SQLiteDB {
     /**
      ** Update SaleTransaction record
      */
-    public boolean updateSaleTransaction(Integer transactionID, double discountRate, double price) {
+    public boolean updateSaleTransaction(Integer transactionID, double discountRate, double price, String status) {
         if (this.dbConnection == null || transactionID == null)
             return false;
 
         boolean updated = false;
         String sql = "UPDATE Transactions\n" +
-                     "SET discountRate = ?, price = ?\n" +
+                     "SET discountRate = ?, price = ?, status = ?\n" +
                      "WHERE id = ?;";
 
         try{
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
             pstmt.setDouble(1, discountRate);
             pstmt.setDouble(2, price);
-            pstmt.setInt(3, transactionID);
+            pstmt.setString(3, status != null ? status : "");
+            pstmt.setInt(4, transactionID);
             pstmt.executeUpdate();
             updated = true;
         } catch (SQLException e) {
@@ -1174,20 +1186,21 @@ public class SQLiteDB {
     /**
      ** Update SaleTransaction record
      */
-    public boolean updateReturnTransaction(Integer transactionID, int saleID, double price) {
+    public boolean updateReturnTransaction(Integer transactionID, int saleID, double price, String status) {
         if (this.dbConnection == null || transactionID == null)
             return false;
 
         boolean updated = false;
         String sql = "UPDATE Transactions\n" +
-                     "SET discountRate = ?, price = ?\n" +
+                     "SET discountRate = ?, price = ?, status = ?\n" +
                      "WHERE id = ?;";
 
         try{
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
             pstmt.setInt(1, saleID);
             pstmt.setDouble(2, price);
-            pstmt.setInt(3, transactionID);
+            pstmt.setString(3, status != null ? status : "");
+            pstmt.setInt(4, transactionID);
             pstmt.executeUpdate();
             updated = true;
         } catch (SQLException e) {
