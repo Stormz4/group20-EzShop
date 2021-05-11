@@ -11,10 +11,6 @@ import static it.polito.ezshop.data.EZBalanceOperation.Debit;
 import static it.polito.ezshop.data.SQLiteDB.defaultID;
 
 public class EZAccountBook {
-    /*private final SQLiteDB shopDB = new SQLiteDB();
-    if (shopDB.dbConnection == null)
-            shopDB.connect();*/
-
     double currentBalance;
     int nextBalanceId;
 

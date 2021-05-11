@@ -20,7 +20,7 @@ import static it.polito.ezshop.data.SQLiteDB.defaultValue;
 
 
 public class EZShop implements EZShopInterface {
-    final boolean USE_TEST_DB = false;
+    final boolean USE_TEST_DB = true;
 
     final static String creditCardsFile = "src/main/java/it/polito/ezshop/utils/CreditCards.txt";
 
@@ -1553,5 +1553,18 @@ public class EZShop implements EZShopInterface {
                 prod2.getProductDescription(), prod2.getBarCode(), prod2.getPricePerUnit()) );
 
         this.shopDB.insertOrder(defaultID, prod2.getBarCode(), prod2.getPricePerUnit(), prod2.getQuantity(), OSPayed);
+
+        List<TicketEntry> ticketList = new LinkedList<TicketEntry>();
+        int tid = this.shopDB.insertSaleTransaction(ticketList, defaultValue, defaultValue);
+        EZTicketEntry ticket1 = new EZTicketEntry("1345334543427", "prod A", 2, 12.60, 0);
+        shopDB.insertProductPerSale("1345334543427", tid, 2, 0);
+        EZTicketEntry ticket2 = new EZTicketEntry("4532344529689", "prod B", 6, 3.50, 0.1);
+        shopDB.insertProductPerSale("4532344529689", tid, 6, 0.1);
+        EZTicketEntry ticket3 = new EZTicketEntry("5839274928315", "prod C", 1, 56.70, 0.5);
+        shopDB.insertProductPerSale("5839274928315", tid, 1, 0.5);
+        ticketList.add((TicketEntry) ticket1);
+        ticketList.add((TicketEntry) ticket2);
+        ticketList.add((TicketEntry) ticket3);
+
     }
 }
