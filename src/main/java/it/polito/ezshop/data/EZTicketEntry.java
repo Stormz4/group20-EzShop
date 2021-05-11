@@ -73,9 +73,10 @@ public class EZTicketEntry implements TicketEntry {
     public void setDiscountRate(double discountRate) {
         this.discountRate = discountRate;
     }
+
     public double getTotal()
     {
-        return (discountRate * pricePerUnit * amount);
+        return (pricePerUnit * amount * (1-discountRate));
     }
 
     public void updateAmount(int toBeAdded)
