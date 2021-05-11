@@ -32,7 +32,6 @@ public class EZShop implements EZShopInterface {
     private HashMap<Integer, EZProductType> ezProducts;
     private HashMap<Integer, EZOrder> ezOrders;
     private EZReturnTransaction tmpRetTr;
-    private int nextBalanceId;
 
     // TODO verify is this map is needed
     private List<String> ezCards;
@@ -616,7 +615,7 @@ public class EZShop implements EZShopInterface {
         if(!recordBalanceUpdate(-pricePerUnit*quantity))
             return -1;
 
-        shopDB.updateOrder(order.getOrderId(), nextBalanceId, productCode, pricePerUnit, quantity, OSPayed); //todo: to be fixed ???
+        shopDB.updateOrder(order.getOrderId(), accountingBook.nextBalanceId, productCode, pricePerUnit, quantity, OSPayed); //todo: to be fixed ???
 
         return order.getOrderId();
     }
@@ -654,7 +653,7 @@ public class EZShop implements EZShopInterface {
             if(!recordBalanceUpdate(-(order.getPricePerUnit() * order.getQuantity())))
                 return false;
 
-            shopDB.updateOrder(order.getOrderId(), nextBalanceId, order.getProductCode(), order.getPricePerUnit(), order.getQuantity(), OSPayed); //todo: to be fixed ???
+            shopDB.updateOrder(order.getOrderId(), accountingBook.nextBalanceId, order.getProductCode(), order.getPricePerUnit(), order.getQuantity(), OSPayed); //todo: to be fixed ???
         }
 
         return true;
@@ -1473,27 +1472,7 @@ public class EZShop implements EZShopInterface {
         if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager) )
             throw new UnauthorizedException();
 
-        String type;
-
-        if(toBeAdded >= 0)
-            type = Credit;
-        else
-            type = Debit;
-
-        LocalDate time = LocalDate.now();
-        // create new balance operation
-        EZBalanceOperation op = new EZBalanceOperation(defaultID, time, toBeAdded, type);
-        int id = shopDB.insertBalanceOperation(time, toBeAdded, type);
-        if(id == -1) return false; //return false if DB connection problem occurs
-        op.setBalanceId(id);
-        ezBalanceOperations.put(op.getBalanceId(), op);
-        nextBalanceId = op.getBalanceId(); // used to pay orders ???
-
-        accountingBook.updateBalance(toBeAdded);
-
-        // should do anything else???
-
-        return !((toBeAdded + accountingBook.currentBalance) < 0);
+        return accountingBook.addBalanceOperation(shopDB, toBeAdded, ezBalanceOperations);
     }
 
     @Override
