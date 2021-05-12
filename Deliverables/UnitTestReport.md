@@ -152,53 +152,6 @@ Date: 11/05/2021
 |||||||
 |||||||
 
-### **Class *class_name* - method *name***
-
-
-
-**Criteria for method *name*:**
-
-
--
--
-
-
-
-
-
-**Predicates for method *name*:**
-
-| Criteria | Predicate |
-| -------- | --------- |
-|          |           |
-|          |           |
-|          |           |
-|          |           |
-
-
-
-
-
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-|          |                 |
-
-
-
-**Combination of predicates**:
-
-
-| Criteria 1 | Criteria 2 | ... | Valid / Invalid | Description of the test case | JUnit test case |
-|-------|-------|-------|-------|-------|-------|
-|||||||
-|||||||
-|||||||
-|||||||
-|||||||
-
 
 
 # White Box Unit Tests
@@ -210,17 +163,18 @@ Date: 11/05/2021
     <For traceability write the class and method name that contains the test case>
 
 
-| Unit name | JUnit test case |
-|--|--|
-|||
-|||
-||||
+| Unit name               | JUnit test case          |
+|-------------------------|--------------------------|
+| Method isValidBarCode() | TestEZShop_VerifyBarCode |
+| Method isValidCard()    | TestEZShop_IsValidCard   |
+| EZCustomer              | TestEZShop_Customer      |
 
 ### Code coverage report
 
     <Add here the screenshot report of the statement and branch coverage obtained using
     the Eclemma tool. >
 
+    ![](UnitTestImages/img.png)
 
 ### Loop coverage analysis
 
