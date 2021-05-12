@@ -814,7 +814,7 @@ public class SQLiteDB {
                 + " location text,\n"
                 + " note text,\n"
                 + " productDescription text,\n"
-                + " barCode text,\n"
+                + " barCode text UNIQUE,\n"
                 + " pricePerUnit real\n"
                 + ");";
 
@@ -988,10 +988,10 @@ public class SQLiteDB {
 
                 // Internal query to retrieve ticketEntry (productPerSale)
                 LinkedList<TicketEntry> entries = new LinkedList<>();
-                String sql2 = "SELECT barCode, amount, discountRate, productDescription, pricePerUnit \n"
+                String sql2 = "SELECT ProductsPerSale.barCode, amount, discountRate, productDescription, pricePerUnit \n"
                             + "FROM ProductsPerSale \n"
                             + "INNER JOIN ProductTypes ON ProductsPerSale.barCode = ProductTypes.barCode \n"
-                            + "WHERE ProductsPerSale.id = ? ;";
+                            + "WHERE ProductsPerSale.transactionID = ? ;";
 
                 PreparedStatement pstmt = this.dbConnection.prepareStatement(sql2);
                 pstmt.setInt(1, transactionID);
@@ -1040,10 +1040,10 @@ public class SQLiteDB {
 
                 // Internal query to retrieve ticketEntry (productPerSale)
                 LinkedList<TicketEntry> entries = new LinkedList<>();
-                String sql2 = "SELECT barCode, amount, discountRate, productDescription, pricePerUnit \n"
+                String sql2 = "SELECT ProductsPerSale.barCode, amount, discountRate, productDescription, pricePerUnit \n"
                         + "FROM ProductsPerSale \n"
                         + "INNER JOIN ProductTypes ON ProductsPerSale.barCode = ProductTypes.barCode \n"
-                        + "WHERE ProductsPerSale.id = ? ;";
+                        + "WHERE ProductsPerSale.transactionID = ? ;";
 
                 PreparedStatement pstmt = this.dbConnection.prepareStatement(sql2);
                 pstmt.setInt(1, transactionID);
@@ -1090,8 +1090,10 @@ public class SQLiteDB {
             transactionID = this.lastInsertRowId();
 
             // Save in DB all the entries of the sale
-            for (TicketEntry entry : entries)
-                this.insertProductPerSale(entry.getBarCode(), transactionID, entry.getAmount(), entry.getDiscountRate());
+            if (entries != null && !entries.isEmpty()) {
+                for (TicketEntry entry : entries)
+                    this.insertProductPerSale(entry.getBarCode(), transactionID, entry.getAmount(), entry.getDiscountRate());
+            }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
