@@ -1,5 +1,8 @@
 package it.polito.ezshop.data;
 
+import sun.awt.image.ImageWatched;
+
+import java.util.LinkedList;
 import java.util.List;
 
 public class EZReturnTransaction{
@@ -11,22 +14,21 @@ public class EZReturnTransaction{
     private double returnedValue; //   > 0
     private Integer saleTransactionId;
     private List<TicketEntry> entries;
-    //private boolean isPayed;
-    //private boolean isClosed;
     private String status;
 
     public EZReturnTransaction(Integer returnId, Integer saleTransactionId, List<TicketEntry> entries, double returnedValue, String status) {
         this.returnId = returnId;
         this.saleTransactionId = saleTransactionId;
-        this.returnedValue = 0;
-        // this.status = RTOpened;
+        this.returnedValue = returnedValue;
+        this.status = status;
+        this.entries = entries != null ? entries : new LinkedList<>();
     }
 
     public EZReturnTransaction(EZReturnTransaction tmpRetTr) { // necessary??? (used to copy object)
         this.returnId = tmpRetTr.returnId;
         this.saleTransactionId = tmpRetTr.saleTransactionId;
         this.returnedValue = tmpRetTr.returnedValue;
-        this.entries = tmpRetTr.entries;
+        this.entries = tmpRetTr.entries != null ? tmpRetTr.entries : new LinkedList<>();
         this.status = tmpRetTr.status;
     }
 
@@ -46,15 +48,27 @@ public class EZReturnTransaction{
         this.returnedValue += toBeAdded;
     }
 
-    public Integer getSaleTransactionId() { return saleTransactionId; }
+    public Integer getSaleTransactionId() {
+        return saleTransactionId;
+    }
 
-    public void setItsSaleTransactionId(Integer itsSaleTransactionId) { this.saleTransactionId = itsSaleTransactionId; }
+    public void setItsSaleTransactionId(Integer itsSaleTransactionId) {
+        this.saleTransactionId = itsSaleTransactionId;
+    }
 
-    public List<TicketEntry> getEntries() { return entries; }
+    public List<TicketEntry> getEntries() {
+        return entries;
+    }
 
-    public void setEntries(List<TicketEntry> entries) { this.entries = entries; }
+    public void setEntries(List<TicketEntry> entries) {
+        this.entries = entries != null ? entries : new LinkedList<>();
+    }
 
-    public String getStatus() { return status; }
+    public String getStatus() {
+        return status;
+    }
 
-    public void setStatus(String status) { this.status = status; }
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

@@ -22,7 +22,7 @@ import static it.polito.ezshop.data.SQLiteDB.defaultValue;
 
 
 public class EZShop implements EZShopInterface {
-    final boolean USE_TEST_DB = true;
+    final boolean USE_TEST_DB = false;
 
     private final SQLiteDB shopDB = new SQLiteDB();
     private EZUser currUser = null;
@@ -1411,7 +1411,8 @@ public class EZShop implements EZShopInterface {
         else
             saleTransaction = ezSaleTransactions.get(saleNumber);
          */
-        return  this.ezSaleTransactions.get(saleNumber);
+        EZSaleTransaction saleTransaction = this.ezSaleTransactions.get(saleNumber);
+        return saleTransaction;
     }
 
     @Override
