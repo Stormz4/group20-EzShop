@@ -1515,21 +1515,22 @@ public class EZShop implements EZShopInterface {
         if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier) )
             throw new UnauthorizedException();
 
-        if(returnId == null || returnId <= 0) throw new InvalidTransactionIdException();
+        if(returnId == null || returnId <= 0)
+            throw new InvalidTransactionIdException();
 
         if(tmpRetTr == null || tmpRetTr.getStatus().equals(RTClosed))
             return false;
 
-        if(commit)
-        {
-            EZSaleTransaction sale = getSaleTransactionById(tmpRetTr.getSaleTransactionId());
+        EZSaleTransaction sale = getSaleTransactionById(tmpRetTr.getSaleTransactionId());
 
+        if(commit) {
             EZReturnTransaction retToBeStored = new EZReturnTransaction(tmpRetTr); //copy the temporary return transaction
 
             // add ReturnTransaction to return transactions list
             if(ezReturnTransactions == null)
                 ezReturnTransactions = new HashMap<Integer, EZReturnTransaction>();
             ezReturnTransactions.put(tmpRetTr.getReturnId(), retToBeStored);
+
             // add ReturnTransaction to SaleTransaction's list of returns
             List<EZReturnTransaction> returns = sale.getReturns();
             if(returns == null)
@@ -1539,14 +1540,11 @@ public class EZShop implements EZShopInterface {
 
             EZTicketEntry ezticket;
 
-            for ( TicketEntry ticket: tmpRetTr.getEntries())
-            {
+            for ( TicketEntry ticket: tmpRetTr.getEntries()) {
                 ezticket = (EZTicketEntry) ticket;
                 EZProductType product = null;
-                for (EZProductType p : ezProducts.values())
-                {
-                    if(p.getBarCode().equals(ezticket.getBarCode()))
-                    {
+                for (EZProductType p : ezProducts.values()) {
+                    if(p.getBarCode().equals(ezticket.getBarCode())) {
                         product = p;
                         break;
                     }
@@ -1563,12 +1561,14 @@ public class EZShop implements EZShopInterface {
                 EZTicketEntry oldSaleTicket = getSaleTransactionById(tmpRetTr.getSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode());
                 if(!shopDB.updateProductPerSale(product.getBarCode(), sale.getTicketNumber(), oldSaleTicket.getAmount()-ezticket.getAmount(), oldSaleTicket.getDiscountRate()))
                     return false;
-                getSaleTransactionById(tmpRetTr.getSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode()).updateAmount(-ezticket.getAmount()) ;
 
+                getSaleTransactionById(tmpRetTr.getSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode()).updateAmount(-ezticket.getAmount());
 
                 // update (decrease) final price of related sale transaction
-                double newPrice = sale.getPrice()-ezticket.getTotal();
-                if(!shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), newPrice, sale.getStatus())) return false;
+                double newPrice = sale.getPrice() - ezticket.getTotal();
+                if(!shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), newPrice, sale.getStatus()))
+                    return false;
+
                 getSaleTransactionById(tmpRetTr.getSaleTransactionId()).updatePrice(-ezticket.getTotal()); //update final price of sale transaction
             }
             retToBeStored.setStatus(RTClosed);
@@ -1578,21 +1578,29 @@ public class EZShop implements EZShopInterface {
             // clear the temporary transaction:
             tmpRetTr = null;
         }
-        else
-        {//rollback ---> delete the transaction from DB and clear tmpRetTr (clear also related tickets)
-            //delete the return tickets from DB:
+        else {
+            // Rollback
             EZTicketEntry ezticket;
-            for ( TicketEntry ticket: tmpRetTr.getEntries())
-            {
-                ezticket = (EZTicketEntry) ticket;
-                if(!shopDB.deleteProductPerSale(ezticket.getBarCode(), tmpRetTr.getReturnId()))
+            for ( TicketEntry ticket: tmpRetTr.getEntries()) {
+                // Delete the return tickets from DB
+                if(!shopDB.deleteProductPerSale(ticket.getBarCode(), tmpRetTr.getReturnId()))
                     return false;
+
+                // TODO: verify if still needed in case of new versions of the UI
+                List<TicketEntry> saleEntries = sale.getEntries();
+                for (TicketEntry saleEntry : saleEntries) {
+                    if (saleEntry.getBarCode().equals(ticket.getBarCode())) {
+                        int amount = saleEntry.getAmount() + ticket.getAmount();
+                        saleEntry.setAmount(amount);
+                    }
+                }
             }
 
+            // Delete the transaction from DB
             if(!shopDB.deleteTransaction(tmpRetTr.getReturnId()))
                 return false;
 
-            //clear the temporary transaction:
+            // Clear the temporary transaction
             tmpRetTr = null;
         }
 
