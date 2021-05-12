@@ -174,7 +174,7 @@ Date: 11/05/2021
     <Add here the screenshot report of the statement and branch coverage obtained using
     the Eclemma tool. >
 
-    ![](UnitTestImages/img.png)
+![](UnitTestImages/img.png)
 
 ### Loop coverage analysis
 
