@@ -1567,7 +1567,7 @@ public class EZShop implements EZShopInterface {
 
                 // update (decrease) final price of related sale transaction
                 double newPrice = sale.getPrice()-ezticket.getTotal();
-                /*if(!*/shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), newPrice, sale.getStatus());//== false) return false;
+                if(!shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), newPrice, sale.getStatus())) return false;
                 getSaleTransactionById(tmpRetTr.getSaleTransactionId()).updatePrice(-ezticket.getTotal()); //update final price of sale transaction
             }
             retToBeStored.setStatus(RTClosed);
@@ -1584,8 +1584,8 @@ public class EZShop implements EZShopInterface {
             for ( TicketEntry ticket: tmpRetTr.getEntries())
             {
                 ezticket = (EZTicketEntry) ticket;
-                /*if(!*/shopDB.deleteProductPerSale(ezticket.getBarCode(), tmpRetTr.getReturnId());//)
-                    //return false;
+                if(!shopDB.deleteProductPerSale(ezticket.getBarCode(), tmpRetTr.getReturnId()))
+                    return false;
             }
 
             if(!shopDB.deleteTransaction(tmpRetTr.getReturnId()))
