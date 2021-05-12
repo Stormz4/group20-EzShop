@@ -69,7 +69,7 @@ Date: 11/05/2021
 |Valid|Valid|  boolean isValid = ez.isValidBarCode("6291041500213"); <br />-> return true| Class TestEZShop_VerifyBarCode, method testBarCode_13digits()|
 |NULL/Invalid format|Invalid| boolean isValid = ez.isValidBarCode("33235");<br /> -> return false <br /> or: isValid = ez.isValidBarCode(null);<br /> -> return false|testBarCode_nullInput() and testBarCode_notEnoughDigits()|
 
-### **Class *EZShop* - method *isValidBarCode***
+### **Class *EZShop* - method *isValidCard***
 
 
 
@@ -165,16 +165,15 @@ Date: 11/05/2021
 
 | Unit name               | JUnit test case          |
 |-------------------------|--------------------------|
-| Method isValidBarCode() | TestEZShop_VerifyBarCode |
-| Method isValidCard()    | TestEZShop_IsValidCard   |
 | EZCustomer              | TestEZShop_Customer      |
+| EZUser                  | TestEZShop_User          |
 
 ### Code coverage report
 
     <Add here the screenshot report of the statement and branch coverage obtained using
     the Eclemma tool. >
 
-![](UnitTestImages/img.png)
+    <insert the screen>
 
 ### Loop coverage analysis
 
@@ -183,8 +182,12 @@ Date: 11/05/2021
 
 |Unit name | Loop rows | Number of iterations | JUnit test case |
 |---|---|---|---|
-|||||
-|||||
+|EZCustomer|//|//|TestEZShop_Customer|
+|EZUser|//|//|TestEZShop_User|
+||||||
+||||||
+||||||
+||||||
 ||||||
 
 
