@@ -1760,11 +1760,13 @@ public class EZShop implements EZShopInterface {
             String line;
 
             while ((line = bufferedReader.readLine()) != null) {
+                if (line.contains("#"))
+                    continue;
                 if(line.matches(cardNumber+" [0-9]*.[0-9]*"))
                 {
                     if(!isValidCreditCard(cardNumber))
                         return -1;
-                    String creditAsString = line.split(" ")[1];
+                    String creditAsString = line.split(";")[1];
                     cardBalance = Double.parseDouble(creditAsString);
                     break;
                 }
@@ -1790,18 +1792,20 @@ public class EZShop implements EZShopInterface {
             String line, newLine, newValue;
 
             while ((line = file.readLine()) != null) {
+                if (line.contains("#"))
+                    continue;
                 if(line.matches(cardNumber+" [0-9]*.[0-9]*"))
                 {
                     if(!isValidCreditCard(cardNumber))
                         return false;
 
-                    String creditAsString = line.split(" ")[1];
+                    String creditAsString = line.split(";")[1];
                     cardBalance = Double.parseDouble(creditAsString);
 
                     cardBalance += toBeAdded;
                     newValue = cardBalance.toString();
 
-                    newLine = line.split(" ")[0] + newValue;
+                    newLine = line.split(";")[0] + newValue;
                     inputBuffer.append(newLine);
                     inputBuffer.append('\n');
                     break;
