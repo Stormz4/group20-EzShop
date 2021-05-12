@@ -1443,18 +1443,20 @@ public class EZShop implements EZShopInterface {
 
         if(saleNumber == null || saleNumber <= 0) throw new InvalidTransactionIdException();
 
+        if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier) )
+            throw new UnauthorizedException();
+
         EZSaleTransaction sale = getSaleTransactionById(saleNumber);
 
         if(sale == null)
             return defaultID;
 
-        if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier) )
-            throw new UnauthorizedException();
-
-        EZReturnTransaction retTr = new EZReturnTransaction(defaultID, saleNumber, null, defaultValue, RTOpened);
-        int id = shopDB.insertReturnTransaction(null, saleNumber, defaultValue, RTOpened);
+        List<TicketEntry> entries = new LinkedList<TicketEntry>();
+        EZReturnTransaction retTr = new EZReturnTransaction(defaultID, saleNumber, entries, defaultValue, RTOpened);
+        int id = shopDB.insertReturnTransaction(entries, saleNumber, defaultValue, RTOpened);
         if(id == -1) return -1;
         retTr.setReturnId(id);
+        retTr.setStatus(RTOpened);
         tmpRetTr = retTr;
         // return transaction is inserted in the proper lists only in endReturnTransaction() method (if commit == true)
         return retTr.getReturnId();
@@ -1496,6 +1498,11 @@ public class EZShop implements EZShopInterface {
         if(!shopDB.insertProductPerSale(productCode, tmpRetTr.getReturnId(), amount, saleTicket.getDiscountRate()))
             return false;
 
+        List<TicketEntry> entries = tmpRetTr.getEntries();
+        if(entries == null) {
+            entries = new LinkedList<TicketEntry>();
+            tmpRetTr.setEntries(entries);
+        }
         tmpRetTr.getEntries().add(returnTicket);
         tmpRetTr.updateReturnedValue(returnTicket.getTotal());
 
@@ -1519,8 +1526,14 @@ public class EZShop implements EZShopInterface {
             EZReturnTransaction retToBeStored = new EZReturnTransaction(tmpRetTr); //copy the temporary return transaction
 
             // add ReturnTransaction to return transactions list
+            if(ezReturnTransactions == null)
+                ezReturnTransactions = new HashMap<Integer, EZReturnTransaction>();
             ezReturnTransactions.put(tmpRetTr.getReturnId(), retToBeStored);
             // add ReturnTransaction to SaleTransaction's list of returns
+            List<EZReturnTransaction> returns = sale.getReturns();
+            if(returns == null)
+                 returns = new LinkedList<EZReturnTransaction>();
+            sale.setReturns(returns);
             sale.getReturns().add(retToBeStored);
 
             EZTicketEntry ezticket;
@@ -1547,14 +1560,14 @@ public class EZShop implements EZShopInterface {
 
                 // update (decrease) number of sold products (in related sale transaction)
                 EZTicketEntry oldSaleTicket = getSaleTransactionById(tmpRetTr.getSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode());
-                if(shopDB.updateProductPerSale(product.getBarCode(), sale.getTicketNumber(), oldSaleTicket.getAmount()-ezticket.getAmount(), oldSaleTicket.getDiscountRate()))
+                if(!shopDB.updateProductPerSale(product.getBarCode(), sale.getTicketNumber(), oldSaleTicket.getAmount()-ezticket.getAmount(), oldSaleTicket.getDiscountRate()))
                     return false;
                 getSaleTransactionById(tmpRetTr.getSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode()).updateAmount(-ezticket.getAmount()) ;
 
 
                 // update (decrease) final price of related sale transaction
                 double newPrice = sale.getPrice()-ezticket.getTotal();
-                /*if(*/shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), newPrice, sale.getStatus());//== false) return false;
+                /*if(!*/shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), newPrice, sale.getStatus());//== false) return false;
                 getSaleTransactionById(tmpRetTr.getSaleTransactionId()).updatePrice(-ezticket.getTotal()); //update final price of sale transaction
             }
             retToBeStored.setStatus(RTClosed);
@@ -1962,8 +1975,22 @@ public class EZShop implements EZShopInterface {
 
         this.shopDB.insertOrder(defaultID, prod2.getBarCode(), prod2.getPricePerUnit(), prod2.getQuantity(), OSPayed);
 
+        EZProductType prodA = new EZProductType(defaultID, 30, "", "A simple note",
+                "prod A", "1345334543427", 12.60);
+        EZProductType prodB = new EZProductType(defaultID, 30, "", "A simple note",
+                "prod B", "4532344529689", 3.50);
+        EZProductType prodC = new EZProductType(defaultID, 30, "", "A simple note",
+                "prod C", "5839274928315", 56.70);
+        prodA.setId( this.shopDB.insertProductType(prodA.getQuantity(), prodA.getLocation(), prodA.getNote(),
+                prodA.getProductDescription(), prodA.getBarCode(), prodA.getPricePerUnit()) );
+        prodB.setId( this.shopDB.insertProductType(prodB.getQuantity(), prodB.getLocation(), prodB.getNote(),
+                prodB.getProductDescription(), prodB.getBarCode(), prodB.getPricePerUnit()) );
+        prodC.setId( this.shopDB.insertProductType(prodC.getQuantity(), prodC.getLocation(), prodC.getNote(),
+                prodC.getProductDescription(), prodC.getBarCode(), prodC.getPricePerUnit()) );
         List<TicketEntry> ticketList = new LinkedList<TicketEntry>();
-        int tid = this.shopDB.insertSaleTransaction(ticketList, defaultValue, defaultValue, EZSaleTransaction.STPayed);
+        EZSaleTransaction sale1 = new EZSaleTransaction(defaultValue, ticketList, defaultValue, defaultValue, EZSaleTransaction.STOpened);
+        int tid = this.shopDB.insertSaleTransaction(ticketList, defaultValue, defaultValue, EZSaleTransaction.STOpened);
+        sale1.setTicketNumber(tid);
         EZTicketEntry ticket1 = new EZTicketEntry("1345334543427", "prod A", 2, 12.60, 0);
         shopDB.insertProductPerSale("1345334543427", tid, 2, 0);
         EZTicketEntry ticket2 = new EZTicketEntry("4532344529689", "prod B", 6, 3.50, 0.1);
@@ -1973,6 +2000,10 @@ public class EZShop implements EZShopInterface {
         ticketList.add((TicketEntry) ticket1);
         ticketList.add((TicketEntry) ticket2);
         ticketList.add((TicketEntry) ticket3);
-
+        shopDB.updateSaleTransaction(tid, 0.6, 100, EZSaleTransaction.STClosed);
+        sale1.setDiscountRate(0.6);
+        sale1.setPrice(100);
+        sale1.setStatus(EZSaleTransaction.STClosed);
+        ezSaleTransactions.put(tid, sale1);
     }
 }
