@@ -1,4 +1,5 @@
-package it.polito.ezshop.acceptanceTests;
+package it.polito.ezshop.BlackBoxTesting;
+
 
 import it.polito.ezshop.data.EZShop;
 import it.polito.ezshop.exceptions.InvalidPasswordException;
@@ -19,7 +20,7 @@ public class TestEZShop_VerifyBarCode {
     boolean isValid;
 
     @Before
-    public void init() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
+    public void init(){
         ez = new EZShop();
         isValid = false;
     }

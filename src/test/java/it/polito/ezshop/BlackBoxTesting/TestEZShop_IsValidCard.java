@@ -1,4 +1,5 @@
-package it.polito.ezshop.acceptanceTests;
+package it.polito.ezshop.BlackBoxTesting;
+
 
 import it.polito.ezshop.data.EZShop;
 import it.polito.ezshop.exceptions.InvalidPasswordException;
@@ -15,7 +16,7 @@ public class TestEZShop_IsValidCard{
     boolean isValid;
 
     @Before
-    public void init() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
+    public void init(){
         ez = new EZShop();
         isValid = false;
     }
@@ -34,7 +35,7 @@ public class TestEZShop_IsValidCard{
     }
 
     @Test
-    public void testLoyaltyCode_12digits(){
+    public void testLoyaltyCode_10digits(){
         isValid = ez.isValidCard("2332543219");
         assertTrue(isValid);
     }

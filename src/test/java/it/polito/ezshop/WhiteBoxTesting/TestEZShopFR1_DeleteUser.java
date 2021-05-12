@@ -1,4 +1,5 @@
-package it.polito.ezshop.acceptanceTests;
+package it.polito.ezshop.WhiteBoxTesting;
+
 
 import it.polito.ezshop.data.EZShop;
 import it.polito.ezshop.data.SQLiteDB;

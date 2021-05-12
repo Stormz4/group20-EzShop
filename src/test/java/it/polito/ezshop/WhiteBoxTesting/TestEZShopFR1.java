@@ -1,4 +1,7 @@
-package it.polito.ezshop.acceptanceTests;
+package it.polito.ezshop.WhiteBoxTesting;
+
+
+
 import it.polito.ezshop.data.*;
 import it.polito.ezshop.exceptions.*;
 import org.junit.After;

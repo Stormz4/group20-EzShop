@@ -20,7 +20,7 @@ import static it.polito.ezshop.data.SQLiteDB.defaultValue;
 
 
 public class EZShop implements EZShopInterface {
-    final boolean USE_TEST_DB = true;
+    final boolean USE_TEST_DB = false;
 
     final static String creditCardsFile = "src/main/java/it/polito/ezshop/utils/CreditCards.txt";
 
@@ -1435,7 +1435,8 @@ public class EZShop implements EZShopInterface {
         else
             saleTransaction = ezSaleTransactions.get(saleNumber);
          */
-        return  this.ezSaleTransactions.get(saleNumber);
+        EZSaleTransaction saleTransaction = this.ezSaleTransactions.get(saleNumber);
+        return saleTransaction;
     }
 
     @Override

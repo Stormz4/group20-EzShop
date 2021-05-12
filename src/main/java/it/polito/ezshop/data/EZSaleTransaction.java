@@ -1,5 +1,6 @@
 package it.polito.ezshop.data;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class EZSaleTransaction implements SaleTransaction {
@@ -19,15 +20,20 @@ public class EZSaleTransaction implements SaleTransaction {
         this.ticketNumber = ticketNumber;
         this.status = EZSaleTransaction.STOpened;
         this.attachedCard = null;
+        this.entries = new LinkedList<>();
+        this.discountRate = 0;
+        this.price = 0;
+        this.returns = new LinkedList<>();
     }
 
     public EZSaleTransaction (Integer ticketNumber, List<TicketEntry> entries, double discountRate, double price, String status) {
         this.ticketNumber = ticketNumber;
-        this.entries = entries;
+        this.entries = entries != null ? entries : new LinkedList<>();
         this.discountRate = discountRate;
         this.price = price;
-        // this.status = EZSaleTransaction.STOpened;
+        this.status = status;
         this.attachedCard = null;
+        this.returns = new LinkedList<>();
     }
 
     @Override
@@ -42,12 +48,12 @@ public class EZSaleTransaction implements SaleTransaction {
 
     @Override
     public List<TicketEntry> getEntries() {
-        return this.entries; // should return a copy?
+        return this.entries;
     }
 
     @Override
     public void setEntries(List<TicketEntry> entries) {
-        this.entries = entries; // should do a copy?
+        this.entries = entries != null ? entries : new LinkedList<>();
     }
 
     @Override
