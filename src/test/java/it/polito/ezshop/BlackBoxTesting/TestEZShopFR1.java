@@ -1,4 +1,4 @@
-package it.polito.ezshop.WhiteBoxTesting;
+package it.polito.ezshop.BlackBoxTesting;
 
 
 

@@ -135,7 +135,7 @@ public class EZShop implements EZShopInterface {
         }
 
         if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator)){
-            throw new UnauthorizedException();
+            throw new UnauthorizedException("Not authorized");
         }
 
         boolean success = shopDB.deleteUser(id);
@@ -497,6 +497,12 @@ public class EZShop implements EZShopInterface {
         return false;
     }
 
+    public boolean isValidPosition(String newPos){
+        if (newPos == null)
+            return false;
+
+        return newPos.matches("[0-9]+-[a-zA-z]+-[0-9]+");
+    }
     @Override
     public boolean updatePosition(Integer productId, String newPos) throws InvalidProductIdException, InvalidLocationException, UnauthorizedException {
         if (productId == null || productId<=0){
@@ -530,7 +536,7 @@ public class EZShop implements EZShopInterface {
 
         //The position has the following format :
         //<aisleNumber>-<rackAlphabeticIdentifier>-<levelNumber>
-        if (!(newPos.matches("[0-9]+-[a-zA-z]+-[0-9]+"))){
+        if (!(isValidPosition(newPos))){
             // If it doens't match:
             throw new InvalidLocationException();
         }
