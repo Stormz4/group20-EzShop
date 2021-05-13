@@ -1782,14 +1782,19 @@ public class EZShop implements EZShopInterface {
         return true;
     }
 
-    public static boolean isValidCreditCard(String cardNumber)
+    public boolean isValidCreditCard(String cardNumber)
     {
+        if(cardNumber == null)
+            return false;
         return cardNumber.matches("^(?:4[0-9]{12}(?:[0-9]{3})?|[25][1-7][0-9]{14}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\\d{3})\\d{11})$");
     }
 
-    public static double getCreditInTXTbyCardNumber(String cardNumber)
+    public double getCreditInTXTbyCardNumber(String cardNumber)
     {
         double cardBalance = -1;
+
+        if(cardNumber == null)
+            return -1;
 
         try {
             FileReader reader = new FileReader(creditCardsFile);
@@ -1818,8 +1823,14 @@ public class EZShop implements EZShopInterface {
         return cardBalance;
     }
 
-    public static boolean updateCreditInTXTbyCardNumber(String cardNumber, double toBeAdded) {
+    public boolean updateCreditInTXTbyCardNumber(String cardNumber, double toBeAdded) {
         Double cardBalance;
+
+        if(cardNumber == null)
+            return false;
+
+        if(!isValidCreditCard(cardNumber))
+            return false;
 
         try {
             FileReader reader = new FileReader(creditCardsFile);
@@ -1832,9 +1843,6 @@ public class EZShop implements EZShopInterface {
             {
                 if(line.matches(cardNumber+";[0-9]*.[0-9]*"))
                 {
-                    if(!isValidCreditCard(cardNumber))
-                        return false;
-
                     String creditAsString = line.split(";")[1];
                     cardBalance = Double.parseDouble(creditAsString);
 
