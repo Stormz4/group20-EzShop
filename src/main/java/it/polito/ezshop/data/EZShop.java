@@ -629,6 +629,8 @@ public class EZShop implements EZShopInterface {
             return -1;
 
         shopDB.updateOrder(order.getOrderId(), accountingBook.nextBalanceId, productCode, pricePerUnit, quantity, OSPayed); //todo: to be fixed ???
+        order.setBalanceId(accountingBook.nextBalanceId);
+        order.setStatus(OSPayed);
 
         return order.getOrderId();
     }
@@ -667,6 +669,8 @@ public class EZShop implements EZShopInterface {
                 return false;
 
             shopDB.updateOrder(order.getOrderId(), accountingBook.nextBalanceId, order.getProductCode(), order.getPricePerUnit(), order.getQuantity(), OSPayed); //todo: to be fixed ???
+            order.setBalanceId(accountingBook.nextBalanceId);
+            order.setStatus(OSPayed);
         }
 
         return true;
@@ -2036,16 +2040,16 @@ public class EZShop implements EZShopInterface {
         bo1.setBalanceId(id_bo3);
         ezBalanceOperations.put(id_bo3, bo3);
 
-        EZOrder o1 = new EZOrder(defaultID, id_bo1, "1345334543427", 12.60, 400, OSIssued);
-        int id_o1 = shopDB.insertOrder(id_bo1, "1345334543427", 12.60, 400, OSIssued);
+        EZOrder o1 = new EZOrder(defaultID, id_bo1, "1345334543427", 12.60, 4, OSIssued);
+        int id_o1 = shopDB.insertOrder(id_bo1, "1345334543427", 12.60, 4, OSIssued);
         o1.setOrderId(id_o1);
         ezOrders.put(id_o1, o1);
 //        EZOrder o2 = new EZOrder(defaultID, 3234, "4532344529689", 3.50, 150, OSPayed);
 //        int id_o2 = shopDB.insertOrder(3234, "4532344529689", 3.50, 150, OSPayed);
 //        o1.setOrderId(id_o2);
 //        ezOrders.put(id_o2, o2);
-        EZOrder o3 = new EZOrder(defaultID, id_bo3, "5839274928315", 56.70, 62, OSCompleted);
-        int id_o3 = shopDB.insertOrder(id_bo3, "5839274928315", 56.70, 62, OSCompleted);
+        EZOrder o3 = new EZOrder(defaultID, id_bo3, "5839274928315", 56.70, 6, OSCompleted);
+        int id_o3 = shopDB.insertOrder(id_bo3, "5839274928315", 56.70, 6, OSCompleted);
         o1.setOrderId(id_o3);
         ezOrders.put(id_o3, o3);
 
