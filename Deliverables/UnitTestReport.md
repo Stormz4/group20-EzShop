@@ -11,7 +11,9 @@ Date: 11/05/2021
 | Version | Changes |
 | ------- |---------|
 | 1 | Added first version of Unit Test Report document. |
+| 2 | Modified the document and first version of WB testing. |
 
+Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not included in the document since they don't have specific criteria and predicates.
 
 # Contents
 
@@ -105,6 +107,43 @@ Date: 11/05/2021
 |Valid|Valid|  boolean isValid = ez.isValidCard("2332543219"); <br />-> return true| Class TestEZShop_IsValidCard, method testLoyaltyCode_10digits()|
 |NULL/Invalid format | Invalid| boolean isValid = ez.isValidCard("33235"); <br /> -> return false <br /> or: boolean isValid = ez.isValidCard(null) <br /> -> Return false| Methods testLoyaltyCode_notEnoughDigits(), testLoyaltyCode_nullInput()|
 
+### **Class *EZShop* - method *isValidPosition***
+
+
+
+**Criteria for method *isValidPosition*:**
+
+
+- Validity of Position string
+
+
+**Predicates for method *isValidPosition*:**
+
+
+| Criteria                | Predicate |
+| ------------------------ | --------- |
+| Validity of Position string    | Valid     |
+|                          | NULL/Invalid format    |
+
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+|          |                 |
+
+
+**Combination of predicates**:
+
+
+|Validity of Loyalty card code | Valid / Invalid | Description of the test case | JUnit test case |
+-------|-------|-------|-------|
+|Valid|Valid|  boolean isValid = ez.isValidPosition("55-ADB-44"); <br />-> return true| Class TestEZShop_IsValidPosition, method testPosition_Valid()|
+|NULL/Invalid format | Invalid| boolean isValid = ez.isValidPosition("33235"); <br /> -> return false <br /> or: boolean isValid = ez.isValidPosition(null) <br /> -> Return false| Methods testPosition_notValid(), testPosition_nullInput()|
+
+
 ### **Class *class_name* - method *name***
 
 
@@ -163,11 +202,11 @@ Date: 11/05/2021
     <For traceability write the class and method name that contains the test case>
 
 
-| Unit name               | JUnit test case          |
-|-------------------------|--------------------------|
-| EZCustomer              | TestEZShop_Customer      |
-| EZUser                  | TestEZShop_User          |
-| EZProductType           | TestEZShop_ProductType   |
+| Unit name                | JUnit test case            |
+|--------------------------|----------------------------|
+| Method isValidCard()     | TestEZShop_IsValidCard     |
+| Method isValidBarCode()  | TestEZShop_VerifyBarCode   |
+| Method isValidPosition() | TestEZShop_IsValidPosition |
 
 ### Code coverage report
 
@@ -183,10 +222,10 @@ Date: 11/05/2021
 
 |Unit name | Loop rows | Number of iterations | JUnit test case |
 |---|---|---|---|
-|EZCustomer|//|//|TestEZShop_Customer|
-|EZUser|//|//|TestEZShop_User|
-|EZProductType||||TestEZShop_ProductType|
-||||||
+|isValidCard() |//|//|TestEZShop_IsValidCard|
+|isValidBarCode()|8-22|0|TestEZShop_VerifyBarCode, method testBarCode_notEnoughDigits()|
+|isValidBarCode()|8-22|12+|TestEZShop_VerifyBarCode, method testBarCode_12digits(), 13digits(), 14digits()|
+|isValidPosition()|//|//|TestEZShop_IsValidPosition|
 ||||||
 ||||||
 ||||||
