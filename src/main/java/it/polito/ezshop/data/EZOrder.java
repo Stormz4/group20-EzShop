@@ -1,10 +1,10 @@
 package it.polito.ezshop.data;
 
 public class EZOrder implements Order {
-    public static final String OSIssued = "Issued";
+    public static final String OSIssued = "ISSUED";
     //public static final String OSOrdered = "Ordered"; //same as Issued
-    public static final String OSPayed = "Payed";
-    public static final String OSCompleted = "Completed";
+    public static final String OSPayed = "PAYED";
+    public static final String OSCompleted = "COMPLETED";
 
     private Integer orderId;
     private Integer balanceId;
