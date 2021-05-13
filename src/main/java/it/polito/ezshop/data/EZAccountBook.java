@@ -25,7 +25,8 @@ public class EZAccountBook {
 
     boolean updateBalance(double toBeAdded)
     {
-        return false;
+        currentBalance += toBeAdded;
+        return true;
     }
 
     LinkedList<BalanceOperation> getAllTransactions()
