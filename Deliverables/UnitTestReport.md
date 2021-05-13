@@ -167,6 +167,7 @@ Date: 11/05/2021
 |-------------------------|--------------------------|
 | EZCustomer              | TestEZShop_Customer      |
 | EZUser                  | TestEZShop_User          |
+| EZProductType           | TestEZShop_ProductType   |
 
 ### Code coverage report
 
@@ -184,7 +185,7 @@ Date: 11/05/2021
 |---|---|---|---|
 |EZCustomer|//|//|TestEZShop_Customer|
 |EZUser|//|//|TestEZShop_User|
-||||||
+|EZProductType||||TestEZShop_ProductType|
 ||||||
 ||||||
 ||||||

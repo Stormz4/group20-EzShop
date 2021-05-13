@@ -134,7 +134,7 @@ public class EZShop implements EZShopInterface {
         }
 
         if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator)){
-            throw new UnauthorizedException();
+            throw new UnauthorizedException("Not authorized");
         }
 
         boolean success = shopDB.deleteUser(id);
