@@ -21,7 +21,7 @@ import static it.polito.ezshop.data.SQLiteDB.defaultValue;
 
 
 public class EZShop implements EZShopInterface {
-    final boolean USE_TEST_DB = true;
+    final boolean USE_TEST_DB = false;
 
     final static String creditCardsFile = "src/main/java/it/polito/ezshop/utils/CreditCards.txt";
     final static double startingBalanceValue = 1000.00;
@@ -699,7 +699,10 @@ public class EZShop implements EZShopInterface {
 
         EZOrder order = ezOrders.get(orderId);
 
-        if(order == null || !(order.getStatus().equals(OSIssued) || order.getStatus().equals(OSCompleted)))
+//        if(order == null || !(order.getStatus().equals(OSIssued) || order.getStatus().equals(OSCompleted)))
+//            return false;
+
+        if(order == null || !(order.getStatus().equals(OSPayed) || order.getStatus().equals(OSCompleted)))
             return false;
 
         if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
@@ -1757,7 +1760,7 @@ public class EZShop implements EZShopInterface {
                 !isValidCreditCard(creditCard))
             return false;
 
-        double cardBalance = getCreditInTXTbyCardNumber(ticketNumber.toString());
+        double cardBalance = getCreditInTXTbyCardNumber(creditCard.toString());
 
         if(cardBalance < (sale.getPrice() * sale.getDiscountRate()))
             return false; // return false if there aren't enough money in the selected credit card
