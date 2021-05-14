@@ -826,35 +826,37 @@ public class EZShop implements EZShopInterface {
     public boolean modifyCustomer(Integer id, String newCustomerName, String newCustomerCard) throws InvalidCustomerNameException, InvalidCustomerCardException, InvalidCustomerIdException, UnauthorizedException {
         // TODO Should we call the excepiont AND remove the card from the DB if the string is empty?
 
-        if ( newCustomerName == null || newCustomerName.isEmpty() ){
+        if ( newCustomerName == null || newCustomerName.isEmpty() )
             throw new InvalidCustomerNameException();
-        }
-        if ( newCustomerCard == null || !isValidCard(newCustomerCard)){
-            throw new InvalidCustomerCardException();
-        }
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URCashier, URShopManager)){
-            throw new UnauthorizedException();
-        }
 
-        for (Customer c : ezCustomers.values()) {
-            if ( !newCustomerCard.isEmpty() && c.getCustomerCard().equals(newCustomerCard)) {
-                // if the update fails ( cardCode assigned to another user)
-                // also the name must be unique
-                return false;
-            }
-        }
+        if ( !isValidCard(newCustomerCard))
+            throw new InvalidCustomerCardException();
+
+        if (this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URCashier, URShopManager))
+            throw new UnauthorizedException();
 
         EZCustomer customer = ezCustomers.get(id);
-        if (newCustomerCard.isEmpty()) {
-            //if it is an empty string then any existing card code connected to the customer will be removed
-            boolean deleted = shopDB.deleteCard(customer.getCustomerCard());
-            if (deleted) {
-                customer.setCustomerCard("");
-                customer.setPoints(0);
+        String customerCard = customer.getCustomerCard();
+
+        if (newCustomerCard != null) {
+            if (newCustomerCard.isEmpty()) {
+                if ( shopDB.deleteCard(customer.getCustomerCard()) ) {
+                    customer.setCustomerCard("");
+                    customer.setPoints(0);
+                }
+                else
+                    return false;
             }
-            return deleted;
-            //if (customer.getCustomerCard() != null && !customer.getCustomerCard().isEmpty())
-            //       shopDB.deleteCard(customer.getCustomerCard());
+            else if (this.ezCards.get(newCustomerCard) != null) {
+                for (Customer c : ezCustomers.values()) {
+                    if ( !c.getId().equals(id) && c.getCustomerCard().equals(newCustomerCard) )
+                        return false;   // Card already assigned to another customer
+                }
+
+                customerCard = newCustomerCard; // Card already exists and can be assigned to given customer
+            }
+            else
+                return false; // TODO: evaluate if useful
         }
 
         boolean updated = shopDB.updateCustomer(id, newCustomerName, newCustomerCard);
@@ -867,7 +869,6 @@ public class EZShop implements EZShopInterface {
         }
 
         return updated;
-
     }
 
     @Override
