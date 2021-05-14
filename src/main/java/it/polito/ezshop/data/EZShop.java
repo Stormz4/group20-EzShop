@@ -382,7 +382,7 @@ public class EZShop implements EZShopInterface {
 
         // Check if the Barcode is unique
         for (EZProductType product : ezProducts.values()) {
-            if (product.getBarCode().equals(newCode))
+            if (product.getBarCode().equals(newCode) && product.getId() != id)
                 return false;
         }
 
