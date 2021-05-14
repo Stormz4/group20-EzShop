@@ -829,7 +829,7 @@ public class EZShop implements EZShopInterface {
         if ( newCustomerName == null || newCustomerName.isEmpty() )
             throw new InvalidCustomerNameException();
 
-        if ( !isValidCard(newCustomerCard))
+        if ( newCustomerCard != null && !isValidCard(newCustomerCard))
             throw new InvalidCustomerCardException();
 
         if (this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URCashier, URShopManager))
@@ -856,15 +856,15 @@ public class EZShop implements EZShopInterface {
                 customerCard = newCustomerCard; // Card already exists and can be assigned to given customer
             }
             else
-                return false; // TODO: evaluate if useful
+                return false;
         }
 
-        boolean updated = shopDB.updateCustomer(id, newCustomerName, newCustomerCard);
+        boolean updated = shopDB.updateCustomer(id, newCustomerName, customerCard);
         if (updated){
             customer.setCustomerName(newCustomerName);
-            customer.setCustomerCard(newCustomerCard);
+            customer.setCustomerCard(customerCard);
 
-            Integer points = this.ezCards.get(newCustomerCard);
+            Integer points = this.ezCards.get(customerCard);
             customer.setPoints(points);
         }
 

@@ -718,7 +718,7 @@ public class SQLiteDB {
             // loop through the result set
             while (rs.next()) {
                 Integer id = rs.getInt("id");
-                String strId = String.format("%10d", id);
+                String strId = String.format("%10d", id).replace(' ', '0');
                 Integer points = rs.getInt("points");
                 cards.put(strId, points);
             }
