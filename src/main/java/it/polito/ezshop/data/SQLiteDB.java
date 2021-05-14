@@ -931,6 +931,7 @@ public class SQLiteDB {
             pstmt.setString(4, productDescription);
             pstmt.setString(5, barCode);
             pstmt.setDouble(6, pricePerUnit);
+            pstmt.setInt(7, id);
             pstmt.executeUpdate();
             updated = true;
         } catch (SQLException e) {

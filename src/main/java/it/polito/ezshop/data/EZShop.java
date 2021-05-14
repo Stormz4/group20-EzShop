@@ -382,7 +382,7 @@ public class EZShop implements EZShopInterface {
 
         // Check if the Barcode is unique
         for (EZProductType product : ezProducts.values()) {
-            if (product.getBarCode().equals(newCode))
+            if (product.getBarCode().equals(newCode) && product.getId() != id)
                 return false;
         }
 
@@ -714,15 +714,17 @@ public class EZShop implements EZShopInterface {
         }
 
         EZProductType prod = null;
-        for(EZProductType product : ezProducts.values())
-        {
-            if(product.getBarCode().equals(order.getProductCode()))
-            {
+        for(EZProductType product : ezProducts.values()) {
+            if(product.getBarCode().equals(order.getProductCode())) {
                 prod = product;
                 break;
             }
         }
-        assert prod != null; //???
+
+        // TODO: check if this is the proper behavior
+        if (prod == null)
+            return false;
+
         if(prod.getLocation() == null)
             throw new InvalidLocationException();
 
