@@ -14,7 +14,7 @@ public class EZSaleTransaction implements SaleTransaction {
     private double price;
     private List<EZReturnTransaction> returns;
     private String status; //accepted values: "OPENED", "CLOSED", "PAYED"
-    private EZCard attachedCard;
+    private String attachedCard;
 
     public EZSaleTransaction (Integer ticketNumber){
         this.ticketNumber = ticketNumber;
@@ -96,11 +96,11 @@ public class EZSaleTransaction implements SaleTransaction {
         return false;
     }
 
-    public EZCard getAttachedCard() {
+    public String getAttachedCard() {
         return this.attachedCard;
     }
 
-    public void setAttachedCard(EZCard attachedCard) {
+    public void setAttachedCard(String attachedCard) {
         this.attachedCard = attachedCard;
     }
 
