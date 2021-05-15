@@ -725,11 +725,10 @@ public class EZShop implements EZShopInterface {
         if (prod == null)
             return false;
 
-        if(prod.getLocation() == null)
+        if( !isValidPosition(prod.getLocation()) )
             throw new InvalidLocationException();
 
-        if(!order.getStatus().equals(OSCompleted))
-        {
+        if(!order.getStatus().equals(OSCompleted)) {
            if(!shopDB.updateOrder(order.getOrderId(), order.getBalanceId(), order.getProductCode(), order.getPricePerUnit(),
                    order.getQuantity(), OSCompleted))
                return false;
