@@ -10,7 +10,7 @@ public class TestEZShop_User {
 
     EZUser user;
     @Test
-    public void testCustomer(){
+    public void testUser(){
         user = new EZUser(-1, "Ciccio", "superpwd", "Administrator");
 
         user.setUsername("Francesco");

@@ -8,7 +8,7 @@ import java.time.LocalDate;
 public class TestEZShop_BalanceOperation {
     EZBalanceOperation balanceOp;
     @Test
-    public void testCustomer(){
+    public void testBalanceOperation(){
         balanceOp = new EZBalanceOperation(2, LocalDate.now(), 10, EZBalanceOperation.Credit);
         balanceOp.setBalanceId(3);
         int i = balanceOp.getBalanceId();

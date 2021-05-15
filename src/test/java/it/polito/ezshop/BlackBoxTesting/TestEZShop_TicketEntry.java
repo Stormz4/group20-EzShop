@@ -36,27 +36,15 @@ public class TestEZShop_TicketEntry {
         // Check discountRate
         assertEquals(cDiscountRate, ticketEntry.getDiscountRate(), 0.1);
 
-        cBarCode = null;
-        cDescription = null;
-        cAmount = 236186;
-        cPricePerUnit = 8.232;
-        cDiscountRate = 34.34;
-        ticketEntry = new EZTicketEntry(cBarCode, cDescription, cAmount, cPricePerUnit, cDiscountRate);
+
+        // Check behavior with null
+        ticketEntry = new EZTicketEntry(null, null, cAmount, cPricePerUnit, cDiscountRate);
 
         // Check barCode
         assertNull(ticketEntry.getBarCode());
 
         // Check description
         assertNull(ticketEntry.getProductDescription());
-
-        // Check amount
-        assertEquals(cAmount, ticketEntry.getAmount(), 0.1);
-
-        // Check pricePerUnit
-        assertEquals(cPricePerUnit, ticketEntry.getPricePerUnit(), 0.1);
-
-        // Check discountRate
-        assertEquals(cDiscountRate, ticketEntry.getDiscountRate(), 0.1);
     }
 
     @Test

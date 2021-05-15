@@ -10,7 +10,7 @@ import static org.junit.Assert.assertTrue;
 public class TestEZShop_ProductType {
     EZProductType p;
     @Test
-    public void testCustomer(){
+    public void testProductType(){
         p = new EZProductType(-1, 0, "55-AZE-22", "Expires on Monday", "Milk", "233254321519", 5);
         p.setProductDescription("Cookie");
         String s = p.getProductDescription();
