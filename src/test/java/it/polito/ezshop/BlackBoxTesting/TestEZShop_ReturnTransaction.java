@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 public class TestEZShop_ReturnTransaction {
     EZReturnTransaction returnTransaction, returnTransaction2;
     @Test
-    public void testCustomer(){
+    public void testReturnTransaction(){
         returnTransaction = new EZReturnTransaction(2, 1, new LinkedList<>(), 10, EZReturnTransaction.RTClosed);
         int id = returnTransaction.getReturnId();
         double d = returnTransaction.getReturnedValue();
