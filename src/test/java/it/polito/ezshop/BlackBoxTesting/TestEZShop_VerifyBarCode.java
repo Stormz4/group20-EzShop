@@ -38,6 +38,12 @@ public class TestEZShop_VerifyBarCode {
     }
 
     @Test
+    public void testBarCode_alphanumeric(){
+        isValid = ez.isValidBarCode("54326476412b31");
+        assertFalse(isValid);
+    }
+
+    @Test
     public void testBarCode_12digits(){
         isValid = ez.isValidBarCode("233254321519");
         assertTrue(isValid);
@@ -53,6 +59,12 @@ public class TestEZShop_VerifyBarCode {
     public void testBarCode_14digits(){
         isValid = ez.isValidBarCode("54326476412231");
         assertTrue(isValid);
+    }
+
+    @Test
+    public void testBarCode_algorithm(){
+        isValid = ez.isValidBarCode("54326476412234");
+        assertFalse(isValid);
     }
 
 

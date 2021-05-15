@@ -42,7 +42,9 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 **Criteria for method *isValidBarCode*:**
 	
 
- - Validity of Bar code
+ - Validity of BarCode
+ - BarCode matches a regexp
+ - BarCode matches an algorithm
 
 
 **Predicates for method *isValidBarCode*:**
@@ -50,10 +52,12 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 
 | Criteria                | Predicate |
 | ------------------------ | --------- |
-| Validity of BarCode       | Valid     |
-|                          | NULL/Invalid format    |
-
-
+| Validity of BarCode          | Valid        |
+|                              | NULL         |
+| Barcode matches a regexp     | Yes          |
+|                              | No           |
+| BarCode matches an algorithm | Yes          |
+|                              | No           |
 
 **Boundaries**:
 
@@ -65,11 +69,12 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 
 **Combination of predicates**:
 
-
-| Validity of Bar code | Valid / Invalid | Description of the test case | JUnit test case |
--------|-------|-------|-------|
-|Valid|Valid|  boolean isValid = ez.isValidBarCode("6291041500213"); <br />-> return true| Class TestEZShop_VerifyBarCode, method testBarCode_13digits()|
-|NULL/Invalid format|Invalid| boolean isValid = ez.isValidBarCode("33235");<br /> -> return false <br /> or: isValid = ez.isValidBarCode(null);<br /> -> return false|testBarCode_nullInput() and testBarCode_notEnoughDigits()|
+| Validity of BarCode | BarCode matches a regexp | BarCode matches an algorithm | Valid / Invalid | Description of the test case                                                                                                                                                                                             | JUnit test case                                                         |
+|---------------------|--------------------------|------------------------------|-----------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| Valid               | Yes                      | Yes                          | Valid           | boolean isValid = ez.isValidBarCode("6291041500213"); <br>-> return true <br>or: isValid = ez.isValidBarCode("6291041500213");<br>-> return true<br>or: isValid = ez.isValidBarCode("54326476412231");<br>-> return true | Class TestEZShop_VerifyBarCode,<br>method testBarCode_12/13/14digits(); |
+| ""                  | ""                       | No                           | Invalid         | boolean isValid =  ez.isValidBarCode("54326476412234");<br>-> return false                                                                                                                                               | testBarCode_algorithm():                                                |
+| ""                  | No                       | *                            | Invalid         | boolean isValid = ez.isValidBarCode("54326476412b31");<br>-> return false                                                                                                                                                | testBarCode_alphanumeric(), <br>testBarCode_notEnoughDigits()           |
+| NULL                | *                        | *                            | Invalid         | boolean isValid = ez.isValidBarCode(null)<br>-> return false                                                                                                                                                             | testBarCode_nullInput();                                                |
 
 ### **Class *EZShop* - method *isValidCard***
 
@@ -79,6 +84,7 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 
 
 - Validity of Loyalty card code
+- Loyalty card matches a regexp
 
 
 **Predicates for method *isValidCard*:**
@@ -86,9 +92,10 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 
 | Criteria                | Predicate |
 | ------------------------ | --------- |
-| Validity of Loyalty card code     | Valid     |
-|                          | NULL/Invalid format    |
-
+| Validity of Loyalty card code     | Valid                  |
+|                                   | NULL                   |
+| Loyalty card matches a regexp     | Yes                    |
+|                                   | No                     |
 
 
 **Boundaries**:
@@ -100,12 +107,12 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 
 
 **Combination of predicates**:
-
-
-|Validity of Loyalty card code | Valid / Invalid | Description of the test case | JUnit test case |
--------|-------|-------|-------|
-|Valid|Valid|  boolean isValid = ez.isValidCard("2332543219"); <br />-> return true| Class TestEZShop_IsValidCard, method testLoyaltyCode_10digits()|
-|NULL/Invalid format | Invalid| boolean isValid = ez.isValidCard("33235"); <br /> -> return false <br /> or: boolean isValid = ez.isValidCard(null) <br /> -> Return false| Methods testLoyaltyCode_notEnoughDigits(), testLoyaltyCode_nullInput()|
+    
+| Validity of Loyalty card code | Loyalty card matches a regexp | Valid / Invalid | Description of the test case                                     | JUnit test case                                           |
+|-------------------------------|-------------------------------|-----------------|------------------------------------------------------------------|-----------------------------------------------------------|
+| Valid                         | Yes                           | Valid           | boolean isValid = ez.isValidCard("2332543219");  -> return true  | Class TestEZShop_IsValidCard, testLoyaltyCode_10digits(); |
+| ""                            | No                            | Invalid         | boolean isValid = ez.isValidCard("33235"); -> return false       | testLoyaltyCode_notEnoughDigits():                        |
+| NULL                          | *                             | Invalid         | boolean isValid = ez.isValidCard(null) -> return false            | testLoyaltyCode_nullInput();                              |
 
 ### **Class *EZShop* - method *isValidPosition***
 
@@ -115,6 +122,7 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 
 
 - Validity of Position string
+- Position matches a regexp
 
 
 **Predicates for method *isValidPosition*:**
@@ -122,8 +130,10 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 
 | Criteria                | Predicate |
 | ------------------------ | --------- |
-| Validity of Position string    | Valid     |
-|                          | NULL/Invalid format    |
+| Validity of Position string       | Valid                  |
+|                                   | NULL                   |
+| Position matches a regexp         | Yes                    |
+|                                   | No                     |
 
 
 
@@ -137,12 +147,43 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 
 **Combination of predicates**:
 
+| Validity of Position string | Position matches a regexp | Valid / Invalid | Description of the test case                                          | JUnit test case                                                   |
+|-----------------------------|---------------------------|-----------------|-----------------------------------------------------------------------|-------------------------------------------------------------------|
+| Valid                       | Yes                       | Valid           | boolean isValid = ez.isValidPosition("55-ADB-44");<br>-> return true  | Class TestEZShop_IsValidPosition,<br>method testPosition_Valid(); |
+| ""                          | No                        | Invalid         | boolean isValid = ez.isValidPosition("33235");<br>-> return false     | testPosition_notValid();                                          |
+| NULL                        | *                         | Invalid         | boolean isValid = ez.isValidPosition(null)<br>-> return false         | testPosition_nullInput();                                         |
 
-|Validity of Loyalty card code | Valid / Invalid | Description of the test case | JUnit test case |
+### **Class *EZShop* - method *isValidCreditCard***
+
+
+**Criteria for method *isValidCreditCard*:**
+
+- Validity of credit card string
+
+**Predicates for method *isValidCreditCard*:**
+
+| Criteria                | Predicate |
+| ------------------------ | --------- |
+| Validity of credit card string    | Valid     |
+|                                   | NULL/Invalid format    |
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+|          |                 |
+
+
+
+**Combination of predicates**:
+
+
+|Validity of Credit card | Valid / Invalid | Description of the test case | JUnit test case |
 -------|-------|-------|-------|
-|Valid|Valid|  boolean isValid = ez.isValidPosition("55-ADB-44"); <br />-> return true| Class TestEZShop_IsValidPosition, method testPosition_Valid()|
-|NULL/Invalid format | Invalid| boolean isValid = ez.isValidPosition("33235"); <br /> -> return false <br /> or: boolean isValid = ez.isValidPosition(null) <br /> -> Return false| Methods testPosition_notValid(), testPosition_nullInput()|
-
+|Valid|Valid|  boolean isValid = ez.isValidCreditCard("4485370086510891"); <br />-> return true| Class TestEZShop_IsValidCreditCard, method testCreditCardValidity_correct()|
+|NULL/Invalid format | Invalid| boolean isValid = ez.isValidCreditCard(null); <br /> -> return false <br /> or: boolean isValid = ez.isValidCreditCard("4Z85a70b8F51c89D1")<br /> -> return false <br /> or: isValidCreditCard("345");<br /> -> return false <br /> or: isValidCreditCard("#4485370086510891"); <br /> -> return false <br /> or: isValidCreditCard(";-!"); <br /> -> return false <br /> | Methods testCreditCardValidity_null(), testCreditCardValidity_alphanumeric(), testCreditCardValidity_lessDigits(), testCreditCardValidity_hashtag(), testCreditCardValidity_specialCharacters() |
 
 ### **Class *class_name* - method *name***
 
