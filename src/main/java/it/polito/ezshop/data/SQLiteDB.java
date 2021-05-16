@@ -35,6 +35,19 @@ public class SQLiteDB {
         return this.dbConnection != null;
     }
 
+    public boolean isConnected() {
+        if (this.dbConnection != null) {
+            try {
+                return this.dbConnection.isValid(1);
+            }
+            catch (SQLException e) {
+                return false;
+            }
+        }
+
+        return false;
+    }
+
     public void closeConnection() {
         try {
             if (this.dbConnection != null) {
@@ -69,9 +82,9 @@ public class SQLiteDB {
      */
     public void initDatabase() {
         // Create tables if they do not exist already
-        this.createBalanceOperationsTable();//
-        this.createCardsTable();//
-        this.createCustomersTable();//
+        this.createBalanceOperationsTable();
+        this.createCardsTable();
+        this.createCustomersTable();
         this.createOrdersTable();
         this.createProductsPerSaleTable();
         this.createProductTypesTable();
@@ -88,7 +101,6 @@ public class SQLiteDB {
         this.clearTable("ProductsPerSale");
         this.clearTable("ProductTypes");
         this.clearTable("Transactions");
-        // this.clearTable("ReturnTransactions"); // TODO: need this?
 
         return true;
   }

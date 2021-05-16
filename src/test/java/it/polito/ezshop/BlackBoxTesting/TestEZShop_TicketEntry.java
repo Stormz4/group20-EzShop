@@ -96,5 +96,14 @@ public class TestEZShop_TicketEntry {
 
         assertNull(ticketEntry.getBarCode());
         assertNull(ticketEntry.getProductDescription());
+
+        // Check total
+        double total = sPricePerUnit * sAmount * (1 - sDiscountRate);
+        assertEquals(total, ticketEntry.getTotal(), 0.1);
+
+        // Check updateAmount
+        int toBeAdded = 10;
+        ticketEntry.updateAmount(10);
+        assertEquals(sAmount + 10, ticketEntry.getAmount());
     }
 }
