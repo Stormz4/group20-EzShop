@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-//import static it.polito.ezshop.data.EZShop.*;
 import static it.polito.ezshop.data.EZBalanceOperation.Credit;
 import static it.polito.ezshop.data.EZBalanceOperation.Debit;
 
@@ -18,25 +17,10 @@ public class EZAccountBook {
         this.currentBalance = currentBalance;
     }
 
-    boolean addBalanceOperation(Integer transactionID)
-    {
-        return false;
-    }
-
-    boolean updateBalance(double toBeAdded)
+    public boolean updateBalance(double toBeAdded)
     {
         currentBalance += toBeAdded;
         return true;
-    }
-
-    LinkedList<BalanceOperation> getAllTransactions()
-    {
-        return null;
-    }
-
-    boolean updateBalanceOperation(Integer transactionID)
-    {
-        return false;
     }
 
     public double getCurrentBalance() { return currentBalance; }
@@ -46,6 +30,9 @@ public class EZAccountBook {
     public boolean addBalanceOperation(SQLiteDB shopDB, double toBeAdded, HashMap<Integer, EZBalanceOperation> ezBalanceOperations)
     {
         String type;
+
+        if((toBeAdded + this.currentBalance) < 0)
+            return false;
 
         if(toBeAdded >= 0)
             type = Credit;
@@ -59,12 +46,10 @@ public class EZAccountBook {
         if(id == -1) return false; //return false if DB connection problem occurs
         op.setBalanceId(id);
         ezBalanceOperations.put(op.getBalanceId(), op);
-        nextBalanceId = op.getBalanceId(); // used to pay orders ???
+        nextBalanceId = op.getBalanceId();
 
         this.updateBalance(toBeAdded);
 
-        // should do anything else???
-
-        return !((toBeAdded + this.currentBalance) < 0);
+        return true;
     }
 }

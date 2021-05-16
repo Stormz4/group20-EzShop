@@ -22,7 +22,7 @@ public class EZReturnTransaction{
         this.entries = entries != null ? entries : new LinkedList<>();
     }
 
-    public EZReturnTransaction(EZReturnTransaction tmpRetTr) { // necessary??? (used to copy object)
+    public EZReturnTransaction(EZReturnTransaction tmpRetTr) {
         this.returnId = tmpRetTr.returnId;
         this.saleTransactionId = tmpRetTr.saleTransactionId;
         this.returnedValue = tmpRetTr.returnedValue;

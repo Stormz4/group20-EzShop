@@ -3,15 +3,16 @@
 Authors:
 - Mattia Lisciandrello s286329
 - Christian Casalini s281823
-- Palmucci Leonardo s288126
+- Leonardo Palmucci s288126
 - Dario Lanfranco s287524
 
-Date: 11/05/2021
+Date: 16/05/2021
 
 | Version | Changes |
 | ------- |---------|
 | 1 | Added first version of Unit Test Report document. |
 | 2 | Modified the document and first version of WB testing. |
+| 3 | Added some new black box tests
 
 Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not included in the document since they don't have specific criteria and predicates.
 
@@ -158,14 +159,17 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 
 **Criteria for method *isValidCreditCard*:**
 
-- Validity of credit card string
+- Credit card string matches a regexp (no alphanumeric or special characters are allowed, and it has to have a minimum length)
+- Validity of credit card string (validity decided by means of Luhn algorithm)
 
 **Predicates for method *isValidCreditCard*:**
 
-| Criteria                | Predicate |
-| ------------------------ | --------- |
-| Validity of credit card string    | Valid     |
-|                                   | NULL/Invalid format    |
+| Criteria                  | Predicate                                 |
+| ----------------------  | ------------------------------------    |
+| Credit card string matches a regexp   |            Yes                |
+|                                       |            No                 |
+| Validity of credit card string        | Valid                      |
+|                                       | NULL/Invalid format        |
 
 
 **Boundaries**:
@@ -180,10 +184,14 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 **Combination of predicates**:
 
 
-|Validity of Credit card | Valid / Invalid | Description of the test case | JUnit test case |
--------|-------|-------|-------|
-|Valid|Valid|  boolean isValid = ez.isValidCreditCard("4485370086510891"); <br />-> return true| Class TestEZShop_IsValidCreditCard, method testCreditCardValidity_correct()|
-|NULL/Invalid format | Invalid| boolean isValid = ez.isValidCreditCard(null); <br /> -> return false <br /> or: boolean isValid = ez.isValidCreditCard("4Z85a70b8F51c89D1")<br /> -> return false <br /> or: isValidCreditCard("345");<br /> -> return false <br /> or: isValidCreditCard("#4485370086510891"); <br /> -> return false <br /> or: isValidCreditCard(";-!"); <br /> -> return false <br /> | Methods testCreditCardValidity_null(), testCreditCardValidity_alphanumeric(), testCreditCardValidity_lessDigits(), testCreditCardValidity_hashtag(), testCreditCardValidity_specialCharacters() |
+|Credit card matches regexp|Validity of Credit card | Valid / Invalid | Description of the test case | JUnit test case |
+------|-------|-------|-------|-----|
+|Yes|Valid|Valid|  boolean isValid = ez.isValidCreditCard("4485370086510891"); <br />-> return true| Class TestEZShop_IsValidCreditCard, method testCreditCardValidity_correct()|
+|''|NULL/Invalid format | Invalid | boolean isValid = ez.isValidCreditCard("1849264958268091"); | Method testCreditCardValidity_notRespectingLuhnAlgo() |
+|No| * | Invalid| boolean isValid = ez.isValidCreditCard(null); <br /> -> return false <br /> or: boolean isValid = ez.isValidCreditCard("4Z85a70b8F51c89D1")<br /> -> return false <br /> or: isValidCreditCard("345");<br /> -> return false <br /> or: isValidCreditCard("#4485370086510891"); <br /> -> return false <br /> or: isValidCreditCard(";-!"); <br /> -> return false <br /> | Methods testCreditCardValidity_null(), testCreditCardValidity_alphanumeric(), testCreditCardValidity_lessDigits(), testCreditCardValidity_hashtag(), testCreditCardValidity_specialCharacters() |
+
+
+
 
 ### **Class *class_name* - method *name***
 

@@ -50,6 +50,12 @@ public class TestEZShop_isValidCreditCard {
         isValid = ez.isValidCreditCard(";-!");
         assertFalse(isValid);
     }
+
+    @Test
+    public void testCreditCardValidity_notRespectingLuhnAlgo() {
+        isValid = ez.isValidCreditCard("1849264958268091"); // random number
+        assertFalse(isValid);
+    }
 }
 
 
