@@ -159,7 +159,7 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 
 **Criteria for method *isValidCreditCard*:**
 
-- Credit card string matches a regexp (no alphanumeric or special characters are allowed, and it has to have a minimum length)
+- Credit card string matches a regexp (no alphanumeric or special characters are allowed)
 - Validity of credit card string (validity decided by means of Luhn algorithm)
 
 **Predicates for method *isValidCreditCard*:**
@@ -256,6 +256,9 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 | Method isValidCard()     | TestEZShop_IsValidCard     |
 | Method isValidBarCode()  | TestEZShop_VerifyBarCode   |
 | Method isValidPosition() | TestEZShop_IsValidPosition |
+| Method isValidCreditCard() | TestEZShop_isValidCreditCard |
+| Method getCreditInTXTByCreditCard() | TestEZShop_getCreditInTXTByCreditCard |
+| Method updateCreditInTXTbyCreditCard() | TestEZShop_updateCreditInTXTbyCreditCard |
 
 ### Code coverage report
 
@@ -275,9 +278,9 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 |isValidBarCode()|8-22|0|TestEZShop_VerifyBarCode, method testBarCode_notEnoughDigits()|
 |isValidBarCode()|8-22|12+|TestEZShop_VerifyBarCode, method testBarCode_12digits(), 13digits(), 14digits()|
 |isValidPosition()|//|//|TestEZShop_IsValidPosition|
-||||||
-||||||
-||||||
+|isValidCreditCard()|11-22|depends on the credit card string length |Methods in TestEZShop_isValidCreditCard (testCreditCardValidity_correct, testCreditCardValidity_null, etc.)|
+|getCreditInTXTByCreditCard()|14-25|depends on the length of the CreditCards.txt file|Methods in TestEZShop_getCreditInTXTByCreditCard (testGetCredit_correct, testGetCredit_null, etc.) |
+|updateCreditInTXTbyCreditCard()|17-36|depends on the length of the CreditCards.txt file|Methods in TestEZShop_updateCreditInTXTbyCreditCard (testUpdateCredit1_correct, testUpdateCredit2_negativeDouble, etc.)|
 
 
 
