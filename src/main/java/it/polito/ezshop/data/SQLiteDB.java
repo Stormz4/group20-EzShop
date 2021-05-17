@@ -17,6 +17,7 @@ import java.util.List;
 public class SQLiteDB {
     static final String JDBC_DB_NAME = "EZShopDB.db";
     static final String JDBC_DB_URL = "jdbc:sqlite:src/" + JDBC_DB_NAME;
+    static final long MAX_CARDS = 9999999999L;
     static final int defaultID = -1;
     static final int defaultValue = 0;
     private static final int INTEGER = 4; // see https://docs.oracle.com/javase/8/docs/api/constant-values.html#java.sql.Types.INTEGER
@@ -146,19 +147,19 @@ public class SQLiteDB {
     /**
      ** Returns the id of the last inserted row, no matter the table
      */
-    private int lastInsertRowId() {
+    private long lastInsertRowId() {
         if (this.dbConnection == null)
             return defaultID;
 
         String sql = "SELECT last_insert_rowid() AS id;";
-        int lastId = defaultID;
+        long lastId = defaultID;
 
         try{
             Statement stmt  = this.dbConnection.createStatement();
             ResultSet rs    = stmt.executeQuery(sql);
 
             if (rs.next())
-                lastId = rs.getInt("id");
+                lastId = rs.getLong("id");
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -242,7 +243,7 @@ public class SQLiteDB {
                 pstmt.setInt(2, Integer.parseInt(customerCard));
             pstmt.executeUpdate();
 
-            customerId = this.lastInsertRowId();
+            customerId = (int)this.lastInsertRowId();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
@@ -376,7 +377,7 @@ public class SQLiteDB {
             pstmt.setString(3, type);
             pstmt.executeUpdate();
 
-            balanceOperationId = this.lastInsertRowId();
+            balanceOperationId = (int)this.lastInsertRowId();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
@@ -536,7 +537,7 @@ public class SQLiteDB {
             pstmt.setString(5, status != null ? status : "");
             pstmt.executeUpdate();
 
-            orderId = this.lastInsertRowId();
+            orderId = (int)this.lastInsertRowId();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
@@ -663,7 +664,7 @@ public class SQLiteDB {
             pstmt.setString(3, role);
             pstmt.executeUpdate();
 
-            userId = this.lastInsertRowId();
+            userId = (int)this.lastInsertRowId();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
@@ -731,7 +732,7 @@ public class SQLiteDB {
 
         // SQL statement for creating a new Cards table
         String sql = "CREATE TABLE IF NOT EXISTS Cards (\n"
-                + " id integer PRIMARY KEY,\n"
+                + " id BIGINT PRIMARY KEY,\n"
                 + " points integer\n"
                 + ");";
 
@@ -756,7 +757,7 @@ public class SQLiteDB {
 
             // loop through the result set
             while (rs.next()) {
-                Integer id = rs.getInt("id");
+                Long id = rs.getLong("id");
                 String strId = String.format("%10d", id).replace(' ', '0');
                 Integer points = rs.getInt("points");
                 cards.put(strId, points);
@@ -775,6 +776,24 @@ public class SQLiteDB {
         if (this.dbConnection == null)
             return "";
 
+        String sqlCount = "SELECT COUNT(*) AS cardsN FROM Cards;";
+        long cardsN = 0;
+        boolean counted = false;
+        try {
+            Statement stmt  = this.dbConnection.createStatement();
+            ResultSet rs    = stmt.executeQuery(sqlCount);
+
+            if (rs.next())
+                cardsN = rs.getLong("cardsN");
+            counted = true;
+        }
+        catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        if (!counted || (counted && cardsN >= MAX_CARDS))
+            return "";
+
         String sql = "INSERT INTO Cards(points) VALUES(?)";
         String cardCode = "";
 
@@ -783,7 +802,7 @@ public class SQLiteDB {
             pstmt.setInt(1, points != null ? points : defaultValue);
             pstmt.executeUpdate();
 
-            Integer cardId = this.lastInsertRowId();
+            Long cardId = this.lastInsertRowId();
             cardCode = String.format("%10d", cardId).replace(' ', '0');
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -920,7 +939,7 @@ public class SQLiteDB {
             pstmt.setDouble(6, pricePerUnit);
             pstmt.executeUpdate();
 
-            id = this.lastInsertRowId();
+            id = (int)this.lastInsertRowId();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
@@ -1128,7 +1147,7 @@ public class SQLiteDB {
             pstmt.setString(3, status != null ? status : "");
             pstmt.executeUpdate();
 
-            transactionID = this.lastInsertRowId();
+            transactionID = (int)this.lastInsertRowId();
 
             // Save in DB all the entries of the sale
             if (entries != null && !entries.isEmpty()) {
@@ -1160,7 +1179,7 @@ public class SQLiteDB {
             pstmt.setString(3, status != null ? status : "");
             pstmt.executeUpdate();
 
-            transactionID = this.lastInsertRowId();
+            transactionID = (int)this.lastInsertRowId();
 
             // Save in DB all the entries of the sale
             if (entries != null && !entries.isEmpty()) {
