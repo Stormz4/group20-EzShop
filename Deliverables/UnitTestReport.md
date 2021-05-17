@@ -13,6 +13,7 @@ Date: 16/05/2021
 | 1 | Added first version of Unit Test Report document. |
 | 2 | Modified the document and first version of WB testing. |
 | 3 | Added some new black box tests |
+| 4 | Added BB tests for EZOrder and EZReturnTransaction |
 
 Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not included in the document since they don't have specific criteria and predicates.
 
@@ -77,9 +78,9 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 | ""                  | No                       | *                            | Invalid         | boolean isValid = ez.isValidBarCode("54326476412b31");<br>-> return false                                                                                                                                                | testBarCode_alphanumeric(), <br>testBarCode_notEnoughDigits()           |
 | NULL                | *                        | *                            | Invalid         | boolean isValid = ez.isValidBarCode(null)<br>-> return false                                                                                                                                                             | testBarCode_nullInput();                                                |
 
+
+
 ### **Class *EZShop* - method *isValidCard***
-
-
 
 **Criteria for method *isValidCard*:**
 
@@ -603,7 +604,6 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 
 **Combination of predicates**:
 
-
 | Valid setting | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|
 |Valid|Valid| book.setCurrentBalance(12345.67); |Class TestEZShop_AccountBook, method TestEZShop_AccountBook()|
@@ -627,6 +627,7 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 |                                              |        NULL         |
 |    Validity of list of balance operations    |       Valid         |
 |                                              |        NULL         |
+
 **Boundaries**:
 
 | Criteria | Boundary values |
@@ -644,6 +645,129 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 |Valid|Valid|Valid|Valid| book.addBalanceOperation(shopDB2, 150.33, balanceOperations)<br/>or:<br/>book.addBalanceOperation(shopDB2, -150.33, balanceOperations)<br/>or:<br/>book.addBalanceOperation(shopDB2, -10.0, balanceOperations) |''|
 |''|''|Invalid|Invalid|''|''|
 
+
+
+### **Class *EZOrder* - method *setBalanceID***
+
+**Criteria for method *setBalanceID*:**
+
+- Valid insertion of a new Balance Operation ID
+
+**Predicates for method *setBalanceID*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|    Valid Balance Operation ID    |      Valid (any Integer, including NULL)      |
+
+**Combination of predicates**:
+
+| Return Transaction ID | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid| order.setBalanceId(20) |Class TestEZShop_Order, method testOrder()|
+
+
+
+### **Class *EZOrder* - method *setProductCode***
+
+**Criteria for method *setProductCode*:**
+
+- Valid insertion of the Product Code of the Product to order
+
+**Predicates for method *setProductCode*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|    Valid Product Order    |      Valid (any String, including NULL)      |
+
+**Combination of predicates**:
+
+| Return Transaction ID | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid| order.setProductCode(sProductCode) |Class TestEZShop_Order, method testOrder()|
+
+
+
+### **Class *EZOrder* - method *setPricePerUnit***
+
+**Criteria for method *setPricePerUnit*:**
+
+- Valid insertion of the Price Per Unit of the Product to order
+
+**Predicates for method *setPricePerUnit*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|    Valid Price Per Unit    |      Valid (any double)      |
+
+**Combination of predicates**:
+
+| Return Transaction ID | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid| order.setPricePerUnit(24.10) |Class TestEZShop_Order, method testOrder()|
+
+
+
+### **Class *EZOrder* - method *setQuantity***
+
+**Criteria for method *setQuantity*:**
+
+- Valid insertion of the Quantity of the Product to order
+
+**Predicates for method *setQuantity*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|    Valid Product Quantity    |      Valid (any int)      |
+
+**Combination of predicates**:
+
+| Return Transaction ID | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid| order.setQuantity(70) |Class TestEZShop_Order, method testOrder()|
+
+
+
+### **Class *EZOrder* - method *setStatus***
+
+**Criteria for method *setStatus*:**
+
+- Valid insertion of a new Status for the Order
+
+**Predicates for method *setStatus*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|    Valid Status    |      Valid (any String, including NULL)      |
+
+**Combination of predicates**:
+
+| Return Transaction ID | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid| order.setStatus("COMPLETED") | Class TestEZShop_Order, method testOrder() |
+
+
+
+### **Class *EZOrder* - method *setOrderId***
+
+**Criteria for method *setOrderId*:**
+
+- Valid insertion of a new Order ID
+
+**Predicates for method *setOrderId*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|    Valid Order ID    |      Valid (any Integer, including NULL)      |
+
+**Combination of predicates**:
+
+| Return Transaction ID | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid| order.setOrderId(150) |Class TestEZShop_Order, method testOrder()|
+
+
+
+
 ### **Class *EZReturnTransaction* - method *setReturnID***
 
 **Criteria for method *setReturnID*:**
@@ -654,14 +778,15 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 
 | Criteria | Predicate |
 | -------- | --------- |
-|    Valid Return Transaction ID    |      Valid (any integer, including NULL)      |
+|    Valid Return Transaction ID    |      Valid (any Integer, including NULL)      |
 
 **Combination of predicates**:
-
 
 | Return Transaction ID | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|
 |*|Valid| returnTransaction.setReturnId(3) |Class TestEZShop_ReturnTransaction, method testReturnTransaction()|
+
+
 
 ### **Class *EZReturnTransaction* - method *setReturnedValue***
 
@@ -681,6 +806,8 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 | Returned Value | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|
 |*|Valid| returnTransaction.setReturnedValue(10) |Class TestEZShop_ReturnTransaction, method testReturnTransaction()|
+
+
 
 ### **Class *EZReturnTransaction* - method *updateReturnedValue***
 
@@ -702,6 +829,8 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 |-------|-------|-------|-------|-------|
 |*|*|Valid| returnTransaction.updateReturnedValue(25) |Class TestEZShop_ReturnTransaction, method testReturnTransaction()|
 
+
+
 ### **Class *EZReturnTransaction* - method *setItsSaleTransactionId***
 
 **Criteria for method *setItsSaleTransactionId*:**
@@ -712,7 +841,7 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 
 | Criteria | Predicate |
 | -------- | --------- |
-|    Valid Sale Transaction ID    |      Valid (any integer, including NULL)      |
+|    Valid Sale Transaction ID    |      Valid (any Integer, including NULL)      |
 
 **Combination of predicates**:
 
@@ -720,6 +849,8 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 | Return Transaction ID | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|
 |*|Valid| returnTransaction.setItsSaleTransactionId(2) |Class TestEZShop_ReturnTransaction, method testReturnTransaction()|
+
+
 
 ### **Class *EZReturnTransaction* - method *setEntries***
 
@@ -741,6 +872,8 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 |-------|-------|-------|-------|
 |!NULL|Valid| list = new LinkedList<>(); EZTicketEntry entry = new EZTicketEntry("0000", "hello", 2, 98, 0.5); list.add(entry); returnTransaction.setEntries(list) |Class TestEZShop_ReturnTransaction, method testReturnTransaction()|
 |NULL|Valid| returnTransaction.setEntries(null) -> should set an Empty List instead of null |Class TestEZShop_ReturnTransaction, method testReturnTransaction()|
+
+
 
 ### **Class *EZReturnTransaction* - method *setStatus***
 
