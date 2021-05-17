@@ -45,7 +45,7 @@ public class TestEZShop_TicketEntry {
 
         // Check description
         assertNull(ticketEntry.getProductDescription());
-    }
+   }
 
     @Test
     public void testTicketEntrySetters() {

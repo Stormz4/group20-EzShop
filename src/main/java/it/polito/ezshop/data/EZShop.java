@@ -481,7 +481,7 @@ public class EZShop implements EZShopInterface {
             int q = prodType.getQuantity();
 
 
-            boolean success = shopDB.updateProductType(productId, toBeAdded, prodType.getLocation(), prodType.getNote(), prodType.getProductDescription(), prodType.getBarCode(), prodType.getPricePerUnit());
+            boolean success = shopDB.updateProductType(productId, q+toBeAdded, prodType.getLocation(), prodType.getNote(), prodType.getProductDescription(), prodType.getBarCode(), prodType.getPricePerUnit());
             if (!success)
                 return false;
 
@@ -1689,29 +1689,6 @@ public class EZShop implements EZShopInterface {
         return true;
     }
 
-    static boolean verifyByLuhnAlgo(String ccNumber)
-    {
-        if (ccNumber == null){
-            return false;
-        }
-
-        int sum = 0;
-        boolean alternate = false;
-        for (int i = ccNumber.length() - 1; i >= 0; i--)
-        {
-            int n = Integer.parseInt(ccNumber.substring(i, i + 1));
-            if (alternate)
-            {
-                n *= 2;
-                if (n > 9)
-                    n = (n % 10) + 1;
-            }
-            sum += n;
-            alternate = !alternate;
-        }
-        return (sum % 10 == 0);
-    }
-
     @Override
     public double receiveCashPayment(Integer ticketNumber, double cash) throws InvalidTransactionIdException, InvalidPaymentException, UnauthorizedException {
 
@@ -1756,7 +1733,7 @@ public class EZShop implements EZShopInterface {
         if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier) )
             throw new UnauthorizedException();
 
-        if(creditCard == null || !verifyByLuhnAlgo(creditCard) || creditCard.equals("")) throw new InvalidCreditCardException();
+        if(creditCard == null || !isValidCreditCard(creditCard) || creditCard.equals("")) throw new InvalidCreditCardException();
 
         EZSaleTransaction sale = (EZSaleTransaction) getSaleTransaction(ticketNumber);
         if(sale == null ||
@@ -1781,10 +1758,31 @@ public class EZShop implements EZShopInterface {
     }
 
     public boolean isValidCreditCard(String cardNumber)
-    {
+    { // Verification based upon Luhn algorithm
         if(cardNumber == null)
             return false;
-        return cardNumber.matches("^(?:4[0-9]{12}(?:[0-9]{3})?|[25][1-7][0-9]{14}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\\d{3})\\d{11})$");
+
+        // old regexp:
+        // "^(?:4[0-9]{12}(?:[0-9]{3})?|[25][1-7][0-9]{14}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\d{3})\d{11})$"
+
+        if(!cardNumber.matches("[0-9]*"))
+            return false;
+
+        int sum = 0;
+        boolean alternate = false;
+        for (int i = cardNumber.length() - 1; i >= 0; i--)
+        {
+            int n = Integer.parseInt(cardNumber.substring(i, i + 1));
+            if (alternate)
+            {
+                n *= 2;
+                if (n > 9)
+                    n = (n % 10) + 1;
+            }
+            sum += n;
+            alternate = !alternate;
+        }
+        return (sum % 10 == 0);
     }
 
     public double getCreditInTXTbyCardNumber(String cardNumber)
@@ -1900,7 +1898,7 @@ public class EZShop implements EZShopInterface {
 
         if(returnId <= 0) throw new InvalidTransactionIdException(); // not "returnId == null ||" ???
 
-        if(creditCard == null || !verifyByLuhnAlgo(creditCard) || creditCard.equals("")) throw new InvalidCreditCardException();
+        if(creditCard == null || !isValidCreditCard(creditCard) || creditCard.equals("")) throw new InvalidCreditCardException();
 
         EZReturnTransaction retTr = getReturnTransactionById(returnId);
 
