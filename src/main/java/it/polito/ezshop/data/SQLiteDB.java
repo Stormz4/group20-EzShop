@@ -22,15 +22,16 @@ public class SQLiteDB {
     private static final int INTEGER = 4; // see https://docs.oracle.com/javase/8/docs/api/constant-values.html#java.sql.Types.INTEGER
 
     // Define tables names
-    private static final String tBalanceOperations = "BalanceOperations";
-    private static final String tCards = "Cards";
-    private static final String tCustomers = "Customers";
-    private static final String tOrders = "Orders";
-    private static final String tProductsPerSale = "ProductsPerSale";
-    private static final String tProductTypes = "ProductTypes";
-    private static final String tTransactions = "Transactions";
-    private static final String[] tables =  new String [] {tBalanceOperations, tCards, tCustomers, tOrders, tProductsPerSale,
-                                                            tProductsPerSale, tProductTypes, tTransactions};
+    public static final String tBalanceOperations = "BalanceOperations";
+    public static final String tCards = "Cards";
+    public static final String tCustomers = "Customers";
+    public static final String tOrders = "Orders";
+    public static final String tProductsPerSale = "ProductsPerSale";
+    public static final String tProductTypes = "ProductTypes";
+    public static final String tTransactions = "Transactions";
+    public static final String tUsers = "Users";
+    public static final String[] tables =  new String [] {tBalanceOperations, tCards, tCustomers, tOrders, tProductsPerSale,
+                                                            tProductsPerSale, tProductTypes, tTransactions, tUsers};
 
     private Connection dbConnection = null;
 
@@ -119,7 +120,7 @@ public class SQLiteDB {
         return cleared;
   }
 
-  private boolean clearTable(String tableName) {
+  public boolean clearTable(String tableName) {
 
         // Validate tableName, in order to prevent SQL injections
         boolean isValidTable = false;
