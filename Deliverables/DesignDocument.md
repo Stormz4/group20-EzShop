@@ -451,11 +451,10 @@ Shop --> GUI: returns List<Order>
 GUI --> User: Show orders
 User -> GUI: Register payment done for O
 GUI -> Shop: payOrder(orderID)
-Shop -> BalanceOperation: new BalanceOperation()
-BalanceOperation --> Shop: return BalanceOperation
-Shop -> AccountBook: addBalanceOperation()
-AccountBook --> Shop: return boolean
 Shop -> Shop: recordBalanceUpdate()
+Shop -> AccountBook: addBalanceOperation()
+AccountBook -> AccountBook: new BalanceOperation()
+AccountBook --> Shop: return boolean
 Shop -> Order: setStatus(Payed)
 Shop --> GUI: return boolean
 GUI --> User: Show outcome message
@@ -615,7 +614,13 @@ Actor User
 autonumber
 User -> GUI: Read credit card number
 GUI -> Shop: receiveCreditCardPayment()
+Shop -> Shop: getCreditInTXTbyCardNumber()
+Shop -> Shop: isValidCreditCard()
 Shop -> Shop: recordBalanceUpdate()
+Shop -> AccountBook: addBalanceOperation()
+AccountBook -> AccountBook: new BalanceOperation()
+AccountBook --> Shop: return boolean
+Shop -> Shop: updateCreditInTXTbyCardNumber()
 Shop --> GUI: return true
 GUI --> User: succesful message
 @enduml
