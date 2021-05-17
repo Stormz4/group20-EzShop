@@ -481,7 +481,7 @@ public class EZShop implements EZShopInterface {
             int q = prodType.getQuantity();
 
 
-            boolean success = shopDB.updateProductType(productId, toBeAdded, prodType.getLocation(), prodType.getNote(), prodType.getProductDescription(), prodType.getBarCode(), prodType.getPricePerUnit());
+            boolean success = shopDB.updateProductType(productId, q+toBeAdded, prodType.getLocation(), prodType.getNote(), prodType.getProductDescription(), prodType.getBarCode(), prodType.getPricePerUnit());
             if (!success)
                 return false;
 
