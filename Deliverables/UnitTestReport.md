@@ -192,6 +192,38 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 
 
 
+### **Class *EZCustomer* - method *setCustomerName***
+**Criteria for method *setCustomerName*:**
+
+
+**Predicates for method *name*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|          |           |
+|          |           |
+|          |           |
+|          |           |
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+|          |                 |
+
+**Combination of predicates**:
+
+
+| Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid|customer = new EZCustomer(-1, "Marco","0000000500", 0);|Class TestEZShop_Customer, method testCustomer()|
+|||||
+|||||
+|||||
+|||||
+
+
 
 ### **Class *class_name* - method *name***
 
@@ -239,8 +271,6 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 |||||||
 |||||||
 |||||||
-
-
 
 # White Box Unit Tests
 
