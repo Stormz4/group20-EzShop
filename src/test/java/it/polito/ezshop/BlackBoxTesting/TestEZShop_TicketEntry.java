@@ -45,7 +45,7 @@ public class TestEZShop_TicketEntry {
 
         // Check description
         assertNull(ticketEntry.getProductDescription());
-    }
+   }
 
     @Test
     public void testTicketEntrySetters() {
@@ -96,5 +96,11 @@ public class TestEZShop_TicketEntry {
 
         assertNull(ticketEntry.getBarCode());
         assertNull(ticketEntry.getProductDescription());
+        assertEquals(sPricePerUnit * sAmount* (1-sDiscountRate),
+                ticketEntry.getTotal(),
+                1.0);
+
+        ticketEntry.updateAmount(50);
+        assertEquals(sAmount+50, ticketEntry.getAmount());
     }
 }

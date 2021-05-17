@@ -70,6 +70,10 @@ public class TestEZShop_SaleTransaction {
         assertEquals(430.32, sale.getPrice(), 0.001);
         sale.updatePrice(-30.20);
         assertEquals(400.12, sale.getPrice(), 0.001);
+
+        assertFalse(sale.hasRequiredStatus(null));
+        assertFalse(sale.hasRequiredStatus(EZSaleTransaction.STClosed));
+        assertTrue(sale.hasRequiredStatus(EZSaleTransaction.STPayed));
     }
 
 }
