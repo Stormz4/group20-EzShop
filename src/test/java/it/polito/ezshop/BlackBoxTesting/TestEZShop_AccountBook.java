@@ -48,5 +48,9 @@ public class TestEZShop_AccountBook {
 
         assertFalse(book.addBalanceOperation(shopDB2, -10.0, balanceOperations));
         assertEquals(2, balanceOperations.size(), 0);
+
+        assertFalse(book.addBalanceOperation(shopDB2, 150.33, null));
+
+        assertFalse(book.addBalanceOperation(null, 150.33, balanceOperations));
     }
 }

@@ -34,6 +34,9 @@ public class EZAccountBook {
         if((toBeAdded + this.currentBalance) < 0)
             return false;
 
+        if(shopDB == null || ezBalanceOperations == null)
+            return false;
+
         if(toBeAdded >= 0)
             type = Credit;
         else

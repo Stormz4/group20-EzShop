@@ -614,6 +614,8 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 **Criteria for method *addBalanceOperation*:**
 
 - Valid insertion of a new balance operation
+- Validity of DB object
+- Validity of list of balance operations
 
 **Predicates for method *addBalanceOperation*:**
 
@@ -621,7 +623,10 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 | -------- | --------- |
 |    Valid insertion of balance operation      |       Valid         |
 |                                              |      Invalid        |
-
+|    Validity of DB object                     |       Valid         |
+|                                              |        NULL         |
+|    Validity of list of balance operations    |       Valid         |
+|                                              |        NULL         |
 **Boundaries**:
 
 | Criteria | Boundary values |
@@ -632,10 +637,12 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 **Combination of predicates**:
 
 
-| Valid insertion of balance operation | Valid / Invalid | Description of the test case | JUnit test case |
-|-------|-------|-------|-------|
-|Valid|Valid| book.addBalanceOperation(shopDB2, 150.33, balanceOperations)<br/>or:<br/>book.addBalanceOperation(shopDB2, -150.33, balanceOperations)<br/>or:<br/>book.addBalanceOperation(shopDB2, -10.0, balanceOperations) |Class TestEZShop_AccountBook, method TestEZShop_AccountBook()|
-|Invalid|Invalid|''|''|
+|Validity of DB object|Validity of list of balance operations| Valid insertion of balance operation | Valid / Invalid | Description of the test case | JUnit test case |
+------|---------|-------|-------|-------|-------|
+|Invalid|*|*|Invalid| book.addBalanceOperation(null, 150.33, balanceOperations) | Class TestEZShop_AccountBook, method TestEZShop_AccountBook() |
+|*|Invalid|*|Invalid| book.addBalanceOperation(shopDB2, 150.33, null) | '' |
+|Valid|Valid|Valid|Valid| book.addBalanceOperation(shopDB2, 150.33, balanceOperations)<br/>or:<br/>book.addBalanceOperation(shopDB2, -150.33, balanceOperations)<br/>or:<br/>book.addBalanceOperation(shopDB2, -10.0, balanceOperations) |''|
+|''|''|Invalid|Invalid|''|''|
 
 ### **Class *EZReturnTransaction* - method *setReturnID***
 
