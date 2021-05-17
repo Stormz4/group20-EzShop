@@ -7,18 +7,19 @@ Authors:
 - Palmucci Leonardo s288126
 - Dario Lanfranco s287524
 
-Date: 30/04/2021
+Date: 18/05/2021
 
 | Version | Changes |
 | ------- |---------|
 | 1 | Added first version of design document. |
-| 2 | Added functions in Shop | 
+| 2 | Added functions in Shop |
 | 3 | Added sequence diagrams |
 | 4 | Added sequence diagrams for UC9, fixed the class diagram along with the new requirements |
 | 5 | Updated class diagram |
 | 6 | Fixed some sequence diagrams, added method to AccountBook |
 | 7 | Modified use case diagrams, class diagram and verification matrix |
 | 8 | Last fixes. Final version |
+| 9 | Post-coding fixes|
 
 # Contents
 
@@ -188,8 +189,7 @@ class AccountBook {
  +boolean addBalanceOperation(Integer transactionID)
  +boolean updateBalance(double toBeAdded)
  +List<BalanceOperation> getAllTransactions()
- +boolean updateBalanceOperation(Integer transactionID)
-}
+ }
 AccountBook -down- Shop
 class BalanceOperation {
  +transactionID: Integer
@@ -262,7 +262,6 @@ Order "*" - ProductType
 
 Enum OrderStatusEnum {
     Issued
-    Ordered
     Payed
     Completed
 }
@@ -439,7 +438,7 @@ Shop -> Order: setStatus(Issued)
 Shop --> GUI: return orderID
 GUI --> User: show outcome message
 @enduml
-```   
+```
 
 ### Scenario 3-2
 ```plantuml
@@ -461,7 +460,7 @@ Shop -> Order: setStatus(Payed)
 Shop --> GUI: return boolean
 GUI --> User: Show outcome message
 @enduml
-```   
+```
 
 #
 ## UC4
@@ -480,7 +479,7 @@ Shop -> Customer: update()
 Shop --> GUI: return boolean
 GUI --> User: Show outcome message
 @enduml
-```   
+```
 
 ### Scenario 4-2
 ```plantuml
@@ -496,7 +495,7 @@ GUI -> Shop: attachCardToCustomer()
 Shop --> GUI: return boolean
 GUI --> User: Show outcome message
 @enduml
-```   
+```
 
 ### Scenario 4-3
 ```plantuml
@@ -512,7 +511,7 @@ Shop -> Customer: setCard()
 Shop --> GUI: return boolean
 GUI --> User: Show outcome message 
 @enduml
-```   
+```
 
 
 ## UC5 
@@ -556,8 +555,7 @@ autonumber
 User -> GUI: start Sale Transaction
 GUI -> Shop: startSaleTransaction()
 Shop -> SaleTransaction: new SaleTransaction()
-SaleTransaction --> Shop: return TransactionID
-Shop --> GUI: return boolean
+Shop --> GUI: return TransactionID
 User -> GUI: Insert product BarCode
 GUI -> Shop: addProductToSale()
 Shop -> Shop: getProductByBarCode()
@@ -606,7 +604,6 @@ ref over GUI, User, Shop, AccountBook
 end ref
 @enduml
 ```
-
 
 ## UC7
 

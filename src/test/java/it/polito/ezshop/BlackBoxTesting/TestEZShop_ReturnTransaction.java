@@ -45,7 +45,6 @@ public class TestEZShop_ReturnTransaction {
         list.add(entry);
         returnTransaction.setEntries(list);
         List<TicketEntry> gotList = returnTransaction.getEntries();
-        returnTransaction.setStatus(EZReturnTransaction.RTPayed);
         s = returnTransaction.getStatus();
 
         assertEquals(3, id);
@@ -57,7 +56,10 @@ public class TestEZShop_ReturnTransaction {
 
         returnTransaction.updateReturnedValue(25);
         d = returnTransaction.getReturnedValue();
+        returnTransaction.setEntries(null);
+        gotList = returnTransaction.getEntries();
 
+        assertTrue(gotList.isEmpty());
         assertEquals(35, d, 0.1);
     }
 }
