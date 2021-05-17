@@ -280,22 +280,23 @@ public class SQLiteDB {
         if (this.dbConnection == null || customerId == null)
             return false;
 
-        if (customerCard == null)
-            customerCard = "";
+        if (customerName == null || customerName.isEmpty())
+            return false;
 
+        boolean shouldUpdateCard = customerCard != null;
         boolean updated = false;
-        String sql = "UPDATE Customers\n" +
-                     "SET name = ?, card = ?\n" +
-                     "WHERE id = ?;";
+        String sql = "UPDATE Customers\n"
+                   + "SET name = ?" + (shouldUpdateCard ? ", card = ?\n" : "\n")
+                   + "WHERE id = ?;";
 
         try{
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
             pstmt.setString(1, customerName);
-            if (customerCard.isEmpty())
+            if (shouldUpdateCard && customerCard.isEmpty())
                 pstmt.setNull(2, INTEGER);
-            else
+            else if (shouldUpdateCard)
                 pstmt.setInt(2, Integer.parseInt(customerCard));
-            pstmt.setInt(3, customerId);
+            pstmt.setInt((shouldUpdateCard ? 3 : 2), customerId);
             pstmt.executeUpdate();
             updated = true;
         } catch (SQLException e) {

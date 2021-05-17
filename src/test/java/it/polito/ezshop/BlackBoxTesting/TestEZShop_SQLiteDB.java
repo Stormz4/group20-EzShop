@@ -222,6 +222,14 @@ public class TestEZShop_SQLiteDB {
         int cstID = shopDB.insertCustomer(cName, cCustomerCard);
         assertEquals(cstID, defaultID);
 
+        // Check updateCustomer
+        assertTrue(shopDB.updateCustomer(cID, "Jack", "0002938475"));    // Valid params
+        assertTrue(shopDB.updateCustomer(cstID, "Jack", "0002938475")); // Invalid ID
+        assertTrue(shopDB.updateCustomer(cID, "Al", null)); // Null card
+        assertTrue(shopDB.updateCustomer(cID, "Jack", "")); // Empty card
+        assertFalse(shopDB.updateCustomer(cID, null, "0002938475")); // Null name
+        assertFalse(shopDB.updateCustomer(cID, "", "0002938475")); // Null name
+
         // Check deleteCustomer
         assertTrue(shopDB.deleteCustomer(cID));
     }
