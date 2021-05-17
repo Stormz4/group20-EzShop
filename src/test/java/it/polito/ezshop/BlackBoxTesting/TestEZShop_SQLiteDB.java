@@ -26,7 +26,7 @@ public class TestEZShop_SQLiteDB {
     @Before
     public void connectAndInit() {
         shopDB = new SQLiteDB();
-        shopDB.connect();
+        assertTrue(shopDB.connect());
 
         // Check connection
         assertTrue(shopDB.isConnected());
@@ -76,12 +76,22 @@ public class TestEZShop_SQLiteDB {
         if (ezUsers == null)
             ezUsers = shopDB.selectAllUsers();
         assertNotNull(ezUsers);
+
+        if (ezReturnTransactions == null)
+            ezReturnTransactions = shopDB.selectAllReturnTransactions();
+        assertNotNull(ezReturnTransactions);
     }
 
     @Test
     public void testClearDatabase() {
         // Check if clearDatabase is performed without issues
         assertTrue(shopDB.clearDatabase());
+
+        assertEquals(0, shopDB.selectAllBalanceOperations().size());
+        assertEquals(0, shopDB.selectAllOrders().size());
+        assertEquals(0, shopDB.selectAllProductTypes().size());
+        assertEquals(0, shopDB.selectAllSaleTransactions().size());
+        assertEquals(0, shopDB.selectAllReturnTransactions().size());
     }
 
     @Test

@@ -50,7 +50,7 @@ public class EZShop implements EZShopInterface {
     }
 
     public void  loadDataFromDB() {
-        if (this.shopDB.dbConnection == null)
+        if ( !this.shopDB.isConnected() )
             shopDB.connect();
         shopDB.initDatabase();
 
@@ -85,7 +85,7 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public void reset() {
-        if (this.shopDB.dbConnection == null)
+        if ( !this.shopDB.isConnected() )
             this.shopDB.connect();
 
         if (this.shopDB.clearDatabase())
