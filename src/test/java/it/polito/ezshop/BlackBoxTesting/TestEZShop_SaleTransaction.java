@@ -74,6 +74,9 @@ public class TestEZShop_SaleTransaction {
         assertFalse(sale.hasRequiredStatus(null));
         assertFalse(sale.hasRequiredStatus(EZSaleTransaction.STClosed));
         assertTrue(sale.hasRequiredStatus(EZSaleTransaction.STPayed));
+
+        gt = sale.getTicketEntryByBarCode("162748284283");
+        assertNull(gt);
     }
 
 }
