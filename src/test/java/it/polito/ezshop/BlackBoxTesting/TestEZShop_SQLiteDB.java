@@ -50,12 +50,12 @@ public class TestEZShop_SQLiteDB {
 
 
         EZProductType prod1 = new EZProductType(defaultID, 5, "", "A simple note",
-                "First product", "4593744529689", 12.50);
+                "First product", "4627828478338", 12.50);
         prod1.setId( this.shopDB.insertProductType(prod1.getQuantity(), prod1.getLocation(), prod1.getNote(),
                 prod1.getProductDescription(), prod1.getBarCode(), prod1.getPricePerUnit()) );
 
         EZProductType prod2 = new EZProductType(defaultID, 5, "", "A simple note",
-                "First product", "4532341859689", 12.50);
+                "First product", "4838283913450", 12.50);
         prod2.setId( this.shopDB.insertProductType(prod2.getQuantity(), prod2.getLocation(), prod2.getNote(),
                 prod2.getProductDescription(), prod2.getBarCode(), prod2.getPricePerUnit()) );
 
@@ -146,9 +146,6 @@ public class TestEZShop_SQLiteDB {
 
         // Populate DB
         this.populateDB();
-
-        // Check selectAll queries
-        this.testSelectAllQueries();
     }
 
     @After
@@ -161,7 +158,8 @@ public class TestEZShop_SQLiteDB {
         shopDB = null;
     }
 
-    private void testSelectAllQueries() {
+    @Test
+    public void testSelectAllQueries() {
 
         if (ezBalanceOperations == null)
             ezBalanceOperations = shopDB.selectAllBalanceOperations();
