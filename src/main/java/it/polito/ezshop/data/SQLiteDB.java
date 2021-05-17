@@ -1,5 +1,6 @@
 package it.polito.ezshop.data;
 
+import java.lang.reflect.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -8,6 +9,7 @@ import java.sql.Statement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,7 +21,20 @@ public class SQLiteDB {
     static final int defaultID = -1;
     static final int defaultValue = 0;
     private static final int INTEGER = 4; // see https://docs.oracle.com/javase/8/docs/api/constant-values.html#java.sql.Types.INTEGER
-    Connection dbConnection = null;
+
+    // Define tables names
+    public static final String tBalanceOperations = "BalanceOperations";
+    public static final String tCards = "Cards";
+    public static final String tCustomers = "Customers";
+    public static final String tOrders = "Orders";
+    public static final String tProductsPerSale = "ProductsPerSale";
+    public static final String tProductTypes = "ProductTypes";
+    public static final String tTransactions = "Transactions";
+    public static final String tUsers = "Users";
+    public static final String[] tables =  new String [] {tBalanceOperations, tCards, tCustomers, tOrders, tProductsPerSale,
+                                                            tProductsPerSale, tProductTypes, tTransactions, tUsers};
+
+    private Connection dbConnection = null;
 
     /**
      ** Connect to the DB
@@ -34,6 +49,19 @@ public class SQLiteDB {
         }
 
         return this.dbConnection != null;
+    }
+
+    public boolean isConnected() {
+        if (this.dbConnection != null) {
+            try {
+                return this.dbConnection.isValid(1);
+            }
+            catch (SQLException e) {
+                return false;
+            }
+        }
+
+        return false;
     }
 
     public void closeConnection() {
@@ -70,9 +98,9 @@ public class SQLiteDB {
      */
     public void initDatabase() {
         // Create tables if they do not exist already
-        this.createBalanceOperationsTable();//
-        this.createCardsTable();//
-        this.createCustomersTable();//
+        this.createBalanceOperationsTable();
+        this.createCardsTable();
+        this.createCustomersTable();
         this.createOrdersTable();
         this.createProductsPerSaleTable();
         this.createProductTypesTable();
@@ -84,25 +112,36 @@ public class SQLiteDB {
         if (this.dbConnection == null)
             return false;
 
-        this.clearTable("BalanceOperations");
-        this.clearTable("Orders");
-        this.clearTable("ProductsPerSale");
-        this.clearTable("ProductTypes");
-        this.clearTable("Transactions");
-        // this.clearTable("ReturnTransactions"); // TODO: need this?
+        boolean cleared = this.clearTable(tBalanceOperations);
+        cleared &= this.clearTable(tOrders);
+        cleared &= this.clearTable(tProductsPerSale);
+        cleared &= this.clearTable(tProductTypes);
+        cleared &= this.clearTable(tTransactions);
 
-        return true;
+        return cleared;
   }
 
-  private void clearTable(String tableName) {
-      String sql =  "DELETE FROM " + tableName + " ;";
+  public boolean clearTable(String tableName) {
 
-      try{
-          Statement stmt = this.dbConnection.createStatement();
-          stmt.execute(sql);
-      } catch (SQLException e) {
-          System.out.println(e.getMessage());
-      }
+        // Validate tableName, in order to prevent SQL injections
+        boolean isValidTable = false;
+        for (String tName : SQLiteDB.tables)
+            isValidTable |= tableName.equals(tName);
+
+        if (!isValidTable)
+            return false;
+
+        String sql =  "DELETE FROM " + tableName + " ;";
+
+        try{
+            Statement stmt = this.dbConnection.createStatement();
+            stmt.execute(sql);
+            return true;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return false;
   }
 
     /**
@@ -993,7 +1032,8 @@ public class SQLiteDB {
         HashMap<Integer, EZSaleTransaction> saleTransactions = new HashMap<>();
         String sql = "SELECT id, discountRate, price, status \n"
                    + "FROM Transactions \n"
-                   + "WHERE status <> \"OPENED\";";
+                   + "WHERE saleID IS NULL \n"
+                   + "  AND status <> \"OPENED\";";
 
         try {
             Statement stmt  = this.dbConnection.createStatement();

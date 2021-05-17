@@ -50,7 +50,7 @@ public class EZShop implements EZShopInterface {
     }
 
     public void  loadDataFromDB() {
-        if (this.shopDB.dbConnection == null)
+        if ( !this.shopDB.isConnected() )
             shopDB.connect();
         shopDB.initDatabase();
 
@@ -85,7 +85,7 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public void reset() {
-        if (this.shopDB.dbConnection == null)
+        if ( !this.shopDB.isConnected() )
             this.shopDB.connect();
 
         if (this.shopDB.clearDatabase())
@@ -1924,7 +1924,7 @@ public class EZShop implements EZShopInterface {
         if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager) )
             throw new UnauthorizedException();
         if(accountingBook == null)
-            accountingBook = new EZAccountBook(startingBalanceValue);
+            accountingBook = new EZAccountBook(startingBalanceValue); //???
         return accountingBook.addBalanceOperation(shopDB, toBeAdded, ezBalanceOperations);
     }
 
