@@ -1924,7 +1924,7 @@ public class EZShop implements EZShopInterface {
         if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager) )
             throw new UnauthorizedException();
         if(accountingBook == null)
-            accountingBook = new EZAccountBook(startingBalanceValue);
+            accountingBook = new EZAccountBook(startingBalanceValue); //???
         return accountingBook.addBalanceOperation(shopDB, toBeAdded, ezBalanceOperations);
     }
 
