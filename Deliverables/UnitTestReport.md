@@ -12,7 +12,7 @@ Date: 16/05/2021
 | ------- |---------|
 | 1 | Added first version of Unit Test Report document. |
 | 2 | Modified the document and first version of WB testing. |
-| 3 | Added some new black box tests
+| 3 | Added some new black box tests |
 
 Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not included in the document since they don't have specific criteria and predicates.
 
@@ -97,7 +97,6 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 |                                   | NULL                   |
 | Loyalty card matches a regexp     | Yes                    |
 |                                   | No                     |
-
 
 **Boundaries**:
 
@@ -638,6 +637,123 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 |Valid|Valid| book.addBalanceOperation(shopDB2, 150.33, balanceOperations)<br/>or:<br/>book.addBalanceOperation(shopDB2, -150.33, balanceOperations)<br/>or:<br/>book.addBalanceOperation(shopDB2, -10.0, balanceOperations) |Class TestEZShop_AccountBook, method TestEZShop_AccountBook()|
 |Invalid|Invalid|''|''|
 
+### **Class *EZReturnTransaction* - method *setReturnID***
+
+**Criteria for method *setReturnID*:**
+
+- Valid insertion of a new Return Transaction ID
+
+**Predicates for method *setReturnID*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|    Valid Return Transaction ID    |      Valid (any integer, including NULL)      |
+
+**Combination of predicates**:
+
+
+| Return Transaction ID | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid| returnTransaction.setReturnId(3) |Class TestEZShop_ReturnTransaction, method testReturnTransaction()|
+
+### **Class *EZReturnTransaction* - method *setReturnedValue***
+
+**Criteria for method *setReturnedValue*:**
+
+- Valid insertion of a new Returned Value
+
+**Predicates for method *setReturnedValue*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|    Valid Returned Value    |      Valid (any double)      |
+
+**Combination of predicates**:
+
+
+| Returned Value | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid| returnTransaction.setReturnedValue(10) |Class TestEZShop_ReturnTransaction, method testReturnTransaction()|
+
+### **Class *EZReturnTransaction* - method *updateReturnedValue***
+
+**Criteria for method *updateReturnedValue*:**
+
+- Valid insertion of a new value to add to the returnedValue of the Return Transaction
+
+**Predicates for method *updateReturnedValue*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|    Valid Value to add    |      Valid (any double)      |
+| Valid Current Value of returnedValue | Valid (any double) |
+
+**Combination of predicates**:
+
+
+| toBeAdded | returnedValue | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|-------|
+|*|*|Valid| returnTransaction.updateReturnedValue(25) |Class TestEZShop_ReturnTransaction, method testReturnTransaction()|
+
+### **Class *EZReturnTransaction* - method *setItsSaleTransactionId***
+
+**Criteria for method *setItsSaleTransactionId*:**
+
+- Valid insertion of a the Sale Transaction ID associated to the Return Transaction
+
+**Predicates for method *setItsSaleTransactionId*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|    Valid Sale Transaction ID    |      Valid (any integer, including NULL)      |
+
+**Combination of predicates**:
+
+
+| Return Transaction ID | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid| returnTransaction.setItsSaleTransactionId(2) |Class TestEZShop_ReturnTransaction, method testReturnTransaction()|
+
+### **Class *EZReturnTransaction* - method *setEntries***
+
+**Criteria for method *setEntries*:**
+
+- Valid insertion of a new list of Ticket Entries
+
+**Predicates for method *setEntries*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|    Valid list of Ticket Entries    |      Valid (any List of TicketEntry)      |
+|  | Valid (null) |
+
+**Combination of predicates**:
+
+
+| Entries | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|!NULL|Valid| list = new LinkedList<>(); EZTicketEntry entry = new EZTicketEntry("0000", "hello", 2, 98, 0.5); list.add(entry); returnTransaction.setEntries(list) |Class TestEZShop_ReturnTransaction, method testReturnTransaction()|
+|NULL|Valid| returnTransaction.setEntries(null) -> should set an Empty List instead of null |Class TestEZShop_ReturnTransaction, method testReturnTransaction()|
+
+### **Class *EZReturnTransaction* - method *setStatus***
+
+**Criteria for method *setStatus*:**
+
+- Valid insertion of the Status of the Return Transaction
+
+**Predicates for method *setStatus*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|    Valid Return Transaction Status    |      Valid (any String)      |
+
+**Combination of predicates**:
+
+
+| Return Transaction ID | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid| returnTransaction.setStatus(EZReturnTransaction.RTPayed) |Class TestEZShop_ReturnTransaction, method testReturnTransaction()|
+
 
 
 
@@ -646,7 +762,6 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 
 
 **Criteria for method *name*:**
-
 
 -
 -
@@ -691,7 +806,7 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 # White Box Unit Tests
 
 ### Test cases definition
-    
+
     <JUnit test classes must be in src/test/java/it/polito/ezshop>
     <Report here all the created JUnit test cases, and the units/classes under test >
     <For traceability write the class and method name that contains the test case>
@@ -710,7 +825,7 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 
     <Add here the screenshot report of the statement and branch coverage obtained using
     the Eclemma tool. >
-
+    
     <insert the screen>
 
 ### Loop coverage analysis
