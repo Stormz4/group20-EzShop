@@ -96,11 +96,13 @@ public class TestEZShop_TicketEntry {
 
         assertNull(ticketEntry.getBarCode());
         assertNull(ticketEntry.getProductDescription());
-        assertEquals(sPricePerUnit * sAmount* (1-sDiscountRate),
-                ticketEntry.getTotal(),
-                1.0);
 
-        ticketEntry.updateAmount(50);
-        assertEquals(sAmount+50, ticketEntry.getAmount());
+        // Check total
+        double total = sPricePerUnit * sAmount * (1 - sDiscountRate);
+        assertEquals(total, ticketEntry.getTotal(), 0.1);
+
+        // Check updateAmount
+        ticketEntry.updateAmount(10);
+        assertEquals(sAmount + 10, ticketEntry.getAmount());
     }
 }
