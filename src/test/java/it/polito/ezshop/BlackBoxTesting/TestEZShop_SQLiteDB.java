@@ -207,7 +207,7 @@ public class TestEZShop_SQLiteDB {
     }
 
     @Test
-    public void testInsertDeleteCustomer() {
+    public void testCustomer() {
         String cName = "Johnny";
         String cCustomerCard = "0364829165";
         int cPoints = 185;
@@ -232,6 +232,49 @@ public class TestEZShop_SQLiteDB {
 
         // Check deleteCustomer
         assertTrue(shopDB.deleteCustomer(cID));
+    }
+
+    @Test
+    public void testBalanceOperation() {
+        LocalDate cDate = LocalDate.now();
+        double cMoney = 12.50;
+        String cType = "CREDIT";
+
+        // Proper balanceOperation insertion
+        int id = shopDB.insertBalanceOperation(cDate, cMoney, cType);
+        assertNotEquals(id, defaultID);
+
+        // Insert with null date
+        int failID = shopDB.insertBalanceOperation(null, cMoney, cType);
+        assertEquals(failID, defaultID);
+
+        // Insert with null type
+        failID = shopDB.insertBalanceOperation(cDate, cMoney, null);
+        assertEquals(failID, defaultID);
+
+        // Proper balanceOperation update
+        boolean updated = shopDB.updateBalanceOperation(id, LocalDate.now(), 16.80, cType);
+        assertTrue(updated);
+
+        // Update with null date
+        updated = shopDB.updateBalanceOperation(id, null, 16.80, cType);
+        assertFalse(updated);
+
+        // Update with null type
+        updated = shopDB.updateBalanceOperation(id, LocalDate.now(), 16.80, null);
+        assertFalse(updated);
+
+        // Update with inexistent ID
+        updated = shopDB.updateBalanceOperation(failID, LocalDate.now(), 16.80, cType);
+        assertTrue(updated);
+
+        // Delete balanceOperation with existent ID
+        boolean deleted = shopDB.deleteBalanceOperation(id);
+        assertTrue(deleted);
+
+        // Delete balanceOperation with inexistent DB
+        deleted = shopDB.deleteBalanceOperation(failID);
+        assertTrue(deleted);
     }
 
     @Test

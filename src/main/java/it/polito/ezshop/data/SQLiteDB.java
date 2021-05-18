@@ -358,7 +358,7 @@ public class SQLiteDB {
      */
     public Integer insertBalanceOperation(LocalDate date, double money, String type) {
         if (this.dbConnection == null || date == null || type == null)
-            return null;
+            return defaultID;
 
         String sql = "INSERT INTO BalanceOperations(date, money, type) VALUES(?,?,?)";
         int balanceOperationId = defaultID;
