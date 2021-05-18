@@ -12,7 +12,6 @@ import it.polito.ezshop.data.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.sqlite.SQLiteException;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -224,6 +223,24 @@ public class TestEZShop_SQLiteDB {
 
         // Check deleteCustomer
         assertTrue(shopDB.deleteCustomer(cID));
+    }
+
+    @Test
+    public void testUserDB(){
+        int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager");
+        boolean update = shopDB.updateUser(uID, "Rosario2", "testpwd2", "Cashier");
+        boolean delete = shopDB.deleteUser(uID);
+
+        assertNotEquals(uID, defaultID);
+        assertFalse(shopDB.updateUser(null, "Rosario2", "testpwd2", "Cashier"));
+        assertFalse(shopDB.deleteUser(null));
+        assertTrue(update);
+        assertTrue(delete);
+
+        HashMap<Integer, EZUser> map = shopDB.selectAllUsers();
+        System.out.println(map);
+        assertTrue(map.size() > 0);
+
     }
 
     @Test

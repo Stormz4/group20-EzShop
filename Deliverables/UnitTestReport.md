@@ -15,7 +15,9 @@ Date: 16/05/2021
 | 3 | Added some new black box tests |
 | 4 | Added BB tests for EZOrder and EZReturnTransaction |
 
-Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not included in the document since they don't have specific criteria and predicates.
+Leaf classes (TestEZShop_Customer, User and so on) and DB methods don't include involve a lot of controls and checks on the
+data since they're checked at an higher level in EZShop.
+
 
 # Contents
 
@@ -1229,7 +1231,7 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 
 **Criteria for method *setItsSaleTransactionId*:**
 
-- Valid insertion of a the Sale Transaction ID associated to the Return Transaction
+- Valid insertion of the Sale Transaction ID associated to the Return Transaction
 
 **Predicates for method *setItsSaleTransactionId*:**
 
@@ -1289,31 +1291,81 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 |*|Valid| returnTransaction.setStatus(EZReturnTransaction.RTPayed) |Class TestEZShop_ReturnTransaction, method testReturnTransaction()|
 
 
+### **Class *SQLiteDB* - method *insertUser***
 
+**Criteria for method *insertUser*:**
 
-### **Class *class_name* - method *name***
+ - Validity of username
+ - Validity of password
+ - Validity of role
 
-
-
-**Criteria for method *name*:**
-
--
--
-
-
-
-
-
-**Predicates for method *name*:**
+**Predicates for method *insertUser*:**
 
 | Criteria | Predicate |
 | -------- | --------- |
-|          |           |
-|          |           |
-|          |           |
-|          |           |
+| Validity of username        |    Valid       |
+| Validity of password         |    Valid       |
+| Validity of role         |     Valid      |
 
 
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+
+**Combination of predicates**:
+
+| Criteria 1 | Criteria 2 | Criteria 3 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|-------|-------|
+|*|*|*|Valid|  int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager");| TestEZShop_SQLiteDB, method testUserDB() |
+
+### **Class *SQLiteDB* - method *updateUser***
+
+**Criteria for method *updateUser*:**
+
+- Validity of id integer
+- Validity of username
+- Validity of password
+- Validity of role
+
+**Predicates for method *updateUser*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Validity of id integer | Valid |
+|                        | NULL  |
+| Validity of username        |    Valid       |
+| Validity of password         |    Valid       |
+| Validity of role         |     Valid      |
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+
+**Combination of predicates**:
+
+| Criteria 1 | Criteria 2 | Criteria 3 | Criteria 4 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|-------|-------|-------|
+|Valid|*|*|*|Valid| int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager");  <br> boolean update = shopDB.updateUser(uID, "Rosario2", "testpwd2", "Cashier"); -> return true| TestEZShop_SQLiteDB, method testUserDB() |
+|NULL|*|*|*|Invalid|   boolean update = shopDB.updateUser(null, "Rosario2", "testpwd2", "Cashier"); -> return false| TestEZShop_SQLiteDB, method testUserDB() |
+
+### **Class *SQLiteDB* - method *deleteUser***
+
+**Criteria for method *deleteUser*:**
+
+- Validity of id integer
+
+
+**Predicates for method *deleteUser*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Validity of id integer | Valid |
+|                        | NULL  |
 
 
 
@@ -1322,20 +1374,14 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 | Criteria | Boundary values |
 | -------- | --------------- |
 |          |                 |
-|          |                 |
-
-
 
 **Combination of predicates**:
 
+| Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|Valid|Valid| int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager");  <br> boolean update = shopDB.deleteUser(uID); -> return true| TestEZShop_SQLiteDB, method testUserDB() |
+|NULL|Invalid|   boolean update = shopDB.deleteUser(null) -> return false| TestEZShop_SQLiteDB, method testUserDB() |
 
-| Criteria 1 | Criteria 2 | ... | Valid / Invalid | Description of the test case | JUnit test case |
-|-------|-------|-------|-------|-------|-------|
-|||||||
-|||||||
-|||||||
-|||||||
-|||||||
 
 # White Box Unit Tests
 
