@@ -282,7 +282,6 @@ public class TestEZShop_SQLiteDB {
 
     @Test
     public void testOrder() {
-        // int cOrderID
         int cBalanceID = 2;
         String cProductCode = "7293829484929";
         double cPricePerUnit = 8.40;
@@ -328,6 +327,40 @@ public class TestEZShop_SQLiteDB {
         // Delete order with inexistent id
         deleted = shopDB.deleteBalanceOperation(failID);
         assertTrue(deleted);
+    }
+
+    @Test
+    public void testCard() {
+        Integer cPoints = 125;
+
+        // Proper Card insertions
+        String validCard = shopDB.insertCard(cPoints);
+        assertNotNull(validCard);
+        assertTrue(EZShop.isValidCard(validCard));
+
+        // Insert Card with null points
+        String invalidCard = shopDB.insertCard(null);
+        assertTrue(invalidCard.isEmpty());
+
+        // Proper Card update
+        boolean updated = shopDB.updateCard(validCard, cPoints);
+        assertTrue(updated);
+
+        // Update Card with null points
+        updated = shopDB.updateCard(validCard, null);
+        assertFalse(updated);
+
+        // Update Card with inexistent cardCode
+        updated = shopDB.updateCard(invalidCard, cPoints);
+        assertFalse(updated);
+
+        // Delete Card
+        boolean deleted = shopDB.deleteCard(validCard);
+        assertTrue(deleted);
+
+        // Delete Card with invalid code
+        deleted = shopDB.deleteCard(invalidCard);
+        assertFalse(deleted);
     }
 
     @Test

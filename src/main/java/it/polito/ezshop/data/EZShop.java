@@ -794,7 +794,7 @@ public class EZShop implements EZShopInterface {
     }
 
 
-    public boolean isValidCard(String card){
+    public static boolean isValidCard(String card){
         if (card == null)
             return false;
 

@@ -828,7 +828,10 @@ public class SQLiteDB {
      ** Update Card record
      */
     public boolean updateCard(String cardCode, Integer points) {
-        if (this.dbConnection == null || cardCode == null || cardCode.isEmpty() || points == null)
+        if (this.dbConnection == null || cardCode == null || points == null)
+            return false;
+
+        if (cardCode.isEmpty())
             return false;
 
         boolean deleted = false;
