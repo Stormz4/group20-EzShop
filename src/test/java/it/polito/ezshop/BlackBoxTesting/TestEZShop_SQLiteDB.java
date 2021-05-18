@@ -231,25 +231,24 @@ public class TestEZShop_SQLiteDB {
         int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager");
         int uID2 = shopDB.insertUser("Rosario", "testpwd", "ShopManager");
         boolean update = shopDB.updateUser(uID, "Rosario2", "testpwd2", "Cashier");
-        boolean delete = shopDB.deleteUser(uID);
 
         assertNotEquals(defaultID, uID);
         assertEquals(defaultID, uID2);
         assertFalse(shopDB.updateUser(null, "Rosario2", "testpwd2", "Cashier"));
         assertFalse(shopDB.deleteUser(null));
         assertTrue(update);
-        assertTrue(delete);
 
         HashMap<Integer, EZUser> map = shopDB.selectAllUsers();
         System.out.println(map);
         assertTrue(map.size() > 0);
 
-        // FIXME this resutls true, it shouldn't, modify the db method
         int uID3 = shopDB.insertUser("sheldon", "testpwd", "ShopManager");
+        assertEquals(defaultID, uID3);
         boolean update2 = shopDB.updateUser(uID, "sheldon", "testpwd2", "Cashier");
         assertFalse(update2); // User already exists
 
-
+        boolean delete = shopDB.deleteUser(uID);
+        assertTrue(delete);
     }
 
     @Test
