@@ -1009,7 +1009,7 @@ data since they're checked at an higher level in EZShop.
 ### **Class *EZAccountBook* - method *addBalanceOperation***
 **Criteria for method *addBalanceOperation*:**
 
-- Valid insertion of a new balance operation
+- Amount  
 - Validity of DB object
 - Validity of list of balance operations
 
@@ -1017,8 +1017,8 @@ data since they're checked at an higher level in EZShop.
 
 | Criteria | Predicate |
 | -------- | --------- |
-|    Valid insertion of balance operation      |       Valid         |
-|                                              |      Invalid        |
+|    Amount                                    |       >= 0          |
+|                                              |        < 0          |
 |    Validity of DB object                     |       Valid         |
 |                                              |        NULL         |
 |    Validity of list of balance operations    |       Valid         |
@@ -1028,18 +1028,17 @@ data since they're checked at an higher level in EZShop.
 
 | Criteria | Boundary values |
 | -------- | --------------- |
-|          |                 |
-|          |                 |
+|     Amount     |        0         |
 
 **Combination of predicates**:
 
 
-|Validity of DB object|Validity of list of balance operations| Valid insertion of balance operation | Valid / Invalid | Description of the test case | JUnit test case |
-------|---------|-------|-------|-------|-------|
+|Validity of DB object|Amount|Validity of list of balance operations| Valid / Invalid | Description of the test case | JUnit test case |
+------|------|-----|-------|-------|----------|
 |Invalid|*|*|Invalid| book.addBalanceOperation(null, 150.33, balanceOperations) | Class TestEZShop_AccountBook, method TestEZShop_AccountBook() |
-|*|Invalid|*|Invalid| book.addBalanceOperation(shopDB2, 150.33, null) | '' |
-|Valid|Valid|Valid|Valid| book.addBalanceOperation(shopDB2, 150.33, balanceOperations)<br/>or:<br/>book.addBalanceOperation(shopDB2, -150.33, balanceOperations)<br/>or:<br/>book.addBalanceOperation(shopDB2, -10.0, balanceOperations) |''|
-|''|''|Invalid|Invalid|''|''|
+|*|*|Invalid|Invalid| book.addBalanceOperation(shopDB2, 150.33, null) | '' |
+|Valid| \>= 0|Valid|Valid| book.addBalanceOperation(shopDB2, 150.33, balanceOperations)|''|
+|''| < 0 |''|Valid|book.addBalanceOperation(shopDB2, -150.33, balanceOperations)<br/>or:<br/>book.addBalanceOperation(shopDB2, -10.0, balanceOperations) |''|
 
 
 

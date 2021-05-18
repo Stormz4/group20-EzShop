@@ -21,7 +21,7 @@ import static it.polito.ezshop.data.SQLiteDB.defaultValue;
 
 
 public class EZShop implements EZShopInterface {
-    final boolean USE_TEST_DB = false;
+    final boolean USE_TEST_DB = false; //todo: remove
 
     final static String creditCardsFile = "src/main/java/it/polito/ezshop/utils/CreditCards.txt";
     final static double startingBalanceValue = 1000.00;
