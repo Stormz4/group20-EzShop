@@ -468,7 +468,9 @@ public class SQLiteDB {
                 + " productCode text,\n"
                 + " pricePerUnit real,\n"
                 + " quantity integer,\n"
-                + " status text\n"
+                + " status text,\n"
+                + "FOREIGN KEY(productCode) REFERENCES ProductTypes(barCode),  \n"
+                + "FOREIGN KEY(balanceId) REFERENCES BalanceOperations(id) \n"
                 + ");";
 
         try{

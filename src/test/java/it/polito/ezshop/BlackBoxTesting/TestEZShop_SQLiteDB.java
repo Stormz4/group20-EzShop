@@ -275,6 +275,59 @@ public class TestEZShop_SQLiteDB {
         // Delete balanceOperation with inexistent DB
         deleted = shopDB.deleteBalanceOperation(failID);
         assertTrue(deleted);
+
+        // Testing here totalBalance because there's not so much to test about it
+        double balance = shopDB.selectTotalBalance();
+    }
+
+    @Test
+    public void testOrder() {
+        // int cOrderID
+        int cBalanceID = 2;
+        String cProductCode = "7293829484929";
+        double cPricePerUnit = 8.40;
+        int cQuantity = 12;
+        String cStatus = "COMPLETED";
+
+        // Proper Order insertion
+        int id = shopDB.insertOrder(cBalanceID, cProductCode, cPricePerUnit, cQuantity, cStatus);
+        assertNotEquals(id, defaultID);
+
+        // Insertion with null balanceID
+        int failID = shopDB.insertOrder(null, cProductCode, cPricePerUnit, cQuantity, cStatus);
+        assertEquals(failID, defaultID);
+
+        // Insertion with inexistent balanceID
+        failID = shopDB.insertOrder(87658876, cProductCode, cPricePerUnit, cQuantity, cStatus);
+        assertNotEquals(failID, defaultID);
+
+        // Insertion with inexistent productCode
+        failID = shopDB.insertOrder(cBalanceID, "4762834629", cPricePerUnit, cQuantity, cStatus);
+        assertNotEquals(failID, defaultID);
+
+        // Insertion with null productCode
+        failID = shopDB.insertOrder(cBalanceID, null, cPricePerUnit, cQuantity, cStatus);
+        assertEquals(failID, defaultID);
+
+        // Insertion with null status
+        failID = shopDB.insertOrder(cBalanceID, cProductCode, cPricePerUnit, cQuantity, null);
+        assertEquals(failID, defaultID);
+
+        // Proper Order update
+        boolean updated = shopDB.updateOrder(id, cBalanceID, "2747364827", cPricePerUnit, cQuantity, cStatus);
+        assertTrue(updated);
+
+        // Order update with inexistent id
+        updated = shopDB.updateOrder(failID, cBalanceID, "2749964827", cPricePerUnit, cQuantity, cStatus);
+        assertTrue(updated);
+
+        // Delete order
+        boolean deleted = shopDB.deleteBalanceOperation(id);
+        assertTrue(deleted);
+
+        // Delete order with inexistent id
+        deleted = shopDB.deleteBalanceOperation(failID);
+        assertTrue(deleted);
     }
 
     @Test
