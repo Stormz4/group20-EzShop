@@ -13,6 +13,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -226,12 +227,14 @@ public class TestEZShop_SQLiteDB {
     }
 
     @Test
-    public void testUserDB(){
+    public void testUserDB() throws SQLException {
         int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager");
+        int uID2 = shopDB.insertUser("Rosario", "testpwd", "ShopManager");
         boolean update = shopDB.updateUser(uID, "Rosario2", "testpwd2", "Cashier");
         boolean delete = shopDB.deleteUser(uID);
 
-        assertNotEquals(uID, defaultID);
+        assertNotEquals(defaultID, uID);
+        assertEquals(defaultID, uID2);
         assertFalse(shopDB.updateUser(null, "Rosario2", "testpwd2", "Cashier"));
         assertFalse(shopDB.deleteUser(null));
         assertTrue(update);
@@ -240,6 +243,12 @@ public class TestEZShop_SQLiteDB {
         HashMap<Integer, EZUser> map = shopDB.selectAllUsers();
         System.out.println(map);
         assertTrue(map.size() > 0);
+
+        // FIXME this resutls true, it shouldn't, modify the db method
+        int uID3 = shopDB.insertUser("sheldon", "testpwd", "ShopManager");
+        boolean update2 = shopDB.updateUser(uID, "sheldon", "testpwd2", "Cashier");
+        assertFalse(update2); // User already exists
+
 
     }
 
