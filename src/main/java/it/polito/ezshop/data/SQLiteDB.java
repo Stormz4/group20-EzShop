@@ -1248,21 +1248,20 @@ public class SQLiteDB {
     /**
      ** Update SaleTransaction record
      */
-    public boolean updateReturnTransaction(Integer transactionID, int saleID, double price, String status) {
+    public boolean updateReturnTransaction(Integer transactionID, double price, String status) {
         if (this.dbConnection == null || transactionID == null)
             return false;
 
         boolean updated = false;
         String sql = "UPDATE Transactions\n" +
-                     "SET discountRate = ?, price = ?, status = ?\n" +
+                     "SET price = ?, status = ?\n" +
                      "WHERE id = ?;";
 
         try{
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
-            pstmt.setInt(1, saleID);
-            pstmt.setDouble(2, price);
-            pstmt.setString(3, status != null ? status : "");
-            pstmt.setInt(4, transactionID);
+            pstmt.setDouble(1, price);
+            pstmt.setString(2, status != null ? status : "");
+            pstmt.setInt(3, transactionID);
             pstmt.executeUpdate();
             updated = true;
         } catch (SQLException e) {

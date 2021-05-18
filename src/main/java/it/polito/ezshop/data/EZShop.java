@@ -1587,7 +1587,7 @@ public class EZShop implements EZShopInterface {
             }
             retToBeStored.setStatus(RTClosed);
             // update ReturnTransaction in DB:
-            if(!shopDB.updateReturnTransaction(retToBeStored.getReturnId(), retToBeStored.getSaleTransactionId(), retToBeStored.getReturnedValue(), "TODO: complete with correct STATUS"))
+            if(!shopDB.updateReturnTransaction(retToBeStored.getReturnId(), retToBeStored.getReturnedValue(), "TODO: complete with correct STATUS"))
                 return false;
             // clear the temporary transaction:
             tmpRetTr = null;
