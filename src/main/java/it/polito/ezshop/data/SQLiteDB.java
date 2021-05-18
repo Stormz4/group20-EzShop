@@ -277,11 +277,8 @@ public class SQLiteDB {
      ** Update Customer record
      */
     public boolean updateCustomer(Integer customerId, String customerName, String customerCard) {
-        if (this.dbConnection == null || customerId == null)
+        if (this.dbConnection == null || customerId == null || customerName == null || customerCard == null)
             return false;
-
-        if (customerCard == null)
-            customerCard = "";
 
         boolean updated = false;
         String sql = "UPDATE Customers\n" +
@@ -411,7 +408,7 @@ public class SQLiteDB {
      ** Update BalanceOperation record
      */
     public boolean updateBalanceOperation(Integer id, LocalDate date, double money, String type) {
-        if (this.dbConnection == null || id == null)
+        if (this.dbConnection == null || id == null || date == null || type == null)
             return false;
 
         boolean updated = false;
@@ -419,13 +416,9 @@ public class SQLiteDB {
                      "SET date = ?, money = ?, type = ?\n" +
                      "WHERE id = ?;";
 
-        String strDate = null;
-        if (date != null)
-            strDate = date.toString();
-
         try{
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
-            pstmt.setString(1, strDate);
+            pstmt.setString(1, date.toString());
             pstmt.setDouble(2, money);
             pstmt.setString(3, type);
             pstmt.setInt(4, id);
@@ -571,7 +564,7 @@ public class SQLiteDB {
      ** Update Order record
      */
     public boolean updateOrder(Integer id, Integer balanceId, String productCode, double pricePerUnit, int quantity, String status) {
-        if (this.dbConnection == null || id == null)
+        if (this.dbConnection == null || id == null || balanceId == null || productCode == null || status == null)
             return false;
 
         boolean updated = false;
@@ -698,7 +691,7 @@ public class SQLiteDB {
      ** Update User record
      */
     public boolean updateUser(Integer id, String userName, String password, String role) {
-        if (this.dbConnection == null || id == null)
+        if (this.dbConnection == null || id == null || userName == null || password == null || role == null)
             return false;
 
         boolean updated = false;
@@ -837,7 +830,7 @@ public class SQLiteDB {
      ** Update Card record
      */
     public boolean updateCard(String cardCode, Integer points) {
-        if (this.dbConnection == null || cardCode == null || cardCode.isEmpty())
+        if (this.dbConnection == null || cardCode == null || cardCode.isEmpty() || points == null)
             return false;
 
         boolean deleted = false;
@@ -973,7 +966,10 @@ public class SQLiteDB {
      ** Update ProductType record
      */
     public boolean updateProductType(Integer id, Integer quantity, String location, String note, String productDescription, String barCode, double pricePerUnit) {
-        if (this.dbConnection == null || id == null)
+        if (this.dbConnection == null)
+            return false;
+
+        if (id == null || quantity == null || location == null || note == null || productDescription == null || barCode == null)
             return false;
 
         boolean updated = false;
@@ -1222,7 +1218,7 @@ public class SQLiteDB {
      ** Update SaleTransaction record
      */
     public boolean updateSaleTransaction(Integer transactionID, double discountRate, double price, String status) {
-        if (this.dbConnection == null || transactionID == null)
+        if (this.dbConnection == null || transactionID == null || status == null)
             return false;
 
         boolean updated = false;
@@ -1234,7 +1230,7 @@ public class SQLiteDB {
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
             pstmt.setDouble(1, discountRate);
             pstmt.setDouble(2, price);
-            pstmt.setString(3, status != null ? status : "");
+            pstmt.setString(3, status);
             pstmt.setInt(4, transactionID);
             pstmt.executeUpdate();
             updated = true;
@@ -1249,7 +1245,7 @@ public class SQLiteDB {
      ** Update SaleTransaction record
      */
     public boolean updateReturnTransaction(Integer transactionID, double price, String status) {
-        if (this.dbConnection == null || transactionID == null)
+        if (this.dbConnection == null || transactionID == null || status == null)
             return false;
 
         boolean updated = false;
@@ -1260,7 +1256,7 @@ public class SQLiteDB {
         try{
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
             pstmt.setDouble(1, price);
-            pstmt.setString(2, status != null ? status : "");
+            pstmt.setString(2, status);
             pstmt.setInt(3, transactionID);
             pstmt.executeUpdate();
             updated = true;
@@ -1375,7 +1371,7 @@ public class SQLiteDB {
      ** Update ProductPerSale record
      */
     public boolean updateProductPerSale(String barCode, Integer transactionID, int amount, double discountRate) {
-        if (this.dbConnection == null || transactionID == null)
+        if (this.dbConnection == null || transactionID == null || barCode == null)
             return false;
 
         boolean updated = false;
