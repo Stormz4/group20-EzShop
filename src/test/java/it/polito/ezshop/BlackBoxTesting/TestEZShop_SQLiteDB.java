@@ -12,8 +12,8 @@ import it.polito.ezshop.data.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.sqlite.SQLiteException;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -232,6 +232,31 @@ public class TestEZShop_SQLiteDB {
 
         // Check deleteCustomer
         assertTrue(shopDB.deleteCustomer(cID));
+    }
+
+    @Test
+    public void testUserDB() throws SQLException {
+        int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager");
+        int uID2 = shopDB.insertUser("Rosario", "testpwd", "ShopManager");
+        boolean update = shopDB.updateUser(uID, "Rosario2", "testpwd2", "Cashier");
+
+        assertNotEquals(defaultID, uID);
+        assertEquals(defaultID, uID2);
+        assertFalse(shopDB.updateUser(null, "Rosario2", "testpwd2", "Cashier"));
+        assertFalse(shopDB.deleteUser(null));
+        assertTrue(update);
+
+        HashMap<Integer, EZUser> map = shopDB.selectAllUsers();
+        System.out.println(map);
+        assertTrue(map.size() > 0);
+
+        int uID3 = shopDB.insertUser("sheldon", "testpwd", "ShopManager");
+        assertEquals(defaultID, uID3);
+        boolean update2 = shopDB.updateUser(uID, "sheldon", "testpwd2", "Cashier");
+        assertFalse(update2); // User already exists
+
+        boolean delete = shopDB.deleteUser(uID);
+        assertTrue(delete);
     }
 
     @Test

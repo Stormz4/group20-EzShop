@@ -225,11 +225,8 @@ public class SQLiteDB {
      ** Insert new Customer record
      */
     public Integer insertCustomer(String customerName, String customerCard) {
-        if (this.dbConnection == null || customerName == null)
+        if (this.dbConnection == null || customerName == null || customerCard == null)
             return defaultID;
-
-        if (customerCard == null)
-            customerCard = "";
 
         String sql = "INSERT INTO Customers(name, card) VALUES(?,?)";
         int customerId = defaultID;
@@ -277,26 +274,25 @@ public class SQLiteDB {
      ** Update Customer record
      */
     public boolean updateCustomer(Integer customerId, String customerName, String customerCard) {
-        if (this.dbConnection == null || customerId == null)
+        if (this.dbConnection == null || customerId == null || customerName == null || customerCard == null)
             return false;
 
-        if (customerName == null || customerName.isEmpty())
+        if (customerName.isEmpty())
             return false;
 
-        boolean shouldUpdateCard = customerCard != null;
         boolean updated = false;
         String sql = "UPDATE Customers\n"
-                   + "SET name = ?" + (shouldUpdateCard ? ", card = ?\n" : "\n")
+                   + "SET name = ?, card = ?\n"
                    + "WHERE id = ?;";
 
         try{
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
             pstmt.setString(1, customerName);
-            if (shouldUpdateCard && customerCard.isEmpty())
+            if (customerCard.isEmpty())
                 pstmt.setNull(2, INTEGER);
-            else if (shouldUpdateCard)
+            else
                 pstmt.setInt(2, Integer.parseInt(customerCard));
-            pstmt.setInt((shouldUpdateCard ? 3 : 2), customerId);
+            pstmt.setInt(3, customerId);
             pstmt.executeUpdate();
             updated = true;
         } catch (SQLException e) {
@@ -361,19 +357,15 @@ public class SQLiteDB {
      ** Insert new BalanceOperation record
      */
     public Integer insertBalanceOperation(LocalDate date, double money, String type) {
-        if (this.dbConnection == null)
+        if (this.dbConnection == null || date == null || type == null)
             return null;
 
         String sql = "INSERT INTO BalanceOperations(date, money, type) VALUES(?,?,?)";
         int balanceOperationId = defaultID;
 
-        String strDate = null;
-        if (date != null)
-            strDate = date.toString();
-
         try{
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
-            pstmt.setString(1, strDate);
+            pstmt.setString(1, date.toString());
             pstmt.setDouble(2, money);
             pstmt.setString(3, type);
             pstmt.executeUpdate();
@@ -412,7 +404,7 @@ public class SQLiteDB {
      ** Update BalanceOperation record
      */
     public boolean updateBalanceOperation(Integer id, LocalDate date, double money, String type) {
-        if (this.dbConnection == null || id == null)
+        if (this.dbConnection == null || id == null || date == null || type == null)
             return false;
 
         boolean updated = false;
@@ -420,13 +412,9 @@ public class SQLiteDB {
                      "SET date = ?, money = ?, type = ?\n" +
                      "WHERE id = ?;";
 
-        String strDate = null;
-        if (date != null)
-            strDate = date.toString();
-
         try{
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
-            pstmt.setString(1, strDate);
+            pstmt.setString(1, date.toString());
             pstmt.setDouble(2, money);
             pstmt.setString(3, type);
             pstmt.setInt(4, id);
@@ -523,7 +511,7 @@ public class SQLiteDB {
      ** Insert new Order record
      */
     public Integer insertOrder(Integer balanceId, String productCode, double pricePerUnit, int quantity, String status) {
-        if (this.dbConnection == null)
+        if (this.dbConnection == null || balanceId == null || productCode == null || status == null)
             return defaultID;
 
         String sql = "INSERT INTO Orders(balanceId, productCode, pricePerUnit, quantity, status) VALUES(?,?,?,?,?)";
@@ -531,11 +519,11 @@ public class SQLiteDB {
 
         try{
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
-            pstmt.setInt(1, balanceId != null ? balanceId : defaultID);
-            pstmt.setString(2, productCode != null ? productCode : "");
+            pstmt.setInt(1, balanceId);
+            pstmt.setString(2, productCode);
             pstmt.setDouble(3, pricePerUnit);
             pstmt.setInt(4, quantity);
-            pstmt.setString(5, status != null ? status : "");
+            pstmt.setString(5, status);
             pstmt.executeUpdate();
 
             orderId = (int)this.lastInsertRowId();
@@ -572,7 +560,7 @@ public class SQLiteDB {
      ** Update Order record
      */
     public boolean updateOrder(Integer id, Integer balanceId, String productCode, double pricePerUnit, int quantity, String status) {
-        if (this.dbConnection == null || id == null)
+        if (this.dbConnection == null || id == null || balanceId == null || productCode == null || status == null)
             return false;
 
         boolean updated = false;
@@ -652,8 +640,8 @@ public class SQLiteDB {
      ** Insert new User record
      */
     public Integer insertUser(String userName, String password, String role) {
-        if (this.dbConnection == null)
-            return null;
+        if (this.dbConnection == null || userName == null || password == null || role == null)
+            return defaultID;
 
         int userId = defaultID;
         String sql = "INSERT INTO Users(userName, password, role) VALUES(?,?,?)";
@@ -699,7 +687,7 @@ public class SQLiteDB {
      ** Update User record
      */
     public boolean updateUser(Integer id, String userName, String password, String role) {
-        if (this.dbConnection == null || id == null)
+        if (this.dbConnection == null || id == null || userName == null || password == null || role == null)
             return false;
 
         boolean updated = false;
@@ -774,7 +762,7 @@ public class SQLiteDB {
      ** Insert new Card record
      */
     public String insertCard(Integer points) {
-        if (this.dbConnection == null)
+        if (this.dbConnection == null || points == null)
             return "";
 
         String sqlCount = "SELECT COUNT(*) AS cardsN FROM Cards;";
@@ -792,7 +780,7 @@ public class SQLiteDB {
             System.out.println(e.getMessage());
         }
 
-        if (!counted || (counted && cardsN >= MAX_CARDS))
+        if (!counted || cardsN >= MAX_CARDS)
             return "";
 
         String sql = "INSERT INTO Cards(points) VALUES(?)";
@@ -800,7 +788,7 @@ public class SQLiteDB {
 
         try{
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
-            pstmt.setInt(1, points != null ? points : defaultValue);
+            pstmt.setInt(1, points);
             pstmt.executeUpdate();
 
             Long cardId = this.lastInsertRowId();
@@ -816,7 +804,7 @@ public class SQLiteDB {
      ** Delete Card record with given cardCode
      */
     public boolean deleteCard(String cardCode) {
-        if (this.dbConnection == null || cardCode == null || cardCode.length() == 0)
+        if (this.dbConnection == null || cardCode == null || cardCode.isEmpty())
             return false;
 
         boolean deleted = false;
@@ -838,7 +826,7 @@ public class SQLiteDB {
      ** Update Card record
      */
     public boolean updateCard(String cardCode, Integer points) {
-        if (this.dbConnection == null || cardCode == null || cardCode.isEmpty())
+        if (this.dbConnection == null || cardCode == null || cardCode.isEmpty() || points == null)
             return false;
 
         boolean deleted = false;
@@ -926,6 +914,9 @@ public class SQLiteDB {
         if (this.dbConnection == null)
             return defaultID;
 
+        if (quantity == null || location == null || note == null || productDescription == null || barCode == null)
+            return defaultID;
+
         int id = defaultID;
         String sql = "INSERT INTO ProductTypes(quantity, location, note, productDescription, barCode, pricePerUnit) \n"
                    + "VALUES(?,?,?,?,?,?);";
@@ -974,7 +965,10 @@ public class SQLiteDB {
      ** Update ProductType record
      */
     public boolean updateProductType(Integer id, Integer quantity, String location, String note, String productDescription, String barCode, double pricePerUnit) {
-        if (this.dbConnection == null || id == null)
+        if (this.dbConnection == null)
+            return false;
+
+        if (id == null || quantity == null || location == null || note == null || productDescription == null || barCode == null)
             return false;
 
         boolean updated = false;
@@ -1134,7 +1128,7 @@ public class SQLiteDB {
      ** Insert new SaleTransaction record
      */
     public Integer insertSaleTransaction(List<TicketEntry> entries, double discountRate, double price, String status) {
-        if (this.dbConnection == null)
+        if (this.dbConnection == null || status == null)
             return defaultID;
 
         int transactionID = defaultID;
@@ -1145,7 +1139,7 @@ public class SQLiteDB {
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
             pstmt.setDouble(1, discountRate);
             pstmt.setDouble(2, price);
-            pstmt.setString(3, status != null ? status : "");
+            pstmt.setString(3, status);
             pstmt.executeUpdate();
 
             transactionID = (int)this.lastInsertRowId();
@@ -1166,7 +1160,7 @@ public class SQLiteDB {
      ** Insert new SaleTransaction record
      */
     public Integer insertReturnTransaction(List<TicketEntry> entries, int saleID, double price, String status) {
-        if (this.dbConnection == null)
+        if (this.dbConnection == null || status == null)
             return defaultID;
 
         int transactionID = defaultID;
@@ -1177,7 +1171,7 @@ public class SQLiteDB {
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
             pstmt.setInt(1, saleID);
             pstmt.setDouble(2, price);
-            pstmt.setString(3, status != null ? status : "");
+            pstmt.setString(3, status);
             pstmt.executeUpdate();
 
             transactionID = (int)this.lastInsertRowId();
@@ -1223,7 +1217,7 @@ public class SQLiteDB {
      ** Update SaleTransaction record
      */
     public boolean updateSaleTransaction(Integer transactionID, double discountRate, double price, String status) {
-        if (this.dbConnection == null || transactionID == null)
+        if (this.dbConnection == null || transactionID == null || status == null)
             return false;
 
         boolean updated = false;
@@ -1235,7 +1229,7 @@ public class SQLiteDB {
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
             pstmt.setDouble(1, discountRate);
             pstmt.setDouble(2, price);
-            pstmt.setString(3, status != null ? status : "");
+            pstmt.setString(3, status);
             pstmt.setInt(4, transactionID);
             pstmt.executeUpdate();
             updated = true;
@@ -1249,21 +1243,20 @@ public class SQLiteDB {
     /**
      ** Update SaleTransaction record
      */
-    public boolean updateReturnTransaction(Integer transactionID, int saleID, double price, String status) {
-        if (this.dbConnection == null || transactionID == null)
+    public boolean updateReturnTransaction(Integer transactionID, double price, String status) {
+        if (this.dbConnection == null || transactionID == null || status == null)
             return false;
 
         boolean updated = false;
         String sql = "UPDATE Transactions\n" +
-                     "SET discountRate = ?, price = ?, status = ?\n" +
+                     "SET price = ?, status = ?\n" +
                      "WHERE id = ?;";
 
         try{
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
-            pstmt.setInt(1, saleID);
-            pstmt.setDouble(2, price);
-            pstmt.setString(3, status != null ? status : "");
-            pstmt.setInt(4, transactionID);
+            pstmt.setDouble(1, price);
+            pstmt.setString(2, status);
+            pstmt.setInt(3, transactionID);
             pstmt.executeUpdate();
             updated = true;
         } catch (SQLException e) {
@@ -1305,7 +1298,7 @@ public class SQLiteDB {
      ** Insert new ProductPerSale record
      */
     public boolean insertProductPerSale(String barCode, Integer transactionID, int amount, double discountRate) {
-        if (this.dbConnection == null)
+        if (this.dbConnection == null || barCode == null || transactionID == null)
             return false;
 
         boolean inserted = false;
@@ -1332,7 +1325,7 @@ public class SQLiteDB {
      ** Delete ProductPerSale record with given id
      */
     public boolean deleteProductPerSale(String barCode, Integer transactionID) {
-        if (this.dbConnection == null || transactionID == null)
+        if (this.dbConnection == null || barCode == null || transactionID == null)
             return false;
 
         boolean deleted = false;
@@ -1377,7 +1370,7 @@ public class SQLiteDB {
      ** Update ProductPerSale record
      */
     public boolean updateProductPerSale(String barCode, Integer transactionID, int amount, double discountRate) {
-        if (this.dbConnection == null || transactionID == null)
+        if (this.dbConnection == null || transactionID == null || barCode == null)
             return false;
 
         boolean updated = false;

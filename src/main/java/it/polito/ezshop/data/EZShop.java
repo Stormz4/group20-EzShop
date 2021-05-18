@@ -21,7 +21,7 @@ import static it.polito.ezshop.data.SQLiteDB.defaultValue;
 
 
 public class EZShop implements EZShopInterface {
-    final boolean USE_TEST_DB = false;
+    final boolean USE_TEST_DB = false; //todo: remove
 
     final static String creditCardsFile = "src/main/java/it/polito/ezshop/utils/CreditCards.txt";
     final static double startingBalanceValue = 1000.00;
@@ -1587,7 +1587,7 @@ public class EZShop implements EZShopInterface {
             }
             retToBeStored.setStatus(RTClosed);
             // update ReturnTransaction in DB:
-            if(!shopDB.updateReturnTransaction(retToBeStored.getReturnId(), retToBeStored.getSaleTransactionId(), retToBeStored.getReturnedValue(), "TODO: complete with correct STATUS"))
+            if(!shopDB.updateReturnTransaction(retToBeStored.getReturnId(), retToBeStored.getReturnedValue(), "TODO: complete with correct STATUS"))
                 return false;
             // clear the temporary transaction:
             tmpRetTr = null;

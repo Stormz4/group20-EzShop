@@ -15,7 +15,9 @@ Date: 16/05/2021
 | 3 | Added some new black box tests |
 | 4 | Added BB tests for EZOrder and EZReturnTransaction |
 
-Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not included in the document since they don't have specific criteria and predicates.
+Leaf classes (TestEZShop_Customer, User and so on) and DB methods don't include involve a lot of controls and checks on the
+data since they're checked at an higher level in EZShop.
+
 
 # Contents
 
@@ -274,36 +276,430 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 |''|Incorrect|Invalid|''|''|
 
 
-### **Class *EZCustomer* - method *setCustomer***
-**Criteria for method *setCustomer*:**
+### **Class *EZCustomer* - method *setCustomerName***
+**Criteria for method *setCustomerName*:**
+- Validity of customer name string
 
-
-**Predicates for method *setCustomer*:**
+**Predicates for method *setCustomerName*:**
 
 | Criteria | Predicate |
 | -------- | --------- |
-|          |           |
-|          |           |
-|          |           |
-|          |           |
+|    Validity of customer name string     |       Valid    |
+
 
 **Boundaries**:
 
 | Criteria | Boundary values |
 | -------- | --------------- |
 |          |                 |
-|          |                 |
+
 
 **Combination of predicates**:
 
 
 | Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|
-|*|Valid|customer = new EZCustomer(-1, "Marco","0000000500", 0);|Class TestEZShop_Customer, method testCustomer()|
-|||||
-|||||
-|||||
-|||||
+|*|Valid| customer.setCustomerName("Francesco");|Class TestEZShop_Customer, method testCustomer()|
+
+### **Class *EZCustomer* - method *setCustomerCard***
+**Criteria for method *setCustomerCard*:**
+- Validity of customer card string
+
+**Predicates for method *setCustomerCard*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|   Validity of customer card string    |     Valid     |
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+
+
+**Combination of predicates**:
+
+
+| Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid|customer.setCustomerCard("0000000501");|Class TestEZShop_Customer, method testCustomer()|
+
+### **Class *EZCustomer* - method *setId***
+**Criteria for method *setId*:**
+- Validity of id integer
+
+**Predicates for method *setId*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|    Validity of id integer      |     Valid      |
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+
+
+**Combination of predicates**:
+
+
+| Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid|customer.setId(-1);|Class TestEZShop_Customer, method testCustomer()|
+
+### **Class *EZCustomer* - method *setPoints***
+**Criteria for method *setPoints*:**
+- Validity of points integer
+
+**Predicates for method *setPoints*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|      Validity of points integer    |      Valid     |
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+
+
+**Combination of predicates**:
+
+
+| Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid|customer.setPoints(50);|Class TestEZShop_Customer, method testCustomer()|
+
+
+### **Class *EZUser* - method *setUsername***
+**Criteria for method *setUsername*:**
+- Validity of username string
+
+**Predicates for method *setUsername*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|     Validity of username string     |     Valid      |
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+
+
+**Combination of predicates**:
+
+
+| Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid|user.setUsername("Francesco");|Class TestEZShop_User, method testUser()|
+
+### **Class *EZUser* - method *setPassword***
+**Criteria for method *setPassword*:**
+- Validity of password string
+
+**Predicates for method *setPassword*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|     Validity of password string     |      Valid     |
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+
+
+**Combination of predicates**:
+
+
+| Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid|user.setPassword("nopwd");|Class TestEZShop_User, method testUser()|
+
+### **Class *EZUser* - method *setId***
+**Criteria for method *setId*:**
+- Validity of id integer
+
+**Predicates for method *setId*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Validity of id integer       |     Valid      |
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+
+
+**Combination of predicates**:
+
+
+| Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid|user.setId(-2);|Class TestEZShop_User, method testUser()|
+
+### **Class *EZUser* - method *setRole***
+**Criteria for method *setRole*:**
+- Validity of role
+
+**Predicates for method *setRole*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|          |           |
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+
+
+**Combination of predicates**:
+
+
+| Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|Yes|Valid|user.setRole("ShopManager");|Class TestEZShop_User, method testUser()|
+|No |Invalid|user.setRole(null);       |""                                      |
+
+### **Class *EZUser* - method *hasRequiredRole***
+**Criteria for method *hasRequiredRole*:**
+- Validity of role
+- Role is equal to one of the required roles
+
+**Predicates for method *hasRequiredRole*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|          |           |
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+
+
+**Combination of predicates**:
+
+
+| Criteria 1 | Criteria 2 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|-------|
+|Yes|Yes|Valid|user.setRole("ShopManager"); <br> boolean b2 = user.hasRequiredRole("ShopManager");|Class TestEZShop_User, method testUser()|
+|Yes|No|Invalid|user.setRole("ShopManager"); <br> boolean b2 = user.hasRequiredRole("Cashier");|Class TestEZShop_User, method testUser()|
+|No|*|Invalid|user.setRole("ShopManager"); <br> boolean b2 = user.hasRequiredRole(null);|Class TestEZShop_User, method testUser()|
+
+### **Class *EZProductType* - method *setProductDescription***
+**Criteria for method *setProductDescription*:**
+- Validity of product description
+
+**Predicates for method *setProductDescription*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|Validity of product description  |      Valid     |
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+
+
+**Combination of predicates**:
+
+| Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid| p.setProductDescription("Cookie");|Class TestEZShop_ProductType, method testProductType()|
+
+### **Class *EZProductType* - method *setBarCode***
+**Criteria for method *setBarCode*:**
+- Validity of Bar code
+
+**Predicates for method *setBarCode*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|Validity of bar code  |      Valid     |
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+
+
+**Combination of predicates**:
+
+| Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid|  p.setBarCode("6291041500213");|Class TestEZShop_ProductType, method testProductType()|
+
+### **Class *EZProductType* - method *setId***
+**Criteria for method *setId*:**
+- Validity of Bar code
+
+**Predicates for method *setId*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|Validity of id  |      Valid     |
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+
+
+**Combination of predicates**:
+
+| Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid|  p.setId(-2);|Class TestEZShop_ProductType, method testProductType()|
+
+### **Class *EZProductType* - method *setQuantity***
+**Criteria for method *setQuantity*:**
+- Validity of quantity integer
+
+**Predicates for method *setQuantity*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|Validity of quantity integer  |      Valid     |
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+
+
+**Combination of predicates**:
+
+| Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid|  p.setQuantity(5);|Class TestEZShop_ProductType, method testProductType()|
+
+### **Class *EZProductType* - method *setNote***
+**Criteria for method *setNote*:**
+- Validity of note string
+
+**Predicates for method *setNote*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|Validity of note string |      Valid     |
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+
+
+**Combination of predicates**:
+
+| Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid|  p.setNote("Expires on Sunday");|Class TestEZShop_ProductType, method testProductType()|
+
+
+### **Class *EZProductType* - method *setLocation***
+**Criteria for method *setLocation*:**
+- Validity of location string
+
+**Predicates for method *setLocation*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|Validity of location string |      Valid     |
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+
+
+**Combination of predicates**:
+
+| Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid|  p.setLocation("32-ABU-45");|Class TestEZShop_ProductType, method testProductType()|
+
+
+### **Class *EZProductType* - method *setPricePerUnit***
+**Criteria for method *setPricePerUnit*:**
+- Validity of price double
+
+**Predicates for method *setPricePerUnit*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|Validity of price double |      Valid     |
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+
+
+**Combination of predicates**:
+
+| Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid|p.setPricePerUnit(10.5); |Class TestEZShop_ProductType, method testProductType()|
+
+### **Class *EZProductType* - method *editQuantity***
+**Criteria for method *editQuantity*:**
+- Validity of quantity to be added
+
+**Predicates for method *editQuantity*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|Validity of quantity to be added |      Valid     |
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+
+
+**Combination of predicates**:
+
+| Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid|p.editQuantity(40);|Class TestEZShop_ProductType, method testProductType()|
+
 
 ### **Class *EZSaleTransaction* - method *setTicketNumber***
 **Criteria for method *setTicketNumber*:**
@@ -613,7 +1009,7 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 ### **Class *EZAccountBook* - method *addBalanceOperation***
 **Criteria for method *addBalanceOperation*:**
 
-- Valid insertion of a new balance operation
+- Amount  
 - Validity of DB object
 - Validity of list of balance operations
 
@@ -621,8 +1017,8 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 
 | Criteria | Predicate |
 | -------- | --------- |
-|    Valid insertion of balance operation      |       Valid         |
-|                                              |      Invalid        |
+|    Amount                                    |       >= 0          |
+|                                              |        < 0          |
 |    Validity of DB object                     |       Valid         |
 |                                              |        NULL         |
 |    Validity of list of balance operations    |       Valid         |
@@ -632,18 +1028,17 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 
 | Criteria | Boundary values |
 | -------- | --------------- |
-|          |                 |
-|          |                 |
+|     Amount     |        0         |
 
 **Combination of predicates**:
 
 
-|Validity of DB object|Validity of list of balance operations| Valid insertion of balance operation | Valid / Invalid | Description of the test case | JUnit test case |
-------|---------|-------|-------|-------|-------|
+|Validity of DB object|Amount|Validity of list of balance operations| Valid / Invalid | Description of the test case | JUnit test case |
+------|------|-----|-------|-------|----------|
 |Invalid|*|*|Invalid| book.addBalanceOperation(null, 150.33, balanceOperations) | Class TestEZShop_AccountBook, method TestEZShop_AccountBook() |
-|*|Invalid|*|Invalid| book.addBalanceOperation(shopDB2, 150.33, null) | '' |
-|Valid|Valid|Valid|Valid| book.addBalanceOperation(shopDB2, 150.33, balanceOperations)<br/>or:<br/>book.addBalanceOperation(shopDB2, -150.33, balanceOperations)<br/>or:<br/>book.addBalanceOperation(shopDB2, -10.0, balanceOperations) |''|
-|''|''|Invalid|Invalid|''|''|
+|*|*|Invalid|Invalid| book.addBalanceOperation(shopDB2, 150.33, null) | '' |
+|Valid| \>= 0|Valid|Valid| book.addBalanceOperation(shopDB2, 150.33, balanceOperations)|''|
+|''| < 0 |''|Valid|book.addBalanceOperation(shopDB2, -150.33, balanceOperations)<br/>or:<br/>book.addBalanceOperation(shopDB2, -10.0, balanceOperations) |''|
 
 
 
@@ -835,7 +1230,7 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 
 **Criteria for method *setItsSaleTransactionId*:**
 
-- Valid insertion of a the Sale Transaction ID associated to the Return Transaction
+- Valid insertion of the Sale Transaction ID associated to the Return Transaction
 
 **Predicates for method *setItsSaleTransactionId*:**
 
@@ -895,31 +1290,89 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 |*|Valid| returnTransaction.setStatus(EZReturnTransaction.RTPayed) |Class TestEZShop_ReturnTransaction, method testReturnTransaction()|
 
 
+### **Class *SQLiteDB* - method *insertUser***
 
+**Criteria for method *insertUser*:**
 
-### **Class *class_name* - method *name***
+ - Validity of username
+ - Uniqueness of username
+ - Validity of password
+ - Validity of role
 
-
-
-**Criteria for method *name*:**
-
--
--
-
-
-
-
-
-**Predicates for method *name*:**
+**Predicates for method *insertUser*:**
 
 | Criteria | Predicate |
 | -------- | --------- |
-|          |           |
-|          |           |
-|          |           |
-|          |           |
+| Validity of username        |    Valid       |
+| Uniqueness of username       | Yes |
+|                              | No |
+| Validity of password         |    Valid       |
+| Validity of role         |     Valid      |
 
 
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+
+**Combination of predicates**:
+
+| Criteria 1 | Criteria 2 | Criteria 3 | Criteria 4 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|-------|-------|-------|
+|*|Yes|*|*|Valid|  int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager");| TestEZShop_SQLiteDB, method testUserDB() |
+|*|No|*|*|Invalid|  int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager"); <br> int uID2 = shopDB.insertUser("Rosario", "testpwd", "ShopManager"); -> return -1| TestEZShop_SQLiteDB, method testUserDB() |
+
+### **Class *SQLiteDB* - method *updateUser***
+
+**Criteria for method *updateUser*:**
+
+- Validity of id integer
+- Validity of username
+- Uniqueness of username
+- Validity of password
+- Validity of role
+
+**Predicates for method *updateUser*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Validity of id integer | Valid |
+|                        | NULL  |
+| Validity of username        |    Valid       |
+| Uniqueness of username       | Yes |
+|                              | No |
+| Validity of password         |    Valid       |
+| Validity of role         |     Valid      |
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+
+**Combination of predicates**:
+
+| Criteria 1 | Criteria 2 | Criteria 3 | Criteria 4 | Criteria 5 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|-------|-------|-------|-------|
+|Valid|*|Yes|*|*|Valid| int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager");  <br> boolean update = shopDB.updateUser(uID, "Rosario2", "testpwd2", "Cashier"); -> return true| TestEZShop_SQLiteDB, method testUserDB() |
+|Valid|*|No|*|*|Invalid| int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager"); <br> int uID3 = shopDB.insertUser("sheldon", "testpwd", "ShopManager"); <br> boolean update2 = shopDB.updateUser(uID, "sheldon", "testpwd2", "Cashier"); -> return false| TestEZShop_SQLiteDB, method testUserDB() |
+|NULL|*|*|*|*|Invalid|   boolean update = shopDB.updateUser(null, "Rosario2", "testpwd2", "Cashier"); -> return false| TestEZShop_SQLiteDB, method testUserDB() |
+
+### **Class *SQLiteDB* - method *deleteUser***
+
+**Criteria for method *deleteUser*:**
+
+- Validity of id integer
+
+
+**Predicates for method *deleteUser*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Validity of id integer | Valid |
+|                        | NULL  |
 
 
 
@@ -928,20 +1381,14 @@ Tests regarding leaf classes (TestEZShop_Customer, User and so on) are not inclu
 | Criteria | Boundary values |
 | -------- | --------------- |
 |          |                 |
-|          |                 |
-
-
 
 **Combination of predicates**:
 
+| Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|Valid|Valid| int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager");  <br> boolean update = shopDB.deleteUser(uID); -> return true| TestEZShop_SQLiteDB, method testUserDB() |
+|NULL|Invalid|   boolean update = shopDB.deleteUser(null) -> return false| TestEZShop_SQLiteDB, method testUserDB() |
 
-| Criteria 1 | Criteria 2 | ... | Valid / Invalid | Description of the test case | JUnit test case |
-|-------|-------|-------|-------|-------|-------|
-|||||||
-|||||||
-|||||||
-|||||||
-|||||||
 
 # White Box Unit Tests
 

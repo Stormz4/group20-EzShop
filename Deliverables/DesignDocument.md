@@ -152,19 +152,85 @@ The model contains the following classes, which are persistent:
 @startuml
 package it.polito.ezshop.model{
 class Shop{
-
+    +shopDB: SQLiteDB
+    +currUser: User
+    +accountingBook: AccountBook
+    +loadDataFromDB(void)
+    +clearData(void)
+    +isValidPosition(String position)
+    +isValidCard(String card)
+    +getSaleTransactionById(Integer saleNumber)
+    +getReturnTransactionById(Integer returnId)
+    +isValidCreditCard(String creditCard)
+    +getCreditInTXTbyCardNumber(String cardNumber)
+    +updateCreditInTXTbyCardNumber(String cardNumber, double toBeAdded)
 }
 
-
+Class SQLiteDB {
+    +connect(void)
+    +isConnected(void)
+    +closeConnection(void)
+    +createNewDatabase(void)
+    +initDatabase(void)
+    +clearDatabase(void)
+    +clearTable(String tableName)
+    +lastInsertRowId(void)
+    +createCustomersTable(void)
+    +selectAllCustomers(void)
+    +insertCustomer(String customerName, String customerCard)
+    +deleteCustomer(Integer id)
+    +updateCustomer(Integer customerId, String customerName, String customerCard)
+    +createBalanceOperationsTable(void)
+    +selectAllBalanceOperations(void)
+    +insertBalanceOperation(LocalDate date, double money, String type)
+    +deleteBalanceOperation(Integer id)
+    +updateBalanceOperation(Integer id, LocalDate date, double money, String type)
+    +selectTotalBalance(void)
+    +createOrdersTable(void)
+    +selectAllOrders(void)
+    +insertOrder(Integer balanceId, String productCode, double pricePerUnit, int quantity, String status)
+    +updateOrder(Integer id, Integer balanceId, String productCode, double pricePerUnit, int quantity, String status)
+    +createUsersTable(void)
+    +selectAllUsers(void)
+    +insertUser(String userName, String password, String role)
+    +deleteUser(Integer id)
+    +updateUser(Integer id, String userName, String password, String role)
+    +createCardsTable(void)
+    +selectAllCards(void)
+    +insertCard(Integer points)
+    +deleteCard(String cardCode)
+    +updateCard(String cardCode, Integer points)
+    +createProductTypesTable(void)
+    +selectAllProductTypes(void)
+    +insertProductType(Integer quantity, String location, String note, String productDescription, String barCode, double pricePerUnit)
+    +deleteProductType(Integer id)
+    +updateProductType(Integer id, Integer quantity, String location, String note, String productDescription, String barCode, double pricePerUnit)
+    +createTransactionsTable(void)
+    +selectAllSaleTransactions(void)
+    +selectAllReturnTransactions(void)
+    +insertSaleTransaction(List<TicketEntry> entries, double discountRate, double price, String status)
+    +insertReturnTransaction(List<TicketEntry> entries, int saleID, double price, String status)
+    +deleteTransaction(Integer transactionID)
+    +updateSaleTransaction(Integer transactionID, double discountRate, double price, String status)
+    +updateReturnTransaction(Integer transactionID, int saleID, double price, String status)
+    +createProductsPerSaleTable(void)
+    +insertProductPerSale(String barCode, Integer transactionID, int amount, double discountRate)
+    +deleteProductPerSale(String barCode, Integer transactionID)
+    +deleteAllProductsPerSale(Integer transactionID)
+    +updateProductPerSale(String barCode, Integer transactionID, int amount, double discountRate)
+}
+Shop -- SQLiteDB
 
 class ProductType{
     +productID: Integer
     +barCode: String
+    +location: String
     +description: String
     +pricePerUnit: double
     +quantity: int
     +discountRate: float
     +notes: String
+    +editQuantity(int toBeAdded)
 }
 
 class User{
@@ -172,6 +238,7 @@ class User{
     +username: String
     +password: String
     +role: UserRoleEnum
+    +hasRequiredRole(String ...requiredRoles)
 }
 
 Enum UserRoleEnum {
@@ -185,18 +252,17 @@ User -[hidden]-> UserRoleEnum
 Shop -- "*" User
 
 class AccountBook {
- +balance: double
+ +currentBalance: double
+ +nextBalanceId: int
  +boolean addBalanceOperation(Integer transactionID)
  +boolean updateBalance(double toBeAdded)
- +List<BalanceOperation> getAllTransactions()
  }
 AccountBook -down- Shop
 class BalanceOperation {
- +transactionID: Integer
- +description: String 
- +amount: int
- +date: LocalDate
- +type: BalanceOpTypeEnum
+ +balanceId: int
+ +date: LocalDate 
+ +money: double
+ +type: String
 }
 AccountBook -up- "*" BalanceOperation
 
@@ -207,52 +273,50 @@ Enum BalanceOpTypeEnum {
 
 BalanceOperation -[hidden]-> BalanceOpTypeEnum
 
-class Order
-
-Order --|> BalanceOperation
-SaleTransaction --|> BalanceOperation
-ReturnTransaction --|> BalanceOperation
+Order -- BalanceOperation
+SaleTransaction -- BalanceOperation
+ReturnTransaction -- BalanceOperation
 
 
 
 Shop -down- "*" ProductType
 
 class SaleTransaction {
+    +ticketNumber: Integer
     +time: LocalDate
     +paymentType: String
-    +discountRate: float
-    +isClosed: boolean
-    +quantityPerProduct: HashMap<Integer, int>
+    +discountRate: double
+    +price: double
+    +status: String
+    +attachedCard: String
+    +hasRequiredStatus(String ...requiredStatus)
+    +getTicketEntryByBarCode(String barCode)
+    +updatePrice(double toBeAdded)
 }
 SaleTransaction - "*" ProductType
 
-class LoyaltyCard {
-    +cardID: String
-    +points: int
+class TicketEntry {
+    +barCode: String
+    +productDescription: String
+    +amount: int
+    +pricePerUnit: double
+    +discountRate: double
 }
+SaleTransaction -up-"*" TicketEntry
+ReturnTransaction -up-"*" TicketEntry
 
 class Customer {
-    +customerID: Integer
-    +name: String
-    +surname: String
-    +update(String name, String surname, String card)
+    +id: Integer
+    +customerName: String
+    +customerCard: String
+    +points: Integer
 }
-
-LoyaltyCard "0..1" - Customer
-
-SaleTransaction "*" -- "0..1" LoyaltyCard
-
-class Position {
-    +aisleID: Integer
-    +rackID: Integer
-    +levelID: Integer
-}
-
-ProductType - "0..1" Position
 
 
 class Order {
-  +supplier: String
+  +orderId: Integer  
+  +balanceId: Integer
+  +productCode: String
   +pricePerUnit: double
   +quantity: int
   +status: OrderStatusEnum
@@ -270,18 +334,18 @@ Order -[hidden]-> OrderStatusEnum
 
 
 class ReturnTransaction {
+  +returnId: Integer  
   +quantity: int
   +returnedValue: double
-  +isClosed: boolean
+  +saleTransactionId: Integer
+  +status: String
 }
 
-Shop -- "*" LoyaltyCard
 Shop -down- "*" Customer
 
 ReturnTransaction "*" - SaleTransaction
 ReturnTransaction "*" - ProductType
 
-note left of LoyaltyCard: "ID is a number on 10 digits "
 note "bar code is a number on 12 to \n14 digits, compliant to GTIN \nspecifications, see https://www.gs1\n.org/services/how-calculate-check\n-digit-manually " as N2  
 N2 .. ProductType
 note "ID is a unique identifier of a transaction, \nprinted on the receipt (ticket number) " as N3
@@ -294,23 +358,26 @@ note "Map to \nimplement 1..n" as N9
 note "Map to \nimplement 1..n" as N10
 note "Map to \nimplement 1..n" as N11
 note "Map to \nimplement 1..n" as N12
+note "Map to \nimplement 1..n" as N13
+note "Map to \nimplement 1..n" as N14
 
 
 AccountBook .. N6
 N6 .. BalanceOperation
 Shop .. N7
 N7 .. Customer
-LoyaltyCard .. N8
 N8 .. SaleTransaction
 ProductType .. N9
 N9 .. Shop
 Shop .. N10
 N10 .. User
 Shop .. N11
-N11 .. LoyaltyCard
 SaleTransaction .. N12
 N12 .. ReturnTransaction
-
+TicketEntry .. N13
+N13 .. SaleTransaction
+TicketEntry .. N14
+N14 .. ReturnTransaction
 }
 @enduml
 ```
@@ -318,15 +385,15 @@ N12 .. ReturnTransaction
 
 # Verification traceability matrix
 
-| FR ID | Shop | User | Administrator | Order | ProductType | Position | SaleTransaction | LoyaltyCard | Customer | ReturnTransaction | AccountBook | Balance Operation |
+| FR ID | Shop | User | Administrator | Order | ProductType | SaleTransaction | Customer | ReturnTransaction | AccountBook | Balance Operation |
 |:-------:|:------:|:------:|:---------------:|:-------:|:-------------:|:----------:|:-----------------:|:-------------:|:----------:|:-------------------:|:-------------:|-------------------:|
-| FR1   | X    | X    | X             |       |             |          |                 |             |          |                   |             |                   |
-| FR3   | X    | X    | X             |       | X           | X        |                 |             |          |                   |             |                   |
-| FR4   | X    | X    | X             | X     | X           | X        |                 |             |          |                   | X           | X                 |
-| FR5   | X    | X    | X             |       |             |          |                 | X           | X        |                   |             |                   |
-| FR6   | X    | X    | X             |       | X           |          | X               | X           |          | X                 | X           | X                 |
-| FR7   | X    | X    | X             |       |             |          | X               |             |          | X                 | X           | X                 |
-| FR8   | X    | X    | X             |       |             |          | X               |             |          |        X          | X           | X                 |
+| FR1   | X    | X    | X             |       |             |                 |          |                   |             |                   |
+| FR3   | X    | X    | X             |       | X           |                 |          |                   |             |                   |
+| FR4   | X    | X    | X             | X     | X           |                 |          |                   | X           | X                 |
+| FR5   | X    | X    | X             |       |             |                 | X        |                   |             |                   |
+| FR6   | X    | X    | X             |       | X           | X               |          | X                 | X           | X                 |
+| FR7   | X    | X    | X             |       |             | X               |          | X                 | X           | X                 |
+| FR8   | X    | X    | X             |       |             | X               |          |        X          | X           | X                 |
 
 # Verification sequence diagrams 
 
@@ -558,11 +625,11 @@ Shop --> GUI: return TransactionID
 User -> GUI: Insert product BarCode
 GUI -> Shop: addProductToSale()
 Shop -> Shop: getProductByBarCode()
+Shop -> TicketEntry: new TicketEntry()
+TicketEntry --> Shop: return TicketEntry
 Shop -> Shop : updateQuantity()
 User -> GUI: close Sale Transaction
 GUI -> Shop: endSaleTransaction()
-Shop -> AccountBook: addBalanceOperation()
-AccountBook --> Shop: return boolean
 Shop --> GUI: return boolean
 GUI --> User: ask Payment Type
 User -> GUI: Select payment type
@@ -586,6 +653,8 @@ Shop --> GUI: return boolean
 User -> GUI: Insert product BarCode
 GUI -> Shop: addProductToSale()
 Shop -> Shop: getProductByBarCode()
+Shop -> TicketEntry: new TicketEntry()
+TicketEntry --> Shop: return TicketEntry
 Shop -> Shop : updateQuantity()
 Shop --> GUI: return boolean
 User -> GUI: insert discount rate
@@ -593,8 +662,6 @@ GUI -> Shop: applyDiscountRateToSale()
 Shop --> GUI: return boolean
 User -> GUI: close Sale Transaction
 GUI -> Shop: endSaleTransaction()
-Shop -> AccountBook: addBalanceOperation()
-AccountBook --> Shop: return boolean
 Shop --> GUI: return boolean
 GUI --> User: ask Payment Type
 User -> GUI: Select payment type
@@ -612,7 +679,7 @@ end ref
 @startuml
 Actor User
 autonumber
-User -> GUI: Read credit card number
+User -> GUI: Insert credit card number
 GUI -> Shop: receiveCreditCardPayment()
 Shop -> Shop: getCreditInTXTbyCardNumber()
 Shop -> Shop: isValidCreditCard()
@@ -622,7 +689,7 @@ AccountBook -> AccountBook: new BalanceOperation()
 AccountBook --> Shop: return boolean
 Shop -> Shop: updateCreditInTXTbyCardNumber()
 Shop --> GUI: return true
-GUI --> User: succesful message
+GUI --> User: successful message
 @enduml
 ```
 
@@ -637,6 +704,8 @@ User -> User: Compute cash quantity
 User -> GUI: Record cash payment
 GUI -> Shop: receiveCashPayment()
 Shop -> Shop: recordBalanceUpdate()
+Shop -> AccountBook: addBalanceOperation()
+AccountBook -> AccountBook: new BalanceOperation()
 AccountBook --> Shop: return true
 Shop --> GUI: return double
 GUI --> User: return double
@@ -655,22 +724,22 @@ User -> GUI: Insert transaction ID
 GUI -> Shop: startReturnTransaction()
 Shop -> ReturnTransaction: new ReturnTransaction()
 ReturnTransaction --> Shop: return ReturnTransaction
+Shop --> GUI: return Integer (ReturnTransaction ID)
 User -> GUI: Insert product BarCode
 User -> GUI: Insert quantity of returned items
 GUI -> Shop: returnProduct()
 Shop -> Shop: getProductTypeByBarCode()
-Shop -> Shop : updateQuantity()
+Shop -> TicketEntry: new TicketEntry()
+TicketEntry --> Shop: return TicketEntry
 Shop --> GUI: return boolean
-Shop --> GUI: return Integer (ReturnTransaction ID)
+User -> GUI: Close return transaction
+GUI -> Shop: endReturnTransaction()
+Shop -> Shop: update related sale transaction
+Shop --> GUI: return boolean
+GUI --> User: Successful message
 ref over GUI, User, Shop, AccountBook
 Manage credit card return and update balance (go to UC10)
 end ref
-User -> GUI: Close return transaction
-GUI -> Shop: endReturnTransaction()
-Shop -> AccountBook: updateBalanceOperation()
-AccountBook --> Shop: return boolean
-Shop --> GUI: return boolean
-GUI --> User: Successful message
 @enduml
 ```
 
@@ -686,8 +755,6 @@ User -> GUI: Selects a start date
 User -> GUI: Selects an end date
 User -> GUI: Send transaction list request
 GUI -> Shop: getCreditsAndDebits()
-Shop -> AccountBook: getAllTransactions()
-AccountBook --> Shop: return transaction list
 Shop --> GUI: return transactions list
 GUI --> User: display list
 @enduml
@@ -703,9 +770,13 @@ Actor User
 autonumber
 User -> GUI: Insert credit card number
 GUI -> Shop: returnCreditCardPayment()
+Shop -> Shop: getCreditInTXTbyCardNumber()
+Shop -> Shop: isValidCreditCard()
 Shop -> Shop: recordBalanceUpdate()
 Shop -> AccountBook: addBalanceOperation()
+AccountBook -> AccountBook: new BalanceOperation()
 AccountBook --> Shop: return boolean
+Shop -> Shop: updateCreditInTXTbyCardNumber()
 Shop --> GUI: Amount returned
 GUI --> User: Successful message
 @enduml
@@ -722,7 +793,8 @@ User -> GUI: Record cash return
 GUI -> Shop: returnCashPayment()
 Shop -> Shop: recordBalanceUpdate()
 Shop -> AccountBook: addBalanceOperation()
-AccountBook --> Shop: return boolean
+AccountBook -> AccountBook: new BalanceOperation()
+AccountBook --> Shop: return true
 Shop --> GUI: Amount returned
 GUI --> User: Successful message
 @enduml
