@@ -256,7 +256,7 @@ public class EZShop implements EZShopInterface {
         return true;
     }
 
-    public boolean isValidBarCode(String barCode){
+    static public boolean isValidBarCode(String barCode){
 
         if (barCode == null){
             return false;
@@ -495,7 +495,7 @@ public class EZShop implements EZShopInterface {
         return false;
     }
 
-    public boolean isValidPosition(String newPos){
+    static public boolean isValidPosition(String newPos){
         if (newPos == null)
             return false;
 
@@ -794,7 +794,7 @@ public class EZShop implements EZShopInterface {
     }
 
 
-    public boolean isValidCard(String card){
+    static public boolean isValidCard(String card){
         if (card == null)
             return false;
 
@@ -1757,7 +1757,7 @@ public class EZShop implements EZShopInterface {
         return true;
     }
 
-    public boolean isValidCreditCard(String cardNumber)
+    static public boolean isValidCreditCard(String cardNumber)
     { // Verification based upon Luhn algorithm
         if(cardNumber == null)
             return false;

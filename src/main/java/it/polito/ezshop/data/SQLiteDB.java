@@ -277,10 +277,13 @@ public class SQLiteDB {
         if (this.dbConnection == null || customerId == null || customerName == null || customerCard == null)
             return false;
 
+        if (customerName.isEmpty())
+            return false;
+
         boolean updated = false;
-        String sql = "UPDATE Customers\n" +
-                     "SET name = ?, card = ?\n" +
-                     "WHERE id = ?;";
+        String sql = "UPDATE Customers\n"
+                   + "SET name = ?, card = ?\n"
+                   + "WHERE id = ?;";
 
         try{
             PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
@@ -355,7 +358,7 @@ public class SQLiteDB {
      */
     public Integer insertBalanceOperation(LocalDate date, double money, String type) {
         if (this.dbConnection == null || date == null || type == null)
-            return null;
+            return defaultID;
 
         String sql = "INSERT INTO BalanceOperations(date, money, type) VALUES(?,?,?)";
         int balanceOperationId = defaultID;
@@ -465,7 +468,9 @@ public class SQLiteDB {
                 + " productCode text,\n"
                 + " pricePerUnit real,\n"
                 + " quantity integer,\n"
-                + " status text\n"
+                + " status text,\n"
+                + "FOREIGN KEY(productCode) REFERENCES ProductTypes(barCode),  \n"
+                + "FOREIGN KEY(balanceId) REFERENCES BalanceOperations(id) \n"
                 + ");";
 
         try{
@@ -823,7 +828,10 @@ public class SQLiteDB {
      ** Update Card record
      */
     public boolean updateCard(String cardCode, Integer points) {
-        if (this.dbConnection == null || cardCode == null || cardCode.isEmpty() || points == null)
+        if (this.dbConnection == null || cardCode == null || points == null)
+            return false;
+
+        if (cardCode.isEmpty())
             return false;
 
         boolean deleted = false;

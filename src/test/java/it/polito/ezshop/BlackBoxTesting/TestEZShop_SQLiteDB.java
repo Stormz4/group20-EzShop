@@ -207,7 +207,7 @@ public class TestEZShop_SQLiteDB {
     }
 
     @Test
-    public void testInsertDeleteCustomer() {
+    public void testCustomer() {
         String cName = "Johnny";
         String cCustomerCard = "0364829165";
         int cPoints = 185;
@@ -222,8 +222,145 @@ public class TestEZShop_SQLiteDB {
         int cstID = shopDB.insertCustomer(cName, cCustomerCard);
         assertEquals(cstID, defaultID);
 
+        // Check updateCustomer
+        assertTrue(shopDB.updateCustomer(cID, "Jack", "0002938475"));    // Valid params
+        assertTrue(shopDB.updateCustomer(cstID, "Jack", "0002938475")); // Invalid ID
+        assertFalse(shopDB.updateCustomer(cID, "Al", null)); // Null card
+        assertTrue(shopDB.updateCustomer(cID, "Jack", "")); // Empty card
+        assertFalse(shopDB.updateCustomer(cID, null, "0002938475")); // Null name
+        assertFalse(shopDB.updateCustomer(cID, "", "0002938475")); // Null name
+
         // Check deleteCustomer
         assertTrue(shopDB.deleteCustomer(cID));
+    }
+
+    @Test
+    public void testBalanceOperation() {
+        LocalDate cDate = LocalDate.now();
+        double cMoney = 12.50;
+        String cType = "CREDIT";
+
+        // Proper balanceOperation insertion
+        int id = shopDB.insertBalanceOperation(cDate, cMoney, cType);
+        assertNotEquals(id, defaultID);
+
+        // Insert with null date
+        int failID = shopDB.insertBalanceOperation(null, cMoney, cType);
+        assertEquals(failID, defaultID);
+
+        // Insert with null type
+        failID = shopDB.insertBalanceOperation(cDate, cMoney, null);
+        assertEquals(failID, defaultID);
+
+        // Proper balanceOperation update
+        boolean updated = shopDB.updateBalanceOperation(id, LocalDate.now(), 16.80, cType);
+        assertTrue(updated);
+
+        // Update with null date
+        updated = shopDB.updateBalanceOperation(id, null, 16.80, cType);
+        assertFalse(updated);
+
+        // Update with null type
+        updated = shopDB.updateBalanceOperation(id, LocalDate.now(), 16.80, null);
+        assertFalse(updated);
+
+        // Update with inexistent ID
+        updated = shopDB.updateBalanceOperation(failID, LocalDate.now(), 16.80, cType);
+        assertTrue(updated);
+
+        // Delete balanceOperation with existent ID
+        boolean deleted = shopDB.deleteBalanceOperation(id);
+        assertTrue(deleted);
+
+        // Delete balanceOperation with inexistent DB
+        deleted = shopDB.deleteBalanceOperation(failID);
+        assertTrue(deleted);
+
+        // Testing here totalBalance because there's not so much to test about it
+        double balance = shopDB.selectTotalBalance();
+    }
+
+    @Test
+    public void testOrder() {
+        int cBalanceID = 2;
+        String cProductCode = "7293829484929";
+        double cPricePerUnit = 8.40;
+        int cQuantity = 12;
+        String cStatus = "COMPLETED";
+
+        // Proper Order insertion
+        int id = shopDB.insertOrder(cBalanceID, cProductCode, cPricePerUnit, cQuantity, cStatus);
+        assertNotEquals(id, defaultID);
+
+        // Insertion with null balanceID
+        int failID = shopDB.insertOrder(null, cProductCode, cPricePerUnit, cQuantity, cStatus);
+        assertEquals(failID, defaultID);
+
+        // Insertion with inexistent balanceID
+        failID = shopDB.insertOrder(87658876, cProductCode, cPricePerUnit, cQuantity, cStatus);
+        assertNotEquals(failID, defaultID);
+
+        // Insertion with inexistent productCode
+        failID = shopDB.insertOrder(cBalanceID, "4762834629", cPricePerUnit, cQuantity, cStatus);
+        assertNotEquals(failID, defaultID);
+
+        // Insertion with null productCode
+        failID = shopDB.insertOrder(cBalanceID, null, cPricePerUnit, cQuantity, cStatus);
+        assertEquals(failID, defaultID);
+
+        // Insertion with null status
+        failID = shopDB.insertOrder(cBalanceID, cProductCode, cPricePerUnit, cQuantity, null);
+        assertEquals(failID, defaultID);
+
+        // Proper Order update
+        boolean updated = shopDB.updateOrder(id, cBalanceID, "2747364827", cPricePerUnit, cQuantity, cStatus);
+        assertTrue(updated);
+
+        // Order update with inexistent id
+        updated = shopDB.updateOrder(failID, cBalanceID, "2749964827", cPricePerUnit, cQuantity, cStatus);
+        assertTrue(updated);
+
+        // Delete order
+        boolean deleted = shopDB.deleteBalanceOperation(id);
+        assertTrue(deleted);
+
+        // Delete order with inexistent id
+        deleted = shopDB.deleteBalanceOperation(failID);
+        assertTrue(deleted);
+    }
+
+    @Test
+    public void testCard() {
+        Integer cPoints = 125;
+
+        // Proper Card insertions
+        String validCard = shopDB.insertCard(cPoints);
+        assertNotNull(validCard);
+        assertTrue(EZShop.isValidCard(validCard));
+
+        // Insert Card with null points
+        String invalidCard = shopDB.insertCard(null);
+        assertTrue(invalidCard.isEmpty());
+
+        // Proper Card update
+        boolean updated = shopDB.updateCard(validCard, cPoints);
+        assertTrue(updated);
+
+        // Update Card with null points
+        updated = shopDB.updateCard(validCard, null);
+        assertFalse(updated);
+
+        // Update Card with inexistent cardCode
+        updated = shopDB.updateCard(invalidCard, cPoints);
+        assertFalse(updated);
+
+        // Delete Card
+        boolean deleted = shopDB.deleteCard(validCard);
+        assertTrue(deleted);
+
+        // Delete Card with invalid code
+        deleted = shopDB.deleteCard(invalidCard);
+        assertFalse(deleted);
     }
 
     @Test
