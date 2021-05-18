@@ -1331,7 +1331,7 @@ public class SQLiteDB {
      ** Delete ProductPerSale record with given id
      */
     public boolean deleteProductPerSale(String barCode, Integer transactionID) {
-        if (this.dbConnection == null || transactionID == null)
+        if (this.dbConnection == null || transactionID == null || barCode == null)
             return false;
 
         boolean deleted = false;
@@ -1376,7 +1376,7 @@ public class SQLiteDB {
      ** Update ProductPerSale record
      */
     public boolean updateProductPerSale(String barCode, Integer transactionID, int amount, double discountRate) {
-        if (this.dbConnection == null || transactionID == null)
+        if (this.dbConnection == null || transactionID == null || barCode == null)
             return false;
 
         boolean updated = false;
