@@ -253,7 +253,7 @@ public class TestEZShop_SQLiteDB {
 
     @Test
     public void testUpdateReturnTransaction() {
-        //todo: to be added to testReturnTransactions method
+        //todo: to be added to testReturnTransactions method (ALSO update UnitTestReport.md on the location of this method!)
 
         Integer st1 = shopDB.insertSaleTransaction(null, defaultValue, defaultValue, EZSaleTransaction.STOpened);
         Integer rt1 = shopDB.insertReturnTransaction(null, st1, defaultValue, EZReturnTransaction.RTOpened);
@@ -263,7 +263,7 @@ public class TestEZShop_SQLiteDB {
         update = shopDB.updateReturnTransaction(null, st1, 45.60, EZReturnTransaction.RTClosed);
         assertFalse(update);
         update = shopDB.updateReturnTransaction(rt1, st1, 45.60, null);
-        assertFalse(update);
+        assertFalse(update); //??? Should be an assertTrue?
 
     }
 
