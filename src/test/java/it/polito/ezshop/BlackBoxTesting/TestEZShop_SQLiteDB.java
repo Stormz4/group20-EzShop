@@ -321,11 +321,11 @@ public class TestEZShop_SQLiteDB {
         assertTrue(updated);
 
         // Delete order
-        boolean deleted = shopDB.deleteBalanceOperation(id);
+        boolean deleted = shopDB.deleteOrder(id);
         assertTrue(deleted);
 
         // Delete order with inexistent id
-        deleted = shopDB.deleteBalanceOperation(failID);
+        deleted = shopDB.deleteOrder(failID);
         assertTrue(deleted);
     }
 
