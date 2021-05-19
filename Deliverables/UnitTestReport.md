@@ -1827,10 +1827,9 @@ String cStatus = "COMPLETED";<br/>
 
 ### Code coverage report
 
-    <Add here the screenshot report of the statement and branch coverage obtained using
-    the Eclemma tool. >
-    
-    <insert the screen>
+![](UnitTestImages/UnitReportStats.png)
+
+EZAccountBook's coverage is 0% because it's part of integration testing; for the same reason, EZShop's coverage is low.
 
 ### Loop coverage analysis
 
