@@ -21,7 +21,7 @@ import static it.polito.ezshop.data.SQLiteDB.defaultValue;
 
 
 public class EZShop implements EZShopInterface {
-    final boolean USE_TEST_DB = true; //todo: remove
+    final boolean USE_TEST_DB = false; //todo: remove
 
     final static String creditCardsFile = "src/main/java/it/polito/ezshop/utils/CreditCards.txt";
     final static double startingBalanceValue = 1000.00;
@@ -1478,6 +1478,8 @@ public class EZShop implements EZShopInterface {
     }
 
     public EZReturnTransaction getReturnTransactionById(Integer returnId) {
+        if(tmpRetTr != null && returnId.equals(tmpRetTr.getReturnId()))
+            return tmpRetTr;
         return ezReturnTransactions.get(returnId);
     }
 
@@ -1981,7 +1983,7 @@ public class EZShop implements EZShopInterface {
 
     private void testDB() {
         // TODO: remove all this stuff before delivery
-        if (!USE_TEST_DB)
+        if (true)
             return;
 
         this.shopDB.insertUser("admin", "admin", URAdministrator);
