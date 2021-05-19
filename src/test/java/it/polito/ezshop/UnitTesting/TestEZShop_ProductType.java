@@ -1,6 +1,5 @@
-package it.polito.ezshop.BlackBoxTesting;
+package it.polito.ezshop.UnitTesting;
 
-import it.polito.ezshop.data.EZCustomer;
 import it.polito.ezshop.data.EZProductType;
 import org.junit.Test;
 

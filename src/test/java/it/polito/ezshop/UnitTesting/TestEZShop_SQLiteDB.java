@@ -1,4 +1,4 @@
-package it.polito.ezshop.BlackBoxTesting;
+package it.polito.ezshop.UnitTesting;
 
 import static it.polito.ezshop.data.EZBalanceOperation.Credit;
 import static it.polito.ezshop.data.EZBalanceOperation.Debit;
@@ -430,7 +430,7 @@ public class TestEZShop_SQLiteDB {
     }
 
     @Test
-    public void testInsDelTransaction(){
+    public void testReturnTransaction(){
         // test InsertReturnTransaction
         LinkedList<TicketEntry> list = new LinkedList<>();
         EZTicketEntry entry = new EZTicketEntry("6291041500213", "abc", 10, 0.5, 0.9);
@@ -443,11 +443,6 @@ public class TestEZShop_SQLiteDB {
         // test deleteTransaction
         assertTrue(shopDB.deleteTransaction(id1));
         assertFalse(shopDB.deleteTransaction(null));
-    }
-
-    @Test
-    public void testUpdateReturnTransaction() {
-        //todo: to be added to testReturnTransactions method (ALSO update UnitTestReport.md on the location of this method!)
 
         Integer st1 = shopDB.insertSaleTransaction(null, defaultValue, defaultValue, EZSaleTransaction.STOpened);
         Integer rt1 = shopDB.insertReturnTransaction(null, st1, defaultValue, EZReturnTransaction.RTOpened);

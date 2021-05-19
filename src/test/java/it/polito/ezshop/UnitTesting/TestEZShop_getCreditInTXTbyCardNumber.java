@@ -1,7 +1,6 @@
-package it.polito.ezshop.BlackBoxTesting;
+package it.polito.ezshop.UnitTesting;
 
 import it.polito.ezshop.data.*;
-import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
