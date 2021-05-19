@@ -1390,6 +1390,135 @@ data since they're checked at an higher level in EZShop.
 |NULL|Invalid|   boolean update = shopDB.deleteUser(null) -> return false| TestEZShop_SQLiteDB, method testUserDB() |
 
 
+### **Class *SQLiteDB* - method *updateReturnTransaction***
+
+**Criteria for method *updateReturnTransaction*:**
+
+- Validity of input transactionId
+- Validity of input status String
+
+
+**Predicates for method *updateReturnTransaction*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Validity of input transactionId        | Valid |
+|                                        | NULL  |
+| Validity of input status String        | Valid |
+|                                        | NULL  |
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+
+**Combination of predicates**:
+
+|Validity of input transactionId| Validity of input barCode String | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|---|--------|-------|-------|
+|Valid|Valid|Valid| boolean  -> return true  | TestEZShop_SQLiteDB, method ??? |
+|NULL|*|Invalid| boolean  -> return false | TestEZShop_SQLiteDB, method ??? |
+|*|NULL|Invalid|  boolean  -> return false | TestEZShop_SQLiteDB, method ??? |
+
+
+### **Class *SQLiteDB* - method *deleteProductPerSale***
+
+**Criteria for method *deleteProductPerSale*:**
+
+- Validity of input barCode String
+- Validity of input transactionId
+
+
+**Predicates for method *deleteProductPerSale*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Validity of input barCode String       | Valid |
+|                                        | NULL  |
+| Validity of input transactionId        | Valid |
+|                                        | NULL  |
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+
+**Combination of predicates**:
+
+| Validity of input barCode String |Validity of input transactionId| Valid / Invalid | Description of the test case | JUnit test case |
+|-------|---|--------|-------|-------|
+|Valid|Valid|Valid| boolean delete = shopDB.deleteProductPerSale("4627828478338", 1); -> return true  | TestEZShop_SQLiteDB, method testProductPerSales() |
+|NULL|*|Invalid| boolean delete = shopDB.deleteProductPerSale(null, 1); -> return false | TestEZShop_SQLiteDB, method testProductPerSales() |
+|*|NULL|Invalid|  boolean delete = shopDB.deleteProductPerSale("4627828478338", null); -> return false | TestEZShop_SQLiteDB, method testProductPerSales() |
+
+
+
+### **Class *SQLiteDB* - method *deleteAllProductsPerSale***
+
+**Criteria for method *deleteAllProductsPerSale*:**
+
+- Validity of input transactionId
+
+
+**Predicates for method *deleteAllProductsPerSale*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Validity of input transactionId        | Valid |
+|                                        | NULL  |
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+
+**Combination of predicates**:
+
+|Validity of input transactionId| Valid / Invalid | Description of the test case | JUnit test case |
+|----------|--------|-------|-------|
+|Valid|Valid| boolean delete = shopDB.deleteAllProductsPerSale(null); -> return true  | TestEZShop_SQLiteDB, method testProductPerSales() |
+|NULL|Invalid|  boolean delete = shopDB.deleteAllProductsPerSale(1); -> return false | TestEZShop_SQLiteDB, method testProductPerSales() |
+
+
+### **Class *SQLiteDB* - method *updateProductPerSale***
+
+**Criteria for method *updateProductPerSale*:**
+
+- Validity of input barCode String
+- Validity of input transactionId
+
+
+**Predicates for method *updateProductPerSale*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Validity of input barCode String       | Valid |
+|                                        | NULL  |
+| Validity of input transactionId        | Valid |
+|                                        | NULL  |
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+
+**Combination of predicates**:
+
+| Validity of input barCode String |Validity of input transactionId| Valid / Invalid | Description of the test case | JUnit test case |
+|-------|---|--------|----|------------|
+|Valid|Valid|Valid| boolean update = shopDB.updateProductPerSale("4627828478338", st2, 5, 0.60); -> return true  | TestEZShop_SQLiteDB, method testProductPerSales() |
+|NULL|*|Invalid| boolean update = shopDB.updateProductPerSale(null, st2, 5, 0.60); -> return false | TestEZShop_SQLiteDB, method testProductPerSales() |
+|*|NULL|Invalid|  boolean update = shopDB.updateProductPerSale("4627828478338", null, 5, 0.60); -> return false | TestEZShop_SQLiteDB, method testProductPerSales() |
+
+
 # White Box Unit Tests
 
 ### Test cases definition

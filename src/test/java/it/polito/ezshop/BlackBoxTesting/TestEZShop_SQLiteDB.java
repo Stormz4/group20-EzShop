@@ -394,4 +394,52 @@ public class TestEZShop_SQLiteDB {
 
         shopDB.initDatabase();
     }
+
+    @Test
+    public void testUpdateReturnTransaction() {
+        //todo: to be added to testReturnTransactions method (ALSO update UnitTestReport.md on the location of this method!)
+
+        Integer st1 = shopDB.insertSaleTransaction(null, defaultValue, defaultValue, EZSaleTransaction.STOpened);
+        Integer rt1 = shopDB.insertReturnTransaction(null, st1, defaultValue, EZReturnTransaction.RTOpened);
+
+        boolean update = shopDB.updateReturnTransaction(rt1, st1, 45.60, EZReturnTransaction.RTClosed);
+        assertTrue(update);
+        update = shopDB.updateReturnTransaction(null, st1, 45.60, EZReturnTransaction.RTClosed);
+        assertFalse(update);
+        update = shopDB.updateReturnTransaction(rt1, st1, 45.60, null);
+        assertFalse(update); //??? Should be an assertTrue?
+
+    }
+
+    @Test
+    public void testProductPerSales() {
+        //todo: lack of test on insertProductPerSale ???
+
+        Integer st1 = shopDB.insertSaleTransaction(null, defaultValue, defaultValue, EZSaleTransaction.STOpened);
+        Integer st2 = shopDB.insertSaleTransaction(null, defaultValue, defaultValue, EZSaleTransaction.STOpened);
+
+        shopDB.insertProductPerSale("4627828478338", st1, 3, 0.30);
+        boolean delete = shopDB.deleteProductPerSale("4627828478338", st1);
+        assertTrue(delete);
+        delete = shopDB.deleteProductPerSale(null, st1);
+        assertFalse(delete);
+        delete = shopDB.deleteProductPerSale("4627828478338", null);
+        assertFalse(delete);
+
+        shopDB.insertProductPerSale("4627828478338", st1, 3, 0.30);
+        shopDB.insertProductPerSale("2141513141144", st1, 5, 0.70);
+        delete = shopDB.deleteAllProductsPerSale(null);
+        assertFalse(delete);
+        delete = shopDB.deleteAllProductsPerSale(st1);
+        assertTrue(delete);
+
+        shopDB.insertProductPerSale("4627828478338", st2, 3, 0.30);
+        shopDB.insertProductPerSale("2141513141144", st2, 5, 0.70);
+        boolean update = shopDB.updateProductPerSale("4627828478338", st2, 5, 0.60);
+        assertTrue(update);
+        update = shopDB.updateProductPerSale(null, st2, 5, 0.60);
+        assertFalse(update);
+        update = shopDB.updateProductPerSale("4627828478338", null, 5, 0.60);
+        assertFalse(update);
+    }
 }

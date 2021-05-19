@@ -1585,9 +1585,12 @@ public class EZShop implements EZShopInterface {
 
                 getSaleTransactionById(tmpRetTr.getSaleTransactionId()).updatePrice(-ezticket.getTotal()); //update final price of sale transaction
             }
+            double saleDiscount = getSaleTransactionById(retToBeStored.getSaleTransactionId()).getDiscountRate();
+            double oldReturnedValue = retToBeStored.getReturnedValue();
+            retToBeStored.setReturnedValue(oldReturnedValue * saleDiscount);
             retToBeStored.setStatus(RTClosed);
             // update ReturnTransaction in DB:
-            if(!shopDB.updateReturnTransaction(retToBeStored.getReturnId(), retToBeStored.getReturnedValue(), "TODO: complete with correct STATUS"))
+            if(!shopDB.updateReturnTransaction(retToBeStored.getReturnId(), retToBeStored.getSaleTransactionId(), retToBeStored.getReturnedValue()*saleDiscount, RTClosed))
                 return false;
             // clear the temporary transaction:
             tmpRetTr = null;
