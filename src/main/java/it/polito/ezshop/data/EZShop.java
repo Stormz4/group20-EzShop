@@ -1788,7 +1788,7 @@ public class EZShop implements EZShopInterface {
         return (sum % 10 == 0);
     }
 
-    public double getCreditInTXTbyCardNumber(String cardNumber)
+    static public double getCreditInTXTbyCardNumber(String cardNumber)
     {
         double cardBalance = -1;
 
@@ -1822,7 +1822,7 @@ public class EZShop implements EZShopInterface {
         return cardBalance;
     }
 
-    public boolean updateCreditInTXTbyCardNumber(String cardNumber, double toBeAdded) {
+    static public boolean updateCreditInTXTbyCardNumber(String cardNumber, double toBeAdded) {
         Double cardBalance;
 
         if(cardNumber == null)

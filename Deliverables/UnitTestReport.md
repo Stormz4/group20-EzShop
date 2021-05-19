@@ -1298,10 +1298,13 @@ data since they're checked at an higher level in EZShop.
 | Criteria | Predicate |
 | -------- | --------- |
 | Validity of username        |    Valid       |
+|                        | NULL  |
 | Uniqueness of username       | Yes |
 |                              | No |
 | Validity of password         |    Valid       |
+|                        | NULL  |
 | Validity of role         |     Valid      |
+|                        | NULL  |
 
 
 **Boundaries**:
@@ -1314,8 +1317,11 @@ data since they're checked at an higher level in EZShop.
 
 | Criteria 1 | Criteria 2 | Criteria 3 | Criteria 4 | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|-------|-------|-------|
-|*|Yes|*|*|Valid|  int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager");| TestEZShop_SQLiteDB, method testUserDB() |
-|*|No|*|*|Invalid|  int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager"); <br> int uID2 = shopDB.insertUser("Rosario", "testpwd", "ShopManager"); -> return -1| TestEZShop_SQLiteDB, method testUserDB() |
+|Yes|Yes|Yes|Yes|Valid|  int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager");| TestEZShop_SQLiteDB, method testUserDB() |
+|""|No|*|*|Invalid|  int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager"); <br> int uID2 = shopDB.insertUser("Rosario", "testpwd", "ShopManager"); -> return -1| TestEZShop_SQLiteDB, method testUserDB() |
+|*|*|NULL|*|Invalid|  int uID = shopDB.insertUser("Rosario", null, null); -> return -1| TestEZShop_SQLiteDB, method testUserDB() |
+|*|*|*|NULL|Invalid|  int uID = shopDB.insertUser("Rosario", "testpwd", null); -> return -1| TestEZShop_SQLiteDB, method testUserDB() |
+|NULL|*|*|*|Invalid|  int uID = shopDB.insertUser(null, null, null); -> return -1| TestEZShop_SQLiteDB, method testUserDB() |
 
 ### **Class *SQLiteDB* - method *updateUser***
 
@@ -1334,10 +1340,13 @@ data since they're checked at an higher level in EZShop.
 | Validity of id integer | Valid |
 |                        | NULL  |
 | Validity of username        |    Valid       |
+|                        | NULL  |
 | Uniqueness of username       | Yes |
 |                              | No |
 | Validity of password         |    Valid       |
+|                        | NULL  |
 | Validity of role         |     Valid      |
+|                        | NULL  |
 
 
 **Boundaries**:
@@ -1353,6 +1362,10 @@ data since they're checked at an higher level in EZShop.
 |Valid|*|Yes|*|*|Valid| int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager");  <br> boolean update = shopDB.updateUser(uID, "Rosario2", "testpwd2", "Cashier"); -> return true| TestEZShop_SQLiteDB, method testUserDB() |
 |Valid|*|No|*|*|Invalid| int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager"); <br> int uID3 = shopDB.insertUser("sheldon", "testpwd", "ShopManager"); <br> boolean update2 = shopDB.updateUser(uID, "sheldon", "testpwd2", "Cashier"); -> return false| TestEZShop_SQLiteDB, method testUserDB() |
 |NULL|*|*|*|*|Invalid|   boolean update = shopDB.updateUser(null, "Rosario2", "testpwd2", "Cashier"); -> return false| TestEZShop_SQLiteDB, method testUserDB() |
+|*|NULL|*|*|*|Invalid|   int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager"); <br> boolean update = shopDB.updateUser(uID, null, null, null); -> return false| TestEZShop_SQLiteDB, method testUserDB() |
+|*|*|*|NULL|*|Invalid|   int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager"); <br> boolean update = shopDB.updateUser(uID, "Rosario", null, null); -> return false| TestEZShop_SQLiteDB, method testUserDB() |
+|*|*|*|*|NULL|Invalid|   int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager"); <br> boolean update = shopDB.updateUser(uID, "Rosario", "testpwd", null); -> return false| TestEZShop_SQLiteDB, method testUserDB() |
+
 
 ### **Class *SQLiteDB* - method *deleteUser***
 

@@ -4,6 +4,7 @@ import it.polito.ezshop.data.*;
 import it.polito.ezshop.exceptions.InvalidPasswordException;
 import it.polito.ezshop.exceptions.InvalidRoleException;
 import it.polito.ezshop.exceptions.InvalidUsernameException;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -23,6 +24,14 @@ public class TestEZShop_AccountBook {
         shopDB2.connect();
         shopDB2.initDatabase();
     }
+
+
+    @After
+    public void closeConnection() {
+        shopDB2.closeConnection();
+
+    }
+
 
     @Test
     public void testAccountBook() {

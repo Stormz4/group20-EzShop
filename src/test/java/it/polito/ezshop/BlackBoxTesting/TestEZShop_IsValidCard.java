@@ -12,31 +12,29 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class TestEZShop_IsValidCard{
-    EZShop ez;
     boolean isValid;
 
     @Before
     public void init(){
-        ez = new EZShop();
         isValid = false;
     }
 
     @Test
     public void testLoyaltyCode_notEnoughDigits(){
-        isValid = ez.isValidCard("33235");
+        isValid = EZShop.isValidCard("33235");
         assertFalse(isValid);
     }
 
     @Test
 
     public void testLoyaltyCode_nullInput(){
-        isValid = ez.isValidCard(null);
+        isValid = EZShop.isValidCard(null);
         assertFalse(isValid);
     }
 
     @Test
     public void testLoyaltyCode_10digits(){
-        isValid = ez.isValidCard("2332543219");
+        isValid = EZShop.isValidCard("2332543219");
         assertTrue(isValid);
     }
 

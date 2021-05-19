@@ -16,54 +16,52 @@ public class TestEZShop_VerifyBarCode {
     // https://www.gs1.org/services/how-calculate-check-digit-manually
     // 12 to 14 digits
 
-    EZShop ez;
     boolean isValid;
 
     @Before
     public void init(){
-        ez = new EZShop();
         isValid = false;
     }
 
     @Test
     public void testBarCode_notEnoughDigits(){
-        isValid = ez.isValidBarCode("33235");
+        isValid = EZShop.isValidBarCode("33235");
         assertFalse(isValid);
     }
 
     @Test
     public void testBarCode_nullInput(){
-        isValid = ez.isValidBarCode(null);
+        isValid = EZShop.isValidBarCode(null);
         assertFalse(isValid);
     }
 
     @Test
     public void testBarCode_alphanumeric(){
-        isValid = ez.isValidBarCode("54326476412b31");
+        isValid =  EZShop.isValidBarCode("54326476412b31");
         assertFalse(isValid);
     }
 
     @Test
     public void testBarCode_12digits(){
-        isValid = ez.isValidBarCode("233254321519");
+        isValid =  EZShop.isValidBarCode("233254321519");
         assertTrue(isValid);
     }
 
     @Test
     public void testBarCode_13digits(){
-        isValid = ez.isValidBarCode("6291041500213");
+        isValid =  EZShop.isValidBarCode("6291041500213");
         assertTrue(isValid);
     }
 
     @Test
     public void testBarCode_14digits(){
-        isValid = ez.isValidBarCode("54326476412231");
+        isValid = EZShop.isValidBarCode("54326476412231");
         assertTrue(isValid);
     }
 
     @Test
     public void testBarCode_algorithm(){
-        isValid = ez.isValidBarCode("54326476412234");
+        isValid =  EZShop.isValidBarCode("54326476412234");
         assertFalse(isValid);
     }
 

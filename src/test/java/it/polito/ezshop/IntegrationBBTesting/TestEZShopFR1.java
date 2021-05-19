@@ -1,4 +1,4 @@
-package it.polito.ezshop.BlackBoxTesting;
+package it.polito.ezshop.IntegrationBBTesting;
 
 
 
@@ -33,6 +33,7 @@ public class TestEZShopFR1 {
         if (created1 != null){
             shopDB2.deleteUser(created1);
         }
+        shopDB2.closeConnection();
     }
 
     // Order: create->update->delete

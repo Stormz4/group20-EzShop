@@ -366,8 +366,15 @@ public class TestEZShop_SQLiteDB {
     @Test
     public void testUserDB() throws SQLException {
         int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager");
+        assertEquals(defaultID, (int) shopDB.insertUser(null, null, null));
+        assertEquals(defaultID, (int) shopDB.insertUser("Rosario", null, null));
+        assertEquals(defaultID, (int) shopDB.insertUser("Rosario", "testpwd", null));
         int uID2 = shopDB.insertUser("Rosario", "testpwd", "ShopManager");
         boolean update = shopDB.updateUser(uID, "Rosario2", "testpwd2", "Cashier");
+
+        assertFalse(shopDB.updateUser(null, null, null, null));
+        assertFalse(shopDB.updateUser(uID, "Rosario", null, null));
+        assertFalse(shopDB.updateUser(uID, "Rosario", "testpwd", null));
 
         assertNotEquals(defaultID, uID);
         assertEquals(defaultID, uID2);
