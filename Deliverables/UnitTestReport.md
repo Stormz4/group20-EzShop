@@ -18,7 +18,8 @@ Date: 19/05/2021
 | 6 | Added BB tests for DB (ProductType and ReturnTransaction) |
 
 Leaf classes (TestEZShop_Customer, User and so on) and DB methods don't include involve a lot of controls and checks on the
-data since they're checked at an higher level in EZShop.
+data since they're checked at a higher level in EZShop.<br/>
+Boundaries tables are not reported in most cases because they were empty.
 
 
 # Contents
@@ -57,13 +58,6 @@ data since they're checked at an higher level in EZShop.
 | BarCode matches an algorithm | Yes          |
 |                              | No           |
 
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-|          |                 |
-
 
 **Combination of predicates**:
 
@@ -94,13 +88,6 @@ data since they're checked at an higher level in EZShop.
 |                                   | NULL                   |
 | Loyalty card matches a regexp     | Yes                    |
 |                                   | No                     |
-
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-|          |                 |
 
 
 **Combination of predicates**:
@@ -133,15 +120,6 @@ data since they're checked at an higher level in EZShop.
 |                                   | No                     |
 
 
-
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-|          |                 |
-
-
 **Combination of predicates**:
 
 | Validity of Position string | Position matches a regexp | Valid / Invalid | Description of the test case                                          | JUnit test case                                                   |
@@ -169,15 +147,6 @@ data since they're checked at an higher level in EZShop.
 |                                       |            No                 |
 | Validity of credit card string (Luhn) | Valid                      |
 |                                       | Invalid format        |
-
-
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-|          |                 |
-
 
 
 **Combination of predicates**:
@@ -212,14 +181,6 @@ data since they're checked at an higher level in EZShop.
 |                                        |     Incorrect                |
 
 
-
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-|          |                 |
-
 **Combination of predicates**:
 
 
@@ -252,14 +213,6 @@ data since they're checked at an higher level in EZShop.
 |                                        |     Incorrect                |
 
 
-
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-|          |                 |
-
 **Combination of predicates**:
 
 
@@ -281,13 +234,6 @@ data since they're checked at an higher level in EZShop.
 |    Validity of customer name string     |       Valid    |
 
 
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-
-
 **Combination of predicates**:
 
 
@@ -304,13 +250,6 @@ data since they're checked at an higher level in EZShop.
 | Criteria | Predicate |
 | -------- | --------- |
 |   Validity of customer card string    |     Valid     |
-
-
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
 
 
 **Combination of predicates**:
@@ -331,13 +270,6 @@ data since they're checked at an higher level in EZShop.
 |    Validity of id integer      |     Valid      |
 
 
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-
-
 **Combination of predicates**:
 
 
@@ -354,13 +286,6 @@ data since they're checked at an higher level in EZShop.
 | Criteria | Predicate |
 | -------- | --------- |
 |      Validity of points integer    |      Valid     |
-
-
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
 
 
 **Combination of predicates**:
@@ -382,13 +307,6 @@ data since they're checked at an higher level in EZShop.
 |     Validity of username string     |     Valid      |
 
 
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-
-
 **Combination of predicates**:
 
 
@@ -405,13 +323,6 @@ data since they're checked at an higher level in EZShop.
 | Criteria | Predicate |
 | -------- | --------- |
 |     Validity of password string     |      Valid     |
-
-
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
 
 
 **Combination of predicates**:
@@ -432,13 +343,6 @@ data since they're checked at an higher level in EZShop.
 | Validity of id integer       |     Valid      |
 
 
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-
-
 **Combination of predicates**:
 
 
@@ -454,14 +358,8 @@ data since they're checked at an higher level in EZShop.
 
 | Criteria | Predicate |
 | -------- | --------- |
-|          |           |
-
-
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
+| Validity of role  |  Valid    |
+|                   | NULL      |
 
 
 **Combination of predicates**:
@@ -481,14 +379,10 @@ data since they're checked at an higher level in EZShop.
 
 | Criteria | Predicate |
 | -------- | --------- |
-|          |           |
-
-
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
+| Validity of role                           |  Valid    |
+|                                            | NULL      |
+| Role is equal to one of the required roles | Yes    |
+|                                            | No      |
 
 
 **Combination of predicates**:
@@ -511,13 +405,6 @@ data since they're checked at an higher level in EZShop.
 |Validity of product description  |      Valid     |
 
 
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-
-
 **Combination of predicates**:
 
 | Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
@@ -533,13 +420,6 @@ data since they're checked at an higher level in EZShop.
 | Criteria | Predicate |
 | -------- | --------- |
 |Validity of bar code  |      Valid     |
-
-
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
 
 
 **Combination of predicates**:
@@ -559,13 +439,6 @@ data since they're checked at an higher level in EZShop.
 |Validity of id  |      Valid     |
 
 
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-
-
 **Combination of predicates**:
 
 | Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
@@ -583,13 +456,6 @@ data since they're checked at an higher level in EZShop.
 |Validity of quantity integer  |      Valid     |
 
 
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-
-
 **Combination of predicates**:
 
 | Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
@@ -605,13 +471,6 @@ data since they're checked at an higher level in EZShop.
 | Criteria | Predicate |
 | -------- | --------- |
 |Validity of note string |      Valid     |
-
-
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
 
 
 **Combination of predicates**:
@@ -632,13 +491,6 @@ data since they're checked at an higher level in EZShop.
 |Validity of location string |      Valid     |
 
 
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-
-
 **Combination of predicates**:
 
 | Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
@@ -657,13 +509,6 @@ data since they're checked at an higher level in EZShop.
 |Validity of price double |      Valid     |
 
 
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-
-
 **Combination of predicates**:
 
 | Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
@@ -679,13 +524,6 @@ data since they're checked at an higher level in EZShop.
 | Criteria | Predicate |
 | -------- | --------- |
 |Validity of quantity to be added |      Valid     |
-
-
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
 
 
 **Combination of predicates**:
@@ -707,12 +545,6 @@ data since they're checked at an higher level in EZShop.
 |    Valid setting      |       Valid         |
 |                       |      Invalid        |
 
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-|          |                 |
 
 **Combination of predicates**:
 
@@ -735,13 +567,6 @@ data since they're checked at an higher level in EZShop.
 |    Valid setting      |       Valid         |
 |                       |      Invalid        |
 
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-|          |                 |
-
 **Combination of predicates**:
 
 
@@ -762,13 +587,6 @@ data since they're checked at an higher level in EZShop.
 | -------- | --------- |
 |    Valid setting      |       Valid         |
 |                       |      Invalid        |
-
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-|          |                 |
 
 **Combination of predicates**:
 
@@ -791,12 +609,6 @@ data since they're checked at an higher level in EZShop.
 |    Valid setting      |       Valid         |
 |                       |      Invalid        |
 
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-|          |                 |
 
 **Combination of predicates**:
 
@@ -819,15 +631,8 @@ data since they're checked at an higher level in EZShop.
 |    Valid setting      |       Valid         |
 |                       |      Invalid        |
 
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-|          |                 |
 
 **Combination of predicates**:
-
 
 | Valid setting | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|
@@ -846,13 +651,6 @@ data since they're checked at an higher level in EZShop.
 | -------- | --------- |
 |    Valid setting      |       Valid         |
 |                       |      Invalid        |
-
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-|          |                 |
 
 **Combination of predicates**:
 
@@ -875,15 +673,8 @@ data since they're checked at an higher level in EZShop.
 |    Valid setting      |       Valid         |
 |                       |      Invalid        |
 
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-|          |                 |
 
 **Combination of predicates**:
-
 
 | Valid setting | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|
@@ -902,15 +693,9 @@ data since they're checked at an higher level in EZShop.
 |    Valid input        |       Valid         |
 |                       |      Invalid        |
 
-**Boundaries**:
 
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-|          |                 |
 
 **Combination of predicates**:
-
 
 | Valid input | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|
@@ -930,15 +715,8 @@ data since they're checked at an higher level in EZShop.
 |    Correct price updating     |      Yes         |
 |                               |      No          |
 
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-|          |                 |
 
 **Combination of predicates**:
-
 
 | Correct price updating | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|
@@ -957,15 +735,8 @@ data since they're checked at an higher level in EZShop.
 |    Correct balance updating      |       Yes         |
 |                                  |       No          |
 
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-|          |                 |
 
 **Combination of predicates**:
-
 
 | Correct balance updating | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|
@@ -984,13 +755,6 @@ data since they're checked at an higher level in EZShop.
 | -------- | --------- |
 |    Valid setting      |       Valid         |
 |                       |      Invalid        |
-
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-|          |                 |
 
 **Combination of predicates**:
 
@@ -1307,12 +1071,6 @@ data since they're checked at an higher level in EZShop.
 |                        | NULL  |
 
 
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-
 **Combination of predicates**:
 
 | Criteria 1 | Criteria 2 | Criteria 3 | Criteria 4 | Valid / Invalid | Description of the test case | JUnit test case |
@@ -1349,12 +1107,6 @@ data since they're checked at an higher level in EZShop.
 |                        | NULL  |
 
 
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-
 **Combination of predicates**:
 
 | Criteria 1 | Criteria 2 | Criteria 3 | Criteria 4 | Criteria 5 | Valid / Invalid | Description of the test case | JUnit test case |
@@ -1381,11 +1133,6 @@ data since they're checked at an higher level in EZShop.
 | Validity of id integer | Valid |
 |                        | NULL  |
 
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
 
 **Combination of predicates**:
 
@@ -1412,12 +1159,6 @@ data since they're checked at an higher level in EZShop.
 | Validity of input status String        | Valid |
 |                                        | NULL  |
 
-
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
 
 **Combination of predicates**:
 
