@@ -179,7 +179,7 @@ public class SQLiteDB {
         // SQL statement for creating a new Customer table
         String sql = "CREATE TABLE IF NOT EXISTS Customers (\n"
                    + " id integer PRIMARY KEY,\n"
-                   + " name text NOT NULL,\n"
+                   + " name text NOT NULL UNIQUE,\n"
                    + " card integer UNIQUE,\n"
                    + "FOREIGN KEY(card) REFERENCES Cards(id)\n"
                    + ");";
