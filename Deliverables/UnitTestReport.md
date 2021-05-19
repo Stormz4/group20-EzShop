@@ -1423,9 +1423,9 @@ data since they're checked at an higher level in EZShop.
 
 |Validity of input transactionId| Validity of input barCode String | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|---|--------|-------|-------|
-|Valid|Valid|Valid| boolean  -> return true  | TestEZShop_SQLiteDB, method ??? |
-|NULL|*|Invalid| boolean  -> return false | TestEZShop_SQLiteDB, method ??? |
-|*|NULL|Invalid|  boolean  -> return false | TestEZShop_SQLiteDB, method ??? |
+|Valid|Valid|Valid| boolean  -> return true  | TestEZShop_SQLiteDB, method testReturnTransaction() |
+|NULL|*|Invalid| boolean  -> return false | TestEZShop_SQLiteDB, method testReturnTransaction() |
+|*|NULL|Invalid|  boolean  -> return false | TestEZShop_SQLiteDB, method testReturnTransaction() |
 
 
 ### **Class *SQLiteDB* - method *deleteProductPerSale***
@@ -1610,6 +1610,32 @@ LinkedList<TicketEntry> list;<br />TicketEntry entry = new TicketEntry(...);<br 
 |-------|-------|-------|-------|
 |True|Valid| int id = insertReturnTransaction(...)<br />deleteTransaction(id) -> return true | TestEZShop_SQLiteDB, method testInsDelTransaction() |
 |False|Invalid| deleteTransaction(null) -> return false | TestEZShop_SQLiteDB, method testInsDelTransaction() |
+
+
+### **Class *SQLiteDB* - method *insertBalanceOperation***
+
+**Criteria for method *insertBalanceOperation*:**
+
+- Validity of input date
+- Validity of input type String
+
+**Predicates for method *insertBalanceOperation*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Validity of input date | Valid |
+|  | NULL     |
+| Validity of input type String | Valid |
+|  | NULL     |
+
+**Combination of predicates**:
+
+| Validity of input date | Validity of input type String | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|---|----|-------|
+|NULL|*| int failID = shopDB.insertBalanceOperation(null, cMoney, cType); | TestEZShop_SQLiteDB, method testBalanceOperation() |
+|*|NULL|  failID = shopDB.insertBalanceOperation(cDate, cMoney, null); | TestEZShop_SQLiteDB, method testBalanceOperation() |
+|Valid|Valid|  int id = shopDB.insertBalanceOperation(cDate, cMoney, cType); | TestEZShop_SQLiteDB, method testBalanceOperation() |
+
 
 # White Box Unit Tests
 
