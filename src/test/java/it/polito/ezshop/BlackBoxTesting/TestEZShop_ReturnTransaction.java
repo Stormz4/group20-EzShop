@@ -45,12 +45,13 @@ public class TestEZShop_ReturnTransaction {
         list.add(entry);
         returnTransaction.setEntries(list);
         List<TicketEntry> gotList = returnTransaction.getEntries();
+        returnTransaction.setStatus(EZSaleTransaction.STPayed);
         s = returnTransaction.getStatus();
 
         assertEquals(3, id);
         assertEquals(10, d, 0.1);
         assertEquals(2, trId);
-        //assertEquals("PAYED", s);
+        assertEquals("PAYED", s);
         assertTrue(gotList.contains(entry));
         assertEquals(1, gotList.size());
 
