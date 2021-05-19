@@ -351,7 +351,7 @@ public class TestEZShop_SQLiteDB {
 
         // Delete order with null id
         deleted = shopDB.deleteOrder(null);
-        assertTrue(deleted);
+        assertFalse(deleted);
     }
 
     @Test
