@@ -1433,7 +1433,7 @@ public class EZShop implements EZShopInterface {
 
     public BalanceOperation getBalanceOpById(Integer balanceId) {
         return ezBalanceOperations.get(balanceId);
-    } // serve???
+    }
 
     public EZSaleTransaction getSaleTransactionById(Integer saleNumber) {
         /*
@@ -1655,7 +1655,9 @@ public class EZShop implements EZShopInterface {
                 }
             }
 
-            assert product != null; //???
+            if (product == null)
+                return false;
+
             // re-update (decrease) quantity on the shelves
             if(!shopDB.updateProductType(product.getId(), product.getQuantity()-ezticket.getAmount(), product.getLocation(),
                 product.getNote(), product.getProductDescription(), product.getBarCode(), product.getPricePerUnit()))
@@ -1670,12 +1672,14 @@ public class EZShop implements EZShopInterface {
 
             // re-update (increase) final price of related sale transaction
             double newPrice = sale.getPrice()+ezticket.getTotal();
-            /*if(*/shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), newPrice, sale.getStatus());//== false) return false;
+            if(!shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), newPrice, sale.getStatus()))
+                return false;
+
             getSaleTransactionById(retTr.getSaleTransactionId()).setPrice(+ezticket.getTotal());
 
             //delete also the return ticket from DB:
-            /*if(!*/shopDB.deleteProductPerSale(ezticket.getBarCode(), retTr.getReturnId());//)
-                //return false;
+            if(!shopDB.deleteProductPerSale(ezticket.getBarCode(), retTr.getReturnId()))
+                return false;
 
         }
         // remove the almost deleted return transaction from related lists:
