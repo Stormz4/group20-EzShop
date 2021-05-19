@@ -1,4 +1,4 @@
-package it.polito.ezshop.BlackBoxTesting;
+package it.polito.ezshop.IntegrationBBTesting;
 
 import it.polito.ezshop.data.*;
 import it.polito.ezshop.exceptions.InvalidPasswordException;
