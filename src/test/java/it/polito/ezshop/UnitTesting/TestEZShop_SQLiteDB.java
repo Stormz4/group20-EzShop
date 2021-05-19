@@ -305,10 +305,6 @@ public class TestEZShop_SQLiteDB {
         int failID = shopDB.insertOrder(null, cProductCode, cPricePerUnit, cQuantity, cStatus);
         assertEquals(failID, defaultID);
 
-        // Insertion with inexistent balanceID
-        failID = shopDB.insertOrder(87658876, cProductCode, cPricePerUnit, cQuantity, cStatus);
-        assertNotEquals(failID, defaultID);
-
         // Insertion with inexistent productCode
         failID = shopDB.insertOrder(cBalanceID, "4762834629", cPricePerUnit, cQuantity, cStatus);
         assertNotEquals(failID, defaultID);
@@ -329,12 +325,32 @@ public class TestEZShop_SQLiteDB {
         updated = shopDB.updateOrder(failID, cBalanceID, "2749964827", cPricePerUnit, cQuantity, cStatus);
         assertTrue(updated);
 
+        // Order update with null id
+        updated = shopDB.updateOrder(null, cBalanceID, "2749964827", cPricePerUnit, cQuantity, cStatus);
+        assertFalse(updated);
+
+        // Order update with null balanceID
+        updated = shopDB.updateOrder(id, null, "2749964827", cPricePerUnit, cQuantity, cStatus);
+        assertFalse(updated);
+
+        // Order update with null productCode
+        updated = shopDB.updateOrder(id, cBalanceID, null, cPricePerUnit, cQuantity, cStatus);
+        assertFalse(updated);
+
+        // Order update with null status
+        updated = shopDB.updateOrder(id, cBalanceID, cProductCode, cPricePerUnit, cQuantity, null);
+        assertFalse(updated);
+
         // Delete order
         boolean deleted = shopDB.deleteOrder(id);
         assertTrue(deleted);
 
         // Delete order with inexistent id
         deleted = shopDB.deleteOrder(failID);
+        assertTrue(deleted);
+
+        // Delete order with null id
+        deleted = shopDB.deleteOrder(null);
         assertTrue(deleted);
     }
 

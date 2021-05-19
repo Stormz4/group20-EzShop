@@ -1700,6 +1700,112 @@ int id = shopDB.insertBalanceOperation(cDate, cMoney, cType);
 |NULL|*|*| Invalid | boolean updated = shopDB.updateBalanceOperation(null, LocalDate.now(), 16.80, null); -> return false| TestEZShop_SQLiteDB, method testBalanceOperation() |
 
 
+### **Class *SQLiteDB* - method *insertOrder***
+
+**Criteria for method *insertOrder*:**
+
+- Validity of BalanceID
+- Validity of ProductCode
+- Existence of ProductCode
+- Validity of Status
+
+**Predicates for method *insertOrder*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Validity of BalanceID     | Valid |
+|                           | NULL  |
+| Validity of ProductCode   | Valid |
+|                           | NULL  |
+| Existence of ProductCode  | Yes   |
+|                           | No    |
+| Validity of Status        | Valid |
+|                           | NULL  |
+
+**Combination of predicates**:
+
+int cBalanceID = 2;<br/>
+String cProductCode = "7293829484929";<br/>
+double cPricePerUnit = 8.40;<br/>
+int cQuantity = 12;<br/>
+String cStatus = "COMPLETED";<br/>
+
+| Criteria 1 | Criteria 2 | Criteria 3  | Criteria 4   | Valid / Invalid | Description of the test case | JUnit test case |
+|------------|------------|-------------|--------------|-----------|-------|-------|
+| Valid      | Valid      | Yes         | Valid        | Valid     |  int id = shopDB.insertOrder(cBalanceID, cProductCode, cPricePerUnit, cQuantity, cStatus); | TestEZShop_SQLiteDB, method testOrder() |
+| NULL       | *          | *           | *            | Invalid   |  int failID = shopDB.insertOrder(null, cProductCode, cPricePerUnit, cQuantity, cStatus);   | TestEZShop_SQLiteDB, method testOrder() |
+| Valid      | Valid      | No          | Valid        | Valid     |  failID = shopDB.insertOrder(cBalanceID, "4762834629", cPricePerUnit, cQuantity, cStatus); | TestEZShop_SQLiteDB, method testOrder() |
+| *          | NULL       | *           | *            | Invalid   |  failID = shopDB.insertOrder(cBalanceID, null, cPricePerUnit, cQuantity, cStatus);         | TestEZShop_SQLiteDB, method testOrder() |
+| *          | *          | *           | NULL         | Invalid   |  failID = shopDB.insertOrder(cBalanceID, cProductCode, cPricePerUnit, cQuantity, null);    | TestEZShop_SQLiteDB, method testOrder() |
+
+
+### **Class *SQLiteDB* - method *updateOrder***
+
+**Criteria for method *updateOrder*:**
+
+- Validity of id
+- Existence of id
+- Validity of BalanceID
+- Validity of ProductCode
+- Validity of Status
+
+**Predicates for method *updateOrder*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Validity of id            | Valid |
+|                           | NULL  |
+| Existence of id           | Yes   |
+|                           | No    |
+| Validity of BalanceID     | Valid |
+|                           | NULL  |
+| Validity of ProductCode   | Valid |
+|                           | NULL  |
+| Validity of Status        | Valid |
+|                           | NULL  |
+
+**Combination of predicates**:
+
+int cBalanceID = 2;<br/>
+String cProductCode = "7293829484929";<br/>
+double cPricePerUnit = 8.40;<br/>
+int cQuantity = 12;<br/>
+String cStatus = "COMPLETED";<br/>
+
+| Criteria 1 | Criteria 2 | Criteria 3  | Criteria 4   | Criteria 5   | Valid / Invalid | Description of the test case | JUnit test case |
+|------------|------------|-------------|--------------|--------------|-----------|-------|-------|
+| Valid      | Yes        | Valid       | Valid        | Valid        | Valid     |  boolean updated = shopDB.updateOrder(id, cBalanceID, "2747364827", cPricePerUnit, cQuantity, cStatus); | TestEZShop_SQLiteDB, method testOrder() |
+| Valid      | No         | Valid       | Valid        | Valid        | Valid     |  updated = shopDB.updateOrder(failID, cBalanceID, "2749964827", cPricePerUnit, cQuantity, cStatus);     | TestEZShop_SQLiteDB, method testOrder() |
+| NULL       | *          | *           | *            | *            | Invalid   |  updated = shopDB.updateOrder(null, cBalanceID, "2749964827", cPricePerUnit, cQuantity, cStatus);       | TestEZShop_SQLiteDB, method testOrder() |
+| *          | *          | NUL         | *            | *            | Invalid   |  updated = shopDB.updateOrder(id, null, "2749964827", cPricePerUnit, cQuantity, cStatus);               | TestEZShop_SQLiteDB, method testOrder() |
+| *          | *          | *           | NULL         | *            | Invalid   |  updated = shopDB.updateOrder(id, cBalanceID, null, cPricePerUnit, cQuantity, cStatus);                 | TestEZShop_SQLiteDB, method testOrder() |
+| *          | *          | *           | *            | NULL         | Invalid   |  updated = shopDB.updateOrder(id, cBalanceID, cProductCode, cPricePerUnit, cQuantity, null);            | TestEZShop_SQLiteDB, method testOrder() |
+
+
+### **Class *SQLiteDB* - method *deleteOrder***
+
+**Criteria for method *deleteOrder*:**
+
+- Validity of id
+- Existence of id
+
+**Predicates for method *deleteOrder*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Validity of id            | Valid |
+|                           | NULL  |
+| Existence of id           | Yes   |
+|                           | No    |
+
+**Combination of predicates**:
+
+| Criteria 1 | Criteria 2 | Valid / Invalid | Description of the test case | JUnit test case |
+|------------|------------|-----------|-------|-------|
+| Valid      | Yes        | Valid     |  boolean deleted = shopDB.deleteOrder(id); | TestEZShop_SQLiteDB, method testOrder() |
+| Valid      | No         | Valid     |  deleted = shopDB.deleteOrder(failID);     | TestEZShop_SQLiteDB, method testOrder() |
+| NULL       | *          | Invalid   |  deleted = shopDB.deleteOrder(null);       | TestEZShop_SQLiteDB, method testOrder() |
+
 
 # White Box Unit Tests
 
