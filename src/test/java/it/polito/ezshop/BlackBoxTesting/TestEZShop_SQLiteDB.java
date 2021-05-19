@@ -402,11 +402,11 @@ public class TestEZShop_SQLiteDB {
         Integer st1 = shopDB.insertSaleTransaction(null, defaultValue, defaultValue, EZSaleTransaction.STOpened);
         Integer rt1 = shopDB.insertReturnTransaction(null, st1, defaultValue, EZReturnTransaction.RTOpened);
 
-        boolean update = shopDB.updateReturnTransaction(rt1, st1, 45.60, EZReturnTransaction.RTClosed);
+        boolean update = shopDB.updateReturnTransaction(rt1, 45.60, EZReturnTransaction.RTClosed);
         assertTrue(update);
-        update = shopDB.updateReturnTransaction(null, st1, 45.60, EZReturnTransaction.RTClosed);
+        update = shopDB.updateReturnTransaction(null, 45.60, EZReturnTransaction.RTClosed);
         assertFalse(update);
-        update = shopDB.updateReturnTransaction(rt1, st1, 45.60, null);
+        update = shopDB.updateReturnTransaction(rt1, 45.60, null);
         assertFalse(update); //??? Should be an assertTrue?
 
     }
