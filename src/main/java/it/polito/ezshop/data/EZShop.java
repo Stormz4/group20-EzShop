@@ -241,9 +241,6 @@ public class EZShop implements EZShopInterface {
             }
         }
 
-        // todo: to be removed
-        accountingBook = new EZAccountBook(startingBalanceValue);
-
         return currUser;
     }
 
