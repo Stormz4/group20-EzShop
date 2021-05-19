@@ -273,9 +273,9 @@ public class TestEZShop_SQLiteDB {
         updated = shopDB.updateBalanceOperation(id, LocalDate.now(), 16.80, null);
         assertFalse(updated);
 
-        // Update with inexistent ID
-        updated = shopDB.updateBalanceOperation(failID, LocalDate.now(), 16.80, cType);
-        assertTrue(updated);
+        // Update with null id
+        updated = shopDB.updateBalanceOperation(null, LocalDate.now(), 16.80, cType);
+        assertFalse(updated);
 
         // Delete balanceOperation with existent ID
         boolean deleted = shopDB.deleteBalanceOperation(id);

@@ -1630,11 +1630,75 @@ LinkedList<TicketEntry> list;<br />TicketEntry entry = new TicketEntry(...);<br 
 
 **Combination of predicates**:
 
+LocalDate cDate = LocalDate.now();
+double cMoney = 12.50;
+String cType = "CREDIT";
+
+int id = shopDB.insertBalanceOperation(cDate, cMoney, cType);
+
 | Validity of input date | Validity of input type String | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|---|----|-------|
-|NULL|*| int failID = shopDB.insertBalanceOperation(null, cMoney, cType); | TestEZShop_SQLiteDB, method testBalanceOperation() |
-|*|NULL|  failID = shopDB.insertBalanceOperation(cDate, cMoney, null); | TestEZShop_SQLiteDB, method testBalanceOperation() |
-|Valid|Valid|  int id = shopDB.insertBalanceOperation(cDate, cMoney, cType); | TestEZShop_SQLiteDB, method testBalanceOperation() |
+|NULL|*|Invalid | int failID = shopDB.insertBalanceOperation(null, cMoney, cType); | TestEZShop_SQLiteDB, method testBalanceOperation() |
+|*|NULL| Invalid |failID = shopDB.insertBalanceOperation(cDate, cMoney, null); | TestEZShop_SQLiteDB, method testBalanceOperation() |
+|Valid|Valid| Valid| int id = shopDB.insertBalanceOperation(cDate, cMoney, cType); | TestEZShop_SQLiteDB, method testBalanceOperation() |
+
+
+### Class *SQLiteDB* - method *deleteBalanceOperation***
+
+**Criteria for method *deleteBalanceOperation*:**
+
+- Validity of id integer
+
+**Predicates for method *deleteBalanceOperation*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Validity of id integer | Valid |
+|                        | NULL  |
+
+**Combination of predicates**:
+
+LocalDate cDate = LocalDate.now();
+double cMoney = 12.50;
+String cType = "CREDIT";
+
+int id = shopDB.insertBalanceOperation(cDate, cMoney, cType);
+
+| Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|Valid|Valid|shopDB.deleteBalanceOperation(id); -> return true| TestEZShop_SQLiteDB, method testBalanceOperation() |
+|NULL|Invalid| shopDB.deleteBalanceOperation(null) -> return false| TestEZShop_SQLiteDB, method testBalanceOperation() |
+
+
+### Class *SQLiteDB* - method *updateBalanceOperation***
+
+**Criteria for method *updateBalanceOperation*:**
+
+- Validity of id integer
+- Validity of input date
+- Validity of input type String
+
+**Predicates for method *updateBalanceOperation*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Validity of id integer | Valid |
+|                        | NULL  |
+| Validity of input date | Valid |
+|  | NULL     |
+| Validity of input type String | Valid |
+|  | NULL     |
+
+
+**Combination of predicates**:
+
+| Validity of id integer | Validity of input date | Validity of input type String | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|---|----|-------|-------|
+|Valid|Valid|Valid| Valid| boolean updated = shopDB.updateBalanceOperation(id, LocalDate.now(), 16.80, cType); -> return true | TestEZShop_SQLiteDB, method testBalanceOperation() |
+|*|NULL|*|Invalid | boolean updated = shopDB.updateBalanceOperation(id, null, 16.80, cType); -> return false| TestEZShop_SQLiteDB, method testBalanceOperation() |
+|*|*|NULL| Invalid | boolean updated = shopDB.updateBalanceOperation(id, LocalDate.now(), 16.80, null); -> return false| TestEZShop_SQLiteDB, method testBalanceOperation() |
+|NULL|*|*| Invalid | boolean updated = shopDB.updateBalanceOperation(null, LocalDate.now(), 16.80, null); -> return false| TestEZShop_SQLiteDB, method testBalanceOperation() |
+
 
 
 # White Box Unit Tests
