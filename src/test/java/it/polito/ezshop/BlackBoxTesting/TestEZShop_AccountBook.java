@@ -14,13 +14,11 @@ import static org.junit.Assert.*;
 
 public class TestEZShop_AccountBook {
     EZAccountBook book;
-    EZShop ez;
-    private final SQLiteDB shopDB2 = new SQLiteDB();
+    private SQLiteDB shopDB2 = new SQLiteDB();
     HashMap<Integer, EZBalanceOperation> balanceOperations = new HashMap<Integer, EZBalanceOperation>();
 
     @Before
     public void init() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
-        ez = new EZShop();
         shopDB2.connect();
         shopDB2.initDatabase();
     }
@@ -30,8 +28,9 @@ public class TestEZShop_AccountBook {
     public void closeConnection() {
         shopDB2.closeConnection();
 
+        assertFalse(shopDB2.isConnected());
+        shopDB2 = null;
     }
-
 
     @Test
     public void testAccountBook() {
