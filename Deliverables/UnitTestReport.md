@@ -1486,12 +1486,12 @@ int cID = shopDB.insertCustomer(cName, cCustomerCard);
 
 ### **Class *SQLiteDB* - method *deleteCustomer***
 
-**Criteria for method *deleteUser*:**
+**Criteria for method *deleteCustomer*:**
 
 - Validity of id integer
 
 
-**Predicates for method *deleteUser*:**
+**Predicates for method *deleteCustomer*:**
 
 | Criteria | Predicate |
 | -------- | --------- |
@@ -1517,6 +1517,82 @@ int cID = shopDB.insertCustomer(cName, cCustomerCard);
 |-------|-------|-------|-------|
 |Valid|Valid| shopDB.deleteCustomer(cID);| TestEZShop_SQLiteDB, method testCustomer() |
 |NULL|Invalid| shopDB.deleteCustomer(cID); | TestEZShop_SQLiteDB, method testCustomer() |
+
+
+### **Class *SQLiteDB* - method *insertCard***
+
+**Criteria for method *insertCard*:**
+
+- Validity of card points
+
+**Predicates for method *insertCustomer*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Validity of card points    |    Valid       |
+|                        | NULL  |
+
+
+**Combination of predicates**:
+
+| Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|-------|-------|-------|
+|Valid|Valid |Integer cPoints = 125; <br> String validCard = shopDB.insertCard(cPoints); -> return card|  TestEZShop_SQLiteDB, method testCard() |
+|NULL|Invalid | String invalidCard = shopDB.insertCard(null); -> return empty string|  TestEZShop_SQLiteDB, method testCard() |
+
+
+### **Class *SQLiteDB* - method *updateCard***
+
+**Criteria for method *updateCard*:**
+
+- Validity of card code
+- Validity of card points
+
+**Predicates for method *updateCard*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Validity of card code| Valid |
+|                        | NULL/Empty  |
+| Validity of card points    |    Valid       |
+|                        | NULL  |
+
+**Combination of predicates**:
+
+Integer cPoints = 125;
+String validCard = shopDB.insertCard(cPoints);
+
+| Criteria 1 | Criteria 2 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|-------|
+|Valid|Valid|Valid| shopDB.updateCard(validCard, cPoints); -> return true | TestEZShop_SQLiteDB, method testCard() |
+|NULL/Empty|*|Invalid| shopDB.updateCard("", cPoints); -> return false| TestEZShop_SQLiteDB, method testCard()|
+|*|NULL|Invalid|shopDB.updateCard(validCard, null); -> return false | TestEZShop_SQLiteDB, method testCard()|
+
+
+### **Class *SQLiteDB* - method *deleteCard***
+
+**Criteria for method *deleteCard*:**
+
+- Validity of card code
+
+
+**Predicates for method *deleteCard*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Validity of card code | Valid |
+|                        | NULL/Empty  |
+
+
+**Combination of predicates**:
+
+String invalidCard = "";
+
+| Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|Valid|Valid|shopDB.deleteCard(validCard); -> return true| TestEZShop_SQLiteDB, method testCard() |
+|NULL/Empty|Invalid| shopDB.deleteCard(invalidCard); | TestEZShop_SQLiteDB, method testCard() |
+
 
 
 ### **Class *SQLiteDB* - method *updateReturnTransaction***
