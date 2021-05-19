@@ -218,20 +218,29 @@ public class TestEZShop_SQLiteDB {
         // Check if insertion was successful
         assertNotEquals(cID, defaultID);
 
-        // Check if prevents insertion of another customer with same card
-        int cstID = shopDB.insertCustomer(cName, cCustomerCard);
-        assertEquals(cstID, defaultID);
+        assertEquals((int) shopDB.insertCustomer(null, cCustomerCard), defaultID);
+        assertEquals((int) shopDB.insertCustomer(cName, null), defaultID);
 
+
+        // Check if prevents insertion of another customer with same card/name
+        int cstID = shopDB.insertCustomer(cName, "0364829166");
+        assertEquals(defaultID, cstID);
+        int cstID2 = shopDB.insertCustomer("Johnny2", cCustomerCard);
+        assertEquals(defaultID, cstID2);
+
+        int c3 = shopDB.insertCustomer("Marcus", "0364829999");
         // Check updateCustomer
-        assertTrue(shopDB.updateCustomer(cID, "Jack", "0002938475"));    // Valid params
-        assertTrue(shopDB.updateCustomer(cstID, "Jack", "0002938475")); // Invalid ID
+        assertTrue(shopDB.updateCustomer(cID,  "Jack", "0002938475"));    // Valid params
+        assertFalse(shopDB.updateCustomer(null, "Jack", "0002938475")); // Invalid ID
         assertFalse(shopDB.updateCustomer(cID, "Al", null)); // Null card
         assertTrue(shopDB.updateCustomer(cID, "Jack", "")); // Empty card
         assertFalse(shopDB.updateCustomer(cID, null, "0002938475")); // Null name
         assertFalse(shopDB.updateCustomer(cID, "", "0002938475")); // Null name
-
+        assertFalse(shopDB.updateCustomer(cID, "Marcus", cCustomerCard));
+        assertFalse(shopDB.updateCustomer(cID, "Alphonse", "0364829999"));
         // Check deleteCustomer
         assertTrue(shopDB.deleteCustomer(cID));
+        assertFalse(shopDB.deleteCustomer(null));
     }
 
     @Test

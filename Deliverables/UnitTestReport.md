@@ -1317,7 +1317,7 @@ data since they're checked at an higher level in EZShop.
 
 | Criteria 1 | Criteria 2 | Criteria 3 | Criteria 4 | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|-------|-------|-------|
-|Yes|Yes|Yes|Yes|Valid|  int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager");| TestEZShop_SQLiteDB, method testUserDB() |
+|Valid|Yes|Valid|Valid|Valid|  int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager");| TestEZShop_SQLiteDB, method testUserDB() |
 |""|No|*|*|Invalid|  int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager"); <br> int uID2 = shopDB.insertUser("Rosario", "testpwd", "ShopManager"); -> return -1| TestEZShop_SQLiteDB, method testUserDB() |
 |*|*|NULL|*|Invalid|  int uID = shopDB.insertUser("Rosario", null, null); -> return -1| TestEZShop_SQLiteDB, method testUserDB() |
 |*|*|*|NULL|Invalid|  int uID = shopDB.insertUser("Rosario", "testpwd", null); -> return -1| TestEZShop_SQLiteDB, method testUserDB() |
@@ -1395,6 +1395,128 @@ data since they're checked at an higher level in EZShop.
 |-------|-------|-------|-------|
 |Valid|Valid| int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager");  <br> boolean update = shopDB.deleteUser(uID); -> return true| TestEZShop_SQLiteDB, method testUserDB() |
 |NULL|Invalid|   boolean update = shopDB.deleteUser(null) -> return false| TestEZShop_SQLiteDB, method testUserDB() |
+
+
+### **Class *SQLiteDB* - method *insertCustomer***
+
+**Criteria for method *insertCustomer*:**
+
+- Validity of name
+- Uniqueness of name
+- Validity of customer card
+- Uniqueness of customer card
+
+**Predicates for method *insertCustomer*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Validity of name     |    Valid       |
+|                        | NULL  |
+| Uniqueness of name      | Yes |
+|                              | No |
+| Validity of customer card        |    Valid       |
+|                        | NULL  |
+| Uniqueness of custoemr card     | Yes |
+|                              | No |
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+
+**Combination of predicates**:
+
+| Criteria 1 | Criteria 2 | Criteria 3 | Criteria 4 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|-------|-------|-------|
+|Valid|Yes|Valid|Yes|Valid| String cName = "Johnny"; String cCustomerCard = "0364829165"; <br> int cID = shopDB.insertCustomer(cName, cCustomerCard); -> return cID | TestEZShop_SQLiteDB, method testCustomer() |
+|""|No|*|*|Invalid|  String cName = "Johnny"; String cCustomerCard = "0364829165"; <br> int cID = shopDB.insertCustomer(cName, cCustomerCard); -> return cID <br> int cID = shopDB.insertCustomer(cName, "0364829166"); -> return cID| TestEZShop_SQLiteDB, method testCustomer()|
+|*|*|NULL|*|Invalid|  shopDB.insertCustomer(null, cCustomerCard); -> return -1 | TestEZShop_SQLiteDB, method testCustomer()|
+|*|*|Yes|No|Invalid|  String cName = "Johnny"; String cCustomerCard = "0364829165"; <br> int cID = shopDB.insertCustomer(cName, cCustomerCard); <br> int cstID2 = shopDB.insertCustomer("Johnny2", cCustomerCard); -> return -1| TestEZShop_SQLiteDB, method testCustomer() |
+|NULL|*|*|*|Invalid| shopDB.insertCustomer(null, cCustomerCard);-> return -1| TestEZShop_SQLiteDB, method testCustomer() |
+
+### **Class *SQLiteDB* - method *updateCustomer***
+
+**Criteria for method *updateCustomer*:**
+
+- Validity of id integer
+- Validity of name
+- Uniqueness of name
+- Validity of customer card
+- Uniqueness of customer card
+
+**Predicates for method *updateCustomer*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Validity of id integer | Valid |
+|                        | NULL  |
+| Validity of name     |    Valid       |
+|                        | NULL  |
+| Uniqueness of name      | Yes |
+|                              | No |
+| Validity of customer card        |    Valid       |
+|                        | NULL  |
+| Uniqueness of customer card     | Yes |
+|                              | No |
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+
+**Combination of predicates**:
+
+cID represents the id of an existing customer:
+String cName = "Johnny";
+String cCustomerCard = "0364829165";
+int cID = shopDB.insertCustomer(cName, cCustomerCard);
+
+| Criteria 1 | Criteria 2 | Criteria 3 | Criteria 4 | Criteria 5 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|-------|-------|-------|-------|
+|Yes|Valid|Yes|Valid|Yes|Valid| shopDB.updateCustomer(cID, "Jack", "0002938475") | TestEZShop_SQLiteDB, method testCustomer() |
+|NULL|*|*|*|*|Invalid|shopDB.updateCustomer(null, "Jack", "0002938475") | TestEZShop_SQLiteDB, method testCustomer()|
+|*|NULL|*|*|*|Invalid|shopDB.updateCustomer(cID, null, "0002938475") | TestEZShop_SQLiteDB, method testCustomer()|
+|*|Yes|No|*|*|Invalid|  int c3 = shopDB.insertCustomer("Marcus", "0364829999"); <br> shopDB.updateCustomer(cID, "Marcus", cCustomerCard)| TestEZShop_SQLiteDB, method testCustomer() |
+|*|*|*|NULL|*|Invalid| shopDB.updateCustomer(cID, cName, null)| TestEZShop_SQLiteDB, method testCustomer() |
+|*|*|*|Yes|No|Invalid| int c3 = shopDB.insertCustomer("Marcus", "0364829999"); <br> shopDB.updateCustomer(cID, cName, "0364829999")| TestEZShop_SQLiteDB, method testCustomer() |
+
+
+### **Class *SQLiteDB* - method *deleteCustomer***
+
+**Criteria for method *deleteUser*:**
+
+- Validity of id integer
+
+
+**Predicates for method *deleteUser*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Validity of id integer | Valid |
+|                        | NULL  |
+
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+
+**Combination of predicates**:
+
+cID represents the id of an existing customer:
+String cName = "Johnny";
+String cCustomerCard = "0364829165";
+int cID = shopDB.insertCustomer(cName, cCustomerCard);
+
+| Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|Valid|Valid| shopDB.deleteCustomer(cID);| TestEZShop_SQLiteDB, method testCustomer() |
+|NULL|Invalid| shopDB.deleteCustomer(cID); | TestEZShop_SQLiteDB, method testCustomer() |
 
 
 ### **Class *SQLiteDB* - method *updateReturnTransaction***
