@@ -468,14 +468,12 @@ public class TestEZShop_SQLiteDB {
         update = shopDB.updateReturnTransaction(null, 45.60, EZReturnTransaction.RTClosed);
         assertFalse(update);
         update = shopDB.updateReturnTransaction(rt1, 45.60, null);
-        assertFalse(update); //??? Should be an assertTrue?
+        assertFalse(update);
 
     }
 
     @Test
     public void testProductPerSales() {
-        //todo: lack of test on insertProductPerSale ???
-
         Integer st1 = shopDB.insertSaleTransaction(null, defaultValue, defaultValue, EZSaleTransaction.STOpened);
         Integer st2 = shopDB.insertSaleTransaction(null, defaultValue, defaultValue, EZSaleTransaction.STOpened);
 

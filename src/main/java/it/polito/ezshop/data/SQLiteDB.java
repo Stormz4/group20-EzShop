@@ -871,7 +871,6 @@ public class SQLiteDB {
                 + " pricePerUnit real\n"
                 + ");";
 
-        // TODO: Should handle this as an exception?
         if (this.dbConnection == null)
             return;
 
