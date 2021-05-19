@@ -1295,6 +1295,7 @@ data since they're checked at an higher level in EZShop.
 **Criteria for method *insertUser*:**
 
  - Validity of username
+ - Uniqueness of username
  - Validity of password
  - Validity of role
 
@@ -1303,38 +1304,8 @@ data since they're checked at an higher level in EZShop.
 | Criteria | Predicate |
 | -------- | --------- |
 | Validity of username        |    Valid       |
-| Validity of password         |    Valid       |
-| Validity of role         |     Valid      |
-
-
-**Boundaries**:
-
-| Criteria | Boundary values |
-| -------- | --------------- |
-|          |                 |
-
-**Combination of predicates**:
-
-| Criteria 1 | Criteria 2 | Criteria 3 | Valid / Invalid | Description of the test case | JUnit test case |
-|-------|-------|-------|-------|-------|-------|
-|*|*|*|Valid|  int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager");| TestEZShop_SQLiteDB, method testUserDB() |
-
-### **Class *SQLiteDB* - method *updateUser***
-
-**Criteria for method *updateUser*:**
-
-- Validity of id integer
-- Validity of username
-- Validity of password
-- Validity of role
-
-**Predicates for method *updateUser*:**
-
-| Criteria | Predicate |
-| -------- | --------- |
-| Validity of id integer | Valid |
-|                        | NULL  |
-| Validity of username        |    Valid       |
+| Uniqueness of username       | Yes |
+|                              | No |
 | Validity of password         |    Valid       |
 | Validity of role         |     Valid      |
 
@@ -1349,8 +1320,45 @@ data since they're checked at an higher level in EZShop.
 
 | Criteria 1 | Criteria 2 | Criteria 3 | Criteria 4 | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|-------|-------|-------|
-|Valid|*|*|*|Valid| int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager");  <br> boolean update = shopDB.updateUser(uID, "Rosario2", "testpwd2", "Cashier"); -> return true| TestEZShop_SQLiteDB, method testUserDB() |
-|NULL|*|*|*|Invalid|   boolean update = shopDB.updateUser(null, "Rosario2", "testpwd2", "Cashier"); -> return false| TestEZShop_SQLiteDB, method testUserDB() |
+|*|Yes|*|*|Valid|  int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager");| TestEZShop_SQLiteDB, method testUserDB() |
+|*|No|*|*|Invalid|  int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager"); <br> int uID2 = shopDB.insertUser("Rosario", "testpwd", "ShopManager"); -> return -1| TestEZShop_SQLiteDB, method testUserDB() |
+
+### **Class *SQLiteDB* - method *updateUser***
+
+**Criteria for method *updateUser*:**
+
+- Validity of id integer
+- Validity of username
+- Uniqueness of username
+- Validity of password
+- Validity of role
+
+**Predicates for method *updateUser*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Validity of id integer | Valid |
+|                        | NULL  |
+| Validity of username        |    Valid       |
+| Uniqueness of username       | Yes |
+|                              | No |
+| Validity of password         |    Valid       |
+| Validity of role         |     Valid      |
+
+
+**Boundaries**:
+
+| Criteria | Boundary values |
+| -------- | --------------- |
+|          |                 |
+
+**Combination of predicates**:
+
+| Criteria 1 | Criteria 2 | Criteria 3 | Criteria 4 | Criteria 5 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|-------|-------|-------|-------|
+|Valid|*|Yes|*|*|Valid| int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager");  <br> boolean update = shopDB.updateUser(uID, "Rosario2", "testpwd2", "Cashier"); -> return true| TestEZShop_SQLiteDB, method testUserDB() |
+|Valid|*|No|*|*|Invalid| int uID = shopDB.insertUser("Rosario", "testpwd", "ShopManager"); <br> int uID3 = shopDB.insertUser("sheldon", "testpwd", "ShopManager"); <br> boolean update2 = shopDB.updateUser(uID, "sheldon", "testpwd2", "Cashier"); -> return false| TestEZShop_SQLiteDB, method testUserDB() |
+|NULL|*|*|*|*|Invalid|   boolean update = shopDB.updateUser(null, "Rosario2", "testpwd2", "Cashier"); -> return false| TestEZShop_SQLiteDB, method testUserDB() |
 
 ### **Class *SQLiteDB* - method *deleteUser***
 
