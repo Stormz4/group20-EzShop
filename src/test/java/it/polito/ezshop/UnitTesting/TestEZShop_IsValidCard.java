@@ -1,10 +1,7 @@
-package it.polito.ezshop.BlackBoxTesting;
+package it.polito.ezshop.UnitTesting;
 
 
 import it.polito.ezshop.data.EZShop;
-import it.polito.ezshop.exceptions.InvalidPasswordException;
-import it.polito.ezshop.exceptions.InvalidRoleException;
-import it.polito.ezshop.exceptions.InvalidUsernameException;
 import org.junit.Before;
 import org.junit.Test;
 

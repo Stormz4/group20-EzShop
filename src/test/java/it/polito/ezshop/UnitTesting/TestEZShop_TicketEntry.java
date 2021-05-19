@@ -1,4 +1,4 @@
-package it.polito.ezshop.BlackBoxTesting;
+package it.polito.ezshop.UnitTesting;
 
 import it.polito.ezshop.data.EZTicketEntry;
 import static org.junit.Assert.*;
