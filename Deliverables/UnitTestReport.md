@@ -1529,94 +1529,61 @@ data since they're checked at an higher level in EZShop.
 
 **Criteria for method *deleteProductType*:**
 
-- Value of id integer
+- Id is null
 
 **Predicates for method *deleteProductType*:**
 
 | Criteria | Predicate |
 | -------- | --------- |
-| Value of id integer | >0 |
-|                        | <=0 |
-| | NULL |
-| Product exists in the DB | True |
+| Id is !null | True |
 |  | False |
-
-**Boundaries**:
-
-| Criteria               | Boundary values |
-| ---------------------- | --------------- |
-| Validity of id integer | 0               |
 
 **Combination of predicates**:
 
-| Value of id | Existence of Product | Valid / Invalid | Description of the test case | JUnit test case |
-|-------|-------|-------|-------|-------|
-|>0|True|Valid| deleteProduct(1) -> return true | TestEZShop_SQLiteDB, method testProdTypeDB() |
-|>0|False|Invalid| deleteProduct(100000) -> return false | TestEZShop_SQLiteDB, method testProdTypeDB() |
-|0|*|Invalid| deleteProduct(0) -> return false | TestEZShop_SQLiteDB, method testProdTypeDB() |
-|<0|*|Invalid| deleteProduct(-1) -> return false | TestEZShop_SQLiteDB, method testProdTypeDB() |
-|NULL|*|Invalid| deleteProduct(NULL) -> return false | TestEZShop_SQLiteDB, method testProdTypeDB() |
+| Id is !null | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|True|Valid| deleteProduct(1) -> return true | TestEZShop_SQLiteDB, method testProdTypeDB() |
+|False|Invalid| deleteProduct(null) -> return false | TestEZShop_SQLiteDB, method testProdTypeDB() |
 
 ### **Class *SQLiteDB* - method *updateProductType***
 
-```
-public Integer insertProductType(Integer quantity, String location, String note, String productDescription, String barCode, double pricePerUnit) {
-```
-
 **Criteria for method *updateProductType*:**
 
-- Value of id
-- Value of quantity
-- Content of location 
-- Content of note 
-- Content of productDescription
-- Content of barCode
-- Validity of barCode
-- Value of pricePerUnit
+- Id is !null
+- Quantity is !null
+- Location is !null
+- Note is !null
+- ProductDescription is !null
+- BarCode is !null
 
 **Predicates for method *updateProductType*:**
 
 | Criteria | Predicate |
 | -------- | --------- |
-| Value of id | >0 |
-|                        | <=0 |
-| | NULL |
-| Value of quantity |    >0     |
-|  | <=0 |
-|  | NULL |
-| Content of barCode | !NULL |
-|  | NULL |
-| Validity of barCode | Valid |
-|  | Invalid |
-| Value of pricePerUnit | >0 |
-|  | <=0 |
-| Content of location | * |
-| Content of note | * |
-| Content of productDescription | * |
-
-**Boundaries**:
-
-| Criteria              | Boundary values |
-| --------------------- | --------------- |
-| Value of id           | 0               |
-| Value of quantity     | 0               |
-| Value of pricePerUnit | 0               |
+| Id is !null | True |
+| | False |
+| Quantity is !null |    True    |
+|  | False |
+| Location is !null | True |
+|  | False |
+| Note is !null | True |
+|  | False |
+| ProductDescription is !null | True |
+|  | False |
+| BarCode is !null | True |
+|  | False |
 
 **Combination of predicates**:
 
-| Value of id | Value of quantity | Content of barCode | Validity of barCode | Value of pricePerUnit | Content of location | Content of note | Content of productDescription | Valid / Invalid | Description of the test case | JUnit test case |
-|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|
-|>0|>0|!NULL|Valid|>0|*|*|*|Valid| int id = insertProductType(...)<br />updateProductType(id, 2, "abc", "abc", "niceProd", 6291041500213 , 1.0) -> return true | TestEZShop_SQLiteDB, method testProdTypeDB() |
-|>0|>0|!NULL|Valid|0|*|*|*|Invalid| int id = insertProductType(...)<br />updateProductType(id, 2, "abc", "abc", "niceProd", 6291041500213 , 0) -> return false | TestEZShop_SQLiteDB, method testProdTypeDB() |
-|>0|>0|!NULL|Valid|<0|*|*|*|Invalid| int id = insertProductType(...)<br />updateProductType(id, 2, "abc", "abc", "niceProd", 6291041500213 , -1) -> return false | TestEZShop_SQLiteDB, method testProdTypeDB() |
-|>0|>0|!NULL|Invalid|*|*|*|*|Invalid| int id = insertProductType(...)<br />updateProductType(id, 2, "abc", "abc", "niceProd", 1234 , 1.0) -> return false | TestEZShop_SQLiteDB, method testProdTypeDB() |
-|>0|>0|NULL|*|*|*|*|*|Invalid| int id = insertProductType(...)<br />updateProductType(id, 2, "abc", "abc", "niceProd", NULL, 1.0) -> return false | TestEZShop_SQLiteDB, method testProdTypeDB() |
-|>0|0|*|*|*|*|*|*|Invalid| int id = insertProductType(...)<br />updateProductType(id, 0, "abc", "abc", "niceProd", 6291041500213, 1.0) -> return false | TestEZShop_SQLiteDB, method testProdTypeDB() |
-|>0|<0|*|*|*|*|*|*|Invalid| int id = insertProductType(...)<br />updateProductType(id, -1, "abc", "abc", "niceProd", 6291041500213, 1.0) -> return false | TestEZShop_SQLiteDB, method testProdTypeDB() |
-|>0|NULL|*|*|*|*|*|*|Invalid| int id = insertProductType(...)<br />updateProductType(id, NULL, "abc", "abc", "niceProd", 6291041500213, 1.0) -> return false | TestEZShop_SQLiteDB, method testProdTypeDB() |
-|=0|*|*|*|*|*|*|*|Invalid| int id = insertProductType(...)<br />updateProductType(0, 1, "abc", "abc", "niceProd", 6291041500213, 1.0) -> return false | TestEZShop_SQLiteDB, method testProdTypeDB() |
-|<0|*|*|*|*|*|*|*|Invalid| int id = insertProductType(...)<br />updateProductType(-1, 1, "abc", "abc", "niceProd", 6291041500213, 1.0) -> return false | TestEZShop_SQLiteDB, method testProdTypeDB() |
-|NULL|*|*|*|*|*|*|*|Invalid| int id = insertProductType(...)<br />updateProductType(NULL, 1, "abc", "abc", "niceProd", 6291041500213, 1.0) -> return false | TestEZShop_SQLiteDB, method testProdTypeDB() |
+| Id is !null | Quantity is !null | Location is !null | Note is !null | ProductDescription is !null | BarCode is !null | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|-------|-------|-------|-------|-------|
+|True|True|True|True|True|True|Valid| int id = insertProductType(...)<br />updateProductType(id, 2, "abc", "abc", "niceProd", 6291041500213 , 1.0) -> return true | TestEZShop_SQLiteDB, method testProdTypeDB() |
+|False|*|*|*|*|*|Invalid| int id = insertProductType(...)<br />updateProductType(NULL, 2, "abc", "abc", "niceProd", 6291041500213 , 1.0) -> return false | TestEZShop_SQLiteDB, method testProdTypeDB() |
+|*| False             |*|*|*|*|Invalid| int id = insertProductType(...)<br />updateProductType(id, NULL, "abc", "abc", "niceProd", 6291041500213 , 1.0) -> return false | TestEZShop_SQLiteDB, method testProdTypeDB() |
+|*|*|False|*|*|*|Invalid| int id = insertProductType(...)<br />updateProductType(id, 2, NULL, "abc", "niceProd", 6291041500213 , 1.0) -> return false | TestEZShop_SQLiteDB, method testProdTypeDB() |
+| *           |*|*|False|*|*|Invalid| int id = insertProductType(...)<br />updateProductType(id, 2, "abc", NULL, "niceProd", 6291041500213, 1.0) -> return false | TestEZShop_SQLiteDB, method testProdTypeDB() |
+|*|*|*|*|False|*|Invalid| int id = insertProductType(...)<br />updateProductType(id, 0, "abc", "abc", NULL, 6291041500213, 1.0) -> return false | TestEZShop_SQLiteDB, method testProdTypeDB() |
+|*|*|*|*|*|False|Invalid| int id = insertProductType(...)<br />updateProductType(id, -1, "abc", "abc", "niceProd", NULL, 1.0) -> return false | TestEZShop_SQLiteDB, method testProdTypeDB() |
 
 ### **Class *SQLiteDB* - method *insertReturnTransaction***
 
@@ -1626,51 +1593,24 @@ public Integer insertReturnTransaction(List<TicketEntry> entries, int saleID, do
 
 **Criteria for method *insertReturnTransaction*:**
 
-- Value of saleID
-- Content of entries List
-- Existence of SaleTransaction with given saleID
-- Value of price
-- Content of Status 
+- Status is !null
 
 **Predicates for method *insertReturnTransaction*:**
 
 | Criteria | Predicate |
 | -------- | --------- |
-| Value of sale ID | >0 |
-|  | <=0 |
-| Content of entries List | !Empty |
-|  | Empty |
-|  | NULL |
-| Existence of SaleTransaction with given saleID | True |
+| Status is !null | True |
 |  | False |
-| Value of price | >0 |
-|  | <=0 |
-| Content of Status | Valid Status(one of the possible Status for a Return Transaction) |
-|  | Invalid Status |
-|  | NULL |
 
 
-**Boundaries**:
 
-| Criteria        | Boundary values |
-| --------------- | --------------- |
-| Value of saleID | 0               |
-| Value of price  | 0               |
 
 **Combination of predicates**:
 
-| Value of saleID | Content of entries List | Existence of SaleTransaction with given saleID | Value of price | Content of Status | Valid / Invalid | Description of the test case | JUnit test case |
-|-------|-------|-------|-------|-------|-------|-------|-------|
-| >0 | !Empty | True | >0 | Valid | Valid | LinkedList<TicketEntry> list;<br />TicketEntry entry = new TicketEntry(...);<br />list.add(entry);<br />insertReturnTransaction(list, 1, 1.0, "OPENED") -> return positive int | TestEZShop_SQLiteDB, method testInsDelTransactionDB() |
-| >0 | !Empty | True | >0 | Invalid | Invalid | LinkedList<TicketEntry> list;<br />TicketEntry entry = new TicketEntry(...);<br />list.add(entry);<br />insertReturnTransaction(list, 1, 1.0, "abc") -> return -1 | TestEZShop_SQLiteDB, method testInsDelTransactionDB() |
-| >0 | !Empty | True | >0 | NULL | Invalid | LinkedList<TicketEntry> list;<br />TicketEntry entry = new TicketEntry(...);<br />list.add(entry);<br />insertReturnTransaction(list, 1, 1.0, NULL) -> return -1 | TestEZShop_SQLiteDB, method testInsDelTransactionDB() |
-| >0 | !Empty | True | 0 | * | Invalid | LinkedList<TicketEntry> list;<br />TicketEntry entry = new TicketEntry(...);<br />list.add(entry);<br />insertReturnTransaction(list, 1, 0, "OPENED") -> return -1 | TestEZShop_SQLiteDB, method testInsDelTransactionDB() |
-| >0 | !Empty | True | <0 | * | Invalid | LinkedList<TicketEntry> list;<br />TicketEntry entry = new TicketEntry(...);<br />list.add(entry);<br />insertReturnTransaction(list, 1, -1, "OPENED") -> return -1 | TestEZShop_SQLiteDB, method testInsDelTransactionDB() |
-| >0 | !Empty | False | * | * | Invalid | LinkedList<TicketEntry> list;<br />TicketEntry entry = new TicketEntry(...);<br />list.add(entry);<br />insertReturnTransaction(list, 1000000, 1.0, "OPENED") -> return -1 | TestEZShop_SQLiteDB, method testInsDelTransactionDB() |
-| >0 | Empty | * | * | * | Invalid | LinkedList<TicketEntry> list;<br />insertReturnTransaction(list, 1, 1.0, "OPENED") -> return -1 | TestEZShop_SQLiteDB, method testInsDelTransactionDB() |
-| >0 | NULL | * | * | * | Invalid | insertReturnTransaction(NULL, 1, 1.0, "OPENED") -> return -1 | TestEZShop_SQLiteDB, method testInsDelTransactionDB() |
-| 0 | * | * | * | * | Invalid | LinkedList<TicketEntry> list;<br />TicketEntry entry = new TicketEntry(...);<br />list.add(entry);<br />insertReturnTransaction(list, 0, 1.0, "OPENED") -> return -1 | TestEZShop_SQLiteDB, method testInsDelTransactionDB() |
-|<0|*|*|*|*|Invalid| LinkedList<TicketEntry> list;<br />TicketEntry entry = new TicketEntry(...);<br />list.add(entry);<br />insertReturnTransaction(list, NULL, 1.0, "OPENED") -> return -1 | TestEZShop_SQLiteDB, method testInsDelTransactionDB() |
+| Status is !null | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+| True | Valid | LinkedList<TicketEntry> list;<br />TicketEntry entry = new TicketEntry(...);<br />list.add(entry);<br />insertReturnTransaction(list, 1, 1.0, "OPENED") -> return positive int | TestEZShop_SQLiteDB, method testInsDelTransactionDB() |
+| False | Invalid | LinkedList<TicketEntry> list;<br />TicketEntry entry = new TicketEntry(...);<br />list.add(entry);<br />insertReturnTransaction(list, 1, 1.0, NULL) -> return -1 | TestEZShop_SQLiteDB, method testInsDelTransactionDB() |
 
 ### **Class *SQLiteDB* - method *deleteTransaction***
 
@@ -1682,29 +1622,15 @@ public Integer insertReturnTransaction(List<TicketEntry> entries, int saleID, do
 
 | Criteria | Predicate |
 | -------- | --------- |
-| Value of id integer | >0 |
-|  | <=0 |
-|                        | NULL  |
-| Existence of the Transaction | True |
-|  | False |
-
-**Boundaries**:
-
-| Criteria            | Boundary values |
-| ------------------- | --------------- |
-| Value of id integer | 0               |
+| TransactionID is !null | True |
+|  | False     |
 
 **Combination of predicates**:
 
-| Value of id integer | Existence of the Transaction | Valid / Invalid | Description of the test case | JUnit test case |
-|-------|-------|-------|-------|-------|
-|>0|True|Valid| int id = insertReturnTransaction(...)<br />deleteTransaction(id) -> return true | TestEZShop_SQLiteDB, method testInsDelTransactionDB() |
-|>0|False|Invalid| deleteTransaction(100000) -> return false ** | TestEZShop_SQLiteDB, method testInsDelTransactionDB() |
-|0|*|Invalid| deleteTransaction(0) -> return false | TestEZShop_SQLiteDB, method testInsDelTransactionDB() |
-|<0|*|Invalid| deleteTransaction(-1) -> return false | TestEZShop_SQLiteDB, method testInsDelTransactionDB() |
-|NULL|*|Invalid| deleteTransaction(NULL) -> return false | TestEZShop_SQLiteDB, method testInsDelTransactionDB() |
-
-**test method to populate DB inserts less than 100000 transactions
+| Existence of the Transaction | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|True|Valid| int id = insertReturnTransaction(...)<br />deleteTransaction(id) -> return true | TestEZShop_SQLiteDB, method testInsDelTransactionDB() |
+|False|Invalid| deleteTransaction(NULL) -> return false | TestEZShop_SQLiteDB, method testInsDelTransactionDB() |
 
 # White Box Unit Tests
 
