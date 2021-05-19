@@ -24,7 +24,6 @@ public class EZShop implements EZShopInterface {
     final boolean USE_TEST_DB = false; //todo: remove
 
     final static String creditCardsFile = "src/main/java/it/polito/ezshop/utils/CreditCards.txt";
-    final static double startingBalanceValue = 1000.00;
 
     private final SQLiteDB shopDB = new SQLiteDB();
     private EZUser currUser = null;
@@ -45,8 +44,8 @@ public class EZShop implements EZShopInterface {
     public EZShop() {
         this.loadDataFromDB();
 
-        // TODO: remove before delivery
-        this.testDB();
+        accountingBook = new EZAccountBook(0);
+        accountingBook.setCurrentBalance(shopDB.selectTotalBalance()); // starting balance
     }
 
     public void  loadDataFromDB() {
@@ -1925,8 +1924,10 @@ public class EZShop implements EZShopInterface {
     public boolean recordBalanceUpdate(double toBeAdded) throws UnauthorizedException {
         if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager) )
             throw new UnauthorizedException();
+
+        double balanceValue = (this.shopDB != null && this.shopDB.isConnected()) ? shopDB.selectTotalBalance() : 0;
         if(accountingBook == null)
-            accountingBook = new EZAccountBook(startingBalanceValue); //???
+            accountingBook = new EZAccountBook(balanceValue);
         return accountingBook.addBalanceOperation(shopDB, toBeAdded, ezBalanceOperations);
     }
 
