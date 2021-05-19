@@ -16,6 +16,7 @@ Date: 19/05/2021
 | 4 | Added BB tests for EZOrder and EZReturnTransaction |
 | 5 | Added BB tests for DB (User and SaleTransaction) |
 | 6 | Added BB tests for DB (ProductType and ReturnTransaction) |
+| 7 | Added last missing BB tests | 
 
 Leaf classes (TestEZShop_Customer, User and so on) and DB methods don't include involve a lot of controls and checks on the
 data since they're checked at a higher level in EZShop.<br/>
