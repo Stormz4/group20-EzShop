@@ -403,6 +403,40 @@ public class TestEZShop_SQLiteDB {
     }
 
     @Test
+    public void testProdType(){
+        // test deleteProductType
+        int id = shopDB.insertProductType(10, "abc", "abc", "abc", "4627828478338", 0.9);
+        assertTrue(shopDB.deleteProductType(id));
+        assertFalse(shopDB.deleteProductType(null));
+
+        //test updateProductType
+        id = shopDB.insertProductType(10, "abc", "abc", "abc", "4627828478338", 0.9);
+        assertTrue(shopDB.updateProductType(id, 2, "abc", "abc", "niceProd", "6291041500213" , 1.0));
+        assertFalse(shopDB.updateProductType(null, 2, "abc", "abc", "niceProd", "6291041500213", 1.0));
+        assertFalse(shopDB.updateProductType(id, null, "abc", "abc", "niceProd", "6291041500213", 1.0));
+        assertFalse(shopDB.updateProductType(id, 2, null, "abc", "niceProd", "6291041500213", 1.0));
+        assertFalse(shopDB.updateProductType(id, 2, "abc", null, "niceProd", "6291041500213", 1.0));
+        assertFalse(shopDB.updateProductType(id, 0, "abc", "abc", null, "6291041500213", 1.0));
+        assertFalse(shopDB.updateProductType(id, -1, "abc", "abc", "niceProd", null, 1.0));
+    }
+
+    @Test
+    public void testInsDelTransaction(){
+        // test InsertReturnTransaction
+        LinkedList<TicketEntry> list = new LinkedList<>();
+        EZTicketEntry entry = new EZTicketEntry("6291041500213", "abc", 10, 0.5, 0.9);
+        list.add(entry);
+        int id1 = shopDB.insertReturnTransaction(list, 1, 1.0, "OPENED");
+        assertTrue(id1 > 0);
+        int id2 = shopDB.insertReturnTransaction(list, 1, 1.0, null);
+        assertEquals(-1, id2);
+
+        // test deleteTransaction
+        assertTrue(shopDB.deleteTransaction(id1));
+        assertFalse(shopDB.deleteTransaction(null));
+    }
+
+    @Test
     public void testUpdateReturnTransaction() {
         //todo: to be added to testReturnTransactions method (ALSO update UnitTestReport.md on the location of this method!)
 

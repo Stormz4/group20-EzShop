@@ -1542,8 +1542,8 @@ data since they're checked at an higher level in EZShop.
 
 | Id is !null | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|
-|True|Valid| deleteProduct(1) -> return true | TestEZShop_SQLiteDB, method testProdTypeDB() |
-|False|Invalid| deleteProduct(null) -> return false | TestEZShop_SQLiteDB, method testProdTypeDB() |
+|True|Valid| int id = insertProductType(...)<br />deleteProduct(id) -> return true | TestEZShop_SQLiteDB, method testProdType() |
+|False|Invalid| deleteProduct(null) -> return false | TestEZShop_SQLiteDB, method testProdType() |
 
 ### **Class *SQLiteDB* - method *updateProductType***
 
@@ -1577,19 +1577,15 @@ data since they're checked at an higher level in EZShop.
 
 | Id is !null | Quantity is !null | Location is !null | Note is !null | ProductDescription is !null | BarCode is !null | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|-------|-------|-------|-------|-------|
-|True|True|True|True|True|True|Valid| int id = insertProductType(...)<br />updateProductType(id, 2, "abc", "abc", "niceProd", 6291041500213 , 1.0) -> return true | TestEZShop_SQLiteDB, method testProdTypeDB() |
-|False|*|*|*|*|*|Invalid| int id = insertProductType(...)<br />updateProductType(NULL, 2, "abc", "abc", "niceProd", 6291041500213 , 1.0) -> return false | TestEZShop_SQLiteDB, method testProdTypeDB() |
-|*| False             |*|*|*|*|Invalid| int id = insertProductType(...)<br />updateProductType(id, NULL, "abc", "abc", "niceProd", 6291041500213 , 1.0) -> return false | TestEZShop_SQLiteDB, method testProdTypeDB() |
-|*|*|False|*|*|*|Invalid| int id = insertProductType(...)<br />updateProductType(id, 2, NULL, "abc", "niceProd", 6291041500213 , 1.0) -> return false | TestEZShop_SQLiteDB, method testProdTypeDB() |
-| *           |*|*|False|*|*|Invalid| int id = insertProductType(...)<br />updateProductType(id, 2, "abc", NULL, "niceProd", 6291041500213, 1.0) -> return false | TestEZShop_SQLiteDB, method testProdTypeDB() |
-|*|*|*|*|False|*|Invalid| int id = insertProductType(...)<br />updateProductType(id, 0, "abc", "abc", NULL, 6291041500213, 1.0) -> return false | TestEZShop_SQLiteDB, method testProdTypeDB() |
-|*|*|*|*|*|False|Invalid| int id = insertProductType(...)<br />updateProductType(id, -1, "abc", "abc", "niceProd", NULL, 1.0) -> return false | TestEZShop_SQLiteDB, method testProdTypeDB() |
+|True|True|True|True|True|True|Valid| int id = insertProductType(...)<br />updateProductType(id, 2, "abc", "abc", "niceProd", "6291041500213" , 1.0) -> return true | TestEZShop_SQLiteDB, method testProdType() |
+|False|*|*|*|*|*|Invalid| int id = insertProductType(...)<br />updateProductType(null, 2, "abc", "abc", "niceProd", "6291041500213", 1.0) -> return false | TestEZShop_SQLiteDB, method testProdType() |
+|*| False             |*|*|*|*|Invalid| int id = insertProductType(...)<br />updateProductType(id, null, "abc", "abc", "niceProd", "6291041500213", 1.0) -> return false | TestEZShop_SQLiteDB, method testProdType() |
+|*|*|False|*|*|*|Invalid| int id = insertProductType(...)<br />updateProductType(id, 2, null, "abc", "niceProd", "6291041500213", 1.0) -> return false | TestEZShop_SQLiteDB, method testProdType() |
+| *           |*|*|False|*|*|Invalid| int id = insertProductType(...)<br />updateProductType(id, 2, "abc", null, "niceProd", "6291041500213", 1.0) -> return false | TestEZShop_SQLiteDB, method testProdType() |
+|*|*|*|*|False|*|Invalid| int id = insertProductType(...)<br />updateProductType(id, 0, "abc", "abc", null, "6291041500213", 1.0) -> return false | TestEZShop_SQLiteDB, method testProdType() |
+|*|*|*|*|*|False|Invalid| int id = insertProductType(...)<br />updateProductType(id, -1, "abc", "abc", "niceProd", null, 1.0) -> return false | TestEZShop_SQLiteDB, method testProdType() |
 
 ### **Class *SQLiteDB* - method *insertReturnTransaction***
-
-```
-public Integer insertReturnTransaction(List<TicketEntry> entries, int saleID, double price, String status)
-```
 
 **Criteria for method *insertReturnTransaction*:**
 
@@ -1609,8 +1605,8 @@ public Integer insertReturnTransaction(List<TicketEntry> entries, int saleID, do
 
 | Status is !null | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|
-| True | Valid | LinkedList<TicketEntry> list;<br />TicketEntry entry = new TicketEntry(...);<br />list.add(entry);<br />insertReturnTransaction(list, 1, 1.0, "OPENED") -> return positive int | TestEZShop_SQLiteDB, method testInsDelTransactionDB() |
-| False | Invalid | LinkedList<TicketEntry> list;<br />TicketEntry entry = new TicketEntry(...);<br />list.add(entry);<br />insertReturnTransaction(list, 1, 1.0, NULL) -> return -1 | TestEZShop_SQLiteDB, method testInsDelTransactionDB() |
+| True | Valid | LinkedList<TicketEntry> list;<br />TicketEntry entry = new TicketEntry(...);<br />list.add(entry);<br />insertReturnTransaction(list, 1, 1.0, "OPENED") -> return positive int | TestEZShop_SQLiteDB, method testInsDelTransaction() |
+| False | Invalid | LinkedList<TicketEntry> list;<br />TicketEntry entry = new TicketEntry(...);<br />list.add(entry);<br />insertReturnTransaction(list, 1, 1.0, null) -> return -1 | TestEZShop_SQLiteDB, method testInsDelTransaction() |
 
 ### **Class *SQLiteDB* - method *deleteTransaction***
 
@@ -1629,8 +1625,8 @@ public Integer insertReturnTransaction(List<TicketEntry> entries, int saleID, do
 
 | Existence of the Transaction | Valid / Invalid | Description of the test case | JUnit test case |
 |-------|-------|-------|-------|
-|True|Valid| int id = insertReturnTransaction(...)<br />deleteTransaction(id) -> return true | TestEZShop_SQLiteDB, method testInsDelTransactionDB() |
-|False|Invalid| deleteTransaction(NULL) -> return false | TestEZShop_SQLiteDB, method testInsDelTransactionDB() |
+|True|Valid| int id = insertReturnTransaction(...)<br />deleteTransaction(id) -> return true | TestEZShop_SQLiteDB, method testInsDelTransaction() |
+|False|Invalid| deleteTransaction(null) -> return false | TestEZShop_SQLiteDB, method testInsDelTransaction() |
 
 # White Box Unit Tests
 
