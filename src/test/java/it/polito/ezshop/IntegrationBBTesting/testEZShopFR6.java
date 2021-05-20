@@ -65,6 +65,15 @@ public class testEZShopFR6 {
     public void testAddProductToSale() throws InvalidTransactionIdException, InvalidQuantityException, UnauthorizedException, InvalidProductCodeException, InvalidPasswordException, InvalidUsernameException {
         EZShop ez = new EZShop();
         try {
+            ez.addProductToSale(1, "2345344543423", 5);
+            fail("UnauthorizedException incoming");
+        } catch (UnauthorizedException e){
+            assertNotNull(e);
+        }
+
+        ez.login("TransactionsTest", "pwd"); // Administrator logged-in
+
+        try {
             ez.addProductToSale(-1, "2345344543423", 5);
             fail("InvalidTransactionIdException incoming");
         } catch (InvalidTransactionIdException e) {
@@ -91,32 +100,23 @@ public class testEZShopFR6 {
         }
 
         try {
-            ez.addProductToSale(1, "2345344543423", 5);
-            fail("UnauthorizedException incoming");
-        } catch (UnauthorizedException e){
-            assertNotNull(e);
-        }
-
-        try {
-            ez.addProductToSale(1, "", -5);
+            ez.addProductToSale(1, "", 5);
             fail("InvalidProductCodeException incoming");
         } catch (InvalidProductCodeException e) {
             assertNotNull(e);
         }
         try {
-            ez.addProductToSale(1, null, -5);
+            ez.addProductToSale(1, null, 5);
             fail("InvalidProductCodeException incoming");
         } catch (InvalidProductCodeException e) {
             assertNotNull(e);
         }
         try {
-            ez.addProductToSale(1, "4544334643418", -5); // random number (invalid barCode)
+            ez.addProductToSale(1, "4544334643418", 5); // random number (invalid barCode)
             fail("InvalidProductCodeException incoming");
         } catch (InvalidProductCodeException e) {
             assertNotNull(e);
         }
-
-        ez.login("TransactionsTest", "pwd"); // Administrator logged-in
 
         EZProductType p1 = (EZProductType) ez.getAllProductTypes().stream()
                 .filter(p -> p.getBarCode().equals("2345344543423"))
@@ -126,7 +126,7 @@ public class testEZShopFR6 {
         boolean ok = ez.addProductToSale(s, "2345344543423", 5);
         assertTrue(ok);
         int q_after = p1.getQuantity(); // "...decreasing the temporary amount of product available on the shelves..."
-        assertEquals(q_before, q_after-5, 0);
+        assertEquals(q_before, q_after+5, 0);
 
         ok = ez.addProductToSale(s, "9302832103012", 5);
         assertFalse(ok);
@@ -141,53 +141,156 @@ public class testEZShopFR6 {
     }
 
     @Test
-    public void testApplyDiscountRateToProduct() {
+    public void testApplyDiscountRateToProduct() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidTransactionIdException, InvalidDiscountRateException, InvalidProductCodeException {
+        EZShop ez = new EZShop();
+        try {
+            ez.applyDiscountRateToProduct(1, "2345344543423", 0.25);
+            fail("UnauthorizedException incoming");
+        } catch (UnauthorizedException e){
+            assertNotNull(e);
+        }
+
+        ez.login("TransactionsTest", "pwd"); // Administrator logged-in
+
+
+
+
 
     }
 
     @Test
-    public void testApplyDiscountRateToSale() {
+    public void testApplyDiscountRateToSale() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidTransactionIdException, InvalidDiscountRateException {
+        EZShop ez = new EZShop();
+        try {
+            ez.applyDiscountRateToSale(1, 0.10);
+            fail("UnauthorizedException incoming");
+        } catch (UnauthorizedException e){
+            assertNotNull(e);
+        }
+
+        ez.login("TransactionsTest", "pwd"); // Administrator logged-in
+
 
     }
 
     @Test
-    public void testComputePointsForSale() {
+    public void testComputePointsForSale() throws UnauthorizedException, InvalidTransactionIdException, InvalidPasswordException, InvalidUsernameException {
+        EZShop ez = new EZShop();
+        try {
+            ez.computePointsForSale(1);
+            fail("UnauthorizedException incoming");
+        } catch (UnauthorizedException e){
+            assertNotNull(e);
+        }
+
+        ez.login("TransactionsTest", "pwd"); // Administrator logged-in
+
 
     }
 
     @Test
-    public void testEndSaleTransaction() {
+    public void testEndSaleTransaction() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidTransactionIdException {
+        EZShop ez = new EZShop();
+        try {
+            ez.endSaleTransaction(1);
+            fail("UnauthorizedException incoming");
+        } catch (UnauthorizedException e){
+            assertNotNull(e);
+        }
+
+        ez.login("TransactionsTest", "pwd"); // Administrator logged-in
+
 
     }
 
     @Test
-    public void testDeleteSaleTransaction() {
+    public void testDeleteSaleTransaction() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidTransactionIdException {
+        EZShop ez = new EZShop();
+        try {
+            ez.deleteSaleTransaction(1);
+            fail("UnauthorizedException incoming");
+        } catch (UnauthorizedException e){
+            assertNotNull(e);
+        }
+
+        ez.login("TransactionsTest", "pwd"); // Administrator logged-in
+
 
     }
 
     @Test
-    public void testGetSaleTransaction() {
+    public void testGetSaleTransaction() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidTransactionIdException {
+        EZShop ez = new EZShop();
+        try {
+            ez.getSaleTransaction(1);
+            fail("UnauthorizedException incoming");
+        } catch (UnauthorizedException e){
+            assertNotNull(e);
+        }
+
+        ez.login("TransactionsTest", "pwd"); // Administrator logged-in
+
 
     }
 
     // Return Transactions
     @Test
-    public void testStartReturnTransaction() {
+    public void testStartReturnTransaction() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidTransactionIdException {
+        EZShop ez = new EZShop();
+        try {
+            ez.startReturnTransaction(1);
+            fail("UnauthorizedException incoming");
+        } catch (UnauthorizedException e){
+            assertNotNull(e);
+        }
+
+        ez.login("TransactionsTest", "pwd"); // Administrator logged-in
+
 
     }
 
     @Test
-    public void testReturnProduct() {
+    public void testReturnProduct() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidQuantityException, InvalidTransactionIdException, InvalidProductCodeException {
+        EZShop ez = new EZShop();
+        try {
+            ez.returnProduct(1, "2345344543423", 3);
+            fail("UnauthorizedException incoming");
+        } catch (UnauthorizedException e){
+            assertNotNull(e);
+        }
+
+        ez.login("TransactionsTest", "pwd"); // Administrator logged-in
+
 
     }
 
     @Test
-    public void testEndReturnTransaction() {
+    public void testEndReturnTransaction() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidTransactionIdException {
+        EZShop ez = new EZShop();
+        try {
+            ez.endReturnTransaction(1, true);
+            fail("UnauthorizedException incoming");
+        } catch (UnauthorizedException e){
+            assertNotNull(e);
+        }
+
+        ez.login("TransactionsTest", "pwd"); // Administrator logged-in
+
 
     }
 
     @Test
-    public void testDeleteReturnTransaction() {
+    public void testDeleteReturnTransaction() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidTransactionIdException {
+        EZShop ez = new EZShop();
+        try {
+            ez.deleteReturnTransaction(1);
+            fail("UnauthorizedException incoming");
+        } catch (UnauthorizedException e){
+            assertNotNull(e);
+        }
+
+        ez.login("TransactionsTest", "pwd"); // Administrator logged-in
+
 
     }
 
