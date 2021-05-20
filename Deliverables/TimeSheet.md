@@ -14,9 +14,9 @@ These figures will not be used to evaluate neither the project nor the team, the
 | apr 12 - 18| 30 person hours| | | | | | | | 
 | apr 19 - 25| 15 person hours| 20 person hours | | | | | | | 
 | apr 26 - 2 | | 40 person hours| | | | | | | 
-| may 3 - 9  | | | | | | | | | 
-| may 10 - 16| | | | | | | | | 
-| may 17 - 23| | | | | | | | | 
+| may 3 - 9  | | |50 |5 | | | | | 
+| may 10 - 16| | |30 |25| | | | | 
+| may 17 - 23| | 2 | | | | | | | 
 | may 24 - 30| | | | | | | | | 
 | jun 31 - 6 | | | | | | | | | 
 | jun 7 - 13 | | | | | | | | | 
