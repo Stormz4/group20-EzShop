@@ -313,18 +313,17 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public Integer createProductType(String description, String productCode, double pricePerUnit, String note) throws InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException {
-        if (description == null || description.isEmpty() ) {
-            throw new InvalidProductDescriptionException();
-        }
-        if (productCode == null || productCode.isEmpty() || !isValidBarCode(productCode)) {
-            throw new InvalidProductCodeException();
-        }
-        if(pricePerUnit <=0){
-            throw new InvalidPricePerUnitException();
-        }
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
             throw new UnauthorizedException();
-        }
+
+        if (description == null || description.isEmpty() )
+            throw new InvalidProductDescriptionException();
+
+        if (productCode == null || productCode.isEmpty() || !isValidBarCode(productCode))
+            throw new InvalidProductCodeException();
+
+        if(pricePerUnit <= 0)
+            throw new InvalidPricePerUnitException();
 
         // Check if the Barcode is unique
         for (ProductType product : ezProducts.values()) {
@@ -332,9 +331,10 @@ public class EZShop implements EZShopInterface {
                 return -1;
             }
         }
-        if (note == null){
-            note="";
-        }
+
+        if (note == null)
+            note = "";
+
         Integer id = shopDB.insertProductType(0, "", note, description, productCode, pricePerUnit);
         // Get the highest ID from the DB
 
