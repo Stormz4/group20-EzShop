@@ -832,15 +832,19 @@ public class EZShop implements EZShopInterface {
         if (newCustomerCard != null) {
             if (newCustomerCard.isEmpty()) {
                 if ( shopDB.deleteCard(customer.getCustomerCard()) ) {
+                    customerCard="";
                     customer.setCustomerCard("");
                     customer.setPoints(0);
+
                 }
                 else
                     return false;
             }
             else if (this.ezCards.get(newCustomerCard) != null) {
-                if (customerCard.equals(newCustomerCard) )
-                    return false;   // Card already assigned to another customer
+                for (Customer c: ezCustomers.values()) {
+                    if (c.getCustomerCard().equals(newCustomerCard))
+                        return false;   // Card already assigned to another customer
+                }
 
                 customerCard = newCustomerCard; // Card can be assigned to given customer
             }

@@ -23,8 +23,10 @@ public class TestEZShopFR5 {
         ez = new EZShop();
         shopDB2.connect();
         shopDB2.initDatabase();
+        /*
         boolean cleared = shopDB2.clearTable(SQLiteDB.tBalanceOperations);
         cleared &= shopDB2.clearTable(SQLiteDB.tCards);
+        */
         uId=ez.createUser("testFR5", "pwd", "Administrator");
     }
 
@@ -93,7 +95,7 @@ public class TestEZShopFR5 {
         assertTrue(modifySuccess);
 
         //Test if there is a check for duplicate cards
-        cId2 = ez.defineCustomer("testCard");
+        cId2 = ez.defineCustomer("testCards");
         boolean modifyFalse = ez.modifyCustomer(cId2, "testCard2", card);
 
         assertFalse(modifyFalse);
@@ -101,8 +103,16 @@ public class TestEZShopFR5 {
         //Modify with a null card: the card shouldn't be modified
 
         boolean modifyCard = ez.modifyCustomer(cId, "testFRDefine3", null);
+        c = (EZCustomer) ez.getCustomer(cId);
+        assertTrue(c.getCustomerCard().equals(card));
+        assertTrue(modifyCard);
 
         //Modify with an empty card: the card should be deleted
+        modifyCard = ez.modifyCustomer(cId, "testFRDefine3", "");
+        c = (EZCustomer) ez.getCustomer(cId);
+        assertTrue(c.getCustomerCard().equals(""));
+        assertTrue(modifyCard);
+
 
         // -- DELETE
         // Delete on an id not valid
@@ -110,7 +120,7 @@ public class TestEZShopFR5 {
             ez.deleteCustomer(null);
         });
         assertThrows(InvalidCustomerIdException.class, () -> {
-            ez.deleteCustomer(cId2);
+            ez.deleteCustomer(-1);
         });
         // Id not present
         boolean deleteFalse = ez.deleteCustomer(10000000);
