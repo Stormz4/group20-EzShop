@@ -123,16 +123,16 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean deleteUser(Integer id) throws InvalidUserIdException, UnauthorizedException {
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator)){
+            throw new UnauthorizedException("Not authorized");
+        }
+
         if (id == null || id <=0) {
             throw new InvalidUserIdException();
         }
 
         if (!ezUsers.containsKey(id)) {
             return false;
-        }
-
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator)){
-            throw new UnauthorizedException("Not authorized");
         }
 
         boolean success = shopDB.deleteUser(id);
