@@ -816,14 +816,15 @@ public class EZShop implements EZShopInterface {
      */
     @Override
     public boolean modifyCustomer(Integer id, String newCustomerName, String newCustomerCard) throws InvalidCustomerNameException, InvalidCustomerCardException, InvalidCustomerIdException, UnauthorizedException {
+
+        if (this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URCashier, URShopManager))
+            throw new UnauthorizedException();
+
         if ( newCustomerName == null || newCustomerName.isEmpty() )
             throw new InvalidCustomerNameException();
 
         if ( newCustomerCard != null && !isValidCard(newCustomerCard))
             throw new InvalidCustomerCardException();
-
-        if (this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URCashier, URShopManager))
-            throw new UnauthorizedException();
 
         EZCustomer customer = ezCustomers.get(id);
         String customerCard = customer.getCustomerCard();
@@ -838,12 +839,10 @@ public class EZShop implements EZShopInterface {
                     return false;
             }
             else if (this.ezCards.get(newCustomerCard) != null) {
-                for (Customer c : ezCustomers.values()) {
-                    if ( !c.getId().equals(id) && c.getCustomerCard().equals(newCustomerCard) )
-                        return false;   // Card already assigned to another customer
-                }
+                if (customerCard.equals(newCustomerCard) )
+                    return false;   // Card already assigned to another customer
 
-                customerCard = newCustomerCard; // Card already exists and can be assigned to given customer
+                customerCard = newCustomerCard; // Card can be assigned to given customer
             }
             else
                 return false;
@@ -863,16 +862,16 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean deleteCustomer(Integer id) throws InvalidCustomerIdException, UnauthorizedException {
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URCashier, URShopManager)){
+            throw new UnauthorizedException();
+        }
+
         if (id == null || id <=0 ){
             throw new InvalidCustomerIdException();
         }
 
         if (!ezCustomers.containsKey(id)) {
             return false;
-        }
-
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URCashier, URShopManager)){
-            throw new UnauthorizedException();
         }
 
         boolean success = shopDB.deleteCustomer(id);
@@ -885,16 +884,17 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public Customer getCustomer(Integer id) throws InvalidCustomerIdException, UnauthorizedException {
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URCashier, URShopManager)){
+            throw new UnauthorizedException();
+        }
+
+
         if ( id==null || id <=0) {
             throw new InvalidCustomerIdException();
         }
 
         if (!ezCustomers.containsKey(id)) {
             return null;
-        }
-
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URCashier, URShopManager)){
-            throw new UnauthorizedException();
         }
 
         Customer customer = ezCustomers.get(id);
