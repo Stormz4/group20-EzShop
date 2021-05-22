@@ -953,6 +953,9 @@ public class EZShop implements EZShopInterface {
     @Override
     public boolean attachCardToCustomer(String customerCard, Integer customerId) throws InvalidCustomerIdException, InvalidCustomerCardException, UnauthorizedException {
 
+        if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier))
+            throw new UnauthorizedException();
+
         if (customerId == null || customerId <=0){
             throw new InvalidCustomerIdException();
         }
@@ -966,8 +969,6 @@ public class EZShop implements EZShopInterface {
             throw new InvalidCustomerCardException();
         }
 
-        if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier))
-            throw new UnauthorizedException();
 
         EZCustomer customer = ezCustomers.get(customerId); // This functions checks if the customers map contains the ID.
 
@@ -1006,12 +1007,13 @@ public class EZShop implements EZShopInterface {
     @Override
     public boolean modifyPointsOnCard(String customerCard, int pointsToBeAdded) throws InvalidCustomerCardException, UnauthorizedException {
 
-        if (customerCard == null || !isValidCard(customerCard)){
+        if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier))
+            throw new UnauthorizedException();
+
+        if (customerCard == null || customerCard.isEmpty() || !isValidCard(customerCard)){
             throw new InvalidCustomerCardException();
         }
 
-        if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier))
-            throw new UnauthorizedException();
 
         for (Customer customer : ezCustomers.values()) {
             if (customer.getCustomerCard().equals(customerCard)){
