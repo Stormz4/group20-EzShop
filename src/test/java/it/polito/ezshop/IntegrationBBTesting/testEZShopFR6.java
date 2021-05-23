@@ -326,11 +326,39 @@ public class testEZShopFR6 {
 
         ez.login("TransactionsTest", "pwd"); // Administrator logged-in
 
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.endSaleTransaction(0);
+        });
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.endSaleTransaction(-1);
+        });
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.endSaleTransaction(null);
+        });
 
+        int sid = 9999;
+
+        boolean ok = ez.endSaleTransaction(sid);
+        assertFalse(ok);
+
+        sid = ez.startSaleTransaction(); // Status: OPENED
+        ok = ez.endSaleTransaction(sid);
+        assertTrue(ok);
+
+        // Status: CLOSED
+        ok = ez.endSaleTransaction(sid);
+        assertFalse(ok);
+
+        // TEST ON "return false if there was a problem in registering the data"
+        int sid2 = ez.startSaleTransaction();
+        ez.endSaleTransaction(sid2);
+        ez.deleteSaleTransaction(sid2); // removing the sale transaction in order to generate an error
+        ok = ez.endSaleTransaction(sid2);
+        assertFalse(ok);
     }
 
     @Test
-    public void testDeleteSaleTransaction() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidTransactionIdException {
+    public void testDeleteSaleTransaction() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidTransactionIdException, InvalidPaymentException {
         EZShop ez = new EZShop();
         try {
             ez.deleteSaleTransaction(1);
@@ -341,11 +369,35 @@ public class testEZShopFR6 {
 
         ez.login("TransactionsTest", "pwd"); // Administrator logged-in
 
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.deleteSaleTransaction(0);
+        });
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.deleteSaleTransaction(-1);
+        });
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.deleteSaleTransaction(null);
+        });
 
+        int sid = 9999;
+
+        boolean ok = ez.deleteSaleTransaction(sid);
+        assertFalse(ok);
+
+        sid = ez.startSaleTransaction(); // Status: OPENED
+        ez.endSaleTransaction(sid); // Status: CLOSED
+        ok = ez.deleteSaleTransaction(sid);
+        assertTrue(ok);
+
+        sid = ez.startSaleTransaction(); // Status: OPENED
+        ez.endSaleTransaction(sid); // Status: CLOSED
+        ez.receiveCashPayment(sid, 500); // Status: PAYED
+        ok = ez.deleteSaleTransaction(sid);
+        assertFalse(ok);
     }
 
     @Test
-    public void testGetSaleTransaction() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidTransactionIdException {
+    public void testGetSaleTransaction() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidTransactionIdException, InvalidPaymentException {
         EZShop ez = new EZShop();
         try {
             ez.getSaleTransaction(1);
@@ -356,7 +408,29 @@ public class testEZShopFR6 {
 
         ez.login("TransactionsTest", "pwd"); // Administrator logged-in
 
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.getSaleTransaction(0);
+        });
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.getSaleTransaction(-1);
+        });
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.getSaleTransaction(null);
+        });
 
+        int sid = ez.startSaleTransaction(); // status: OPENED
+        EZSaleTransaction sale = ez.getSaleTransactionById(sid);
+
+        EZSaleTransaction s = (EZSaleTransaction) ez.getSaleTransaction(sid);
+        assertNull(s);
+
+        ez.endSaleTransaction(sid); // status: CLOSED
+
+        s = (EZSaleTransaction) ez.getSaleTransaction(sid);
+        assertEquals(sale, s);
+
+        ez.receiveCashPayment(sid, 500); // status: PAYED
+        assertEquals(sale, s);
     }
 
     // Return Transactions
