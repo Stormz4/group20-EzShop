@@ -18,7 +18,7 @@ public class testEZShopFR6 {
     private final SQLiteDB shopDB2 = new SQLiteDB();
     Integer created1;
 
-    int p1_id;
+    int p1_id, p2_id, p3_id, p4_id;
 
 
     @Before
@@ -29,7 +29,10 @@ public class testEZShopFR6 {
         created1 = null;
         uId=ez.createUser("TransactionsTest", "pwd", "Administrator");
 
-        p1_id = shopDB2.insertProductType(300, "89-XY-98", "Test note", "Test product", "2345344543423", 11.90);
+        p1_id = shopDB2.insertProductType(300, "89-XY-98", "Test note", "Test product 1", "2345344543423", 11.90);
+        p2_id = shopDB2.insertProductType(300, "67-TT-54", "Test note", "Test product 2", "1155678522411", 5.00);
+        p3_id = shopDB2.insertProductType(300, "68-TT-54", "Test note", "Test product 3", "2177878523417", 5.00);
+        p4_id = shopDB2.insertProductType(300, "69-TT-54", "Test note", "Test product 4", "3155678522419", 5.00);
     }
 
     @After
@@ -40,6 +43,9 @@ public class testEZShopFR6 {
         }
 
         shopDB2.deleteProductType(p1_id);
+        shopDB2.deleteProductType(p2_id);
+        shopDB2.deleteProductType(p3_id);
+        shopDB2.deleteProductType(p4_id);
 
         shopDB2.closeConnection();
     }
@@ -62,7 +68,7 @@ public class testEZShopFR6 {
     }
 
     @Test
-    public void testAddProductToSale() throws InvalidTransactionIdException, InvalidQuantityException, UnauthorizedException, InvalidProductCodeException, InvalidPasswordException, InvalidUsernameException {
+    public void testAddProductToSale() throws InvalidTransactionIdException, InvalidQuantityException, UnauthorizedException, InvalidProductCodeException, InvalidPasswordException, InvalidUsernameException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidOrderIdException, InvalidLocationException, InvalidProductIdException {
         EZShop ez = new EZShop();
         try {
             ez.addProductToSale(1, "2345344543423", 5);
@@ -141,7 +147,7 @@ public class testEZShopFR6 {
     }
 
     @Test
-    public void testApplyDiscountRateToProduct() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidTransactionIdException, InvalidDiscountRateException, InvalidProductCodeException, InvalidQuantityException, InvalidPaymentException {
+    public void testApplyDiscountRateToProduct() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidTransactionIdException, InvalidDiscountRateException, InvalidProductCodeException, InvalidQuantityException, InvalidPaymentException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidOrderIdException, InvalidLocationException, InvalidProductIdException {
         EZShop ez = new EZShop();
         try {
             ez.applyDiscountRateToProduct(1, "2345344543423", 0.25);
@@ -254,7 +260,7 @@ public class testEZShopFR6 {
     }
 
     @Test
-    public void testComputePointsForSale() throws UnauthorizedException, InvalidTransactionIdException, InvalidPasswordException, InvalidUsernameException {
+    public void testComputePointsForSale() throws UnauthorizedException, InvalidTransactionIdException, InvalidPasswordException, InvalidUsernameException, InvalidQuantityException, InvalidProductCodeException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidPaymentException, InvalidOrderIdException, InvalidLocationException, InvalidProductIdException {
         EZShop ez = new EZShop();
         try {
             ez.computePointsForSale(1);
@@ -265,7 +271,47 @@ public class testEZShopFR6 {
 
         ez.login("TransactionsTest", "pwd"); // Administrator logged-in
 
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.computePointsForSale(0);
+        });
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.computePointsForSale(-1);
+        });
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.computePointsForSale(null);
+        });
 
+        int sid = 9999;
+
+        int x = ez.computePointsForSale(sid);
+        assertEquals(-1, x, 0);
+
+        sid = ez.startSaleTransaction(); // OPENED sale transaction
+
+        x = ez.computePointsForSale(sid);
+        assertEquals(0, x, 0);
+
+        ez.addProductToSale(sid, "1155678522411", 3);
+        x = ez.computePointsForSale(sid);
+        assertEquals(1, x, 0);
+
+        ez.addProductToSale(sid, "2177878523417", 2);
+        x = ez.computePointsForSale(sid);
+        assertEquals(2, x, 0);
+
+        ez.addProductToSale(sid, "3155678522419", 1);
+        x = ez.computePointsForSale(sid);
+        assertEquals(3, x, 0);
+
+        ez.endSaleTransaction(sid); // Sale transaction CLOSED
+
+        x = ez.computePointsForSale(sid);
+        assertEquals(3, x, 0);
+
+        ez.receiveCashPayment(sid, 500); // Sale transaction PAYED
+
+        x = ez.computePointsForSale(sid);
+        assertEquals(3, x, 0);
     }
 
     @Test
