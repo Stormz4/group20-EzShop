@@ -1712,9 +1712,11 @@ public class EZShop implements EZShopInterface {
 
         if(!this.shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), sale.getPrice(), EZSaleTransaction.STPayed))
             return -1;
+        ezSaleTransactions.get(sale.getTicketNumber()).setStatus(EZSaleTransaction.STPayed);
 
         if(!recordBalanceUpdate(toBePayed)) {
             this.shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), sale.getPrice(), EZSaleTransaction.STClosed);
+            ezSaleTransactions.get(sale.getTicketNumber()).setStatus(EZSaleTransaction.STClosed);
             return -1; // return -1 if DB connection problems occur
         }
 
@@ -1747,8 +1749,15 @@ public class EZShop implements EZShopInterface {
 
         toBePayed = sale.getPrice()*(1-sale.getDiscountRate());
 
-        if(!recordBalanceUpdate(sale.getPrice()))
+        if(!this.shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), sale.getPrice(), EZSaleTransaction.STPayed))
+            return false;
+        ezSaleTransactions.get(sale.getTicketNumber()).setStatus(EZSaleTransaction.STPayed);
+
+        if(!recordBalanceUpdate(sale.getPrice())) {
+            this.shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), sale.getPrice(), EZSaleTransaction.STClosed);
+            ezSaleTransactions.get(sale.getTicketNumber()).setStatus(EZSaleTransaction.STClosed);
             return false; // return false if DB connection problems occur
+        }
 
         if(!updateCreditInTXTbyCardNumber(creditCard, -(sale.getPrice() * (1 - sale.getDiscountRate()))))
             return false;

@@ -141,7 +141,7 @@ public class testEZShopFR6 {
     }
 
     @Test
-    public void testApplyDiscountRateToProduct() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidTransactionIdException, InvalidDiscountRateException, InvalidProductCodeException {
+    public void testApplyDiscountRateToProduct() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidTransactionIdException, InvalidDiscountRateException, InvalidProductCodeException, InvalidQuantityException, InvalidPaymentException {
         EZShop ez = new EZShop();
         try {
             ez.applyDiscountRateToProduct(1, "2345344543423", 0.25);
@@ -152,14 +152,61 @@ public class testEZShopFR6 {
 
         ez.login("TransactionsTest", "pwd"); // Administrator logged-in
 
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.applyDiscountRateToProduct(0, "2345344543423", 0.25);
+        });
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.applyDiscountRateToProduct(-1, "2345344543423", 0.25);
+        });
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.applyDiscountRateToProduct(null, "2345344543423", 0.25);
+        });
 
+        assertThrows(InvalidProductCodeException.class, () -> {
+            ez.applyDiscountRateToProduct(1, "", 0.25);   // random number: invalid barCode
+        });
+        assertThrows(InvalidProductCodeException.class, () -> {
+            ez.applyDiscountRateToProduct(1, null, 0.25);   // random number: invalid barCode
+        });
+        assertThrows(InvalidProductCodeException.class, () -> {
+            ez.applyDiscountRateToProduct(1, "4544334643418", 0.25);   // random number: invalid barCode
+        });
 
+        assertThrows(InvalidDiscountRateException.class, () -> {
+            ez.applyDiscountRateToProduct(1, "2345344543423", -1);
+        });
+        assertThrows(InvalidDiscountRateException.class, () -> {
+            ez.applyDiscountRateToProduct(1, "2345344543423", 1.00);
+        });
+        assertThrows(InvalidDiscountRateException.class, () -> {
+            ez.applyDiscountRateToProduct(1, "2345344543423", 2);
+        });
 
+        int sid = ez.startSaleTransaction(); // OPENED sale transaction
+        ez.addProductToSale(sid, "2345344543423", 5);
 
+        boolean ok = ez.applyDiscountRateToProduct(sid, "2345344543423", 0.25);
+        assertTrue(ok);
+        for (TicketEntry t : ez.getSaleTransactionById(sid).getEntries()) {
+            if(t.getBarCode().equals("2345344543423")) {
+                assertEquals(0.25, t.getDiscountRate(), 0.001);
+            }
+        }
+
+        ok = ez.applyDiscountRateToProduct(sid, "1155994543411", 0.25); // product code that doesn't exist in the sale transaction
+        assertFalse(ok);
+
+        ez.endSaleTransaction(sid); // Sale transaction CLOSED
+        ok = ez.applyDiscountRateToProduct(sid, "2345344543423", 0.25);
+        assertFalse(ok);
+
+        ez.receiveCashPayment(sid, 500); // Sale transaction PAYED
+        ok = ez.applyDiscountRateToProduct(sid, "2345344543423", 0.25);
+        assertFalse(ok);
     }
 
     @Test
-    public void testApplyDiscountRateToSale() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidTransactionIdException, InvalidDiscountRateException {
+    public void testApplyDiscountRateToSale() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidTransactionIdException, InvalidDiscountRateException, InvalidPaymentException {
         EZShop ez = new EZShop();
         try {
             ez.applyDiscountRateToSale(1, 0.10);
@@ -170,7 +217,40 @@ public class testEZShopFR6 {
 
         ez.login("TransactionsTest", "pwd"); // Administrator logged-in
 
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.applyDiscountRateToSale(0, 0.10);
+        });
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.applyDiscountRateToSale(-1, 0.10);
+        });
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.applyDiscountRateToSale(null, 0.10);
+        });
 
+        assertThrows(InvalidDiscountRateException.class, () -> {
+            ez.applyDiscountRateToSale(1, -1);
+        });
+        assertThrows(InvalidDiscountRateException.class, () -> {
+            ez.applyDiscountRateToSale(1,1.00);
+        });
+        assertThrows(InvalidDiscountRateException.class, () -> {
+            ez.applyDiscountRateToSale(1, 2);
+        });
+
+        int sid = ez.startSaleTransaction(); // OPENED sale transaction
+
+        boolean ok = ez.applyDiscountRateToSale(sid, 0.80);
+        assertTrue(ok);
+        assertEquals(0.80, ez.getSaleTransactionById(sid).getDiscountRate(), 0.001);
+
+        ez.endSaleTransaction(sid); // Sale transaction CLOSED
+        ok = ez.applyDiscountRateToSale(sid, 0.10);
+        assertTrue(ok);
+        assertEquals(0.10, ez.getSaleTransactionById(sid).getDiscountRate(), 0.001);
+
+        ez.receiveCashPayment(sid, 500); // Sale transaction PAYED
+        ok = ez.applyDiscountRateToSale(sid, 0.10);
+        assertFalse(ok);
     }
 
     @Test
