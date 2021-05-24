@@ -37,7 +37,7 @@ Date: 24/05/2021
     (ex: step1: class A, step 2: class A+B, step 3: class A+B+C, etc)> 
     <Some steps may  correspond to unit testing (ex step1 in ex above), presented in other document UnitTestReport.md>
     <One step will  correspond to API testing>
-    
+
 The integration sequence we adopted is bottom-up. We started with unit-testing, where we tested all the leaf classes and their methods (EZCustomer, EZProductType...), including the DB class (SQLiteDB).
 These test are documented in UnitTestReport.md.
 Then, we proceeded to test AccountBook which is the only intermediate class, followed by the API testing (Which consist in testing the class EZShop)
@@ -91,18 +91,18 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 ## Scenario UC2.1
 
 | Scenario |  Create user and define rights |
-| ------------- |:-------------:| 
+| ------------- |:-------------:|
 |  Precondition     | Admin A exists and is logged in |
 |  Post condition     | Account X is created |
 | Step#        | Description  |
-|  1    |  A defines the credentials of the new Account X |  
+|  1    |  A defines the credentials of the new Account X |
 |  2    |  A selects the access rights for the new account X |
 |  3    |  C confirms the inserted data |
 
 ## Scenario UC2.2
 
 | Scenario |  Delete user |
-| ------------- |:-------------:| 
+| ------------- |:-------------:|
 |  Precondition     | Admin A exists and is logged in |
 |  | Account X exists |
 |  Post condition     | Account X deleted |
@@ -113,7 +113,7 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 ## Scenario UC2.3
 
 | Scenario |  Modify user rights |
-| ------------- |:-------------:| 
+| ------------- |:-------------:|
 |  Precondition     | Admin A exists and is logged in |
 |  | Account X exists |
 |  Post condition     | X's rights updated |
@@ -126,47 +126,116 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 ## Scenario UC4.1
 
 | Scenario |  Create customer record |
-| ------------- |:-------------:| 
+| ------------- |:-------------:|
 |  Precondition     | Account U for Customer Cu not existing  |
 |  Post condition     | U is  into the system  |
 | Step#        | Description  |
 |  1    |  User asks Cu personal data |
-|  2    |  USer fills U's fields with Cu's personal data |  
+|  2    |  USer fills U's fields with Cu's personal data |
 |  3    |  User confirms  |
 
 
 ## Scenario UC4.2
 
 | Scenario |  Attach Loyalty card to customer record |
-| ------------- |:-------------:| 
+| ------------- |:-------------:|
 |  Precondition     | Account U for Customer Cu existing  |
 |  Post condition     | Loyalty card L attached to U |
 | Step#        | Description  |
 |  1    |  User creates a new L with a unique serial number |
-|  2    |  User attaches L to U  |  
+|  2    |  User attaches L to U  |
 
 
 ## Scenario UC4.3
 
 | Scenario |  Detach Loyalty card from customer record |
-| ------------- |:-------------:| 
+| ------------- |:-------------:|
 |  Precondition     | Account U for Customer Cu existing  |
 | | Loyalty card L attached to U |
 |  Post condition     | Loyalty card L detached from U |
 | Step#        | Description  |
 |  1    |  User selects customer record U |
-|  2    |  User  detaches L from U  |  
+|  2    |  User  detaches L from U  |
 |  3    |  U is updated |
 
 ## Scenario UC4.4
 
 | Scenario |  Update customer record |
-| ------------- |:-------------:| 
+| ------------- |:-------------:|
 |  Precondition     | Account U for Customer Cu existing  |
 |  Post condition     | U updated |
 | Step#        | Description  |
 |  1    |  User selects customer record U |
-|  2    |  User modifies personal data of Cu  | 
+|  2    |  User modifies personal data of Cu  |
+
+## Scenario UC6.1
+
+| Scenario |  Sale of product type X completed |
+| ------------- |:-------------:|
+|  Precondition     | Cashier C exists and is logged in |
+| | Product type X exists and has enough units to complete the sale |
+|  Post condition     | Balance += N*X.unitPrice  |
+| | X.quantity -= N |
+| Step#        | Description  |
+|  1    |  C starts a new sale transaction |
+|  2    |  C reads bar code of X |
+|  3    |  C adds N units of X to the sale |
+|  4    |  X available quantity is decreased by N |
+|  5    |  C closes the sale transaction |
+|  6    |  System asks payment type |
+|  7    |  Manage  payment (see Scenario 7.1)|
+
+## Scenario UC7.1
+
+| Scenario |  Manage payment by valid credit card |
+| ------------- |:-------------:|
+|  Precondition     | Credit card C exists  |
+|  Post condition     | C.Balance -= Price  |
+| Step#        | Description  |
+|  1    |  Read C.number |
+|  2    |  Validate C.number with Luhn algorithm |
+|  3    |  Ask to credit sale price |
+|  4    |  Price payed |
+|  5    |  exit with success |
+
+## Scenario UC7.2
+
+| Scenario |  Manage payment by invalid credit card |
+| ------------- |:-------------:|
+|  Precondition     | Credit card C does not exist  |
+|  Post condition     |   |
+| Step#        | Description  |
+|  1    |  Read C.number |
+|  2    |  Validate C.number with Luhn algorithm |
+|  3    |  C.number invalid, issue warning |
+|  4    |  Exit with error |
+
+## Scenario UC7.3
+
+| Scenario |  Manage credit card payment with not enough credit |
+| ------------- |:-------------:|
+|  Precondition     | Credit card C exists  |
+| | C.Balance < Price |
+|  Post condition     | C.Balance not changed  |
+| Step#        | Description  |
+|  1    |  Read C.number |
+|  2    |  Validate C.number with Luhn algorithm |
+|  3    |  Ask to credit sale price |
+|  4    |  Balance not sufficient, issue warning |
+|  5    |  Exit with error |
+
+## Scenario UC7.4
+
+| Scenario |  Manage cash payment |
+| ------------- |:-------------:|
+|  Precondition     | Cash >= Price  |
+|  Post condition     |   |
+| Step#        | Description  |
+|  1    |  Collect banknotes and coins |
+|  2    |  Compute cash quantity |
+|  3    |  Record cash payment |
+|  4    |  Compute change |
+|  5    |  Return change |
 
 
 # Coverage of Scenarios and FR
@@ -176,19 +245,19 @@ Report also for each of the scenarios the (one or more) API JUnit tests that cov
 
 
 
-| Scenario ID  | Functional Requirements covered | JUnit  Test(s)        | 
-| ------------ | ------------------------------- | --------------------- | 
-|  2.1         | FR1                             | TestEZShopFR1         |             
+| Scenario ID  | Functional Requirements covered | JUnit  Test(s)        |
+| ------------ | ------------------------------- | --------------------- |
+|  2.1         | FR1                             | TestEZShopFR1         |
 |  2.2         | FR1                             | TestEZShopFR1         |
 |  2.3         | FR1                             | TestEZShopFR1         |
 |  4.1         | FR5                             | TestEZShopFR5         |
 |  4.2         | FR5                             | TestEZShopFR5         |
 |  4.3         | FR5                             | TestEZShopFR5         |
-|  4.4         | FR5                             | TestEZShopFR5         |    
-| ...         |                                 |             |             
-| ...         |                                 |             |             
-| ...         |                                 |             |             
-| ...         |                                 |             |             
+|  4.4         | FR5                             | TestEZShopFR5         |
+| 7.1   | FR7.1 | TestEZShopFR7.testReceivePaymentCreditCard |
+| 7.2       | FR7.1 | TestEZShopFR7.testInvalidCardPayment |
+| 7.3      | FR7.1 | TestEZShopFR7.testInsufficientCreditPayment |
+| 7.4      | FR7.2 | TestEZShopFR7.testReceivePaymentCash |
 
 
 
@@ -205,5 +274,5 @@ Report also for each of the scenarios the (one or more) API JUnit tests that cov
 | NFR2                       | Every test case. Test that involve the DB take a bit longer than 0.5sec, but they involve multiple DB methods.          |
 | NFR4                       | TestEZShop_VerifyBarCode |
 | NFR5                       | TestEZShop_IsValidCreditCard |
-| NFR6                       | TestEZShop_IsValidCard |
+| NFR6                       | TestEZShop_IsValidCardT |
 
