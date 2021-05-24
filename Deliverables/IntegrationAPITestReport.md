@@ -168,39 +168,9 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 |  1    |  User selects customer record U |
 |  2    |  User modifies personal data of Cu  |
 
-## Scenario UC6.1
+## Scenario UC10.3
 
-| Scenario |  Sale of product type X completed |
-| ------------- |:-------------:|
-|  Precondition     | Cashier C exists and is logged in |
-| | Product type X exists and has enough units to complete the sale |
-|  Post condition     | Balance += N*X.unitPrice  |
-| | X.quantity -= N |
-| Step#        | Description  |
-|  1    |  C starts a new sale transaction |
-|  2    |  C reads bar code of X |
-|  3    |  C adds N units of X to the sale |
-|  4    |  X available quantity is decreased by N |
-|  5    |  C closes the sale transaction |
-|  6    |  System asks payment type |
-|  7    |  Manage  payment (see Scenario 7.1)|
-
-## Scenario UC7.1
-
-| Scenario |  Manage payment by valid credit card |
-| ------------- |:-------------:|
-|  Precondition     | Credit card C exists  |
-|  Post condition     | C.Balance -= Price  |
-| Step#        | Description  |
-|  1    |  Read C.number |
-|  2    |  Validate C.number with Luhn algorithm |
-|  3    |  Ask to credit sale price |
-|  4    |  Price payed |
-|  5    |  exit with success |
-
-## Scenario UC7.2
-
-| Scenario |  Manage payment by invalid credit card |
+| Scenario | Manage Return Payment by invalid credit card |
 | ------------- |:-------------:|
 |  Precondition     | Credit card C does not exist  |
 |  Post condition     |   |
@@ -210,32 +180,6 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 |  3    |  C.number invalid, issue warning |
 |  4    |  Exit with error |
 
-## Scenario UC7.3
-
-| Scenario |  Manage credit card payment with not enough credit |
-| ------------- |:-------------:|
-|  Precondition     | Credit card C exists  |
-| | C.Balance < Price |
-|  Post condition     | C.Balance not changed  |
-| Step#        | Description  |
-|  1    |  Read C.number |
-|  2    |  Validate C.number with Luhn algorithm |
-|  3    |  Ask to credit sale price |
-|  4    |  Balance not sufficient, issue warning |
-|  5    |  Exit with error |
-
-## Scenario UC7.4
-
-| Scenario |  Manage cash payment |
-| ------------- |:-------------:|
-|  Precondition     | Cash >= Price  |
-|  Post condition     |   |
-| Step#        | Description  |
-|  1    |  Collect banknotes and coins |
-|  2    |  Compute cash quantity |
-|  3    |  Record cash payment |
-|  4    |  Compute change |
-|  5    |  Return change |
 
 
 # Coverage of Scenarios and FR
@@ -254,15 +198,17 @@ Report also for each of the scenarios the (one or more) API JUnit tests that cov
 |  4.2         | FR5                             | TestEZShopFR5         |
 |  4.3         | FR5                             | TestEZShopFR5         |
 |  4.4         | FR5                             | TestEZShopFR5         |
-| 7.1   | FR7.1 | TestEZShopFR7.testReceivePaymentCreditCard |
-| 7.2       | FR7.1 | TestEZShopFR7.testInvalidCardPayment |
-| 7.3      | FR7.1 | TestEZShopFR7.testInsufficientCreditPayment |
-| 7.4      | FR7.2 | TestEZShopFR7.testReceivePaymentCash |
+| 7.1   | FR7.2 | TestEZShopFR7.testReceiveCreditCardPayment |
+| 7.2       | FR7.2 | TestEZShopFR7.testInvalidCardPayment |
+| 7.3      | FR7.2 | TestEZShopFR7.testInsufficientCreditPayment |
+| 7.4      | FR7.1 | TestEZShopFR7.testReceiveCashPayment |
+| 10.1 | FR7.4 | TestEZShopFR7.testReturnCreditCardPayment |
+| 10.2 | FR7.3 | TestEZShopFR7.testReturnCashPayment |
+| 10.3 | FR7.4 | TestEZShopFR7.testReturnInvalidCardPayment |
 
 
 
 # Coverage of Non Functional Requirements
-
 
 <Report in the following table the coverage of the Non Functional Requirements of the application - only those that can be tested with automated testing frameworks.>
 
