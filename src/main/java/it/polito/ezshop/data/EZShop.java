@@ -1490,6 +1490,9 @@ public class EZShop implements EZShopInterface {
         if(product == null)
             return false;
 
+        if(tmpRetTr == null)
+            return false;
+
         EZSaleTransaction sale = getSaleTransactionById(tmpRetTr.getSaleTransactionId());
         if(sale == null)
             return false;

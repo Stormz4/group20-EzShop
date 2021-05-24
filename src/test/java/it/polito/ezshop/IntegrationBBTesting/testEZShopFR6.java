@@ -169,10 +169,10 @@ public class testEZShopFR6 {
         });
 
         assertThrows(InvalidProductCodeException.class, () -> {
-            ez.applyDiscountRateToProduct(1, "", 0.25);   // random number: invalid barCode
+            ez.applyDiscountRateToProduct(1, "", 0.25);   // empty barCode
         });
         assertThrows(InvalidProductCodeException.class, () -> {
-            ez.applyDiscountRateToProduct(1, null, 0.25);   // random number: invalid barCode
+            ez.applyDiscountRateToProduct(1, null, 0.25);   // null barCode
         });
         assertThrows(InvalidProductCodeException.class, () -> {
             ez.applyDiscountRateToProduct(1, "4544334643418", 0.25);   // random number: invalid barCode
@@ -475,7 +475,7 @@ public class testEZShopFR6 {
     }
 
     @Test
-    public void testReturnProduct() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidQuantityException, InvalidTransactionIdException, InvalidProductCodeException {
+    public void testReturnProduct() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidQuantityException, InvalidTransactionIdException, InvalidProductCodeException, InvalidPaymentException {
         EZShop ez = new EZShop();
         try {
             ez.returnProduct(1, "2345344543423", 3);
@@ -486,7 +486,57 @@ public class testEZShopFR6 {
 
         ez.login("TransactionsTest", "pwd"); // Administrator logged-in
 
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.returnProduct(0, "2345344543423", 3);
+        });
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.returnProduct(-1, "2345344543423", 3);
+        });
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.returnProduct(null, "2345344543423", 3);
+        });
 
+        assertThrows(InvalidProductCodeException.class, () -> {
+            ez.returnProduct(1, "", 3);   // empty barCode
+        });
+        assertThrows(InvalidProductCodeException.class, () -> {
+            ez.returnProduct(1, null, 3);   // null barCode
+        });
+        assertThrows(InvalidProductCodeException.class, () -> {
+            ez.returnProduct(1, "4544334643418", 3);   // random number: invalid barCode
+        });
+
+        assertThrows(InvalidQuantityException.class, () -> {
+            ez.returnProduct(1, "2345344543423", 0);
+        });
+        assertThrows(InvalidQuantityException.class, () -> {
+            ez.returnProduct(1, "2345344543423", -1);
+        });
+
+        int sid = ez.startSaleTransaction();
+        ez.addProductToSale(sid, "2345344543423", 10);
+        ez.endSaleTransaction(sid);
+        ez.receiveCashPayment(sid, 500); // Sale Transaction status: PAYED
+
+        int rid = 5555;
+        boolean ok = ez.returnProduct(rid, "2345344543423", 3);
+        assertFalse(ok);
+
+        rid = ez.startReturnTransaction(sid);
+        ok = ez.returnProduct(rid, "2345344543423", 11);
+        assertFalse(ok);
+
+        ok = ez.returnProduct(rid, "5839276671295", 3); // product that does not exist in the catalogue
+        assertFalse(ok);
+
+        ok = ez.returnProduct(rid, "1155678522411", 3); // product that does not exist in the sale transaction (but it exists in the catalogue)
+        assertFalse(ok);
+
+        int q_before = ez.getProductTypeByBarCode("2345344543423").getQuantity();
+        ok = ez.returnProduct(rid, "2345344543423", 3);
+        assertTrue(ok);
+        int q_after = ez.getProductTypeByBarCode("2345344543423").getQuantity();
+        assertEquals(q_before, q_after, 0);
     }
 
     @Test
