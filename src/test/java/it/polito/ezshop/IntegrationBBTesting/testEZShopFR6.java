@@ -435,7 +435,7 @@ public class testEZShopFR6 {
 
     // Return Transactions
     @Test
-    public void testStartReturnTransaction() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidTransactionIdException {
+    public void testStartReturnTransaction() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidTransactionIdException, InvalidPaymentException {
         EZShop ez = new EZShop();
         try {
             ez.startReturnTransaction(1);
@@ -446,7 +446,32 @@ public class testEZShopFR6 {
 
         ez.login("TransactionsTest", "pwd"); // Administrator logged-in
 
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.startReturnTransaction(0);
+        });
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.startReturnTransaction(-1);
+        });
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.startReturnTransaction(null);
+        });
 
+        int sid = 9999;
+
+        int rid = ez.startReturnTransaction(sid);
+        assertEquals(-1, rid, 0);
+
+        sid = ez.startSaleTransaction(); // status: OPENED
+        rid = ez.startReturnTransaction(sid);
+        assertEquals(-1, rid, 0);
+
+        ez.endSaleTransaction(sid); // status: CLOSED
+        rid = ez.startReturnTransaction(sid);
+        assertEquals(-1, rid, 0);
+
+        ez.receiveCashPayment(sid, 500); // status: PAYED
+        rid = ez.startReturnTransaction(sid);
+        assertNotEquals(-1, rid, 0);
     }
 
     @Test

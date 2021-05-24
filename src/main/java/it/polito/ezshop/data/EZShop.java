@@ -1453,7 +1453,7 @@ public class EZShop implements EZShopInterface {
 
         EZSaleTransaction sale = getSaleTransactionById(saleNumber);
 
-        if(sale == null)
+        if(sale == null || !sale.hasRequiredStatus(EZSaleTransaction.STPayed))
             return defaultID;
 
         List<TicketEntry> entries = new LinkedList<TicketEntry>();
