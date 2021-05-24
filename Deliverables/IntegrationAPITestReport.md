@@ -28,7 +28,7 @@ Date: 24/05/2021
 
 
 # Dependency graph
-```
+```plantuml
 @startuml
 top to bottom direction
 package "ezshop.it.polito.ezshop" as ezshopPackage   {
