@@ -1456,6 +1456,9 @@ public class EZShop implements EZShopInterface {
         if(sale == null || !sale.hasRequiredStatus(EZSaleTransaction.STPayed))
             return defaultID;
 
+        if(ezReturnTransactions == null)
+            ezReturnTransactions = new HashMap<Integer, EZReturnTransaction>();
+
         List<TicketEntry> entries = new LinkedList<TicketEntry>();
         EZReturnTransaction retTr = new EZReturnTransaction(defaultID, saleNumber, entries, defaultValue, RTOpened);
         int id = shopDB.insertReturnTransaction(entries, saleNumber, defaultValue, RTOpened);
@@ -1470,6 +1473,8 @@ public class EZShop implements EZShopInterface {
     public EZReturnTransaction getReturnTransactionById(Integer returnId) {
         if(tmpRetTr != null && returnId.equals(tmpRetTr.getReturnId()))
             return tmpRetTr;
+        if(ezReturnTransactions == null)
+            return null;
         return ezReturnTransactions.get(returnId);
     }
 
@@ -1559,7 +1564,8 @@ public class EZShop implements EZShopInterface {
                     }
                 }
 
-                assert product != null;
+                if(product == null)
+                    return false;
                 // update (increase) quantity on the shelves
                 if(!shopDB.updateProductType(product.getId(), product.getQuantity()+ezticket.amount, product.getLocation(),
                     product.getNote(), product.getProductDescription(), product.getBarCode(), product.getPricePerUnit()))
@@ -1582,10 +1588,10 @@ public class EZShop implements EZShopInterface {
             }
             double saleDiscount = getSaleTransactionById(retToBeStored.getSaleTransactionId()).getDiscountRate();
             double oldReturnedValue = retToBeStored.getReturnedValue();
-            retToBeStored.setReturnedValue(oldReturnedValue * saleDiscount);
+            retToBeStored.setReturnedValue(oldReturnedValue * (1-saleDiscount));
             retToBeStored.setStatus(RTClosed);
             // update ReturnTransaction in DB:
-            if(!shopDB.updateReturnTransaction(retToBeStored.getReturnId(), retToBeStored.getReturnedValue()*saleDiscount, RTClosed))
+            if(!shopDB.updateReturnTransaction(retToBeStored.getReturnId(), retToBeStored.getReturnedValue(), RTClosed))
                 return false;
             // clear the temporary transaction:
             tmpRetTr = null;
@@ -1663,16 +1669,16 @@ public class EZShop implements EZShopInterface {
 
             // re-update (increase) number of sold products (in related sale transaction)
             EZTicketEntry oldSaleTicket = getSaleTransactionById(retTr.getSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode());
-            if(shopDB.updateProductPerSale(product.getBarCode(), sale.getTicketNumber(), oldSaleTicket.getAmount()+ezticket.getAmount(), oldSaleTicket.getDiscountRate()))
+            if(!shopDB.updateProductPerSale(product.getBarCode(), sale.getTicketNumber(), oldSaleTicket.getAmount()+ezticket.getAmount(), oldSaleTicket.getDiscountRate()))
                 return false;
-            getSaleTransactionById(tmpRetTr.getSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode()).updateAmount(+ezticket.getAmount()) ;
+            getSaleTransactionById(retTr.getSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode()).updateAmount(+ezticket.getAmount()) ;
 
             // re-update (increase) final price of related sale transaction
             double newPrice = sale.getPrice()+ezticket.getTotal();
             if(!shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), newPrice, sale.getStatus()))
                 return false;
 
-            getSaleTransactionById(retTr.getSaleTransactionId()).setPrice(+ezticket.getTotal());
+            getSaleTransactionById(retTr.getSaleTransactionId()).updatePrice(+ezticket.getTotal());
 
             //delete also the return ticket from DB:
             if(!shopDB.deleteProductPerSale(ezticket.getBarCode(), retTr.getReturnId()))

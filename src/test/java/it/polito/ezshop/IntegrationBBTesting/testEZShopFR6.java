@@ -7,6 +7,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
@@ -65,6 +66,7 @@ public class testEZShopFR6 {
         Integer s = ez.startSaleTransaction();
         boolean positive = s >= 0;
         assertTrue(positive);
+        assertEquals("OPENED", ez.getSaleTransactionById(s).getStatus());
     }
 
     @Test
@@ -344,6 +346,7 @@ public class testEZShopFR6 {
         sid = ez.startSaleTransaction(); // Status: OPENED
         ok = ez.endSaleTransaction(sid);
         assertTrue(ok);
+        assertEquals("CLOSED", ez.getSaleTransactionById(sid).getStatus());
 
         // Status: CLOSED
         ok = ez.endSaleTransaction(sid);
@@ -472,6 +475,7 @@ public class testEZShopFR6 {
         ez.receiveCashPayment(sid, 500); // status: PAYED
         rid = ez.startReturnTransaction(sid);
         assertNotEquals(-1, rid, 0);
+        assertEquals("OPENED", ez.getReturnTransactionById(rid).getStatus());
     }
 
     @Test
@@ -532,15 +536,17 @@ public class testEZShopFR6 {
         ok = ez.returnProduct(rid, "1155678522411", 3); // product that does not exist in the sale transaction (but it exists in the catalogue)
         assertFalse(ok);
 
+        double prod_price = ez.getProductTypeByBarCode("2345344543423").getPricePerUnit();
         int q_before = ez.getProductTypeByBarCode("2345344543423").getQuantity();
         ok = ez.returnProduct(rid, "2345344543423", 3);
         assertTrue(ok);
+        assertEquals(prod_price*3, ez.getReturnTransactionById(rid).getReturnedValue(), 0.001);
         int q_after = ez.getProductTypeByBarCode("2345344543423").getQuantity();
         assertEquals(q_before, q_after, 0);
     }
 
     @Test
-    public void testEndReturnTransaction() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidTransactionIdException {
+    public void testEndReturnTransaction() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidTransactionIdException, InvalidQuantityException, InvalidProductCodeException, InvalidPaymentException {
         EZShop ez = new EZShop();
         try {
             ez.endReturnTransaction(1, true);
@@ -551,11 +557,73 @@ public class testEZShopFR6 {
 
         ez.login("TransactionsTest", "pwd"); // Administrator logged-in
 
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.endReturnTransaction(0, true);
+        });
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.endReturnTransaction(-1, true);
+        });
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.endReturnTransaction(null, true);
+        });
 
+        int sid = ez.startSaleTransaction();
+        ez.addProductToSale(sid, "2345344543423", 10);
+        ez.endSaleTransaction(sid);
+        ez.receiveCashPayment(sid, 500); // Sale Transaction status: PAYED
+
+        int rid = 5555;
+        boolean ok = ez.endReturnTransaction(rid, true);
+        assertFalse(ok);
+
+        double prod_price = ez.getProductTypeByBarCode("2345344543423").getPricePerUnit();
+        int q_before = ez.getProductTypeByBarCode("2345344543423").getQuantity();
+        double price_before = ez.getSaleTransactionById(sid).getPrice();
+        int sale_q_before = -1;
+        List<TicketEntry> saleEntries = ez.getSaleTransactionById(sid).getEntries();
+        for( TicketEntry t : saleEntries ) {
+            if(t.getBarCode().equals("2345344543423"))
+            {
+                sale_q_before = t.getAmount();
+                break;
+            }
+        }
+        rid = ez.startReturnTransaction(sid);
+        ez.returnProduct(rid, "2345344543423", 3);
+        ok = ez.endReturnTransaction(rid, true);
+        assertTrue(ok);
+        int q_after = ez.getProductTypeByBarCode("2345344543423").getQuantity();
+        double price_after = ez.getSaleTransactionById(sid).getPrice();
+        int sale_q_after = -1;
+        saleEntries = ez.getSaleTransactionById(sid).getEntries();
+        for( TicketEntry t : saleEntries ) {
+            if(t.getBarCode().equals("2345344543423"))
+            {
+                sale_q_after = t.getAmount();
+                break;
+            }
+        }
+        assertEquals(q_before+3, q_after, 0);
+        assertEquals(price_before-(prod_price*3), price_after, 0.001);
+        assertEquals(sale_q_before-3, sale_q_after, 0);
+        assertEquals("CLOSED", ez.getReturnTransactionById(rid).getStatus());
+
+        ez.deleteReturnTransaction(rid);
+        ok = ez.endReturnTransaction(rid, true);
+        assertFalse(ok);
+
+        int sid2 = ez.startSaleTransaction();
+        ez.addProductToSale(sid2, "2345344543423", 10);
+        ez.endSaleTransaction(sid2);
+        ez.receiveCashPayment(sid2, 500); // Sale Transaction status: PAYED
+        int rid2 = ez.startReturnTransaction(sid2);
+        ok = ez.endReturnTransaction(rid2, false); // testing rollback situation
+        assertTrue(ok);
+        assertNull(ez.getReturnTransactionById(rid2));
     }
 
     @Test
-    public void testDeleteReturnTransaction() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidTransactionIdException {
+    public void testDeleteReturnTransaction() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidTransactionIdException, InvalidQuantityException, InvalidProductCodeException, InvalidPaymentException {
         EZShop ez = new EZShop();
         try {
             ez.deleteReturnTransaction(1);
@@ -566,7 +634,108 @@ public class testEZShopFR6 {
 
         ez.login("TransactionsTest", "pwd"); // Administrator logged-in
 
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.deleteReturnTransaction(0);
+        });
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.deleteReturnTransaction(-1);
+        });
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.deleteReturnTransaction(null);
+        });
 
+        int sid = ez.startSaleTransaction();
+        ez.addProductToSale(sid, "2345344543423", 10);
+        ez.endSaleTransaction(sid);
+        ez.receiveCashPayment(sid, 500); // Sale Transaction status: PAYED
+
+        int rid = 5555;
+        boolean ok = ez.deleteReturnTransaction(rid);
+        assertFalse(ok);
+
+        double prod_price = ez.getProductTypeByBarCode("2345344543423").getPricePerUnit();
+        rid = ez.startReturnTransaction(sid); // status: OPENED
+        ez.returnProduct(rid, "2345344543423", 3);
+        ok = ez.deleteReturnTransaction(rid);
+        assertFalse(ok);
+        ez.endReturnTransaction(rid, true); // status: CLOSED
+        int q_before = ez.getProductTypeByBarCode("2345344543423").getQuantity();
+        double price_before = ez.getSaleTransactionById(sid).getPrice();
+        int sale_q_before = -1;
+        List<TicketEntry> saleEntries = ez.getSaleTransactionById(sid).getEntries();
+        for( TicketEntry t : saleEntries ) {
+            if(t.getBarCode().equals("2345344543423"))
+            {
+                sale_q_before = t.getAmount();
+                break;
+            }
+        }
+        ok = ez.deleteReturnTransaction(rid);
+        assertTrue(ok);
+        int q_after = ez.getProductTypeByBarCode("2345344543423").getQuantity();
+        double price_after = ez.getSaleTransactionById(sid).getPrice();
+        int sale_q_after = -1;
+        saleEntries = ez.getSaleTransactionById(sid).getEntries();
+        for( TicketEntry t : saleEntries ) {
+            if(t.getBarCode().equals("2345344543423"))
+            {
+                sale_q_after = t.getAmount();
+                break;
+            }
+        }
+        assertEquals(q_before-3, q_after, 0);
+        assertEquals(price_before+(prod_price*3), price_after, 0.001);
+        assertEquals(sale_q_before+3, sale_q_after, 0);
+
+        // Testing "return false if -the return transaction- has been payed":
+        int sid2 = ez.startSaleTransaction();
+        ez.addProductToSale(sid2, "2345344543423", 10);
+        ez.endSaleTransaction(sid2);
+        ez.receiveCashPayment(sid2, 500); // Sale Transaction status: PAYED
+        int rid2 = ez.startReturnTransaction(sid2);
+        ez.returnCashPayment(rid2); // Return Transaction status: PAYED
+        ok = ez.deleteReturnTransaction(rid2);
+        assertFalse(ok);
+
+        // Testing "return false if there are some problems with the db":
+        int sid3 = ez.startSaleTransaction();
+        ez.addProductToSale(sid3, "2345344543423", 10);
+        ez.endSaleTransaction(sid3);
+        ez.receiveCashPayment(sid3, 500); // Sale Transaction status: PAYED
+        int rid3 = ez.startReturnTransaction(sid3);
+        shopDB2.deleteTransaction(rid3); // delete return transaction FROM DB in order to generate an error
+        ok = ez.deleteReturnTransaction(rid3);
+        assertFalse(ok);
+
+        // Testing a particular case: Returning of exactly the sold products
+        int sid4 = ez.startSaleTransaction();
+        ez.addProductToSale(sid4, "1155678522411", 3); // used to test if we return exactly the same number of products
+        ez.endSaleTransaction(sid4);
+        ez.receiveCashPayment(sid4, 500); // Sale Transaction status: PAYED
+        double prod_price4 = ez.getProductTypeByBarCode("1155678522411").getPricePerUnit();
+        int rid4 = ez.startReturnTransaction(sid4); // status: OPENED
+        ez.returnProduct(rid4, "1155678522411", 3);
+        ez.endReturnTransaction(rid4, true); // status: CLOSED
+        int sale_q_before4 = -1;
+        List<TicketEntry> saleEntries4 = ez.getSaleTransactionById(sid4).getEntries();
+        for( TicketEntry t : saleEntries4 ) {
+            if(t.getBarCode().equals("1155678522411"))
+            {
+                sale_q_before4 = t.getAmount();
+                break;
+            }
+        }
+        ez.deleteReturnTransaction(rid4);
+        int sale_q_after4 = -1;
+        saleEntries4 = ez.getSaleTransactionById(sid4).getEntries();
+        for( TicketEntry t : saleEntries4 ) {
+            if(t.getBarCode().equals("1155678522411"))
+            {
+                sale_q_after4 = t.getAmount();
+                break;
+            }
+        }
+        assertEquals(sale_q_before4+3, sale_q_after4, 0);
     }
 
 }
