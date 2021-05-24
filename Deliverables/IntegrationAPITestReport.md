@@ -184,7 +184,6 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 | Classes  | JUnit test cases |
 |----------|------------------|
 |EZShop    | TestEZShopFR1    |
-|          | TestEZShopFR2    |
 |          | TestEZShopFR3    |
 |          | TestEZShopFR4    |
 |          | TestEZShopFR5    |
