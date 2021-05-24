@@ -172,6 +172,12 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 | EZSQLiteDB          | TestEZShop_SQLiteDB          |
 | EZTicketEntry       | TestEZShop_TicketEntry       |
 | EZUser              | TestEZShop_User              |
+| EZShop              | TestEZShop_getCreditInTXTbyCardNumber                | 
+| EZShop              | TestEZShop_updateCreditInTXTbyCardNumber             |
+| EZShop              | TestEZShop_isValidCreditCard                               |
+| EZShop              | TestEZShop_isValidCard                               |
+| EZShop              | TestEZShop_isValidPosition                           |
+| EZShop              | TestEZShop_VerifyBarCode                             |
 
 
 ## Step 2
@@ -278,6 +284,28 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 |  1    |  User selects customer record U |
 |  2    |  User modifies personal data of Cu  | 
 
+## Scenario 8-3
+
+| Scenario |  Return of all the sold products of a product type, cash |
+| ------------- |:-------------:| 
+|  Precondition     | Cashier C exists and is logged in |
+| | Product Type X exists |
+| | SaleTransaction T exists and has exactly N units of X |
+| | Transaction T was paid cash |
+|  Post condition     | Balance -= N*T.priceForProductX  |
+| | X.quantity += N |
+| Step#        | Description  |
+|  1    |  C inserts T.transactionId |
+|  2    |  Return transaction starts |  
+|  3    |  C reads bar code of X |
+|  4    |  C adds N units of X to the return transaction |
+|  5    |  X available quantity is increased by N |
+|  6    |  Manage cash return (go to UC 10) |
+|  7   |  Return  successful |
+|  8   |  C confirms the return transaction and closes it  |
+|  9   |  Transaction is updated |
+|  10   |  Balance is updated |
+
 
 # Coverage of Scenarios and FR
 
@@ -295,6 +323,15 @@ Report also for each of the scenarios the (one or more) API JUnit tests that cov
 |  4.2         | FR5                             | TestEZShopFR5         |
 |  4.3         | FR5                             | TestEZShopFR5         |
 |  4.4         | FR5                             | TestEZShopFR5         |    
+| 6.1         |  FR6      |     TestEZShopFR6         |           
+| 6.2         |  FR6      |     TestEZShopFR6        |             
+| 6.3         |  FR6      |     TestEZShopFR6         |           
+| 6.4         |  FR6      |     TestEZShopFR6        |             
+| 6.5         |  FR6      |     TestEZShopFR6         |           
+| 6.6         |  FR6      |     TestEZShopFR6        |             
+| 8.1         |  FR6      |     TestEZShopFR6         |           
+| 8.2         |  FR6      |     TestEZShopFR6        |          
+| 8.3         |  FR6      |     TestEZShopFR6         |  
 | ...         |                                 |             |             
 | ...         |                                 |             |             
 | ...         |                                 |             |             
@@ -313,6 +350,7 @@ Report also for each of the scenarios the (one or more) API JUnit tests that cov
 | Non Functional Requirement | Test name |
 | -------------------------- | --------- |
 | NFR2                       | Every test case. Test that involve the DB take a bit longer than 0.5sec, but they involve multiple DB methods.          |
+| NFR3                       | TestEZShop_User     |
 | NFR4                       | TestEZShop_VerifyBarCode |
 | NFR5                       | TestEZShop_IsValidCreditCard |
 | NFR6                       | TestEZShop_IsValidCard |
