@@ -28,8 +28,119 @@ Date: 24/05/2021
 
 
 # Dependency graph
+```
+@startuml
+top to bottom direction
+package "ezshop.it.polito.ezshop" as ezshopPackage   {
+class EZShop_main_
+package "data" as data             {
 
-![](./dependencygraph.jpg)
+     class EZShop
+
+     class EZAccountBook
+
+     class SQLiteDB
+
+     class EZSaleTransaction
+     interface EZShopInterface
+
+     class EZBalanceOperation
+     class EZCustomer
+     class EZOrder
+     class EZProductType
+     class EZReturnTransaction
+     class EZTicketEntry
+     class EZUser
+     interface SaleTransaction
+
+     interface BalanceOperation
+     interface Customer
+     interface Order
+     interface ProductType
+     interface TicketEntry
+     interface User
+
+     EZShop_main_ .down[dotted].> EZShop
+     EZShop_main_ .down[dotted].> EZShopInterface
+     EZShop .down[dotted].> EZAccountBook
+     EZShop .down[dotted].> SQLiteDB
+     EZShop .down[dotted].> EZSaleTransaction
+     EZShop .down[dotted].> EZShopInterface
+     EZShop .down[dotted].> EZBalanceOperation 
+     EZShop .down[dotted].> EZCustomer
+     EZShop .down[dotted].> EZOrder
+     EZShop .down[dotted].> EZProductType
+     EZShop .down[dotted].> EZReturnTransaction
+     EZShop .down[dotted].> EZTicketEntry 
+     EZShop .down[dotted].> EZUser
+     EZShop .down[dotted].> SaleTransaction
+     EZShop .down[dotted].> BalanceOperation
+     EZShop .down[dotted].> Customer
+     EZShop .down[dotted].> Order 
+     EZShop .down[dotted].> ProductType
+     EZShop .down[dotted].> TicketEntry
+     EZShop .down[dotted].> User
+     EZShop .down[dotted].> exceptions
+     EZAccountBook .down[dotted].> SQLiteDB
+     EZAccountBook .down[dotted].> EZBalanceOperation
+     SQLiteDB .down[dotted].> EZSaleTransaction
+     SQLiteDB .down[dotted].> EZBalanceOperation
+     SQLiteDB .down[dotted].> EZCustomer
+     SQLiteDB .down[dotted].> EZOrder
+     SQLiteDB .down[dotted].> EZProductType
+     SQLiteDB .down[dotted].> EZBalanceOperation
+     SQLiteDB .down[dotted].> EZReturnTransaction
+     SQLiteDB .down[dotted].> EZTicketEntry
+     SQLiteDB .down[dotted].> EZUser
+     EZSaleTransaction .down[dotted].> EZReturnTransaction
+     EZSaleTransaction .down[dotted].> EZTicketEntry
+     EZSaleTransaction .down[dotted].> SaleTransaction
+     EZSaleTransaction .down[dotted].> TicketEntry
+     EZShopInterface .down[dotted].> BalanceOperation
+     EZShopInterface .down[dotted].> Customer
+     EZShopInterface .down[dotted].> Order
+     EZShopInterface .down[dotted].> ProductType
+     EZShopInterface .down[dotted].> TicketEntry
+     EZShopInterface .down[dotted].> User
+     EZShopInterface .down[dotted].> exceptions
+     EZBalanceOperation .down[dotted].> BalanceOperation
+     EZCustomer .down[dotted].> Customer
+     EZOrder .down[dotted].> Order
+     EZProductType .down[dotted].> ProductType
+     EZTicketEntry .down[dotted].> TicketEntry
+     EZUser .down[dotted].> User
+     SaleTransaction .down[dotted].> TicketEntry
+     
+    }
+    package "exceptions" as exceptions {
+     class InvalidCreditCardException
+     class InvalidCustomerCardException
+     class InvalidCustomerIdException
+     class InvalidCustomerNameException
+     class InvalidDiscountRateException
+     class InvalidLocationException
+     class InvalidOrderIdException
+     class InvalidPasswordException
+     class InvalidPaymentException
+     class InvalidPricePerUnitException
+     class InvalidProductCodeException
+     class InvalidProductDescriptionException
+     class InvalidProductIdException
+     class InvalidQuantityException
+     class InvalidRoleException
+     class InvalidTransactionIdException
+     class InvalidUserIdException
+     class InvalidUnathorizedException
+
+    }
+    TicketEntry -down[hidden]- exceptions
+
+    EZShop -down[hidden]- data
+    data -down[hidden]- exceptions
+
+}
+@enduml
+```
 
 # Integration approach
 
