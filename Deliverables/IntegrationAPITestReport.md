@@ -28,8 +28,119 @@ Date: 24/05/2021
 
 
 # Dependency graph
+```plantuml
+@startuml
+top to bottom direction
+package "ezshop.it.polito.ezshop" as ezshopPackage   {
+class EZShop_main_
+package "data" as data             {
 
-![](./dependencygraph.jpg)
+     class EZShop
+
+     class EZAccountBook
+
+     class SQLiteDB
+
+     class EZSaleTransaction
+     interface EZShopInterface
+
+     class EZBalanceOperation
+     class EZCustomer
+     class EZOrder
+     class EZProductType
+     class EZReturnTransaction
+     class EZTicketEntry
+     class EZUser
+     interface SaleTransaction
+
+     interface BalanceOperation
+     interface Customer
+     interface Order
+     interface ProductType
+     interface TicketEntry
+     interface User
+
+     EZShop_main_ .down[dotted].> EZShop
+     EZShop_main_ .down[dotted].> EZShopInterface
+     EZShop .down[dotted].> EZAccountBook
+     EZShop .down[dotted].> SQLiteDB
+     EZShop .down[dotted].> EZSaleTransaction
+     EZShop .down[dotted].> EZShopInterface
+     EZShop .down[dotted].> EZBalanceOperation 
+     EZShop .down[dotted].> EZCustomer
+     EZShop .down[dotted].> EZOrder
+     EZShop .down[dotted].> EZProductType
+     EZShop .down[dotted].> EZReturnTransaction
+     EZShop .down[dotted].> EZTicketEntry 
+     EZShop .down[dotted].> EZUser
+     EZShop .down[dotted].> SaleTransaction
+     EZShop .down[dotted].> BalanceOperation
+     EZShop .down[dotted].> Customer
+     EZShop .down[dotted].> Order 
+     EZShop .down[dotted].> ProductType
+     EZShop .down[dotted].> TicketEntry
+     EZShop .down[dotted].> User
+     EZShop .down[dotted].> exceptions
+     EZAccountBook .down[dotted].> SQLiteDB
+     EZAccountBook .down[dotted].> EZBalanceOperation
+     SQLiteDB .down[dotted].> EZSaleTransaction
+     SQLiteDB .down[dotted].> EZBalanceOperation
+     SQLiteDB .down[dotted].> EZCustomer
+     SQLiteDB .down[dotted].> EZOrder
+     SQLiteDB .down[dotted].> EZProductType
+     SQLiteDB .down[dotted].> EZBalanceOperation
+     SQLiteDB .down[dotted].> EZReturnTransaction
+     SQLiteDB .down[dotted].> EZTicketEntry
+     SQLiteDB .down[dotted].> EZUser
+     EZSaleTransaction .down[dotted].> EZReturnTransaction
+     EZSaleTransaction .down[dotted].> EZTicketEntry
+     EZSaleTransaction .down[dotted].> SaleTransaction
+     EZSaleTransaction .down[dotted].> TicketEntry
+     EZShopInterface .down[dotted].> BalanceOperation
+     EZShopInterface .down[dotted].> Customer
+     EZShopInterface .down[dotted].> Order
+     EZShopInterface .down[dotted].> ProductType
+     EZShopInterface .down[dotted].> TicketEntry
+     EZShopInterface .down[dotted].> User
+     EZShopInterface .down[dotted].> exceptions
+     EZBalanceOperation .down[dotted].> BalanceOperation
+     EZCustomer .down[dotted].> Customer
+     EZOrder .down[dotted].> Order
+     EZProductType .down[dotted].> ProductType
+     EZTicketEntry .down[dotted].> TicketEntry
+     EZUser .down[dotted].> User
+     SaleTransaction .down[dotted].> TicketEntry
+     
+    }
+    package "exceptions" as exceptions {
+     class InvalidCreditCardException
+     class InvalidCustomerCardException
+     class InvalidCustomerIdException
+     class InvalidCustomerNameException
+     class InvalidDiscountRateException
+     class InvalidLocationException
+     class InvalidOrderIdException
+     class InvalidPasswordException
+     class InvalidPaymentException
+     class InvalidPricePerUnitException
+     class InvalidProductCodeException
+     class InvalidProductDescriptionException
+     class InvalidProductIdException
+     class InvalidQuantityException
+     class InvalidRoleException
+     class InvalidTransactionIdException
+     class InvalidUserIdException
+     class InvalidUnathorizedException
+
+    }
+    TicketEntry -down[hidden]- exceptions
+
+    EZShop -down[hidden]- data
+    data -down[hidden]- exceptions
+
+}
+@enduml
+```
 
 # Integration approach
 
@@ -61,6 +172,12 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 | EZSQLiteDB          | TestEZShop_SQLiteDB          |
 | EZTicketEntry       | TestEZShop_TicketEntry       |
 | EZUser              | TestEZShop_User              |
+| EZShop              | TestEZShop_getCreditInTXTbyCardNumber                | 
+| EZShop              | TestEZShop_updateCreditInTXTbyCardNumber             |
+| EZShop              | TestEZShop_isValidCreditCard                               |
+| EZShop              | TestEZShop_isValidCard                               |
+| EZShop              | TestEZShop_isValidPosition                           |
+| EZShop              | TestEZShop_VerifyBarCode                             |
 
 
 ## Step 2
@@ -73,7 +190,6 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 | Classes  | JUnit test cases |
 |----------|------------------|
 |EZShop    | TestEZShopFR1    |
-|          | TestEZShopFR2    |
 |          | TestEZShopFR3    |
 |          | TestEZShopFR4    |
 |          | TestEZShopFR5    |
@@ -168,6 +284,28 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 |  1    |  User selects customer record U |
 |  2    |  User modifies personal data of Cu  |
 
+## Scenario UC8.3
+
+| Scenario |  Return of all the sold products of a product type, cash |
+| ------------- |:-------------:| 
+|  Precondition     | Cashier C exists and is logged in |
+| | Product Type X exists |
+| | SaleTransaction T exists and has exactly N units of X |
+| | Transaction T was paid cash |
+|  Post condition     | Balance -= N*T.priceForProductX  |
+| | X.quantity += N |
+| Step#        | Description  |
+|  1    |  C inserts T.transactionId |
+|  2    |  Return transaction starts |  
+|  3    |  C reads bar code of X |
+|  4    |  C adds N units of X to the return transaction |
+|  5    |  X available quantity is increased by N |
+|  6    |  Manage cash return (go to UC 10) |
+|  7   |  Return  successful |
+|  8   |  C confirms the return transaction and closes it  |
+|  9   |  Transaction is updated |
+|  10   |  Balance is updated |
+
 ## Scenario UC10.3
 
 | Scenario | Manage Return Payment by invalid credit card |
@@ -179,7 +317,6 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 |  2    |  Validate C.number with Luhn algorithm |
 |  3    |  C.number invalid, issue warning |
 |  4    |  Exit with error |
-
 
 
 # Coverage of Scenarios and FR
@@ -198,14 +335,26 @@ Report also for each of the scenarios the (one or more) API JUnit tests that cov
 |  4.2         | FR5                             | TestEZShopFR5         |
 |  4.3         | FR5                             | TestEZShopFR5         |
 |  4.4         | FR5                             | TestEZShopFR5         |
+| 6.1         |  FR6      |     TestEZShopFR6         |           
+| 6.2         |  FR6      |     TestEZShopFR6        |             
+| 6.3         |  FR6      |     TestEZShopFR6         |           
+| 6.4         |  FR6      |     TestEZShopFR6        |             
+| 6.5         |  FR6      |     TestEZShopFR6         |           
+| 6.6         |  FR6      |     TestEZShopFR6        |   
 | 7.1   | FR7.2 | TestEZShopFR7.testReceiveCreditCardPayment |
 | 7.2       | FR7.2 | TestEZShopFR7.testInvalidCardPayment |
 | 7.3      | FR7.2 | TestEZShopFR7.testInsufficientCreditPayment |
 | 7.4      | FR7.1 | TestEZShopFR7.testReceiveCashPayment |
+| 8.1         |  FR6      |     TestEZShopFR6         |           
+| 8.2         |  FR6      |     TestEZShopFR6        |          
+| 8.3         |  FR6      |     TestEZShopFR6         |  
 | 10.1 | FR7.4 | TestEZShopFR7.testReturnCreditCardPayment |
 | 10.2 | FR7.3 | TestEZShopFR7.testReturnCashPayment |
-| 10.3 | FR7.4 | TestEZShopFR7.testReturnInvalidCardPayment |
-
+| 10.3 | FR7.4 | TestEZShopFR7.testReturnInvalidCardPayment |    
+| ...         |                                 |             |             
+| ...         |                                 |             |             
+| ...         |                                 |             |             
+| ...         |                                 |             |             
 
 
 # Coverage of Non Functional Requirements
@@ -218,6 +367,7 @@ Report also for each of the scenarios the (one or more) API JUnit tests that cov
 | Non Functional Requirement | Test name |
 | -------------------------- | --------- |
 | NFR2                       | Every test case. Test that involve the DB take a bit longer than 0.5sec, but they involve multiple DB methods.          |
+| NFR3                       | TestEZShop_User     |
 | NFR4                       | TestEZShop_VerifyBarCode |
 | NFR5                       | TestEZShop_IsValidCreditCard |
 | NFR6                       | TestEZShop_IsValidCardT |
