@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static it.polito.ezshop.data.EZUser.*;
+import static it.polito.ezshop.data.SQLiteDB.defaultID;
 import static org.junit.Assert.*;
 
 public class TestEZShopFR3 {
@@ -101,6 +102,11 @@ public class TestEZShopFR3 {
             ezShop.createProductType(prodDescription, prodCode, 0, prodNote);
         });
 
+        // Check behavior if DB connection is not opened
+        this.shopDB.closeConnection();
+        productID = ezShop.createProductType(prodDescription, "4627828478338", pricePerUnit, "Note");
+        assertEquals(defaultID, productID.intValue());
+
         // Logout in order to check that UnauthorizedException precedes any other exception
         ezShop.logout();
 
@@ -121,14 +127,16 @@ public class TestEZShopFR3 {
     }
 
    @Test
-    public void testUpdateProduct() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException {
+    public void testUpdateProduct() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidPasswordException, InvalidUsernameException, InvalidProductIdException {
        final String prodDescription = "Test product's description";
-       final  String prodCode = "5839274928315";
+       final String prodCode = "5839274928315";
        final double pricePerUnit = 4.50;
        final String prodNote = "Product's note";
 
        // Proper product creation
        productID = ezShop.createProductType(prodDescription, prodCode, pricePerUnit,prodNote);
+       int productID2 = ezShop.createProductType(prodDescription, "3738456849238", pricePerUnit,prodNote);
+
 
        // Check null id
        assertThrows(InvalidProductIdException.class, () -> {
@@ -155,10 +163,49 @@ public class TestEZShopFR3 {
            ezShop.updateProduct(productID, "", "5839274928315", 12.50, "New note");
        });
 
+       // Check invalid product code
+       assertThrows(InvalidProductCodeException.class, () -> {
+           ezShop.updateProduct(productID, "", "583927492315", 12.50, "New note");
+       });
+
+       // Check null product code
+       assertThrows(InvalidProductCodeException.class, () -> {
+           ezShop.updateProduct(productID, "", null, 12.50, "New note");
+       });
+
+       // Check invalid price
+       assertThrows(InvalidPricePerUnitException.class, () -> {
+           assertFalse(ezShop.updateProduct(productID, "New description", prodCode, -10.20, "Note2"));
+       });
+
+       // Check valid update
+       assertTrue(ezShop.updateProduct(productID, "New description", prodCode, 10.20, "Note2"));
+
+       // Check for barcode uniqueness
+       assertFalse(ezShop.updateProduct(productID2, "New description", prodCode, 10.20, "Note2"));
+
+       // Check inexistent id
+       assertFalse(ezShop.updateProduct(5, "New description", prodCode, 10.20, "Note2"));
+
        // Check authorization if no user is logged in
        ezShop.logout();
        assertThrows(UnauthorizedException.class, () -> {
             ezShop.updateProduct(productID, "New description", "NEWCODE", 12.50, "New note");
        });
+
+       // Check authorization if Cashier (which is not allowed to perform a product update) is logged in
+       ezShop.login("cashier", "cashier");
+       assertThrows(UnauthorizedException.class, () -> {
+           ezShop.updateProduct(productID, prodDescription, prodCode, 12.50, "New note");
+       });
+       ezShop.logout();
+
+       // Check authorization if Manager, which should be able to perform the update, is logged in
+       ezShop.login("manager", "manager");
+       assertTrue(ezShop.updateProduct(productID, "3rd description", prodCode, 3.60, "Note3"));
+
+       // Check behavior if DB connection is not opened
+       this.shopDB.closeConnection();
+       assertFalse(ezShop.updateProduct(productID, "New description", prodCode, 10.20, "Note2"));
     }
 }
