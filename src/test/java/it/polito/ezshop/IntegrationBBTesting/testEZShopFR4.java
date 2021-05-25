@@ -113,7 +113,7 @@ public class testEZShopFR4 {
     }
 
     @Test
-    public void testUpdatePosition() throws InvalidLocationException, UnauthorizedException, InvalidProductIdException {
+    public void testUpdatePosition() throws InvalidLocationException, UnauthorizedException, InvalidProductIdException, InvalidPasswordException, InvalidUsernameException {
         // Test proper update
         assertTrue(ezShop.updatePosition(this.products.get(1), "15-GH-50"));
 
@@ -130,6 +130,44 @@ public class testEZShopFR4 {
         // Test productID < 0
         assertThrows(InvalidProductIdException.class, () -> {
             ezShop.updatePosition(-3, "15-GH-50");
+        });
+
+        // Test valid but inexistent id
+        assertFalse(ezShop.updatePosition(20, "15-GH-50"));
+
+        // Test null newPos and empty newPos
+        assertTrue(ezShop.updatePosition(this.products.get(2), null));
+        assertTrue(ezShop.updatePosition(this.products.get(2), ""));
+
+        // Test uniqueness of position
+        assertFalse(ezShop.updatePosition(this.products.get(3), "15-GH-50"));
+
+        // Check authorization for ShopManager
+        ezShop.logout();
+        ezShop.login("manager", "manager");
+        assertTrue(ezShop.updatePosition(this.products.get(1), "15-JK-50"));
+
+        // Test missing DB's connection
+        shopDB.closeConnection();
+        assertFalse(ezShop.updatePosition(this.products.get(2), ""));
+        assertFalse(ezShop.updatePosition(this.products.get(2), "16-GH-60"));
+
+        // Test invalid newPos
+        assertThrows(InvalidLocationException.class, () -> {
+            assertFalse(ezShop.updatePosition(this.products.get(2), "N3WP0S"));
+        });
+
+        // Check authorization for Cashier
+        ezShop.logout();
+        ezShop.login("cashier", "cashier");
+        assertThrows(UnauthorizedException.class, () -> {
+            ezShop.updatePosition(this.products.get(1), "15-JK-50");
+        });
+
+        // Check authorization when no user is logged in
+        ezShop.logout();
+        assertThrows(UnauthorizedException.class, () -> {
+            ezShop.updateQuantity(this.products.get(1), 5);
         });
     }
 }
