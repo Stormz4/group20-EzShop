@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
 public class TestEZShopFR7 {
 
     EZShop ez;
-    Integer uId, productID, saleTransactionID, returnTransactionID;
+    Integer saleTransactionID, returnTransactionID;
     String barCode = "1234567890128";
     private SQLiteDB shopDB;
     private static final int defaultID = -1;
@@ -150,14 +150,13 @@ public class TestEZShopFR7 {
     }
 
     @After
-    public void teardown() throws InvalidPasswordException, InvalidUsernameException, UnauthorizedException, InvalidProductIdException, InvalidTransactionIdException, InvalidProductCodeException {
+    public void teardown() {
         this.shopDB.closeConnection();
 
         // Check closeConnection
         assertFalse(shopDB.isConnected());
     }
 
-    // TODO le delete ripristinano il DB (aggiornare i test di conseguenza)
     /* All the following test methods need to define a saleTransaction or a returnTransaction first
      * So, every following test will include the first part (without payment) either Scenario 6.1 (if a saleTransaction is needed)
      * or Scenario 8.1 (if a returnTransaction is needed)

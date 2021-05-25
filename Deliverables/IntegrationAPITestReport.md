@@ -172,7 +172,7 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 | EZSQLiteDB          | TestEZShop_SQLiteDB          |
 | EZTicketEntry       | TestEZShop_TicketEntry       |
 | EZUser              | TestEZShop_User              |
-| EZShop              | TestEZShop_getCreditInTXTbyCardNumber                | 
+| EZShop              | TestEZShop_getCreditInTXTbyCardNumber                |
 | EZShop              | TestEZShop_updateCreditInTXTbyCardNumber             |
 | EZShop              | TestEZShop_isValidCreditCard                               |
 | EZShop              | TestEZShop_isValidCard                               |
@@ -287,7 +287,7 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 ## Scenario UC8.3
 
 | Scenario |  Return of all the sold products of a product type, cash |
-| ------------- |:-------------:| 
+| ------------- |:-------------:|
 |  Precondition     | Cashier C exists and is logged in |
 | | Product Type X exists |
 | | SaleTransaction T exists and has exactly N units of X |
@@ -296,7 +296,7 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 | | X.quantity += N |
 | Step#        | Description  |
 |  1    |  C inserts T.transactionId |
-|  2    |  Return transaction starts |  
+|  2    |  Return transaction starts |
 |  3    |  C reads bar code of X |
 |  4    |  C adds N units of X to the return transaction |
 |  5    |  X available quantity is increased by N |
@@ -305,6 +305,39 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 |  8   |  C confirms the return transaction and closes it  |
 |  9   |  Transaction is updated |
 |  10   |  Balance is updated |
+
+## Scenario UC9.2
+
+| Scenario | Manage Return Payment by invalid credit card |
+| ------------- |:-------------:|
+|  Precondition     | User with "Administrator" or "ShopManager" privilege is logged in |
+|  | toBeAdded < 0 |
+|  Post condition     | A Debit is registered with toBeAdded as its amount |
+| Step#        | Description  |
+|  1    | The user orders the system to register a Debit of toBeAdded |
+|  2    | The system registers the Debit in the Accounting Book |
+
+## Scenario UC9.3
+
+| Scenario | Manage Return Payment by invalid credit card |
+| ------------- |:-------------:|
+|  Precondition     | User with "Administrator" or "ShopManager" privilege is logged in |
+|       | toBeAdded >= 0 |
+| Post condition | A Credit is registered with toBeAdded as its amount |
+| Step#        | Description  |
+|  1    | The user orders the system to register a Credit of toBeAdded |
+|  2    | The system registers the Credit in the Accounting Book |
+
+## Scenario UC9.4
+
+| Scenario | Manage Return Payment by invalid credit card |
+| ------------- |:-------------:|
+|  Precondition     | A User is logged in |
+|  Post condition     | The Balance is computed correctly and provided to the User |
+| Step#        | Description  |
+|  1    | The User asks the system the total balance |
+|  2    | The system computes the balance summing all Debits and Credits |
+|  3    | The total balance is provided to the User |
 
 ## Scenario UC10.3
 
@@ -335,26 +368,26 @@ Report also for each of the scenarios the (one or more) API JUnit tests that cov
 |  4.2         | FR5                             | TestEZShopFR5         |
 |  4.3         | FR5                             | TestEZShopFR5         |
 |  4.4         | FR5                             | TestEZShopFR5         |
-| 6.1         |  FR6      |     TestEZShopFR6         |           
-| 6.2         |  FR6      |     TestEZShopFR6        |             
-| 6.3         |  FR6      |     TestEZShopFR6         |           
-| 6.4         |  FR6      |     TestEZShopFR6        |             
-| 6.5         |  FR6      |     TestEZShopFR6         |           
-| 6.6         |  FR6      |     TestEZShopFR6        |   
+| 6.1         |  FR6      |     TestEZShopFR6         |
+| 6.2         |  FR6      |     TestEZShopFR6        |
+| 6.3         |  FR6      |     TestEZShopFR6         |
+| 6.4         |  FR6      |     TestEZShopFR6        |
+| 6.5         |  FR6      |     TestEZShopFR6         |
+| 6.6         |  FR6      |     TestEZShopFR6        |
 | 7.1   | FR7.2 | TestEZShopFR7.testReceiveCreditCardPayment |
 | 7.2       | FR7.2 | TestEZShopFR7.testInvalidCardPayment |
 | 7.3      | FR7.2 | TestEZShopFR7.testInsufficientCreditPayment |
 | 7.4      | FR7.1 | TestEZShopFR7.testReceiveCashPayment |
-| 8.1         |  FR6      |     TestEZShopFR6         |           
-| 8.2         |  FR6      |     TestEZShopFR6        |          
-| 8.3         |  FR6      |     TestEZShopFR6         |  
+| 8.1         |  FR6      |     TestEZShopFR6         |
+| 8.2         |  FR6      |     TestEZShopFR6        |
+| 8.3         |  FR6      |     TestEZShopFR6         |
 | 10.1 | FR7.4 | TestEZShopFR7.testReturnCreditCardPayment |
 | 10.2 | FR7.3 | TestEZShopFR7.testReturnCashPayment |
-| 10.3 | FR7.4 | TestEZShopFR7.testReturnInvalidCardPayment |    
-| ...         |                                 |             |             
-| ...         |                                 |             |             
-| ...         |                                 |             |             
-| ...         |                                 |             |             
+| 10.3 | FR7.4 | TestEZShopFR7.testReturnInvalidCardPayment |
+| 9.2       | FR8.1 | TestEZShopFR8.testRecordDebit |
+| 9.3       | FR8.2 | TestEZShopFR8.testRecordCredit |
+| 9.1       | FR8.3 | TestEZShopFR8.testGetAllCreditsAndDebits |
+| 9.4       | FR8.4 | TestEZShopFR8.testComputeBalance |
 
 
 # Coverage of Non Functional Requirements
