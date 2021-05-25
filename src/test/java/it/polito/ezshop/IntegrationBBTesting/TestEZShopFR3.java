@@ -208,4 +208,9 @@ public class TestEZShopFR3 {
        this.shopDB.closeConnection();
        assertFalse(ezShop.updateProduct(productID, "New description", prodCode, 10.20, "Note2"));
     }
+
+    @Test
+    public void testDeleteProduct() {
+
+    }
 }
