@@ -812,14 +812,15 @@ public class EZShop implements EZShopInterface {
      */
     @Override
     public boolean modifyCustomer(Integer id, String newCustomerName, String newCustomerCard) throws InvalidCustomerNameException, InvalidCustomerCardException, InvalidCustomerIdException, UnauthorizedException {
+
+        if (this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URCashier, URShopManager))
+            throw new UnauthorizedException();
+
         if ( newCustomerName == null || newCustomerName.isEmpty() )
             throw new InvalidCustomerNameException();
 
         if ( newCustomerCard != null && !isValidCard(newCustomerCard))
             throw new InvalidCustomerCardException();
-
-        if (this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URCashier, URShopManager))
-            throw new UnauthorizedException();
 
         EZCustomer customer = ezCustomers.get(id);
         String customerCard = customer.getCustomerCard();
@@ -827,19 +828,21 @@ public class EZShop implements EZShopInterface {
         if (newCustomerCard != null) {
             if (newCustomerCard.isEmpty()) {
                 if ( shopDB.deleteCard(customer.getCustomerCard()) ) {
+                    customerCard="";
                     customer.setCustomerCard("");
                     customer.setPoints(0);
+
                 }
                 else
                     return false;
             }
             else if (this.ezCards.get(newCustomerCard) != null) {
-                for (Customer c : ezCustomers.values()) {
-                    if ( !c.getId().equals(id) && c.getCustomerCard().equals(newCustomerCard) )
+                for (Customer c: ezCustomers.values()) {
+                    if (c.getCustomerCard().equals(newCustomerCard))
                         return false;   // Card already assigned to another customer
                 }
 
-                customerCard = newCustomerCard; // Card already exists and can be assigned to given customer
+                customerCard = newCustomerCard; // Card can be assigned to given customer
             }
             else
                 return false;
@@ -859,16 +862,16 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean deleteCustomer(Integer id) throws InvalidCustomerIdException, UnauthorizedException {
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URCashier, URShopManager)){
+            throw new UnauthorizedException();
+        }
+
         if (id == null || id <=0 ){
             throw new InvalidCustomerIdException();
         }
 
         if (!ezCustomers.containsKey(id)) {
             return false;
-        }
-
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URCashier, URShopManager)){
-            throw new UnauthorizedException();
         }
 
         boolean success = shopDB.deleteCustomer(id);
@@ -881,16 +884,17 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public Customer getCustomer(Integer id) throws InvalidCustomerIdException, UnauthorizedException {
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URCashier, URShopManager)){
+            throw new UnauthorizedException();
+        }
+
+
         if ( id==null || id <=0) {
             throw new InvalidCustomerIdException();
         }
 
         if (!ezCustomers.containsKey(id)) {
             return null;
-        }
-
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URCashier, URShopManager)){
-            throw new UnauthorizedException();
         }
 
         Customer customer = ezCustomers.get(id);
@@ -945,6 +949,9 @@ public class EZShop implements EZShopInterface {
     @Override
     public boolean attachCardToCustomer(String customerCard, Integer customerId) throws InvalidCustomerIdException, InvalidCustomerCardException, UnauthorizedException {
 
+        if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier))
+            throw new UnauthorizedException();
+
         if (customerId == null || customerId <=0){
             throw new InvalidCustomerIdException();
         }
@@ -958,8 +965,6 @@ public class EZShop implements EZShopInterface {
             throw new InvalidCustomerCardException();
         }
 
-        if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier))
-            throw new UnauthorizedException();
 
         EZCustomer customer = ezCustomers.get(customerId); // This functions checks if the customers map contains the ID.
 
@@ -998,12 +1003,13 @@ public class EZShop implements EZShopInterface {
     @Override
     public boolean modifyPointsOnCard(String customerCard, int pointsToBeAdded) throws InvalidCustomerCardException, UnauthorizedException {
 
-        if (customerCard == null || !isValidCard(customerCard)){
+        if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier))
+            throw new UnauthorizedException();
+
+        if (customerCard == null || customerCard.isEmpty() || !isValidCard(customerCard)){
             throw new InvalidCustomerCardException();
         }
 
-        if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier))
-            throw new UnauthorizedException();
 
         for (Customer customer : ezCustomers.values()) {
             if (customer.getCustomerCard().equals(customerCard)){
@@ -1449,8 +1455,11 @@ public class EZShop implements EZShopInterface {
 
         EZSaleTransaction sale = getSaleTransactionById(saleNumber);
 
-        if(sale == null)
+        if(sale == null || !sale.hasRequiredStatus(EZSaleTransaction.STPayed))
             return defaultID;
+
+        if(ezReturnTransactions == null)
+            ezReturnTransactions = new HashMap<Integer, EZReturnTransaction>();
 
         List<TicketEntry> entries = new LinkedList<TicketEntry>();
         EZReturnTransaction retTr = new EZReturnTransaction(defaultID, saleNumber, entries, defaultValue, RTOpened);
@@ -1466,6 +1475,8 @@ public class EZShop implements EZShopInterface {
     public EZReturnTransaction getReturnTransactionById(Integer returnId) {
         if(tmpRetTr != null && returnId.equals(tmpRetTr.getReturnId()))
             return tmpRetTr;
+        if(ezReturnTransactions == null)
+            return null;
         return ezReturnTransactions.get(returnId);
     }
 
@@ -1484,6 +1495,9 @@ public class EZShop implements EZShopInterface {
         ProductType product = getProductTypeByBarCode(productCode);
 
         if(product == null)
+            return false;
+
+        if(tmpRetTr == null)
             return false;
 
         EZSaleTransaction sale = getSaleTransactionById(tmpRetTr.getSaleTransactionId());
@@ -1552,7 +1566,8 @@ public class EZShop implements EZShopInterface {
                     }
                 }
 
-                assert product != null;
+                if(product == null)
+                    return false;
                 // update (increase) quantity on the shelves
                 if(!shopDB.updateProductType(product.getId(), product.getQuantity()+ezticket.amount, product.getLocation(),
                     product.getNote(), product.getProductDescription(), product.getBarCode(), product.getPricePerUnit()))
@@ -1575,10 +1590,10 @@ public class EZShop implements EZShopInterface {
             }
             double saleDiscount = getSaleTransactionById(retToBeStored.getSaleTransactionId()).getDiscountRate();
             double oldReturnedValue = retToBeStored.getReturnedValue();
-            retToBeStored.setReturnedValue(oldReturnedValue * saleDiscount);
+            retToBeStored.setReturnedValue(oldReturnedValue * (1-saleDiscount));
             retToBeStored.setStatus(RTClosed);
             // update ReturnTransaction in DB:
-            if(!shopDB.updateReturnTransaction(retToBeStored.getReturnId(), retToBeStored.getReturnedValue()*saleDiscount, RTClosed))
+            if(!shopDB.updateReturnTransaction(retToBeStored.getReturnId(), retToBeStored.getReturnedValue(), RTClosed))
                 return false;
             // clear the temporary transaction:
             tmpRetTr = null;
@@ -1656,16 +1671,16 @@ public class EZShop implements EZShopInterface {
 
             // re-update (increase) number of sold products (in related sale transaction)
             EZTicketEntry oldSaleTicket = getSaleTransactionById(retTr.getSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode());
-            if(shopDB.updateProductPerSale(product.getBarCode(), sale.getTicketNumber(), oldSaleTicket.getAmount()+ezticket.getAmount(), oldSaleTicket.getDiscountRate()))
+            if(!shopDB.updateProductPerSale(product.getBarCode(), sale.getTicketNumber(), oldSaleTicket.getAmount()+ezticket.getAmount(), oldSaleTicket.getDiscountRate()))
                 return false;
-            getSaleTransactionById(tmpRetTr.getSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode()).updateAmount(+ezticket.getAmount()) ;
+            getSaleTransactionById(retTr.getSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode()).updateAmount(+ezticket.getAmount()) ;
 
             // re-update (increase) final price of related sale transaction
             double newPrice = sale.getPrice()+ezticket.getTotal();
             if(!shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), newPrice, sale.getStatus()))
                 return false;
 
-            getSaleTransactionById(retTr.getSaleTransactionId()).setPrice(+ezticket.getTotal());
+            getSaleTransactionById(retTr.getSaleTransactionId()).updatePrice(+ezticket.getTotal());
 
             //delete also the return ticket from DB:
             if(!shopDB.deleteProductPerSale(ezticket.getBarCode(), retTr.getReturnId()))
@@ -1708,9 +1723,11 @@ public class EZShop implements EZShopInterface {
 
         if(!this.shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), sale.getPrice(), EZSaleTransaction.STPayed))
             return -1;
+        ezSaleTransactions.get(sale.getTicketNumber()).setStatus(EZSaleTransaction.STPayed);
 
         if(!recordBalanceUpdate(toBePayed)) {
             this.shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), sale.getPrice(), EZSaleTransaction.STClosed);
+            ezSaleTransactions.get(sale.getTicketNumber()).setStatus(EZSaleTransaction.STClosed);
             return -1; // return -1 if DB connection problems occur
         }
 
@@ -1743,8 +1760,15 @@ public class EZShop implements EZShopInterface {
 
         toBePayed = sale.getPrice()*(1-sale.getDiscountRate());
 
-        if(!recordBalanceUpdate(sale.getPrice()))
+        if(!this.shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), sale.getPrice(), EZSaleTransaction.STPayed))
+            return false;
+        ezSaleTransactions.get(sale.getTicketNumber()).setStatus(EZSaleTransaction.STPayed);
+
+        if(!recordBalanceUpdate(sale.getPrice())) {
+            this.shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), sale.getPrice(), EZSaleTransaction.STClosed);
+            ezSaleTransactions.get(sale.getTicketNumber()).setStatus(EZSaleTransaction.STClosed);
             return false; // return false if DB connection problems occur
+        }
 
         if(!updateCreditInTXTbyCardNumber(creditCard, -(sale.getPrice() * (1 - sale.getDiscountRate()))))
             return false;
