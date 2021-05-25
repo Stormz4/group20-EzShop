@@ -381,13 +381,13 @@ Report also for each of the scenarios the (one or more) API JUnit tests that cov
 | 8.1         |  FR6      |     TestEZShopFR6         |
 | 8.2         |  FR6      |     TestEZShopFR6        |
 | 8.3         |  FR6      |     TestEZShopFR6         |
+| 9.1       | FR8.3 | TestEZShopFR8.testGetAllCreditsAndDebits |
+| 9.2       | FR8.1 | TestEZShopFR8.testRecordDebit |
+| 9.3       | FR8.2 | TestEZShopFR8.testRecordCredit |
+| 9.4       | FR8.4 | TestEZShopFR8.testComputeBalance |
 | 10.1 | FR7.4 | TestEZShopFR7.testReturnCreditCardPayment |
 | 10.2 | FR7.3 | TestEZShopFR7.testReturnCashPayment |
 | 10.3 | FR7.4 | TestEZShopFR7.testReturnInvalidCardPayment |
-| 9.2       | FR8.1 | TestEZShopFR8.testRecordDebit |
-| 9.3       | FR8.2 | TestEZShopFR8.testRecordCredit |
-| 9.1       | FR8.3 | TestEZShopFR8.testGetAllCreditsAndDebits |
-| 9.4       | FR8.4 | TestEZShopFR8.testComputeBalance |
 
 
 # Coverage of Non Functional Requirements
