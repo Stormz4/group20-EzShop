@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
 public class TestEZShopFR7 {
 
     EZShop ez;
-    Integer uId, productID, saleTransactionID, returnTransactionID;
+    Integer saleTransactionID, returnTransactionID;
     String barCode = "1234567890128";
     private SQLiteDB shopDB;
     private static final int defaultID = -1;
@@ -150,14 +150,13 @@ public class TestEZShopFR7 {
     }
 
     @After
-    public void teardown() throws InvalidPasswordException, InvalidUsernameException, UnauthorizedException, InvalidProductIdException, InvalidTransactionIdException, InvalidProductCodeException {
+    public void teardown() {
         this.shopDB.closeConnection();
 
         // Check closeConnection
         assertFalse(shopDB.isConnected());
     }
 
-    // TODO le delete ripristinano il DB (aggiornare i test di conseguenza)
     /* All the following test methods need to define a saleTransaction or a returnTransaction first
      * So, every following test will include the first part (without payment) either Scenario 6.1 (if a saleTransaction is needed)
      * or Scenario 8.1 (if a returnTransaction is needed)
@@ -237,7 +236,7 @@ public class TestEZShopFR7 {
     /** This test method checks whether error return values or exception are raised as expected
     */
     @Test
-    public void testAllCasesReceive() throws UnauthorizedException, InvalidTransactionIdException, InvalidCreditCardException, InvalidQuantityException, InvalidProductCodeException, InvalidPaymentException, InvalidProductIdException {
+    public void testAllCasesReceive() throws UnauthorizedException, InvalidTransactionIdException, InvalidCreditCardException, InvalidQuantityException, InvalidProductCodeException, InvalidPaymentException, InvalidProductIdException, InvalidPasswordException, InvalidUsernameException {
         String creditCard = "4485370086510891";
 
         // Test receiveCreditCardPayment
@@ -266,11 +265,68 @@ public class TestEZShopFR7 {
         // Handle Payment by Cash
         assertTrue(ez.receiveCashPayment(saleTransactionID, 0.25) == -1); // Insufficient money
         Integer finalSaleTransactionID1 = saleTransactionID;
+        assertThrows(InvalidTransactionIdException.class, () -> ez.receiveCashPayment(0, 25)); // Invalid Transaction ID
         assertThrows(InvalidTransactionIdException.class, () -> ez.receiveCashPayment(-1, 25)); // Invalid Transaction ID
         assertThrows(InvalidPaymentException.class, () -> ez.receiveCashPayment(finalSaleTransactionID1, -1)); // Negative cash
 
         // Test User authentication on both receiveCreditCardPayment and receiveCashPayment
+
+        // Create saleTransaction for next test
+        saleTransactionID = ez.startSaleTransaction();
+        assertTrue(saleTransactionID > 0);
+        assertTrue(ez.updateQuantity(ez.getProductTypeByBarCode(barCode).getId(), 2));
+        assertTrue(ez.addProductToSale(saleTransactionID, barCode, 2));
+        assertTrue(ez.endSaleTransaction(saleTransactionID));
         ez.logout();
+
+        // receiveCashPayment, but User is ShopManager
+        ez.login("aldo", "pwd");
+        assertTrue(ez.receiveCashPayment(saleTransactionID, 10000) >= 0);
+        ez.logout();
+
+        // Create saleTransaction for next test
+        ez.login("testUser00", "pwd");
+        saleTransactionID = ez.startSaleTransaction();
+        assertTrue(saleTransactionID > 0);
+        assertTrue(ez.updateQuantity(ez.getProductTypeByBarCode(barCode).getId(), 2));
+        assertTrue(ez.addProductToSale(saleTransactionID, barCode, 2));
+        assertTrue(ez.endSaleTransaction(saleTransactionID));
+        ez.logout();
+
+        // receiveCreditCardPayment, but User is ShopManager
+        ez.login("aldo", "pwd");
+        assertTrue(ez.receiveCreditCardPayment(saleTransactionID, creditCard));
+        ez.logout();
+
+        // Create saleTransaction for next test
+        ez.login("testUser00", "pwd");
+        saleTransactionID = ez.startSaleTransaction();
+        assertTrue(saleTransactionID > 0);
+        assertTrue(ez.updateQuantity(ez.getProductTypeByBarCode(barCode).getId(), 2));
+        assertTrue(ez.addProductToSale(saleTransactionID, barCode, 2));
+        assertTrue(ez.endSaleTransaction(saleTransactionID));
+        ez.logout();
+
+        // receiveCashPayment, but User is Cashier
+        ez.login("cashier", "cashier");
+        assertTrue(ez.receiveCashPayment(saleTransactionID, 10000) >= 0);
+        ez.logout();
+
+        // Create saleTransaction for next test
+        ez.login("testUser00", "pwd");
+        saleTransactionID = ez.startSaleTransaction();
+        assertTrue(saleTransactionID > 0);
+        assertTrue(ez.updateQuantity(ez.getProductTypeByBarCode(barCode).getId(), 2));
+        assertTrue(ez.addProductToSale(saleTransactionID, barCode, 2));
+        assertTrue(ez.endSaleTransaction(saleTransactionID));
+        ez.logout();
+
+        // receiveCreditCardPayment, but User is Cashier
+        ez.login("cashier", "cashier");
+        assertTrue(ez.receiveCreditCardPayment(saleTransactionID, creditCard));
+        ez.logout();
+
+        // No User logged in, expected UnauthorizedException
         assertThrows(UnauthorizedException.class, () -> ez.receiveCashPayment(finalSaleTransactionID1, 10.0));
         assertThrows(UnauthorizedException.class, () -> ez.receiveCreditCardPayment(finalSaleTransactionID1, creditCard));
     }
@@ -346,12 +402,12 @@ public class TestEZShopFR7 {
     /** This test method checks whether error return values or exception are raised as expected
      */
     @Test
-    public void testAllCasesReturn() throws UnauthorizedException, InvalidQuantityException, InvalidTransactionIdException, InvalidProductCodeException, InvalidPaymentException, InvalidCreditCardException {
+    public void testAllCasesReturn() throws UnauthorizedException, InvalidQuantityException, InvalidTransactionIdException, InvalidProductCodeException, InvalidPaymentException, InvalidCreditCardException, InvalidPasswordException, InvalidUsernameException, InvalidProductIdException {
         String creditCard = "4485370086510891"; // Credit Card is registered
         // Create and complete saleTransaction for the following returnTransaction to test
         saleTransactionID = ez.startSaleTransaction();
         assertTrue(saleTransactionID > 0);
-        assertTrue(ez.addProductToSale(saleTransactionID, barCode, 2));
+        assertTrue(ez.addProductToSale(saleTransactionID, barCode, 7));
         assertTrue(ez.endSaleTransaction(saleTransactionID));
         assertTrue(ez.receiveCashPayment(saleTransactionID, 10000) >= 0);
 
@@ -374,7 +430,7 @@ public class TestEZShopFR7 {
         assertTrue(returnTransactionID > 0);
         assertTrue(ez.returnProduct(returnTransactionID, barCode, 1));
 
-        // Test returnCashPayment
+        // Test returnCashPayment other cases
         assertFalse(ez.returnCashPayment(returnTransactionID) != -1); // the transaction is not closed
         assertTrue(ez.endReturnTransaction(returnTransactionID, true)); // close the returnTransaction
         assertTrue(ez.deleteReturnTransaction(returnTransactionID)); // delete the returnTransaction
@@ -382,11 +438,59 @@ public class TestEZShopFR7 {
         assertThrows(InvalidTransactionIdException.class, () -> ez.returnCashPayment(-1));
 
         // Test authentication for both returnCreditCardPayment and returnCashPayment
+        // Create returnTransaction for next test
+        returnTransactionID = ez.startReturnTransaction(saleTransactionID);
+        assertTrue(returnTransactionID > 0);
+        assertTrue(ez.returnProduct(returnTransactionID, barCode, 1));
+        assertTrue(ez.endReturnTransaction(returnTransactionID, true)); // close the returnTransaction
+        ez.logout();
+
+        // returnCreditCardPayment, but User is ShopManager
+        ez.login("aldo", "pwd");
+        assertTrue(ez.returnCreditCardPayment(returnTransactionID, creditCard) >= 0);
+        ez.logout();
+
+        // Create returnTransaction for next test
+        ez.login("testUser00", "pwd");
+        returnTransactionID = ez.startReturnTransaction(saleTransactionID);
+        assertTrue(returnTransactionID > 0);
+        assertTrue(ez.returnProduct(returnTransactionID, barCode, 1));
+        assertTrue(ez.endReturnTransaction(returnTransactionID, true)); // close the returnTransaction
+        ez.logout();
+
+        // returnCashPayment, but User is ShopManager
+        ez.login("aldo", "pwd");
+        assertTrue(ez.returnCashPayment(returnTransactionID) >= 0);
+        ez.logout();
+
+        // Create returnTransaction for next test
+        ez.login("testUser00", "pwd");
+        returnTransactionID = ez.startReturnTransaction(saleTransactionID);
+        assertTrue(returnTransactionID > 0);
+        assertTrue(ez.returnProduct(returnTransactionID, barCode, 1));
+        assertTrue(ez.endReturnTransaction(returnTransactionID, true)); // close the returnTransaction
+        ez.logout();
+
+        // returnCreditCardPayment, but User is Cashier
+        ez.login("cashier", "cashier");
+        assertTrue(ez.returnCreditCardPayment(returnTransactionID, creditCard) >= 0);
+        ez.logout();
+
+        // Create returnTransaction for next test
+        ez.login("testUser00", "pwd");
+        returnTransactionID = ez.startReturnTransaction(saleTransactionID);
+        assertTrue(returnTransactionID > 0);
+        assertTrue(ez.returnProduct(returnTransactionID, barCode, 1));
+        assertTrue(ez.endReturnTransaction(returnTransactionID, true)); // close the returnTransaction
+        ez.logout();
+
+        // returnCashPayment, but User is Cashier
+        ez.login("cashier", "cashier");
+        assertTrue(ez.returnCashPayment(returnTransactionID) >= 0);
         ez.logout();
         Integer finalReturnTransactionID1 = returnTransactionID;
         assertThrows(UnauthorizedException.class, () -> ez.returnCreditCardPayment(finalReturnTransactionID1, creditCard));
         assertThrows(UnauthorizedException.class, () -> ez.returnCashPayment(finalReturnTransactionID1));
-        returnTransactionID = null;
     }
 
 }

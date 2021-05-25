@@ -441,7 +441,7 @@ public class SQLiteDB {
         if (dbConnection == null)
             return defaultValue;
 
-        double startingBalance = 50000;
+        double startingBalance = 0;
         double totalBalance = 0;
 
         try{
