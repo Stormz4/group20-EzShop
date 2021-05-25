@@ -62,6 +62,8 @@ public class TestEZShopFR3 {
         ezShop.createProductType("Description 1", "1345334543427", 1.00, "Note 1");
         ezShop.createProductType("Description 2", "4532344529689", 2.00, "Note 2");
         ezShop.createProductType("Description 3", "5839274928315", 3.00, "Note 3");
+        ezShop.createProductType("Description", "1627482847283", 4.00, "Note 4");
+        ezShop.createProductType("Description", "4778293942845", 5.00, "Note 5");
     }
 
     @Test
@@ -318,6 +320,38 @@ public class TestEZShopFR3 {
         ezShop.logout();
         assertThrows(UnauthorizedException.class, () -> {
             ezShop.getProductTypeByBarCode("B4RC0D3");
+        });
+    }
+
+    @Test
+    public void testGetProductTypesByDescription() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidPasswordException, InvalidUsernameException {
+        this.addSomeProductToTest();
+
+        // Check with empty description
+        assertEquals(0, ezShop.getProductTypesByDescription("").size());
+
+        // Check with null description (which should be treated as an empty string)
+        assertEquals(0, ezShop.getProductTypesByDescription(null).size());
+
+        // Check with existing description
+        assertEquals(2, ezShop.getProductTypesByDescription("Description").size());
+
+        // Check authorization for ShopManager
+        ezShop.logout();
+        ezShop.login("manager", "manager");
+        assertEquals(2, ezShop.getProductTypesByDescription("Description").size());
+
+        // Check authorization for Cashier
+        ezShop.logout();
+        ezShop.login("cashier", "cashier");
+        assertThrows(UnauthorizedException.class, () -> {
+            assertEquals(2, ezShop.getProductTypesByDescription("Description").size());
+        });
+
+        // Check authorization when no user is logged in
+        ezShop.logout();
+        assertThrows(UnauthorizedException.class, () -> {
+            assertEquals(2, ezShop.getProductTypesByDescription("Description").size());
         });
     }
 }

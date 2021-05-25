@@ -438,14 +438,15 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public List<ProductType> getProductTypesByDescription(String description) throws UnauthorizedException {
-
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
             throw new UnauthorizedException();
-        }
-        List<ProductType> filteredList = getAllProductTypes();
 
-        // Doesn't match the description: remove.
-        filteredList.removeIf(product -> !(product.getProductDescription().equals(description)));
+        String desc = description != null ? description : "";
+
+        List<ProductType> filteredList = getAllProductTypes();
+        // If product doesn't match the description, remove it from the list.
+        filteredList.removeIf(product -> !(product.getProductDescription().equals(desc)));
+
         return filteredList;
     }
 
