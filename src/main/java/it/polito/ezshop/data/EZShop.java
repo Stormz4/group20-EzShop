@@ -5,14 +5,12 @@ import it.polito.ezshop.exceptions.*;
 import java.io.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.HashMap;
 import java.util.List;
 import java.lang.Math;
 import java.util.stream.Collectors;
 
-import static it.polito.ezshop.data.EZBalanceOperation.*;
 import static it.polito.ezshop.data.EZReturnTransaction.*;
 import static it.polito.ezshop.data.EZOrder.*;
 import static it.polito.ezshop.data.EZUser.*;
@@ -1351,7 +1349,7 @@ public class EZShop implements EZShopInterface {
             return -1;
         ezSaleTransactions.get(sale.getTicketNumber()).setStatus(EZSaleTransaction.STPayed);
 
-        if(!recordBalanceUpdate(toBePayed)) {
+        if(!recordBalanceUpdateCashierAllowed(toBePayed)) {
             this.shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), sale.getPrice(), EZSaleTransaction.STClosed);
             ezSaleTransactions.get(sale.getTicketNumber()).setStatus(EZSaleTransaction.STClosed);
             return -1; // return -1 if DB connection problems occur
@@ -1389,7 +1387,7 @@ public class EZShop implements EZShopInterface {
             return false;
         ezSaleTransactions.get(sale.getTicketNumber()).setStatus(EZSaleTransaction.STPayed);
 
-        if(!recordBalanceUpdate(sale.getPrice())) {
+        if(!recordBalanceUpdateCashierAllowed(sale.getPrice())) {
             this.shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), sale.getPrice(), EZSaleTransaction.STClosed);
             ezSaleTransactions.get(sale.getTicketNumber()).setStatus(EZSaleTransaction.STClosed);
             return false; // return false if DB connection problems occur
@@ -1420,7 +1418,7 @@ public class EZShop implements EZShopInterface {
 
         double returnedMoney = retTr.getReturnedValue();
 
-        if(!recordBalanceUpdate(-returnedMoney))
+        if(!recordBalanceUpdateCashierAllowed(-returnedMoney))
             return -1; // return -1 if DB connection problems occur
 
         return returnedMoney;
@@ -1448,7 +1446,7 @@ public class EZShop implements EZShopInterface {
 
         double returnedMoney = retTr.getReturnedValue();
 
-        if(!recordBalanceUpdate(-returnedMoney))
+        if(!recordBalanceUpdateCashierAllowed(-returnedMoney))
             return defaultID; // return -1 if DB connection problems occur
 
         if(!updateCreditInTXTbyCardNumber(creditCard, +(retTr.getReturnedValue())))
@@ -1464,6 +1462,16 @@ public class EZShop implements EZShopInterface {
     @Override
     public boolean recordBalanceUpdate(double toBeAdded) throws UnauthorizedException {
         if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager) )
+            throw new UnauthorizedException();
+
+        double balanceValue = (this.shopDB != null && this.shopDB.isConnected()) ? shopDB.selectTotalBalance() : 0;
+        if(accountingBook == null)
+            accountingBook = new EZAccountBook(balanceValue);
+        return accountingBook.addBalanceOperation(shopDB, toBeAdded, ezBalanceOperations);
+    }
+
+    public boolean recordBalanceUpdateCashierAllowed(double toBeAdded) throws UnauthorizedException {
+        if( this.currUser == null || !this.currUser.hasRequiredRole(URCashier, URAdministrator, URShopManager) )
             throw new UnauthorizedException();
 
         double balanceValue = (this.shopDB != null && this.shopDB.isConnected()) ? shopDB.selectTotalBalance() : 0;
