@@ -223,19 +223,20 @@ public class EZShop implements EZShopInterface {
          * @throws InvalidUsernameException if the username is empty or null
          * @throws InvalidPasswordException if the password is empty or null
          */
-        if (username == null || username.isEmpty()){
+        if (this.currUser != null)
+            return null;
+
+        if (username == null || username.isEmpty())
             throw new InvalidUsernameException();
-        }
-        if (password == null || password.isEmpty()){
+
+        if (password == null || password.isEmpty())
             throw new InvalidPasswordException();
-        }
 
         //
         // Iterate the map and search the user
         for (EZUser user : ezUsers.values()) {
-            if (user.getPassword().equals(password) && user.getUsername().equals(username)){
+            if (user.getPassword().equals(password) && user.getUsername().equals(username))
                 this.currUser = user;
-            }
         }
 
         return currUser;
@@ -395,7 +396,7 @@ public class EZShop implements EZShopInterface {
         if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
             throw new UnauthorizedException();
 
-        if (id == null || id<=0)
+        if (id == null || id <= 0)
             throw new InvalidProductIdException();
 
         if (!ezProducts.containsKey(id))
@@ -415,8 +416,7 @@ public class EZShop implements EZShopInterface {
             throw new UnauthorizedException();
         }
 
-        List<ProductType> prodList = new LinkedList<>(ezProducts.values());
-        return prodList;
+        return ezProducts != null ? new LinkedList<>(ezProducts.values()) : new LinkedList<>();
     }
 
     @Override

@@ -110,19 +110,9 @@ public class TestEZShopFR3 {
         // Logout in order to check that UnauthorizedException precedes any other exception
         ezShop.logout();
 
-        // UnauthorizedException should precede InvalidProductDescriptionException
+        // UnauthorizedException should precede other exceptions
         assertThrows(UnauthorizedException.class, () -> {
-            ezShop.createProductType(null, prodCode, pricePerUnit,prodNote);
-        });
-
-        // UnauthorizedException should precede InvalidProductCodeException
-        assertThrows(UnauthorizedException.class, () -> {
-            ezShop.createProductType(prodDescription, null, pricePerUnit, prodNote);
-        });
-
-        // UnauthorizedException should precede InvalidPricePerUnitException
-        assertThrows(UnauthorizedException.class, () -> {
-            ezShop.createProductType(prodDescription, prodCode, -2.50, prodNote);
+            ezShop.createProductType(null, null, -2.50, prodNote);
         });
     }
 
@@ -210,7 +200,46 @@ public class TestEZShopFR3 {
     }
 
     @Test
-    public void testDeleteProduct() {
+    public void testDeleteProduct() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidProductIdException, InvalidPasswordException, InvalidUsernameException {
+        // Check proper deletion as admin
+        productID = ezShop.createProductType("Product description", "3738456849238", 2.50, "Prod note");
+        assertTrue(ezShop.deleteProductType(productID));
 
+        // Check deletion with inexistent id
+        assertFalse(ezShop.deleteProductType(productID));
+
+        // Check proper deletion as shop manager
+        ezShop.logout();
+        ezShop.login("manager", "manager");
+        productID = ezShop.createProductType("Product description", "3738456849238", 2.50, "Prod note");
+        assertTrue(ezShop.deleteProductType(productID));
+
+        // Check deletion with null id
+        assertThrows(InvalidProductIdException.class, () -> {
+            ezShop.deleteProductType(null);
+        });
+
+        // Check deletion with invalid id
+        assertThrows(InvalidProductIdException.class, () -> {
+            ezShop.deleteProductType(defaultID);
+        });
+
+        // Check deletion if DB's connection is not opened
+        productID = ezShop.createProductType("Product description", "3738456849238", 2.50, "Prod note");
+        this.shopDB.closeConnection();
+        assertFalse(ezShop.deleteProductType(productID));
+
+        // Check unauthorizedException if logged user is Cashier
+        ezShop.logout();
+        ezShop.login("cashier", "cashier");
+        assertThrows(UnauthorizedException.class, () -> {
+            ezShop.deleteProductType(defaultID);
+        });
+
+        // No user logged
+        ezShop.logout();
+        assertThrows(UnauthorizedException.class, () -> {
+            ezShop.deleteProductType(defaultID);
+        });
     }
 }
