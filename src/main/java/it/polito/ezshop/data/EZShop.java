@@ -345,27 +345,23 @@ public class EZShop implements EZShopInterface {
     //================================================================================================================//
     @Override
     public boolean updateQuantity(Integer productId, int toBeAdded) throws InvalidProductIdException, UnauthorizedException {
-        if (productId == null || productId<=0){
-            throw new InvalidProductIdException();
-        }
-        if (!ezProducts.containsKey(productId)) {
-            return false;
-        }
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
+        if (this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
             throw new UnauthorizedException();
-        }
+
+        if (productId == null || productId <= 0)
+            throw new InvalidProductIdException();
+
+        if (!ezProducts.containsKey(productId))
+            return false;
 
         EZProductType prodType = ezProducts.get(productId);
-        if ((toBeAdded > 0) || (toBeAdded < 0 && prodType.getQuantity() > Math.abs(toBeAdded))){
-                    // If i need to remove 50 quantity (oBeAdded = -50), i must have quanity > abs(50).
-            int q = prodType.getQuantity();
+        if ((toBeAdded > 0) || (toBeAdded < 0 && prodType.getQuantity() >= Math.abs(toBeAdded))) {
+            int newQuantity = prodType.getQuantity() + toBeAdded;
 
-
-            boolean success = shopDB.updateProductType(productId, q+toBeAdded, prodType.getLocation(), prodType.getNote(), prodType.getProductDescription(), prodType.getBarCode(), prodType.getPricePerUnit());
-            if (!success)
+            if (!shopDB.updateProductType(productId, newQuantity, prodType.getLocation(), prodType.getNote(), prodType.getProductDescription(), prodType.getBarCode(), prodType.getPricePerUnit()))
                 return false;
 
-            prodType.setQuantity(toBeAdded+q);
+            prodType.setQuantity(newQuantity);
             ezProducts.replace(productId, prodType);
 
             return true;
