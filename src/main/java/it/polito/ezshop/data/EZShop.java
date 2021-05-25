@@ -223,19 +223,20 @@ public class EZShop implements EZShopInterface {
          * @throws InvalidUsernameException if the username is empty or null
          * @throws InvalidPasswordException if the password is empty or null
          */
-        if (username == null || username.isEmpty()){
+        if (this.currUser != null)
+            return null;
+
+        if (username == null || username.isEmpty())
             throw new InvalidUsernameException();
-        }
-        if (password == null || password.isEmpty()){
+
+        if (password == null || password.isEmpty())
             throw new InvalidPasswordException();
-        }
 
         //
         // Iterate the map and search the user
         for (EZUser user : ezUsers.values()) {
-            if (user.getPassword().equals(password) && user.getUsername().equals(username)){
+            if (user.getPassword().equals(password) && user.getUsername().equals(username))
                 this.currUser = user;
-            }
         }
 
         return currUser;
@@ -243,18 +244,17 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean logout() {
-        if (currUser == null){
+        if (currUser == null)
             return false;
-        }
+
         currUser = null;
         return true;
     }
 
     static public boolean isValidBarCode(String barCode){
 
-        if (barCode == null){
+        if (barCode == null)
             return false;
-        }
 
         if (barCode.matches("[0-9]{12,14}")){
             int sum=0;
@@ -311,30 +311,33 @@ public class EZShop implements EZShopInterface {
     */
 
 
+    //================================================================================================================//
+    //                                                Manage Products                                                 //
+    //================================================================================================================//
     @Override
     public Integer createProductType(String description, String productCode, double pricePerUnit, String note) throws InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException {
-        if (description == null || description.isEmpty() ) {
-            throw new InvalidProductDescriptionException();
-        }
-        if (productCode == null || productCode.isEmpty() || !isValidBarCode(productCode)) {
-            throw new InvalidProductCodeException();
-        }
-        if(pricePerUnit <=0){
-            throw new InvalidPricePerUnitException();
-        }
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
             throw new UnauthorizedException();
-        }
+
+        if (description == null || description.isEmpty() )
+            throw new InvalidProductDescriptionException();
+
+        if (productCode == null || productCode.isEmpty() || !isValidBarCode(productCode))
+            throw new InvalidProductCodeException();
+
+        if(pricePerUnit <= 0)
+            throw new InvalidPricePerUnitException();
 
         // Check if the Barcode is unique
         for (ProductType product : ezProducts.values()) {
             if (product.getBarCode().equals(productCode)) {
-                return -1;
+                return defaultID;
             }
         }
-        if (note == null){
-            note="";
-        }
+
+        if (note == null)
+            note = "";
+
         Integer id = shopDB.insertProductType(0, "", note, description, productCode, pricePerUnit);
         // Get the highest ID from the DB
 
@@ -352,31 +355,27 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean updateProduct(Integer id, String newDescription, String newCode, double newPrice, String newNote) throws InvalidProductIdException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException {
-
-        if (id == null || id<=0){
-            throw new InvalidProductIdException();
-        }
-
-        if (!ezProducts.containsKey(id)) {
-            return false;
-        }
-
-        if (newDescription == null || newDescription.isEmpty() ) {
-            throw new InvalidProductDescriptionException();
-        }
-        if (newCode == null || newCode.isEmpty() || !isValidBarCode(newCode)) {
-            throw new InvalidProductCodeException();
-        }
-        if(newPrice <=0){
-            throw new InvalidPricePerUnitException();
-        }
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
             throw new UnauthorizedException();
-        }
+
+        if (id == null || id <= 0)
+            throw new InvalidProductIdException();
+
+        if (newCode == null || newCode.isEmpty() || !isValidBarCode(newCode))
+            throw new InvalidProductCodeException();
+
+        if (newDescription == null || newDescription.isEmpty())
+            throw new InvalidProductDescriptionException();
+
+        if(newPrice <= 0)
+            throw new InvalidPricePerUnitException();
+
+        if (!ezProducts.containsKey(id))
+            return false;
 
         // Check if the Barcode is unique
         for (EZProductType product : ezProducts.values()) {
-            if (product.getBarCode().equals(newCode) && product.getId() != id)
+            if (product.getBarCode().equals(newCode) && !product.getId().equals(id))
                 return false;
         }
 
@@ -396,18 +395,16 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean deleteProductType(Integer id) throws InvalidProductIdException, UnauthorizedException {
-        if (id == null || id<=0){
-            throw new InvalidProductIdException();
-        }
-        if (!ezProducts.containsKey(id)) {
-            return false;
-        }
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
             throw new UnauthorizedException();
-        }
 
-        boolean success=shopDB.deleteProductType(id);
-        if (!success)
+        if (id == null || id <= 0)
+            throw new InvalidProductIdException();
+
+        if (!ezProducts.containsKey(id))
+            return false;
+
+        if (!shopDB.deleteProductType(id))
             return false;
 
         ezProducts.remove(id);
@@ -417,28 +414,23 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public List<ProductType> getAllProductTypes() throws UnauthorizedException {
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier))
             throw new UnauthorizedException();
-        }
 
-        List<ProductType> prodList = new LinkedList<>(ezProducts.values());
-        return prodList;
+        return ezProducts != null ? new LinkedList<>(ezProducts.values()) : new LinkedList<>();
     }
 
     @Override
     public ProductType getProductTypeByBarCode(String barCode) throws InvalidProductCodeException, UnauthorizedException {
-        if (barCode == null || barCode.isEmpty() || !isValidBarCode(barCode)) {
-            throw new InvalidProductCodeException();
-        }
-
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
+        if (this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
             throw new UnauthorizedException();
-        }
+
+        if (barCode == null || barCode.isEmpty() || !isValidBarCode(barCode))
+            throw new InvalidProductCodeException();
 
         for (ProductType product : ezProducts.values()) {
-            if (product.getBarCode().equals(barCode)) {
+            if (product.getBarCode().equals(barCode))
                 return product;
-            }
         }
 
         return null;
@@ -446,17 +438,22 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public List<ProductType> getProductTypesByDescription(String description) throws UnauthorizedException {
-
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
             throw new UnauthorizedException();
-        }
-        List<ProductType> filteredList = getAllProductTypes();
 
-        // Doesn't match the description: remove.
-        filteredList.removeIf(product -> !(product.getProductDescription().equals(description)));
+        String desc = description != null ? description : "";
+
+        List<ProductType> filteredList = getAllProductTypes();
+        // If product doesn't match the description, remove it from the list.
+        filteredList.removeIf(product -> !(product.getProductDescription().equals(desc)));
+
         return filteredList;
     }
 
+
+    //================================================================================================================//
+    //                                          Manage Inventory and Orders                                           //
+    //================================================================================================================//
     @Override
     public boolean updateQuantity(Integer productId, int toBeAdded) throws InvalidProductIdException, UnauthorizedException {
         if (productId == null || productId<=0){
@@ -485,7 +482,6 @@ public class EZShop implements EZShopInterface {
             return true;
         }
 
-
         return false;
     }
 
@@ -495,6 +491,7 @@ public class EZShop implements EZShopInterface {
 
         return newPos.matches("[0-9]+-[a-zA-z]+-[0-9]+");
     }
+
     @Override
     public boolean updatePosition(Integer productId, String newPos) throws InvalidProductIdException, InvalidLocationException, UnauthorizedException {
         if (productId == null || productId<=0){
@@ -575,27 +572,6 @@ public class EZShop implements EZShopInterface {
         return orderID;
     }
 
-    /**
-     * This method directly orders and pays <quantity> units of product with given <productCode>, each unit will be payed
-     * <pricePerUnit> to the supplier. <pricePerUnit> can differ from the re-selling price of the same product. The
-     * product might have no location assigned in this step.
-     * This method affects the balance of the system.
-     * It can be invoked only after a user with role "Administrator" or "ShopManager" is logged in.
-     *
-     * @param productCode the code of the product to be ordered
-     * @param quantity the quantity of product to be ordered
-     * @param pricePerUnit the price to correspond to the supplier (!= than the resale price of the shop) per unit of
-     *                     product
-     *
-     * @return  the id of the order (> 0)
-     *          -1 if the product does not exists, if the balance is not enough to satisfy the order, if there are some
-     *          problems with the db
-     *
-     * @throws InvalidProductCodeException if the productCode is not a valid bar code, if it is null or if it is empty
-     * @throws InvalidQuantityException if the quantity is less than or equal to 0
-     * @throws InvalidPricePerUnitException if the price per unit of product is less than or equal to 0
-     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
-     */
     @Override
     public Integer payOrderFor(String productCode, int quantity, double pricePerUnit) throws InvalidProductCodeException, InvalidQuantityException, InvalidPricePerUnitException, UnauthorizedException {
         if (productCode == null || productCode.isEmpty() || !isValidBarCode(productCode)) {
@@ -633,20 +609,6 @@ public class EZShop implements EZShopInterface {
         return order.getOrderId();
     }
 
-    /**
-     * This method change the status the order with given <orderId> into the "PAYED" state. The order should be either
-     * issued (in this case the status changes) or payed (in this case the method has no effect).
-     * This method affects the balance of the system.
-     * It can be invoked only after a user with role "Administrator" or "ShopManager" is logged in.
-     *
-     * @param orderId the id of the order to be ORDERED
-     *
-     * @return  true if the order has been successfully ordered
-     *          false if the order does not exist or if it was not in an ISSUED/ORDERED state
-     *
-     * @throws InvalidOrderIdException if the order id is less than or equal to 0 or if it is null.
-     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
-     */
     @Override
     public boolean payOrder(Integer orderId) throws InvalidOrderIdException, UnauthorizedException {
         if (orderId == null || orderId <=0)
@@ -674,22 +636,6 @@ public class EZShop implements EZShopInterface {
         return true;
     }
 
-    /**
-     * This method records the arrival of an order with given <orderId>. This method changes the quantity of available product.
-     * The product type affected must have a location registered. The order should be either in the PAYED state (in this
-     * case the state will change to the COMPLETED one and the quantity of product type will be updated) or in the
-     * COMPLETED one (in this case this method will have no effect at all).
-     * It can be invoked only after a user with role "Administrator" or "ShopManager" is logged in.
-     *
-     * @param orderId the id of the order that has arrived
-     *
-     * @return  true if the operation was successful
-     *          false if the order does not exist or if it was not in an ORDERED/COMPLETED state
-     *
-     * @throws InvalidOrderIdException if the order id is less than or equal to 0 or if it is null.
-     * @throws InvalidLocationException if the ordered product type has not an assigned location.
-     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
-     */
     @Override
     public boolean recordOrderArrival(Integer orderId) throws InvalidOrderIdException, UnauthorizedException, InvalidLocationException {
         if (orderId == null || orderId <=0)

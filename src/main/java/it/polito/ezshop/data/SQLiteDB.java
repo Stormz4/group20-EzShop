@@ -18,7 +18,7 @@ public class SQLiteDB {
     static final String JDBC_DB_NAME = "EZShopDB.db";
     static final String JDBC_DB_URL = "jdbc:sqlite:src/" + JDBC_DB_NAME;
     static final long MAX_CARDS = 9999999999L;
-    static final int defaultID = -1;
+    public static final int defaultID = -1;
     static final int defaultValue = 0;
     private static final int INTEGER = 4; // see https://docs.oracle.com/javase/8/docs/api/constant-values.html#java.sql.Types.INTEGER
 
