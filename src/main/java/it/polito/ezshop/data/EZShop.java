@@ -392,18 +392,16 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean deleteProductType(Integer id) throws InvalidProductIdException, UnauthorizedException {
-        if (id == null || id<=0){
-            throw new InvalidProductIdException();
-        }
-        if (!ezProducts.containsKey(id)) {
-            return false;
-        }
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
             throw new UnauthorizedException();
-        }
 
-        boolean success=shopDB.deleteProductType(id);
-        if (!success)
+        if (id == null || id<=0)
+            throw new InvalidProductIdException();
+
+        if (!ezProducts.containsKey(id))
+            return false;
+
+        if (!shopDB.deleteProductType(id))
             return false;
 
         ezProducts.remove(id);
