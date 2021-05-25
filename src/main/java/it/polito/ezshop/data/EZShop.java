@@ -5,14 +5,12 @@ import it.polito.ezshop.exceptions.*;
 import java.io.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.HashMap;
 import java.util.List;
 import java.lang.Math;
 import java.util.stream.Collectors;
 
-import static it.polito.ezshop.data.EZBalanceOperation.*;
 import static it.polito.ezshop.data.EZReturnTransaction.*;
 import static it.polito.ezshop.data.EZOrder.*;
 import static it.polito.ezshop.data.EZUser.*;
@@ -39,6 +37,9 @@ public class EZShop implements EZShopInterface {
     private HashMap<Integer, EZReturnTransaction> ezReturnTransactions;
     private EZSaleTransaction tmpSaleTransaction;
 
+    //================================================================================================================//
+    //                                                  Constructor                                                   //
+    //================================================================================================================//
     public EZShop() {
         this.loadDataFromDB();
 
@@ -46,40 +47,10 @@ public class EZShop implements EZShopInterface {
         accountingBook.setCurrentBalance(shopDB.selectTotalBalance()); // starting balance
     }
 
-    public void  loadDataFromDB() {
-        if ( !this.shopDB.isConnected() )
-            shopDB.connect();
-        shopDB.initDatabase();
 
-        if (ezBalanceOperations == null)
-            ezBalanceOperations = shopDB.selectAllBalanceOperations();
-
-        if (ezCards == null)
-            ezCards = shopDB.selectAllCards();
-
-        if (ezCustomers == null)
-            ezCustomers = shopDB.selectAllCustomers();
-
-        if (ezOrders == null)
-            ezOrders = shopDB.selectAllOrders();
-
-        if (ezProducts == null)
-            ezProducts = shopDB.selectAllProductTypes();
-
-        if (ezSaleTransactions == null)
-            ezSaleTransactions = shopDB.selectAllSaleTransactions();
-
-        if (ezUsers == null)
-            ezUsers = shopDB.selectAllUsers();
-    }
-
-    private void clearData() {
-        ezBalanceOperations = null;
-        ezOrders = null;
-        ezProducts = null;
-        ezSaleTransactions = null;
-    }
-
+    //================================================================================================================//
+    //                                    Reset the application to its base state                                     //
+    //================================================================================================================//
     @Override
     public void reset() {
         if ( !this.shopDB.isConnected() )
@@ -89,6 +60,10 @@ public class EZShop implements EZShopInterface {
             this.clearData();
     }
 
+
+    //================================================================================================================//
+    //                                            Manage users and rights                                             //
+    //================================================================================================================//
     @Override
     public Integer createUser(String username, String password, String role) throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
         if (username == null || username.isEmpty() ) {
@@ -146,9 +121,8 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public List<User> getAllUsers() throws UnauthorizedException {
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator)){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator))
             throw new UnauthorizedException();
-        }
 
         List<User> usersList = new LinkedList<>(ezUsers.values());
         return usersList;
@@ -156,17 +130,14 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public User getUser(Integer id) throws InvalidUserIdException, UnauthorizedException {
-        if (id == null || id <=0) {
+        if (id == null || id <= 0)
             throw new InvalidUserIdException();
-        }
 
-        if (!ezUsers.containsKey(id)) {
+        if (!ezUsers.containsKey(id))
             return null;
-        }
 
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator)){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator))
             throw new UnauthorizedException();
-        }
 
         User user = ezUsers.get(id);
         return user;
@@ -174,31 +145,18 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean updateUserRights(Integer id, String role) throws InvalidUserIdException, InvalidRoleException, UnauthorizedException {
-        /**
-         * This method updates the role of a user with given id. It can be invoked only after a user with role "Administrator" is
-         * logged in.
-         *
-         * @param id the id of the user
-         * @param role the new role the user should be assigned to
-         *
-         * @return true if the update was successful, false if the user does not exist
-         *
-         * @throws InvalidUserIdException   if the user Id is less than or equal to 0 or if it is null
-         * @throws InvalidRoleException     if the new role is empty, null or not among one of the following : {"Administrator", "Cashier", "ShopManager"}
-         * @throws UnauthorizedException    if there is no logged user or if it has not the rights to perform the operation
-         */
-        if (id==null || id <=0) {
+        if (id==null || id <=0)
             throw new InvalidUserIdException();
-        }
-        if (!ezUsers.containsKey(id)) {
+
+        if (!ezUsers.containsKey(id))
             return false;
-        }
-        if (role.isEmpty() || !(role.equals(URAdministrator) || role.equals(URCashier) || role.equals(URShopManager))) {
+
+        if (role.isEmpty() || !(role.equals(URAdministrator) || role.equals(URCashier) || role.equals(URShopManager)))
             throw new InvalidRoleException();
-        }
-        if((this.currUser == null) || (!this.currUser.hasRequiredRole(URAdministrator))){
+
+        if((this.currUser == null) || (!this.currUser.hasRequiredRole(URAdministrator)))
             throw new UnauthorizedException();
-        }
+
         EZUser user = ezUsers.get(id);
 
         boolean success = shopDB.updateUser(id, user.getUsername(), user.getPassword(), role);
@@ -212,30 +170,20 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public User login(String username, String password) throws InvalidUsernameException, InvalidPasswordException {
-        /**
-         * This method lets a user with given username and password login into the system
-         *
-         * @param username the username of the user
-         * @param password the password of the user
-         *
-         * @return an object of class User filled with the logged user's data if login is successful, null otherwise ( wrong credentials or db problems)
-         *
-         * @throws InvalidUsernameException if the username is empty or null
-         * @throws InvalidPasswordException if the password is empty or null
-         */
-        if (username == null || username.isEmpty()){
+        if (this.currUser != null)
+            return null;
+
+        if (username == null || username.isEmpty())
             throw new InvalidUsernameException();
-        }
-        if (password == null || password.isEmpty()){
+
+        if (password == null || password.isEmpty())
             throw new InvalidPasswordException();
-        }
 
         //
         // Iterate the map and search the user
         for (EZUser user : ezUsers.values()) {
-            if (user.getPassword().equals(password) && user.getUsername().equals(username)){
+            if (user.getPassword().equals(password) && user.getUsername().equals(username))
                 this.currUser = user;
-            }
         }
 
         return currUser;
@@ -243,98 +191,41 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean logout() {
-        if (currUser == null){
+        if (currUser == null)
             return false;
-        }
+
         currUser = null;
         return true;
     }
 
-    static public boolean isValidBarCode(String barCode){
 
-        if (barCode == null){
-            return false;
-        }
-
-        if (barCode.matches("[0-9]{12,14}")){
-            int sum=0;
-            int number=0;
-            for(int i=0; i<barCode.length()-1; i++){
-                number=Integer.parseInt(Character.toString(barCode.charAt(i)));
-                if (barCode.length() == 12 || barCode.length()==14){
-                    if (!(i%2==1)){
-                        number=number*3;
-                    }
-                }
-                else {
-                    if (!(i % 2 == 0)) {
-                        number = number * 3;
-                    }
-                }
-                // else number = number*1;
-                sum = sum+number;
-            }
-            // Now find the nearest multiple of 10 and subtract sum from it
-
-            // Return of closest of two
-            int result = (10-sum%10)+sum;
-            if ((result-sum)==Integer.parseInt(Character.toString(barCode.charAt(barCode.length()-1)))){
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-
-    /*
-
-    Some valid barCodes (12 digits):
-    1345334543427
-    4532344529689
-    5839274928315
-    4838283913450
-    4778293942845
-    8397489193845
-    1627482847283
-    3738456849238
-    4482847392351
-    7293829484929
-    4738294729395
-    4627828478338
-    4892937849335
-    4839947221225
-    1881930382935
-    4908382312833
-    2141513141144
-
-    */
-
-
+    //================================================================================================================//
+    //                                                Manage Products                                                 //
+    //================================================================================================================//
     @Override
     public Integer createProductType(String description, String productCode, double pricePerUnit, String note) throws InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException {
-        if (description == null || description.isEmpty() ) {
-            throw new InvalidProductDescriptionException();
-        }
-        if (productCode == null || productCode.isEmpty() || !isValidBarCode(productCode)) {
-            throw new InvalidProductCodeException();
-        }
-        if(pricePerUnit <=0){
-            throw new InvalidPricePerUnitException();
-        }
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
             throw new UnauthorizedException();
-        }
+
+        if (description == null || description.isEmpty() )
+            throw new InvalidProductDescriptionException();
+
+        if (productCode == null || productCode.isEmpty() || !isValidBarCode(productCode))
+            throw new InvalidProductCodeException();
+
+        if(pricePerUnit <= 0)
+            throw new InvalidPricePerUnitException();
 
         // Check if the Barcode is unique
         for (ProductType product : ezProducts.values()) {
             if (product.getBarCode().equals(productCode)) {
-                return -1;
+                return defaultID;
             }
         }
-        if (note == null){
-            note="";
-        }
+
+        if (note == null)
+            note = "";
+
         Integer id = shopDB.insertProductType(0, "", note, description, productCode, pricePerUnit);
         // Get the highest ID from the DB
 
@@ -352,31 +243,27 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean updateProduct(Integer id, String newDescription, String newCode, double newPrice, String newNote) throws InvalidProductIdException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException {
-
-        if (id == null || id<=0){
-            throw new InvalidProductIdException();
-        }
-
-        if (!ezProducts.containsKey(id)) {
-            return false;
-        }
-
-        if (newDescription == null || newDescription.isEmpty() ) {
-            throw new InvalidProductDescriptionException();
-        }
-        if (newCode == null || newCode.isEmpty() || !isValidBarCode(newCode)) {
-            throw new InvalidProductCodeException();
-        }
-        if(newPrice <=0){
-            throw new InvalidPricePerUnitException();
-        }
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
             throw new UnauthorizedException();
-        }
+
+        if (id == null || id <= 0)
+            throw new InvalidProductIdException();
+
+        if (newCode == null || newCode.isEmpty() || !isValidBarCode(newCode))
+            throw new InvalidProductCodeException();
+
+        if (newDescription == null || newDescription.isEmpty())
+            throw new InvalidProductDescriptionException();
+
+        if(newPrice <= 0)
+            throw new InvalidPricePerUnitException();
+
+        if (!ezProducts.containsKey(id))
+            return false;
 
         // Check if the Barcode is unique
         for (EZProductType product : ezProducts.values()) {
-            if (product.getBarCode().equals(newCode) && product.getId() != id)
+            if (product.getBarCode().equals(newCode) && !product.getId().equals(id))
                 return false;
         }
 
@@ -391,23 +278,22 @@ public class EZShop implements EZShopInterface {
         prodType.setPricePerUnit(newPrice);
         prodType.setNote(newNote);
         ezProducts.replace(id, prodType);
+
         return true;
     }
 
     @Override
     public boolean deleteProductType(Integer id) throws InvalidProductIdException, UnauthorizedException {
-        if (id == null || id<=0){
-            throw new InvalidProductIdException();
-        }
-        if (!ezProducts.containsKey(id)) {
-            return false;
-        }
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
             throw new UnauthorizedException();
-        }
 
-        boolean success=shopDB.deleteProductType(id);
-        if (!success)
+        if (id == null || id <= 0)
+            throw new InvalidProductIdException();
+
+        if (!ezProducts.containsKey(id))
+            return false;
+
+        if (!shopDB.deleteProductType(id))
             return false;
 
         ezProducts.remove(id);
@@ -417,28 +303,23 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public List<ProductType> getAllProductTypes() throws UnauthorizedException {
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier))
             throw new UnauthorizedException();
-        }
 
-        List<ProductType> prodList = new LinkedList<>(ezProducts.values());
-        return prodList;
+        return ezProducts != null ? new LinkedList<>(ezProducts.values()) : new LinkedList<>();
     }
 
     @Override
     public ProductType getProductTypeByBarCode(String barCode) throws InvalidProductCodeException, UnauthorizedException {
-        if (barCode == null || barCode.isEmpty() || !isValidBarCode(barCode)) {
-            throw new InvalidProductCodeException();
-        }
-
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
+        if (this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
             throw new UnauthorizedException();
-        }
+
+        if (barCode == null || barCode.isEmpty() || !isValidBarCode(barCode))
+            throw new InvalidProductCodeException();
 
         for (ProductType product : ezProducts.values()) {
-            if (product.getBarCode().equals(barCode)) {
+            if (product.getBarCode().equals(barCode))
                 return product;
-            }
         }
 
         return null;
@@ -446,17 +327,22 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public List<ProductType> getProductTypesByDescription(String description) throws UnauthorizedException {
-
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
             throw new UnauthorizedException();
-        }
-        List<ProductType> filteredList = getAllProductTypes();
 
-        // Doesn't match the description: remove.
-        filteredList.removeIf(product -> !(product.getProductDescription().equals(description)));
+        String desc = description != null ? description : "";
+
+        List<ProductType> filteredList = getAllProductTypes();
+        // If product doesn't match the description, remove it from the list.
+        filteredList.removeIf(product -> !(product.getProductDescription().equals(desc)));
+
         return filteredList;
     }
 
+
+    //================================================================================================================//
+    //                                          Manage Inventory and Orders                                           //
+    //================================================================================================================//
     @Override
     public boolean updateQuantity(Integer productId, int toBeAdded) throws InvalidProductIdException, UnauthorizedException {
         if (productId == null || productId<=0){
@@ -485,16 +371,9 @@ public class EZShop implements EZShopInterface {
             return true;
         }
 
-
         return false;
     }
 
-    static public boolean isValidPosition(String newPos){
-        if (newPos == null)
-            return false;
-
-        return newPos.matches("[0-9]+-[a-zA-z]+-[0-9]+");
-    }
     @Override
     public boolean updatePosition(Integer productId, String newPos) throws InvalidProductIdException, InvalidLocationException, UnauthorizedException {
         if (productId == null || productId<=0){
@@ -575,27 +454,6 @@ public class EZShop implements EZShopInterface {
         return orderID;
     }
 
-    /**
-     * This method directly orders and pays <quantity> units of product with given <productCode>, each unit will be payed
-     * <pricePerUnit> to the supplier. <pricePerUnit> can differ from the re-selling price of the same product. The
-     * product might have no location assigned in this step.
-     * This method affects the balance of the system.
-     * It can be invoked only after a user with role "Administrator" or "ShopManager" is logged in.
-     *
-     * @param productCode the code of the product to be ordered
-     * @param quantity the quantity of product to be ordered
-     * @param pricePerUnit the price to correspond to the supplier (!= than the resale price of the shop) per unit of
-     *                     product
-     *
-     * @return  the id of the order (> 0)
-     *          -1 if the product does not exists, if the balance is not enough to satisfy the order, if there are some
-     *          problems with the db
-     *
-     * @throws InvalidProductCodeException if the productCode is not a valid bar code, if it is null or if it is empty
-     * @throws InvalidQuantityException if the quantity is less than or equal to 0
-     * @throws InvalidPricePerUnitException if the price per unit of product is less than or equal to 0
-     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
-     */
     @Override
     public Integer payOrderFor(String productCode, int quantity, double pricePerUnit) throws InvalidProductCodeException, InvalidQuantityException, InvalidPricePerUnitException, UnauthorizedException {
         if (productCode == null || productCode.isEmpty() || !isValidBarCode(productCode)) {
@@ -633,20 +491,6 @@ public class EZShop implements EZShopInterface {
         return order.getOrderId();
     }
 
-    /**
-     * This method change the status the order with given <orderId> into the "PAYED" state. The order should be either
-     * issued (in this case the status changes) or payed (in this case the method has no effect).
-     * This method affects the balance of the system.
-     * It can be invoked only after a user with role "Administrator" or "ShopManager" is logged in.
-     *
-     * @param orderId the id of the order to be ORDERED
-     *
-     * @return  true if the order has been successfully ordered
-     *          false if the order does not exist or if it was not in an ISSUED/ORDERED state
-     *
-     * @throws InvalidOrderIdException if the order id is less than or equal to 0 or if it is null.
-     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
-     */
     @Override
     public boolean payOrder(Integer orderId) throws InvalidOrderIdException, UnauthorizedException {
         if (orderId == null || orderId <=0)
@@ -661,8 +505,11 @@ public class EZShop implements EZShopInterface {
         if(order == null || !(order.getStatus().equals(OSIssued)))
             return false;
 
-        if(!order.getStatus().equals(OSPayed))
-        {
+        // Additional check on balance current value (even if it is not requested by API):
+        if(order.getPricePerUnit()*order.getQuantity() > accountingBook.currentBalance)
+            return false;
+
+        if(!order.getStatus().equals(OSPayed)) {
             if(!recordBalanceUpdate(-(order.getPricePerUnit() * order.getQuantity())))
                 return false;
 
@@ -674,22 +521,6 @@ public class EZShop implements EZShopInterface {
         return true;
     }
 
-    /**
-     * This method records the arrival of an order with given <orderId>. This method changes the quantity of available product.
-     * The product type affected must have a location registered. The order should be either in the PAYED state (in this
-     * case the state will change to the COMPLETED one and the quantity of product type will be updated) or in the
-     * COMPLETED one (in this case this method will have no effect at all).
-     * It can be invoked only after a user with role "Administrator" or "ShopManager" is logged in.
-     *
-     * @param orderId the id of the order that has arrived
-     *
-     * @return  true if the operation was successful
-     *          false if the order does not exist or if it was not in an ORDERED/COMPLETED state
-     *
-     * @throws InvalidOrderIdException if the order id is less than or equal to 0 or if it is null.
-     * @throws InvalidLocationException if the ordered product type has not an assigned location.
-     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
-     */
     @Override
     public boolean recordOrderArrival(Integer orderId) throws InvalidOrderIdException, UnauthorizedException, InvalidLocationException {
         if (orderId == null || orderId <=0)
@@ -750,17 +581,10 @@ public class EZShop implements EZShopInterface {
         return orders;
     }
 
-    /**
-     * This method saves a new customer into the system. The customer's name should be unique.
-     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
-     *
-     * @param customerName the name of the customer to be registered
-     *
-     * @return the id (>0) of the new customer if successful, -1 otherwise
-     *
-     * @throws InvalidCustomerNameException if the customer name is empty or null
-     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
-     */
+
+    //================================================================================================================//
+    //                                          Manage customers and cards                                            //
+    //================================================================================================================//
     @Override
     public Integer defineCustomer(String customerName) throws InvalidCustomerNameException, UnauthorizedException {
         if (customerName == null || customerName.isEmpty()){
@@ -786,34 +610,6 @@ public class EZShop implements EZShopInterface {
         return id;
     }
 
-
-    static public boolean isValidCard(String card){
-        if (card == null)
-            return false;
-
-        return ( card.isEmpty() || card.matches("\\b[0-9]{10}\\b") );
-    }
-
-    /**
-     * This method updates the data of a customer with given <id>. This method can be used to assign/delete a card to a
-     * customer. If <newCustomerCard> has a numeric value than this value will be assigned as new card code, if it is an
-     * empty string then any existing card code connected to the customer will be removed and, finally, it it assumes the
-     * null value then the card code related to the customer should not be affected from the update. The card code should
-     * be unique and should be a string of 10 digits.
-     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
-     *
-     * @param id the id of the customer to be updated
-     * @param newCustomerName the new name to be assigned
-     * @param newCustomerCard the new card code to be assigned. If it is empty it means that the card must be deleted,
-     *                        if it is null then we don't want to update the cardNumber
-     *
-     * @return true if the update is successful
-     *          false if the update fails ( cardCode assigned to another user, db unreacheable)
-     *
-     * @throws InvalidCustomerNameException if the customer name is empty or null
-     * @throws InvalidCustomerCardException if the customer card is empty, null or if it is not in a valid format (string with 10 digits)
-     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
-     */
     @Override
     public boolean modifyCustomer(Integer id, String newCustomerName, String newCustomerCard) throws InvalidCustomerNameException, InvalidCustomerCardException, InvalidCustomerIdException, UnauthorizedException {
 
@@ -915,14 +711,6 @@ public class EZShop implements EZShopInterface {
         return customerList;
     }
 
-    /**
-     * This method returns a string containing the code of a new assignable card.
-     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
-     *
-     * @return the code of a new available card. An empty string if the db is unreachable
-     *
-     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
-     */
     @Override
     public String createCard() throws UnauthorizedException {
         if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier) )
@@ -935,21 +723,6 @@ public class EZShop implements EZShopInterface {
         return cardCode;
     }
 
-    /**
-     * This method assigns a card with given card code to a customer with given identifier. A card with given card code
-     * can be assigned to one customer only.
-     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
-     *
-     * @param customerCard the number of the card to be attached to a customer
-     * @param customerId the id of the customer the card should be assigned to
-     *
-     * @return true if the operation was successful
-     *          false if the card is already assigned to another user, if there is no customer with given id, if the db is unreachable
-     *
-     * @throws InvalidCustomerIdException if the id is null, less than or equal to 0.
-     * @throws InvalidCustomerCardException if the card is null, empty or in an invalid format
-     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
-     */
     @Override
     public boolean attachCardToCustomer(String customerCard, Integer customerId) throws InvalidCustomerIdException, InvalidCustomerCardException, UnauthorizedException {
 
@@ -988,22 +761,6 @@ public class EZShop implements EZShopInterface {
         return attached;
     }
 
-    /**
-     * This method updates the points on a card adding to the number of points available on the card the value assumed by
-     * <pointsToBeAdded>. The points on a card should always be greater than or equal to 0.
-     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
-     *
-     * @param customerCard the card the points should be added to
-     * @param pointsToBeAdded the points to be added or subtracted ( this could assume a negative value)
-     *
-     * @return true if the operation is successful
-     *          false   if there is no card with given code,
-     *                  if pointsToBeAdded is negative and there were not enough points on that card before this operation,
-     *                  if we cannot reach the db.
-     *
-     * @throws InvalidCustomerCardException if the card is null, empty or in an invalid format
-     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
-     */
     @Override
     public boolean modifyPointsOnCard(String customerCard, int pointsToBeAdded) throws InvalidCustomerCardException, UnauthorizedException {
 
@@ -1032,13 +789,10 @@ public class EZShop implements EZShopInterface {
         return false;
     }
 
-    /**
-     * This method starts a new sale transaction and returns its unique identifier.
-     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
-     *
-     * @return the id of the transaction (greater than or equal to 0)
-     */
 
+    //================================================================================================================//
+    //                                           Manage a sale transaction                                            //
+    //================================================================================================================//
     @Override
     public Integer startSaleTransaction() throws UnauthorizedException {
         Integer nextTicketNumber;
@@ -1058,24 +812,6 @@ public class EZShop implements EZShopInterface {
         return nextTicketNumber;
     }
 
-    /**
-     * This method adds a product to a sale transaction decreasing the temporary amount of product available on the
-     * shelves for other customers.
-     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
-     *
-     * @param transactionId the id of the Sale transaction
-     * @param productCode the barcode of the product to be added
-     * @param amount the quantity of product to be added
-     * @return  true if the operation is successful
-     *          false   if the product code does not exist,
-     *                  if the quantity of product cannot satisfy the request,
-     *                  if the transaction id does not identify a started and open transaction.
-     *
-     * @throws InvalidTransactionIdException if the transaction id less than or equal to 0 or if it is null
-     * @throws InvalidProductCodeException if the product code is empty, null or invalid
-     * @throws InvalidQuantityException if the quantity is less than 0
-     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
-     */
     @Override
     public boolean addProductToSale(Integer transactionId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
         EZTicketEntry ticketEntryToAdd;
@@ -1126,25 +862,6 @@ public class EZShop implements EZShopInterface {
         return result;
     }
 
-    /**
-     * This method deletes a product from a sale transaction increasing the temporary amount of product available on the
-     * shelves for other customers.
-     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
-     *
-     * @param transactionId the id of the Sale transaction
-     * @param productCode the barcode of the product to be deleted
-     * @param amount the quantity of product to be deleted
-     *
-     * @return  true if the operation is successful
-     *          false   if the product code does not exist,
-     *                  if the quantity of product cannot satisfy the request,
-     *                  if the transaction id does not identify a started and open transaction.
-     *
-     * @throws InvalidTransactionIdException if the transaction id less than or equal to 0 or if it is null
-     * @throws InvalidProductCodeException if the product code is empty, null or invalid
-     * @throws InvalidQuantityException if the quantity is less than 0
-     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
-     */
     @Override
     public boolean deleteProductFromSale(Integer transactionId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
         EZSaleTransaction saleTransaction;
@@ -1246,25 +963,6 @@ public class EZShop implements EZShopInterface {
         return result;
     }
 
-    /**
-     * This method applies a discount rate to all units of a product type with given type in a sale transaction. The
-     * discount rate should be greater than or equal to 0 and less than 1.
-     * The sale transaction should be started and open.
-     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
-     *
-     * @param transactionId the id of the Sale transaction
-     * @param productCode the barcode of the product to be discounted
-     * @param discountRate the discount rate of the product
-     *
-     * @return  true if the operation is successful
-     *          false   if the product code does not exist,
-     *                  if the transaction id does not identify a started and open transaction.
-     *
-     * @throws InvalidTransactionIdException if the transaction id less than or equal to 0 or if it is null
-     * @throws InvalidProductCodeException if the product code is empty, null or invalid
-     * @throws InvalidDiscountRateException if the discount rate is less than 0 or if it greater than or equal to 1.00
-     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
-     */
     @Override
     public boolean applyDiscountRateToProduct(Integer transactionId, String productCode, double discountRate) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidDiscountRateException, UnauthorizedException {
         EZSaleTransaction saleTransaction;
@@ -1291,22 +989,6 @@ public class EZShop implements EZShopInterface {
         return result;
     }
 
-    /**
-     * This method applies a discount rate to the whole sale transaction.
-     * The discount rate should be greater than or equal to 0 and less than 1.
-     * The sale transaction can be either started or closed but not already payed.
-     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
-     *
-     * @param transactionId the id of the Sale transaction
-     * @param discountRate the discount rate of the sale
-     *
-     * @return  true if the operation is successful
-     *          false if the transaction does not exists
-     *
-     * @throws InvalidTransactionIdException if the transaction id less than or equal to 0 or if it is null
-     * @throws InvalidDiscountRateException if the discount rate is less than 0 or if it greater than or equal to 1.00
-     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
-     */
     @Override
     public boolean applyDiscountRateToSale(Integer transactionId, double discountRate) throws InvalidTransactionIdException, InvalidDiscountRateException, UnauthorizedException {
         EZSaleTransaction saleTransaction;
@@ -1327,20 +1009,6 @@ public class EZShop implements EZShopInterface {
         return result;
     }
 
-    /**
-     * This method returns the number of points granted by a specific sale transaction.
-     * Every 10€ the number of points is increased by 1 (i.e. 19.99€ returns 1 point, 20.00€ returns 2 points).
-     * If the transaction with given id does not exist then the number of points returned should be -1.
-     * The transaction may be in any state (open, closed, payed).
-     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
-     *
-     * @param transactionId the id of the Sale transaction
-     *
-     * @return the points of the sale (1 point for each 10€) or -1 if the transaction does not exists
-     *
-     * @throws InvalidTransactionIdException if the transaction id less than or equal to 0 or if it is null
-     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
-     */
     @Override
     public int computePointsForSale(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
         EZSaleTransaction saleTransaction;
@@ -1356,21 +1024,6 @@ public class EZShop implements EZShopInterface {
         return pointsToAdd;
     }
 
-    /**
-     * This method closes an opened transaction. After this operation the
-     * transaction is persisted in the system's memory.
-     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
-     *
-     * @param transactionId the id of the Sale transaction
-     *
-     * @return  true    if the transaction was successfully closed
-     *          false   if the transaction does not exist,
-     *                  if it has already been closed,
-     *                  if there was a problem in registering the data
-     *
-     * @throws InvalidTransactionIdException if the transaction id less than or equal to 0 or if it is null
-     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
-     */
     @Override
     public boolean endSaleTransaction(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
         EZSaleTransaction saleTransaction;
@@ -1407,17 +1060,6 @@ public class EZShop implements EZShopInterface {
         return result;
     }
 
-    /**
-     * This method returns  a closed sale transaction.
-     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
-     *
-     * @param transactionId the id of the CLOSED Sale transaction
-     *
-     * @return the transaction if it is available (transaction closed), null otherwise
-     *
-     * @throws InvalidTransactionIdException if the transaction id less than or equal to 0 or if it is null
-     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
-     */
     @Override
     public SaleTransaction getSaleTransaction(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
         EZSaleTransaction saleTransaction;
@@ -1428,24 +1070,6 @@ public class EZShop implements EZShopInterface {
         saleTransaction = this.ezSaleTransactions.values().stream()
                 .filter(sale -> sale.getTicketNumber().equals(transactionId) && sale.hasRequiredStatus(EZSaleTransaction.STClosed))
                 .findFirst().orElse(null);
-        return saleTransaction;
-    }
-
-    public BalanceOperation getBalanceOpById(Integer balanceId) {
-        return ezBalanceOperations.get(balanceId);
-    }
-
-    public EZSaleTransaction getSaleTransactionById(Integer saleNumber) {
-        /*
-        EZSaleTransaction saleTransaction;
-        if (this.tmpSaleTransaction.getTicketNumber().equals(saleNumber)) {
-
-            saleTransaction = tmpSaleTransaction;
-        }
-        else
-            saleTransaction = ezSaleTransactions.get(saleNumber);
-         */
-        EZSaleTransaction saleTransaction = this.ezSaleTransactions.get(saleNumber);
         return saleTransaction;
     }
 
@@ -1474,14 +1098,6 @@ public class EZShop implements EZShopInterface {
         tmpRetTr = retTr;
         // return transaction is inserted in the proper lists only in endReturnTransaction() method (if commit == true)
         return retTr.getReturnId();
-    }
-
-    public EZReturnTransaction getReturnTransactionById(Integer returnId) {
-        if(tmpRetTr != null && returnId.equals(tmpRetTr.getReturnId()))
-            return tmpRetTr;
-        if(ezReturnTransactions == null)
-            return null;
-        return ezReturnTransactions.get(returnId);
     }
 
     @Override
@@ -1703,6 +1319,10 @@ public class EZShop implements EZShopInterface {
         return true;
     }
 
+
+    //================================================================================================================//
+    //                                                 Manage payment                                                 //
+    //================================================================================================================//
     @Override
     public double receiveCashPayment(Integer ticketNumber, double cash) throws InvalidTransactionIdException, InvalidPaymentException, UnauthorizedException {
 
@@ -1729,7 +1349,7 @@ public class EZShop implements EZShopInterface {
             return -1;
         ezSaleTransactions.get(sale.getTicketNumber()).setStatus(EZSaleTransaction.STPayed);
 
-        if(!recordBalanceUpdate(toBePayed)) {
+        if(!recordBalanceUpdateCashierAllowed(toBePayed)) {
             this.shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), sale.getPrice(), EZSaleTransaction.STClosed);
             ezSaleTransactions.get(sale.getTicketNumber()).setStatus(EZSaleTransaction.STClosed);
             return -1; // return -1 if DB connection problems occur
@@ -1737,7 +1357,6 @@ public class EZShop implements EZShopInterface {
 
         return (cash - toBePayed);
     }
-
 
     @Override
     public boolean receiveCreditCardPayment(Integer ticketNumber, String creditCard) throws InvalidTransactionIdException, InvalidCreditCardException, UnauthorizedException {
@@ -1768,7 +1387,7 @@ public class EZShop implements EZShopInterface {
             return false;
         ezSaleTransactions.get(sale.getTicketNumber()).setStatus(EZSaleTransaction.STPayed);
 
-        if(!recordBalanceUpdate(sale.getPrice())) {
+        if(!recordBalanceUpdateCashierAllowed(sale.getPrice())) {
             this.shopDB.updateSaleTransaction(sale.getTicketNumber(), sale.getDiscountRate(), sale.getPrice(), EZSaleTransaction.STClosed);
             ezSaleTransactions.get(sale.getTicketNumber()).setStatus(EZSaleTransaction.STClosed);
             return false; // return false if DB connection problems occur
@@ -1777,117 +1396,6 @@ public class EZShop implements EZShopInterface {
         if(!updateCreditInTXTbyCardNumber(creditCard, -(sale.getPrice() * (1 - sale.getDiscountRate()))))
             return false;
 
-        return true;
-    }
-
-    static public boolean isValidCreditCard(String cardNumber)
-    { // Verification based upon Luhn algorithm
-        if(cardNumber == null)
-            return false;
-
-        // old regexp:
-        // "^(?:4[0-9]{12}(?:[0-9]{3})?|[25][1-7][0-9]{14}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\d{3})\d{11})$"
-
-        if(!cardNumber.matches("[0-9]*"))
-            return false;
-
-        int sum = 0;
-        boolean alternate = false;
-        for (int i = cardNumber.length() - 1; i >= 0; i--)
-        {
-            int n = Integer.parseInt(cardNumber.substring(i, i + 1));
-            if (alternate)
-            {
-                n *= 2;
-                if (n > 9)
-                    n = (n % 10) + 1;
-            }
-            sum += n;
-            alternate = !alternate;
-        }
-        return (sum % 10 == 0);
-    }
-
-    static public double getCreditInTXTbyCardNumber(String cardNumber)
-    {
-        double cardBalance = -1;
-
-        if(cardNumber == null)
-            return -1;
-
-        try {
-            FileReader reader = new FileReader(creditCardsFile);
-            BufferedReader bufferedReader = new BufferedReader(reader);
-
-            String line;
-
-            while ((line = bufferedReader.readLine()) != null) {
-                if (line.contains("#"))
-                    continue;
-                if(line.matches(cardNumber+";[0-9]*.[0-9]*"))
-                {
-                    if(!isValidCreditCard(cardNumber))
-                        return -1;
-                    String creditAsString = line.split(";")[1];
-                    cardBalance = Double.parseDouble(creditAsString);
-                    break;
-                }
-            }
-            reader.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return cardBalance;
-    }
-
-    static public boolean updateCreditInTXTbyCardNumber(String cardNumber, double toBeAdded) {
-        Double cardBalance;
-
-        if(cardNumber == null)
-            return false;
-
-        if(!isValidCreditCard(cardNumber))
-            return false;
-
-        try {
-            FileReader reader = new FileReader(creditCardsFile);
-            // input the (modified) file content to the StringBuffer "input"
-            BufferedReader file = new BufferedReader(reader);
-            StringBuffer inputBuffer = new StringBuffer();
-            String line, newLine, newValue;
-
-            while ((line = file.readLine()) != null)
-            {
-                if(line.matches(cardNumber+";[0-9]*.[0-9]*"))
-                {
-                    String creditAsString = line.split(";")[1];
-                    cardBalance = Double.parseDouble(creditAsString);
-
-                    cardBalance += toBeAdded;
-                    newValue = cardBalance.toString();
-
-                    newLine = line.split(";")[0] + ";" + newValue;
-                    inputBuffer.append(newLine);
-                    inputBuffer.append('\n');
-                }
-                else
-                {
-                    inputBuffer.append(line);
-                    inputBuffer.append('\n');
-                }
-            }
-            file.close();
-
-            // write the new string with the replaced line OVER the same file
-            FileOutputStream fileOut = new FileOutputStream(creditCardsFile);
-            fileOut.write(inputBuffer.toString().getBytes());
-            fileOut.close();
-
-        } catch (Exception e) {
-            System.out.println("Problem reading file.");
-        }
         return true;
     }
 
@@ -1910,7 +1418,7 @@ public class EZShop implements EZShopInterface {
 
         double returnedMoney = retTr.getReturnedValue();
 
-        if(!recordBalanceUpdate(-returnedMoney))
+        if(!recordBalanceUpdateCashierAllowed(-returnedMoney))
             return -1; // return -1 if DB connection problems occur
 
         return returnedMoney;
@@ -1930,26 +1438,40 @@ public class EZShop implements EZShopInterface {
 
         EZReturnTransaction retTr = getReturnTransactionById(returnId);
 
-        if(retTr == null) return -1;
-        if(!retTr.getStatus().equals(RTClosed)) return -1;
+        if(retTr == null || !retTr.getStatus().equals(RTClosed))
+            return defaultID;
 
         if(getCreditInTXTbyCardNumber(creditCard) == -1 || !isValidCreditCard(creditCard))
-            return -1;
+            return defaultID;
 
         double returnedMoney = retTr.getReturnedValue();
 
-        if(!recordBalanceUpdate(-returnedMoney))
-            return -1; // return -1 if DB connection problems occur
+        if(!recordBalanceUpdateCashierAllowed(-returnedMoney))
+            return defaultID; // return -1 if DB connection problems occur
 
         if(!updateCreditInTXTbyCardNumber(creditCard, +(retTr.getReturnedValue())))
-            return -1;
+            return defaultID;
 
         return returnedMoney;
     }
 
+
+    //================================================================================================================//
+    //                                                   Accounting                                                   //
+    //================================================================================================================//
     @Override
     public boolean recordBalanceUpdate(double toBeAdded) throws UnauthorizedException {
         if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager) )
+            throw new UnauthorizedException();
+
+        double balanceValue = (this.shopDB != null && this.shopDB.isConnected()) ? shopDB.selectTotalBalance() : 0;
+        if(accountingBook == null)
+            accountingBook = new EZAccountBook(balanceValue);
+        return accountingBook.addBalanceOperation(shopDB, toBeAdded, ezBalanceOperations);
+    }
+
+    public boolean recordBalanceUpdateCashierAllowed(double toBeAdded) throws UnauthorizedException {
+        if( this.currUser == null || !this.currUser.hasRequiredRole(URCashier, URAdministrator, URShopManager) )
             throw new UnauthorizedException();
 
         double balanceValue = (this.shopDB != null && this.shopDB.isConnected()) ? shopDB.selectTotalBalance() : 0;
@@ -2003,6 +1525,247 @@ public class EZShop implements EZShopInterface {
         if (accountingBook != null)
             return accountingBook.currentBalance;
 
-        return -1;
+        return defaultID;
     }
+
+
+    //================================================================================================================//
+    //                                                     Utility                                                    //
+    //================================================================================================================//
+    public void  loadDataFromDB() {
+        if ( !this.shopDB.isConnected() )
+            shopDB.connect();
+        shopDB.initDatabase();
+
+        if (ezBalanceOperations == null)
+            ezBalanceOperations = shopDB.selectAllBalanceOperations();
+
+        if (ezCards == null)
+            ezCards = shopDB.selectAllCards();
+
+        if (ezCustomers == null)
+            ezCustomers = shopDB.selectAllCustomers();
+
+        if (ezOrders == null)
+            ezOrders = shopDB.selectAllOrders();
+
+        if (ezProducts == null)
+            ezProducts = shopDB.selectAllProductTypes();
+
+        if (ezSaleTransactions == null)
+            ezSaleTransactions = shopDB.selectAllSaleTransactions();
+
+        if (ezUsers == null)
+            ezUsers = shopDB.selectAllUsers();
+    }
+
+    private void clearData() {
+        ezBalanceOperations = null;
+        ezOrders = null;
+        ezProducts = null;
+        ezSaleTransactions = null;
+    }
+
+    static public boolean isValidBarCode(String barCode){
+        if (barCode == null)
+            return false;
+
+        if (barCode.matches("[0-9]{12,14}")){
+            int sum=0;
+            int number=0;
+            for(int i=0; i<barCode.length()-1; i++){
+                number=Integer.parseInt(Character.toString(barCode.charAt(i)));
+                if (barCode.length() == 12 || barCode.length()==14){
+                    if (!(i%2==1)){
+                        number=number*3;
+                    }
+                }
+                else {
+                    if (!(i % 2 == 0)) {
+                        number = number * 3;
+                    }
+                }
+                // else number = number*1;
+                sum = sum+number;
+            }
+            // Now find the nearest multiple of 10 and subtract sum from it
+
+            // Return of closest of two
+            int result = (10-sum%10)+sum;
+            if ((result-sum)==Integer.parseInt(Character.toString(barCode.charAt(barCode.length()-1)))){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    static public boolean isValidPosition(String newPos){
+        if (newPos == null)
+            return false;
+
+        return newPos.matches("[0-9]+-[a-zA-z]+-[0-9]+");
+    }
+
+    static public boolean isValidCard(String card){
+        if (card == null)
+            return false;
+
+        return ( card.isEmpty() || card.matches("\\b[0-9]{10}\\b") );
+    }
+
+    public BalanceOperation getBalanceOpById(Integer balanceId) {
+        return ezBalanceOperations.get(balanceId);
+    }
+
+    public EZSaleTransaction getSaleTransactionById(Integer saleNumber) {
+        /*
+        EZSaleTransaction saleTransaction;
+        if (this.tmpSaleTransaction.getTicketNumber().equals(saleNumber)) {
+
+            saleTransaction = tmpSaleTransaction;
+        }
+        else
+            saleTransaction = ezSaleTransactions.get(saleNumber);
+         */
+        EZSaleTransaction saleTransaction = this.ezSaleTransactions.get(saleNumber);
+        return saleTransaction;
+    }
+
+    public EZReturnTransaction getReturnTransactionById(Integer returnId) {
+        if(tmpRetTr != null && returnId.equals(tmpRetTr.getReturnId()))
+            return tmpRetTr;
+
+        if(ezReturnTransactions == null)
+            return null;
+
+        return ezReturnTransactions.get(returnId);
+    }
+
+    static public boolean isValidCreditCard(String cardNumber) { // Verification based upon Luhn algorithm
+        if(cardNumber == null)
+            return false;
+
+        // old regexp:
+        // "^(?:4[0-9]{12}(?:[0-9]{3})?|[25][1-7][0-9]{14}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\d{3})\d{11})$"
+
+        if(!cardNumber.matches("[0-9]*"))
+            return false;
+
+        int sum = 0;
+        boolean alternate = false;
+        for (int i = cardNumber.length() - 1; i >= 0; i--)
+        {
+            int n = Integer.parseInt(cardNumber.substring(i, i + 1));
+            if (alternate)
+            {
+                n *= 2;
+                if (n > 9)
+                    n = (n % 10) + 1;
+            }
+            sum += n;
+            alternate = !alternate;
+        }
+        return (sum % 10 == 0);
+    }
+
+    static public double getCreditInTXTbyCardNumber(String cardNumber) {
+        double cardBalance = -1;
+
+        if(cardNumber == null)
+            return -1;
+
+        try {
+            FileReader reader = new FileReader(creditCardsFile);
+            BufferedReader bufferedReader = new BufferedReader(reader);
+
+            String line;
+
+            while ((line = bufferedReader.readLine()) != null) {
+                if (line.contains("#"))
+                    continue;
+                if(line.matches(cardNumber+";[0-9]*.[0-9]*"))
+                {
+                    if(!isValidCreditCard(cardNumber))
+                        return -1;
+                    String creditAsString = line.split(";")[1];
+                    cardBalance = Double.parseDouble(creditAsString);
+                    break;
+                }
+            }
+            reader.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return cardBalance;
+    }
+
+    static public boolean updateCreditInTXTbyCardNumber(String cardNumber, double toBeAdded) {
+        double cardBalance;
+
+        if(cardNumber == null)
+            return false;
+
+        if(!isValidCreditCard(cardNumber))
+            return false;
+
+        try {
+            FileReader reader = new FileReader(creditCardsFile);
+            // input the (modified) file content to the StringBuffer "input"
+            BufferedReader file = new BufferedReader(reader);
+            StringBuffer inputBuffer = new StringBuffer();
+            String line, newLine, newValue;
+
+            while ((line = file.readLine()) != null) {
+                if(line.matches(cardNumber+";[0-9]*.[0-9]*")) {
+                    String creditAsString = line.split(";")[1];
+                    cardBalance = Double.parseDouble(creditAsString);
+
+                    cardBalance += toBeAdded;
+                    newValue = Double.toString(cardBalance);
+
+                    newLine = line.split(";")[0] + ";" + newValue;
+                    inputBuffer.append(newLine);
+                    inputBuffer.append('\n');
+                }
+                else {
+                    inputBuffer.append(line);
+                    inputBuffer.append('\n');
+                }
+            }
+            file.close();
+
+            // write the new string with the replaced line OVER the same file
+            FileOutputStream fileOut = new FileOutputStream(creditCardsFile);
+            fileOut.write(inputBuffer.toString().getBytes());
+            fileOut.close();
+
+        } catch (Exception e) {
+            System.out.println("Problem reading file.");
+        }
+
+        return true;
+    }
+
+
+    /*  Some valid barCodes (12 digits):
+        1345334543427
+        4532344529689
+        5839274928315
+        4778293942845
+        8397489193845
+        1627482847283
+        3738456849238
+        4482847392351
+        7293829484929
+        4738294729395
+        4627828478338
+        4892937849335
+        4839947221225
+        1881930382935
+        4908382312833
+        2141513141144
+    */
 }
