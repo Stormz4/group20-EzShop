@@ -507,6 +507,10 @@ public class EZShop implements EZShopInterface {
         if(order == null || !(order.getStatus().equals(OSIssued)))
             return false;
 
+        // Additional check on balance current value (even if it is not requested by API):
+        if(order.getPricePerUnit()*order.getQuantity() > accountingBook.currentBalance)
+            return false;
+
         if(!order.getStatus().equals(OSPayed)) {
             if(!recordBalanceUpdate(-(order.getPricePerUnit() * order.getQuantity())))
                 return false;
