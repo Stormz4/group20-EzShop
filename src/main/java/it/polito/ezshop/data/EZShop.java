@@ -328,7 +328,7 @@ public class EZShop implements EZShopInterface {
         // Check if the Barcode is unique
         for (ProductType product : ezProducts.values()) {
             if (product.getBarCode().equals(productCode)) {
-                return -1;
+                return defaultID;
             }
         }
 
@@ -352,31 +352,27 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean updateProduct(Integer id, String newDescription, String newCode, double newPrice, String newNote) throws InvalidProductIdException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException {
-
-        if (id == null || id<=0){
-            throw new InvalidProductIdException();
-        }
-
-        if (!ezProducts.containsKey(id)) {
-            return false;
-        }
-
-        if (newDescription == null || newDescription.isEmpty() ) {
-            throw new InvalidProductDescriptionException();
-        }
-        if (newCode == null || newCode.isEmpty() || !isValidBarCode(newCode)) {
-            throw new InvalidProductCodeException();
-        }
-        if(newPrice <=0){
-            throw new InvalidPricePerUnitException();
-        }
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
             throw new UnauthorizedException();
-        }
+
+        if (id == null || id <= 0)
+            throw new InvalidProductIdException();
+
+        if (newCode == null || newCode.isEmpty() || !isValidBarCode(newCode))
+            throw new InvalidProductCodeException();
+
+        if (newDescription == null || newDescription.isEmpty())
+            throw new InvalidProductDescriptionException();
+
+        if(newPrice <= 0)
+            throw new InvalidPricePerUnitException();
+
+        if (!ezProducts.containsKey(id))
+            return false;
 
         // Check if the Barcode is unique
         for (EZProductType product : ezProducts.values()) {
-            if (product.getBarCode().equals(newCode) && product.getId() != id)
+            if (product.getBarCode().equals(newCode) && !product.getId().equals(id))
                 return false;
         }
 

@@ -1,22 +1,19 @@
 package it.polito.ezshop.IntegrationBBTesting;
 
 import it.polito.ezshop.data.EZShop;
-import it.polito.ezshop.data.ProductType;
 import it.polito.ezshop.data.SQLiteDB;
 import it.polito.ezshop.exceptions.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.LinkedList;
-
-import static it.polito.ezshop.data.EZUser.URAdministrator;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static it.polito.ezshop.data.EZUser.*;
+import static org.junit.Assert.*;
 
 public class TestEZShopFR3 {
     private EZShop ezShop;
     private SQLiteDB shopDB;
+    private Integer productID;
 
     @Before
     public void init() throws InvalidPasswordException, InvalidRoleException, InvalidUsernameException {
@@ -43,6 +40,9 @@ public class TestEZShopFR3 {
         ezShop = new EZShop();
 
         ezShop.createUser("admin", "admin", URAdministrator);
+        ezShop.createUser("cashier", "cashier", URCashier);
+        ezShop.createUser("manager", "manager", URShopManager);
+
         ezShop.login("admin", "admin");
     }
 
@@ -65,12 +65,16 @@ public class TestEZShopFR3 {
         final String prodNote = "Product's note";
 
         // Proper product creation
-        Integer prodID = ezShop.createProductType(prodDescription, prodCode, pricePerUnit,prodNote);
-        assertTrue(prodID > 0);
+        productID = ezShop.createProductType(prodDescription, prodCode, pricePerUnit,prodNote);
+        assertTrue(productID > 0);
+
+        // Proper product creation
+        productID = ezShop.createProductType(prodDescription, prodCode, pricePerUnit,prodNote);
+        assertFalse(productID > 0);
 
         // Product creation with null note
-        prodID = ezShop.createProductType(prodDescription, "1627482847283", pricePerUnit, null);
-        assertTrue(prodID > 0);
+        productID = ezShop.createProductType(prodDescription, "1627482847283", pricePerUnit, null);
+        assertTrue(productID > 0);
 
         // Product creation with null description
         assertThrows(InvalidProductDescriptionException.class, () -> {
@@ -114,5 +118,47 @@ public class TestEZShopFR3 {
         assertThrows(UnauthorizedException.class, () -> {
             ezShop.createProductType(prodDescription, prodCode, -2.50, prodNote);
         });
+    }
+
+   @Test
+    public void testUpdateProduct() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException {
+       final String prodDescription = "Test product's description";
+       final  String prodCode = "5839274928315";
+       final double pricePerUnit = 4.50;
+       final String prodNote = "Product's note";
+
+       // Proper product creation
+       productID = ezShop.createProductType(prodDescription, prodCode, pricePerUnit,prodNote);
+
+       // Check null id
+       assertThrows(InvalidProductIdException.class, () -> {
+           ezShop.updateProduct(null, "New description", "5839274928315", 12.50, "New note");
+       });
+
+       // Check invalid id (== 0)
+       assertThrows(InvalidProductIdException.class, () -> {
+           ezShop.updateProduct(0, "New description", "5839274928315", 12.50, "New note");
+       });
+
+       // Check invalid id (< 0)
+       assertThrows(InvalidProductIdException.class, () -> {
+           ezShop.updateProduct(-5, "New description", "5839274928315", 12.50, "New note");
+       });
+
+       // Check null description
+       assertThrows(InvalidProductDescriptionException.class, () -> {
+           ezShop.updateProduct(productID, null, "5839274928315", 12.50, "New note");
+       });
+
+       // Check invalid description
+       assertThrows(InvalidProductDescriptionException.class, () -> {
+           ezShop.updateProduct(productID, "", "5839274928315", 12.50, "New note");
+       });
+
+       // Check authorization if no user is logged in
+       ezShop.logout();
+       assertThrows(UnauthorizedException.class, () -> {
+            ezShop.updateProduct(productID, "New description", "NEWCODE", 12.50, "New note");
+       });
     }
 }
