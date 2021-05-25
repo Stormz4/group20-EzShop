@@ -412,9 +412,8 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public List<ProductType> getAllProductTypes() throws UnauthorizedException {
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier))
             throw new UnauthorizedException();
-        }
 
         return ezProducts != null ? new LinkedList<>(ezProducts.values()) : new LinkedList<>();
     }

@@ -57,6 +57,12 @@ public class TestEZShopFR3 {
         ezShop = null;
     }
 
+    private void addSomeProductToTest() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException {
+
+        ezShop.createProductType("Description 1", "1345334543427", 1.00, "Note 1");
+        ezShop.createProductType("Description 2", "4532344529689", 2.00, "Note 2");
+        ezShop.createProductType("Description 3", "5839274928315", 3.00, "Note 3");
+    }
 
     @Test
     public void testAddProduct() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException {
@@ -240,6 +246,34 @@ public class TestEZShopFR3 {
         ezShop.logout();
         assertThrows(UnauthorizedException.class, () -> {
             ezShop.deleteProductType(defaultID);
+        });
+    }
+
+    @Test
+    public void testGetAllProducts() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidPasswordException, InvalidUsernameException {
+        // Check that does not return null even if there's no productType in EZShop
+        assertNotNull(ezShop.getAllProductTypes());
+
+        this.addSomeProductToTest();
+
+        // Check that a non-empty list is returned
+        assertNotNull(ezShop.getAllProductTypes());
+        assertNotEquals(0, ezShop.getAllProductTypes().size());
+
+        // Check Cashier's authorization
+        ezShop.logout();
+        ezShop.login("cashier", "cashier");
+        assertNotNull(ezShop.getAllProductTypes());
+
+        // Check ShopManager's authorization
+        ezShop.logout();
+        ezShop.login("manager", "manager");
+        assertNotNull(ezShop.getAllProductTypes());
+
+        // Check authorization with no user logged in
+        ezShop.logout();
+        assertThrows(UnauthorizedException.class, () -> {
+            ezShop.getAllProductTypes();
         });
     }
 }
