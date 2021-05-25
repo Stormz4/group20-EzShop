@@ -276,4 +276,48 @@ public class TestEZShopFR3 {
             ezShop.getAllProductTypes();
         });
     }
+
+    @Test
+    public void testGetProductTypeByBarCode() throws InvalidProductCodeException, UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidPasswordException, InvalidUsernameException {
+        this.addSomeProductToTest();
+
+        // Check proper get
+        assertNotNull(ezShop.getProductTypeByBarCode("4532344529689"));
+
+        // Check with null barcode
+        assertThrows(InvalidProductCodeException.class, () -> {
+            ezShop.getProductTypeByBarCode(null);
+        });
+
+        // Check with empty barcode
+        assertThrows(InvalidProductCodeException.class, () -> {
+            ezShop.getProductTypeByBarCode("");
+        });
+
+        // Check with invalid barcode
+        assertThrows(InvalidProductCodeException.class, () -> {
+            ezShop.getProductTypeByBarCode("B4RC0D3");
+        });
+
+        // Check with valid barcode missing in the DB
+        assertNull(ezShop.getProductTypeByBarCode("7293829484929"));
+
+        // Check authorization for ShopManager
+        ezShop.logout();
+        ezShop.login("manager", "manager");
+        assertNotNull(ezShop.getProductTypeByBarCode("1345334543427"));
+
+        // Check authorization for Cashier
+        ezShop.logout();
+        ezShop.login("cashier", "cashier");
+        assertThrows(UnauthorizedException.class, () -> {
+            ezShop.getProductTypeByBarCode("B4RC0D3");
+        });
+
+        // Check authorization when no user is logged in
+        ezShop.logout();
+        assertThrows(UnauthorizedException.class, () -> {
+            ezShop.getProductTypeByBarCode("B4RC0D3");
+        });
+    }
 }

@@ -420,18 +420,15 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public ProductType getProductTypeByBarCode(String barCode) throws InvalidProductCodeException, UnauthorizedException {
-        if (barCode == null || barCode.isEmpty() || !isValidBarCode(barCode)) {
-            throw new InvalidProductCodeException();
-        }
-
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
+        if (this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
             throw new UnauthorizedException();
-        }
+
+        if (barCode == null || barCode.isEmpty() || !isValidBarCode(barCode))
+            throw new InvalidProductCodeException();
 
         for (ProductType product : ezProducts.values()) {
-            if (product.getBarCode().equals(barCode)) {
+            if (product.getBarCode().equals(barCode))
                 return product;
-            }
         }
 
         return null;
