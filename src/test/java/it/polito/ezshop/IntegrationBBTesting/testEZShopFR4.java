@@ -111,4 +111,25 @@ public class testEZShopFR4 {
             ezShop.updateQuantity(this.products.get(1), 5);
         });
     }
+
+    @Test
+    public void testUpdatePosition() throws InvalidLocationException, UnauthorizedException, InvalidProductIdException {
+        // Test proper update
+        assertTrue(ezShop.updatePosition(this.products.get(1), "15-GH-50"));
+
+        // Test null productID
+        assertThrows(InvalidProductIdException.class, () -> {
+            ezShop.updatePosition(null, "15-GH-50");
+        });
+
+        // Test productID == 0
+        assertThrows(InvalidProductIdException.class, () -> {
+            ezShop.updatePosition(0, "15-GH-50");
+        });
+
+        // Test productID < 0
+        assertThrows(InvalidProductIdException.class, () -> {
+            ezShop.updatePosition(-3, "15-GH-50");
+        });
+    }
 }

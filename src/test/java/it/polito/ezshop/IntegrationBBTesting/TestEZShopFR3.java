@@ -339,13 +339,13 @@ public class TestEZShopFR3 {
         ezShop.logout();
         ezShop.login("cashier", "cashier");
         assertThrows(UnauthorizedException.class, () -> {
-            ezShop.getProductTypesByDescription("Description").size();
+            ezShop.getProductTypesByDescription("Description");
         });
 
         // Check authorization when no user is logged in
         ezShop.logout();
         assertThrows(UnauthorizedException.class, () -> {
-            ezShop.getProductTypesByDescription("Description").size();
+            ezShop.getProductTypesByDescription("Description");
         });
     }
 }

@@ -372,22 +372,22 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean updatePosition(Integer productId, String newPos) throws InvalidProductIdException, InvalidLocationException, UnauthorizedException {
-        if (productId == null || productId<=0){
-            throw new InvalidProductIdException();
-        }
-        if (!ezProducts.containsKey(productId)) {
-            return false;
-        }
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
             throw new UnauthorizedException();
-        }
 
-        if (newPos == null || newPos.isEmpty()){
+        if (productId == null || productId <= 0)
+            throw new InvalidProductIdException();
+
+        if (!ezProducts.containsKey(productId))
+            return false;
+
+        EZProductType prodType = ezProducts.get(productId);
+        if (newPos == null || newPos.isEmpty()) {
             // Reset the location if null or empty
-            EZProductType prodType = ezProducts.get(productId);
-            boolean success = shopDB.updateProductType(productId, prodType.getQuantity(), "", prodType.getNote(), prodType.getProductDescription(), prodType.getBarCode(), prodType.getPricePerUnit());
-            if (!success)
+            boolean updated = shopDB.updateProductType(productId, prodType.getQuantity(), "", prodType.getNote(), prodType.getProductDescription(), prodType.getBarCode(), prodType.getPricePerUnit());
+            if (!updated)
                 return false;
+
             prodType.setLocation("");
             ezProducts.replace(productId, prodType);
             return true;
@@ -395,25 +395,23 @@ public class EZShop implements EZShopInterface {
         else {
             // position has to be unique: check if it is
             for (ProductType product : ezProducts.values()) {
-                if (product.getLocation().equals(newPos)) {
+                if (product.getLocation().equals(newPos))
                     return false;
-                }
             }
         }
 
-        //The position has the following format :
-        //<aisleNumber>-<rackAlphabeticIdentifier>-<levelNumber>
-        if (!(isValidPosition(newPos))){
-            // If it doens't match:
+        // The position has the following format :
+        // <aisleNumber>-<rackAlphabeticIdentifier>-<levelNumber>
+        if (!(isValidPosition(newPos)))
             throw new InvalidLocationException();
-        }
 
-        EZProductType prodType = ezProducts.get(productId);
-        boolean success = shopDB.updateProductType(productId, prodType.getQuantity(), newPos, prodType.getNote(), prodType.getProductDescription(), prodType.getBarCode(), prodType.getPricePerUnit());
-        if (!success)
+        boolean updated = shopDB.updateProductType(productId, prodType.getQuantity(), newPos, prodType.getNote(), prodType.getProductDescription(), prodType.getBarCode(), prodType.getPricePerUnit());
+        if (!updated)
             return false;
+
         prodType.setLocation(newPos);
         ezProducts.replace(productId, prodType);
+
         return true;
     }
 
