@@ -99,11 +99,11 @@ public class TestEZShopFR8 {
         bo1.setBalanceId(id_bo1);
 
         EZBalanceOperation bo2 = new EZBalanceOperation(defaultID, LocalDate.of(2020, 2, 13), 110, Credit);
-        int id_bo2 = shopDB.insertBalanceOperation(LocalDate.of(2020, 2, 13), 35, Credit);
+        int id_bo2 = shopDB.insertBalanceOperation(LocalDate.of(2020, 2, 13), 110, Credit);
         bo1.setBalanceId(id_bo2);
 
-        EZBalanceOperation bo3 = new EZBalanceOperation(defaultID, LocalDate.of(2021, 5, 11), 3500, Debit);
-        int id_bo3 = shopDB.insertBalanceOperation(LocalDate.of(2021, 5, 11), 3500, Debit);
+        EZBalanceOperation bo3 = new EZBalanceOperation(defaultID, LocalDate.of(2021, 5, 11), 3500, Credit);
+        int id_bo3 = shopDB.insertBalanceOperation(LocalDate.of(2021, 5, 11), 3500, Credit);
         bo1.setBalanceId(id_bo3);
 
         EZOrder o1 = new EZOrder(defaultID, id_bo1, "1345334543427", 12.60, 4, OSIssued);
@@ -145,7 +145,6 @@ public class TestEZShopFR8 {
     @Before
     public void init() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidProductIdException {
         ez = new EZShop();
-        ez.login("testUser00", "pwd");
     }
 
     @After
@@ -156,23 +155,80 @@ public class TestEZShopFR8 {
         assertFalse(shopDB.isConnected());
     }
 
+    /** This test method follows Scenario 9.2
+     *
+     */
     @Test
-    public void testRecordDebit(){
+    public void testRecordDebit() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException {
+        double toBeAdded = -2;
+
+        ez.login("testUser00", "pwd");
+        // The DB has an initial balance > 2, so this call should return true
+        assertTrue(ez.recordBalanceUpdate(toBeAdded));
+
 
     }
 
+    /** This test method follows Scenario 9.3
+     *
+     */
     @Test
-    public void testRecordCredit(){
+    public void testRecordCredit() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException {
+        double toBeAdded = 2;
 
+        ez.login("testUser00", "pwd");
+        // A Credit should never return false as we are increasing the total balance
+        assertTrue(ez.recordBalanceUpdate(toBeAdded));
     }
 
+    /** This test method follows Scenario 9.1
+     *
+     */
     @Test
-    public void testGetAllCreditsAndDebits(){
+    public void testGetAllCreditsAndDebits() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException {
+        List<BalanceOperation> allCreditsAndDebits;
+
+        ez.login("testUser00", "pwd");
+        // we only need to test if balanceOperation are returned: we decide to collect the whole accountBook
+        allCreditsAndDebits = ez.getCreditsAndDebits(null, null);
+        // the predefined DB has three balanceOperation, we want to observe if there are all of them
+        assertEquals(3, allCreditsAndDebits.size());
     }
 
+    /** This test method follows Scenario 9.4
+     *
+     */
     @Test
-    public void testComputeBalance(){
+    public void testComputeBalance() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException {
 
+        ez.login("testUser00", "pwd");
+        // the initial sum of the balanceOperation in the predefined DB is 3575
+        assertEquals(3575, ez.computeBalance(), 0.1);
+    }
+
+    /** This test method covers all other cases for the following API methods:
+     *  recordBalanceUpdate, getAllCreditsAndDebits, computeBalance
+     */
+    @Test
+    public void testAllCases() throws InvalidPasswordException, InvalidUsernameException, UnauthorizedException {
+        assertThrows(UnauthorizedException.class, () -> ez.recordBalanceUpdate(45000));
+        assertThrows(UnauthorizedException.class, () -> ez.recordBalanceUpdate(-1));
+        assertThrows(UnauthorizedException.class, () -> ez.getCreditsAndDebits(null, null));
+        assertThrows(UnauthorizedException.class, () -> ez.computeBalance());
+
+        // login with a Cashier, recordBalanceUpdate should not work
+        ez.login("cashier", "cashier");
+        assertThrows(UnauthorizedException.class, () -> ez.recordBalanceUpdate(45));
+        assertNotNull(ez.getCreditsAndDebits(null, null));
+        assertEquals(3575, ez.computeBalance(), 0.1);
+
+
+        // login with a ShopManager, all methods should work
+        ez.login("aldo", "pwd");
+        assertNotNull(ez.getCreditsAndDebits(null, null));
+        assertEquals(3575, ez.computeBalance(), 0.1);
+        assertTrue(ez.recordBalanceUpdate(50));
+        ez.logout();
     }
     
 
