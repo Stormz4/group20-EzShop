@@ -338,7 +338,6 @@ Report also for each of the scenarios the (one or more) API JUnit tests that cov
 | 6.1         |  FR6      |     TestEZShopFR6         |           
 | 6.2         |  FR6      |     TestEZShopFR6        |             
 | 6.3         |  FR6      |     TestEZShopFR6         |           
-| 6.4         |  FR6      |     TestEZShopFR6        |             
 | 6.5         |  FR6      |     TestEZShopFR6         |           
 | 6.6         |  FR6      |     TestEZShopFR6        |   
 | 7.1   | FR7.2 | TestEZShopFR7.testReceiveCreditCardPayment |
