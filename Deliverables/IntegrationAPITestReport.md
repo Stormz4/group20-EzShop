@@ -148,7 +148,7 @@ package "data" as data             {
     (ex: step1: class A, step 2: class A+B, step 3: class A+B+C, etc)> 
     <Some steps may  correspond to unit testing (ex step1 in ex above), presented in other document UnitTestReport.md>
     <One step will  correspond to API testing>
-    
+
 The integration sequence we adopted is bottom-up. We started with unit-testing, where we tested all the leaf classes and their methods (EZCustomer, EZProductType...), including the DB class (SQLiteDB).
 These test are documented in UnitTestReport.md.
 Then, we proceeded to test AccountBook which is the only intermediate class, followed by the API testing (Which consist in testing the class EZShop)
@@ -207,18 +207,18 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 ## Scenario UC2.1
 
 | Scenario |  Create user and define rights |
-| ------------- |:-------------:| 
+| ------------- |:-------------:|
 |  Precondition     | Admin A exists and is logged in |
 |  Post condition     | Account X is created |
 | Step#        | Description  |
-|  1    |  A defines the credentials of the new Account X |  
+|  1    |  A defines the credentials of the new Account X |
 |  2    |  A selects the access rights for the new account X |
 |  3    |  C confirms the inserted data |
 
 ## Scenario UC2.2
 
 | Scenario |  Delete user |
-| ------------- |:-------------:| 
+| ------------- |:-------------:|
 |  Precondition     | Admin A exists and is logged in |
 |  | Account X exists |
 |  Post condition     | Account X deleted |
@@ -229,7 +229,7 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 ## Scenario UC2.3
 
 | Scenario |  Modify user rights |
-| ------------- |:-------------:| 
+| ------------- |:-------------:|
 |  Precondition     | Admin A exists and is logged in |
 |  | Account X exists |
 |  Post condition     | X's rights updated |
@@ -242,49 +242,49 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 ## Scenario UC4.1
 
 | Scenario |  Create customer record |
-| ------------- |:-------------:| 
+| ------------- |:-------------:|
 |  Precondition     | Account U for Customer Cu not existing  |
 |  Post condition     | U is  into the system  |
 | Step#        | Description  |
 |  1    |  User asks Cu personal data |
-|  2    |  USer fills U's fields with Cu's personal data |  
+|  2    |  USer fills U's fields with Cu's personal data |
 |  3    |  User confirms  |
 
 
 ## Scenario UC4.2
 
 | Scenario |  Attach Loyalty card to customer record |
-| ------------- |:-------------:| 
+| ------------- |:-------------:|
 |  Precondition     | Account U for Customer Cu existing  |
 |  Post condition     | Loyalty card L attached to U |
 | Step#        | Description  |
 |  1    |  User creates a new L with a unique serial number |
-|  2    |  User attaches L to U  |  
+|  2    |  User attaches L to U  |
 
 
 ## Scenario UC4.3
 
 | Scenario |  Detach Loyalty card from customer record |
-| ------------- |:-------------:| 
+| ------------- |:-------------:|
 |  Precondition     | Account U for Customer Cu existing  |
 | | Loyalty card L attached to U |
 |  Post condition     | Loyalty card L detached from U |
 | Step#        | Description  |
 |  1    |  User selects customer record U |
-|  2    |  User  detaches L from U  |  
+|  2    |  User  detaches L from U  |
 |  3    |  U is updated |
 
 ## Scenario UC4.4
 
 | Scenario |  Update customer record |
-| ------------- |:-------------:| 
+| ------------- |:-------------:|
 |  Precondition     | Account U for Customer Cu existing  |
 |  Post condition     | U updated |
 | Step#        | Description  |
 |  1    |  User selects customer record U |
-|  2    |  User modifies personal data of Cu  | 
+|  2    |  User modifies personal data of Cu  |
 
-## Scenario 8-3
+## Scenario UC8.3
 
 | Scenario |  Return of all the sold products of a product type, cash |
 | ------------- |:-------------:| 
@@ -306,6 +306,18 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 |  9   |  Transaction is updated |
 |  10   |  Balance is updated |
 
+## Scenario UC10.3
+
+| Scenario | Manage Return Payment by invalid credit card |
+| ------------- |:-------------:|
+|  Precondition     | Credit card C does not exist  |
+|  Post condition     |   |
+| Step#        | Description  |
+|  1    |  Read C.number |
+|  2    |  Validate C.number with Luhn algorithm |
+|  3    |  C.number invalid, issue warning |
+|  4    |  Exit with error |
+
 
 # Coverage of Scenarios and FR
 
@@ -314,33 +326,38 @@ Report also for each of the scenarios the (one or more) API JUnit tests that cov
 
 
 
-| Scenario ID  | Functional Requirements covered | JUnit  Test(s)        | 
-| ------------ | ------------------------------- | --------------------- | 
-|  2.1         | FR1                             | TestEZShopFR1         |             
+| Scenario ID  | Functional Requirements covered | JUnit  Test(s)        |
+| ------------ | ------------------------------- | --------------------- |
+|  2.1         | FR1                             | TestEZShopFR1         |
 |  2.2         | FR1                             | TestEZShopFR1         |
 |  2.3         | FR1                             | TestEZShopFR1         |
 |  4.1         | FR5                             | TestEZShopFR5         |
 |  4.2         | FR5                             | TestEZShopFR5         |
 |  4.3         | FR5                             | TestEZShopFR5         |
-|  4.4         | FR5                             | TestEZShopFR5         |    
+|  4.4         | FR5                             | TestEZShopFR5         |
 | 6.1         |  FR6      |     TestEZShopFR6         |           
 | 6.2         |  FR6      |     TestEZShopFR6        |             
 | 6.3         |  FR6      |     TestEZShopFR6         |           
 | 6.4         |  FR6      |     TestEZShopFR6        |             
 | 6.5         |  FR6      |     TestEZShopFR6         |           
-| 6.6         |  FR6      |     TestEZShopFR6        |             
+| 6.6         |  FR6      |     TestEZShopFR6        |   
+| 7.1   | FR7.2 | TestEZShopFR7.testReceiveCreditCardPayment |
+| 7.2       | FR7.2 | TestEZShopFR7.testInvalidCardPayment |
+| 7.3      | FR7.2 | TestEZShopFR7.testInsufficientCreditPayment |
+| 7.4      | FR7.1 | TestEZShopFR7.testReceiveCashPayment |
 | 8.1         |  FR6      |     TestEZShopFR6         |           
 | 8.2         |  FR6      |     TestEZShopFR6        |          
 | 8.3         |  FR6      |     TestEZShopFR6         |  
+| 10.1 | FR7.4 | TestEZShopFR7.testReturnCreditCardPayment |
+| 10.2 | FR7.3 | TestEZShopFR7.testReturnCashPayment |
+| 10.3 | FR7.4 | TestEZShopFR7.testReturnInvalidCardPayment |    
 | ...         |                                 |             |             
 | ...         |                                 |             |             
 | ...         |                                 |             |             
 | ...         |                                 |             |             
-
 
 
 # Coverage of Non Functional Requirements
-
 
 <Report in the following table the coverage of the Non Functional Requirements of the application - only those that can be tested with automated testing frameworks.>
 
@@ -353,5 +370,5 @@ Report also for each of the scenarios the (one or more) API JUnit tests that cov
 | NFR3                       | TestEZShop_User     |
 | NFR4                       | TestEZShop_VerifyBarCode |
 | NFR5                       | TestEZShop_IsValidCreditCard |
-| NFR6                       | TestEZShop_IsValidCard |
+| NFR6                       | TestEZShop_IsValidCardT |
 

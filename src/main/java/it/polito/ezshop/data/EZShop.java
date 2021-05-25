@@ -1759,7 +1759,7 @@ public class EZShop implements EZShopInterface {
 
         double cardBalance = getCreditInTXTbyCardNumber(creditCard.toString());
 
-        if(cardBalance < (sale.getPrice() * sale.getDiscountRate()))
+        if(cardBalance < (sale.getPrice() * (1-sale.getDiscountRate())))
             return false; // return false if there aren't enough money in the selected credit card
 
         toBePayed = sale.getPrice()*(1-sale.getDiscountRate());
