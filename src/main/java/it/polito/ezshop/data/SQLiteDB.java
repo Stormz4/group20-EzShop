@@ -78,22 +78,6 @@ public class SQLiteDB {
         }
     }
 
-    public boolean clearAllTables() {
-        if (!this.isConnected())
-            return false;
-
-        boolean cleared = this.clearTable(SQLiteDB.tBalanceOperations);
-        cleared &= this.clearTable(SQLiteDB.tCards);
-        cleared &= this.clearTable(SQLiteDB.tCustomers);
-        cleared &= this.clearTable(SQLiteDB.tOrders);
-        cleared &= this.clearTable(SQLiteDB.tProductTypes);
-        cleared &= this.clearTable(SQLiteDB.tProductsPerSale);
-        cleared &= this.clearTable(SQLiteDB.tTransactions);
-        cleared &= this.clearTable(SQLiteDB.tUsers);
-
-        return cleared;
-    }
-
     /**
      ** Create the DB
      */
@@ -129,14 +113,17 @@ public class SQLiteDB {
     }
 
     public boolean clearDatabase() {
-        if (dbConnection == null)
+        if (!this.isConnected())
             return false;
 
-        boolean cleared = this.clearTable(tBalanceOperations);
-        cleared &= this.clearTable(tOrders);
-        cleared &= this.clearTable(tProductsPerSale);
-        cleared &= this.clearTable(tProductTypes);
-        cleared &= this.clearTable(tTransactions);
+        boolean cleared = this.clearTable(SQLiteDB.tBalanceOperations);
+        cleared &= this.clearTable(SQLiteDB.tCards);
+        cleared &= this.clearTable(SQLiteDB.tCustomers);
+        cleared &= this.clearTable(SQLiteDB.tOrders);
+        cleared &= this.clearTable(SQLiteDB.tProductTypes);
+        cleared &= this.clearTable(SQLiteDB.tProductsPerSale);
+        cleared &= this.clearTable(SQLiteDB.tTransactions);
+        cleared &= this.clearTable(SQLiteDB.tUsers);
 
         return cleared;
   }
@@ -457,7 +444,6 @@ public class SQLiteDB {
         if (dbConnection == null)
             return defaultValue;
 
-        //double startingBalance = 0;
         double totalBalance = 0;
 
         try{
@@ -470,7 +456,6 @@ public class SQLiteDB {
             System.out.println(e.getMessage());
         }
 
-        //return totalBalance + startingBalance;
         return totalBalance;
     }
 

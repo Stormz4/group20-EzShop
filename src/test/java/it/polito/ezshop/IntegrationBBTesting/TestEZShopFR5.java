@@ -60,6 +60,10 @@ public class TestEZShopFR5 {
         assertThrows(UnauthorizedException.class, () -> {
             ez.createCard();
         });
+        assertThrows(UnauthorizedException.class, () -> {
+            ez.getAllCustomers();
+        });
+
 
         ez.login("testFR5", "pwd");
         assertThrows(InvalidCustomerNameException.class, () -> {

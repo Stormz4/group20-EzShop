@@ -193,6 +193,14 @@ public class TestEZShopFR8 {
         allCreditsAndDebits = ez.getCreditsAndDebits(null, null);
         // the predefined DB has three balanceOperation, we want to observe if there are all of them
         assertEquals(3, allCreditsAndDebits.size());
+
+        // test all other possible inputs of getAllCreditsAndDebits
+        allCreditsAndDebits = ez.getCreditsAndDebits(LocalDate.of(2021, 5, 11), null);
+        assertEquals(1, allCreditsAndDebits.size());
+        allCreditsAndDebits = ez.getCreditsAndDebits(null, LocalDate.of(2021, 5, 11));
+        assertEquals(3, allCreditsAndDebits.size());
+        allCreditsAndDebits = ez.getCreditsAndDebits(LocalDate.of(2020, 2, 13), LocalDate.now());
+        assertEquals(2, allCreditsAndDebits.size());
     }
 
     /** This test method follows Scenario 9.4

@@ -7,7 +7,7 @@ Authors:
 - Palmucci Leonardo s288126
 - Dario Lanfranco s287524
 
-Date: 18/05/2021
+Date: 26/05/2021
 
 | Version | Changes |
 | ------- |---------|
@@ -19,7 +19,8 @@ Date: 18/05/2021
 | 6 | Fixed some sequence diagrams, added method to AccountBook |
 | 7 | Modified use case diagrams, class diagram and verification matrix |
 | 8 | Last fixes. Final version |
-| 9 | Post-coding fixes|
+| 9 | Post-coding fixes |
+| 10 | Post-testing fixes |
 
 # Contents
 
@@ -37,12 +38,12 @@ The design must satisfy the Official Requirements document, notably functional a
 ```plantuml
 @startuml
 package it.polito.ezshop.gui
-package it.polito.ezshop.model
 package it.polito.ezshop.data
 package it.polito.ezshop.exceptions
-it.polito.ezshop.gui -- it.polito.ezshop.model
-it.polito.ezshop.exceptions <-- it.polito.ezshop.model
-it.polito.ezshop.data <-- it.polito.ezshop.model
+package it.polito.ezshop.utils
+it.polito.ezshop.gui -- it.polito.ezshop.data
+it.polito.ezshop.exceptions <-- it.polito.ezshop.data
+it.polito.ezshop.utils -- it.polito.ezshop.data
 @enduml
 ```
 
@@ -136,7 +137,7 @@ interface EZShopInterface{
 }
 }
 
-package it.polito.ezshop.model{
+package it.polito.ezshop.data{
  class Shop{
 
 }
@@ -146,11 +147,11 @@ class Shop implements EZShopInterface
 @enduml
 ```
 
-The model contains the following classes, which are persistent:
+The data package contains the following classes, which are persistent:
 
 ```plantuml
 @startuml
-package it.polito.ezshop.model{
+package it.polito.ezshop.data{
 class Shop{
     +shopDB: SQLiteDB
     +currUser: User
@@ -167,57 +168,7 @@ class Shop{
 }
 
 Class SQLiteDB {
-    +connect(void)
-    +isConnected(void)
-    +closeConnection(void)
-    +createNewDatabase(void)
-    +initDatabase(void)
-    +clearDatabase(void)
-    +clearTable(String tableName)
-    +lastInsertRowId(void)
-    +createCustomersTable(void)
-    +selectAllCustomers(void)
-    +insertCustomer(String customerName, String customerCard)
-    +deleteCustomer(Integer id)
-    +updateCustomer(Integer customerId, String customerName, String customerCard)
-    +createBalanceOperationsTable(void)
-    +selectAllBalanceOperations(void)
-    +insertBalanceOperation(LocalDate date, double money, String type)
-    +deleteBalanceOperation(Integer id)
-    +updateBalanceOperation(Integer id, LocalDate date, double money, String type)
-    +selectTotalBalance(void)
-    +createOrdersTable(void)
-    +selectAllOrders(void)
-    +insertOrder(Integer balanceId, String productCode, double pricePerUnit, int quantity, String status)
-    +updateOrder(Integer id, Integer balanceId, String productCode, double pricePerUnit, int quantity, String status)
-    +createUsersTable(void)
-    +selectAllUsers(void)
-    +insertUser(String userName, String password, String role)
-    +deleteUser(Integer id)
-    +updateUser(Integer id, String userName, String password, String role)
-    +createCardsTable(void)
-    +selectAllCards(void)
-    +insertCard(Integer points)
-    +deleteCard(String cardCode)
-    +updateCard(String cardCode, Integer points)
-    +createProductTypesTable(void)
-    +selectAllProductTypes(void)
-    +insertProductType(Integer quantity, String location, String note, String productDescription, String barCode, double pricePerUnit)
-    +deleteProductType(Integer id)
-    +updateProductType(Integer id, Integer quantity, String location, String note, String productDescription, String barCode, double pricePerUnit)
-    +createTransactionsTable(void)
-    +selectAllSaleTransactions(void)
-    +selectAllReturnTransactions(void)
-    +insertSaleTransaction(List<TicketEntry> entries, double discountRate, double price, String status)
-    +insertReturnTransaction(List<TicketEntry> entries, int saleID, double price, String status)
-    +deleteTransaction(Integer transactionID)
-    +updateSaleTransaction(Integer transactionID, double discountRate, double price, String status)
-    +updateReturnTransaction(Integer transactionID, int saleID, double price, String status)
-    +createProductsPerSaleTable(void)
-    +insertProductPerSale(String barCode, Integer transactionID, int amount, double discountRate)
-    +deleteProductPerSale(String barCode, Integer transactionID)
-    +deleteAllProductsPerSale(Integer transactionID)
-    +updateProductPerSale(String barCode, Integer transactionID, int amount, double discountRate)
+    
 }
 Shop -- SQLiteDB
 
@@ -381,6 +332,67 @@ N14 .. ReturnTransaction
 }
 @enduml
 ```
+
+SQLite DB class has been separated for diagrams readability:
+
+```plantuml
+@startuml
+Class SQLiteDB {
+    +connect(void)
+    +isConnected(void)
+    +closeConnection(void)
+    +createNewDatabase(void)
+    +initDatabase(void)
+    +clearDatabase(void)
+    +clearTable(String tableName)
+    +lastInsertRowId(void)
+    +createCustomersTable(void)
+    +selectAllCustomers(void)
+    +insertCustomer(String customerName, String customerCard)
+    +deleteCustomer(Integer id)
+    +updateCustomer(Integer customerId, String customerName, String customerCard)
+    +createBalanceOperationsTable(void)
+    +selectAllBalanceOperations(void)
+    +insertBalanceOperation(LocalDate date, double money, String type)
+    +deleteBalanceOperation(Integer id)
+    +updateBalanceOperation(Integer id, LocalDate date, double money, String type)
+    +selectTotalBalance(void)
+    +createOrdersTable(void)
+    +selectAllOrders(void)
+    +insertOrder(Integer balanceId, String productCode, double pricePerUnit, int quantity, String status)
+    +updateOrder(Integer id, Integer balanceId, String productCode, double pricePerUnit, int quantity, String status)
+    +createUsersTable(void)
+    +selectAllUsers(void)
+    +insertUser(String userName, String password, String role)
+    +deleteUser(Integer id)
+    +updateUser(Integer id, String userName, String password, String role)
+    +createCardsTable(void)
+    +selectAllCards(void)
+    +insertCard(Integer points)
+    +deleteCard(String cardCode)
+    +updateCard(String cardCode, Integer points)
+    +createProductTypesTable(void)
+    +selectAllProductTypes(void)
+    +insertProductType(Integer quantity, String location, String note, String productDescription, String barCode, double pricePerUnit)
+    +deleteProductType(Integer id)
+    +updateProductType(Integer id, Integer quantity, String location, String note, String productDescription, String barCode, double pricePerUnit)
+    +createTransactionsTable(void)
+    +selectAllSaleTransactions(void)
+    +selectAllReturnTransactions(void)
+    +insertSaleTransaction(List<TicketEntry> entries, double discountRate, double price, String status)
+    +insertReturnTransaction(List<TicketEntry> entries, int saleID, double price, String status)
+    +deleteTransaction(Integer transactionID)
+    +updateSaleTransaction(Integer transactionID, double discountRate, double price, String status)
+    +updateReturnTransaction(Integer transactionID, int saleID, double price, String status)
+    +createProductsPerSaleTable(void)
+    +insertProductPerSale(String barCode, Integer transactionID, int amount, double discountRate)
+    +deleteProductPerSale(String barCode, Integer transactionID)
+    +deleteAllProductsPerSale(Integer transactionID)
+    +updateProductPerSale(String barCode, Integer transactionID, int amount, double discountRate)
+}
+@enduml
+ ```
+
 
 
 # Verification traceability matrix

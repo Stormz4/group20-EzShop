@@ -15,7 +15,7 @@ public class TestEZShop_updateCreditInTXTbyCardNumber {
     }
 
     @Test
-    public void testUpdateCredit1_correct() { // 150.00 + 50.00 = 200.00
+    public void testUpdateCredit1A_correct() { // 150.00 + 50.00 = 200.00
         isCorrect = EZShop.updateCreditInTXTbyCardNumber("4485370086510891", 50.0);
         value = EZShop.getCreditInTXTbyCardNumber("4485370086510891");
         assertTrue(isCorrect);
@@ -24,6 +24,24 @@ public class TestEZShop_updateCreditInTXTbyCardNumber {
 
         // take back money
         EZShop.updateCreditInTXTbyCardNumber("4485370086510891", -50.0);
+    }
+
+    @Test
+    public void testUpdateCredit1B_correct() { // 300.00 + 50.00 = 350.00
+        isCorrect = EZShop.updateCreditInTXTbyCardNumber("1476020159328823", 50.0);
+        value = EZShop.getCreditInTXTbyCardNumber("1476020159328823");
+        assertTrue(isCorrect);
+        assertEquals(350.00, value, 0.001);
+        // take back money
+        EZShop.updateCreditInTXTbyCardNumber("1476020159328823", -50.0);
+    }
+
+    @Test
+    public void testUpdateCredit_notEnoughMoney() {
+        isCorrect = EZShop.updateCreditInTXTbyCardNumber("8177206401238186", -50.0);
+        value = EZShop.getCreditInTXTbyCardNumber("8177206401238186");
+        assertFalse(isCorrect);
+        assertEquals(0.00, value, 0.001);
     }
 
     @Test

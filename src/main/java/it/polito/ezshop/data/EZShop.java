@@ -36,7 +36,6 @@ public class EZShop implements EZShopInterface {
     private HashMap<Integer, EZBalanceOperation> ezBalanceOperations;
     private HashMap<Integer, EZSaleTransaction> ezSaleTransactions;
     private HashMap<Integer, EZReturnTransaction> ezReturnTransactions;
-    private EZSaleTransaction tmpSaleTransaction;
 
     //================================================================================================================//
     //                                                  Constructor                                                   //
@@ -891,27 +890,7 @@ public class EZShop implements EZShopInterface {
         if (productCode == null || productCode.isEmpty() || !isValidBarCode(productCode)) {
             throw new InvalidProductCodeException();
         }
-        /*
-        try {
-            saleTransaction = (EZSaleTransaction) this.getSaleTransactionById(transactionId);
-            if (saleTransaction != null) {
-                ticketToUpdate = saleTransaction.getEntries().stream().filter(product -> product.getBarCode().equals(productCode))
-                        .findFirst().orElse(null);
-                productToRemove = this.getProductTypeByBarCode(productCode);
-                if (ticketToUpdate != null && ticketToUpdate.getAmount() >= amount && saleTransaction.hasRequiredStatus(EZSaleTransaction.STOpened)) {
-                    if (ticketToUpdate.getAmount() == amount) { // we have to remove all the products of this type
-                        saleTransaction.getEntries().remove(ticketToUpdate);
-                    }
-                    if (ticketToUpdate.getAmount() > amount) {
-                        ticketToUpdate.setAmount(ticketToUpdate.getAmount() - amount);
-                    }
-                    saleTransaction.setPrice(saleTransaction.getPrice() - productToRemove.getPricePerUnit()*amount); // update total price
-                    this.updateQuantity(productToRemove.getId(), amount);
-                    result = true;
-                }
-            }
-        }
-         */
+
         try {
             saleTransaction = this.getSaleTransactionById(transactionId);
             for (ProductType product : ezProducts.values()) {
@@ -1079,11 +1058,14 @@ public class EZShop implements EZShopInterface {
         EZSaleTransaction saleTransaction;
         if (this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier))
             throw new UnauthorizedException();
+
         if (transactionId == null || transactionId <= 0)
             throw new InvalidTransactionIdException();
+
         saleTransaction = this.ezSaleTransactions.values().stream()
-                .filter(sale -> sale.getTicketNumber().equals(transactionId) && sale.hasRequiredStatus(EZSaleTransaction.STClosed))
+                .filter(sale -> sale.getTicketNumber().equals(transactionId) && sale.hasRequiredStatus(EZSaleTransaction.STClosed, EZSaleTransaction.STPayed))
                 .findFirst().orElse(null);
+
         return saleTransaction;
     }
 
@@ -1184,13 +1166,13 @@ public class EZShop implements EZShopInterface {
             // add ReturnTransaction to SaleTransaction's list of returns
             List<EZReturnTransaction> returns = sale.getReturns();
             if(returns == null)
-                 returns = new LinkedList<EZReturnTransaction>();
+                returns = new LinkedList<EZReturnTransaction>();
+
+            returns.add(retToBeStored);
             sale.setReturns(returns);
-            sale.getReturns().add(retToBeStored);
 
             EZTicketEntry ezticket;
-
-            for ( TicketEntry ticket: tmpRetTr.getEntries()) {
+            for ( TicketEntry ticket: tmpRetTr.getEntries() ) {
                 ezticket = (EZTicketEntry) ticket;
                 EZProductType product = null;
                 for (EZProductType p : ezProducts.values()) {
@@ -1435,6 +1417,9 @@ public class EZShop implements EZShopInterface {
         if(!recordBalanceUpdateCashierAllowed(-returnedMoney))
             return -1; // return -1 if DB connection problems occur
 
+        if(!shopDB.updateReturnTransaction(retTr.getReturnId(), retTr.getReturnedValue(), RTPayed))
+            return -1;
+
         return returnedMoney;
 
     }
@@ -1453,18 +1438,21 @@ public class EZShop implements EZShopInterface {
         EZReturnTransaction retTr = getReturnTransactionById(returnId);
 
         if(retTr == null || !retTr.getStatus().equals(RTClosed))
-            return defaultID;
+            return -1;
 
         if(getCreditInTXTbyCardNumber(creditCard) == -1 || !isValidCreditCard(creditCard))
-            return defaultID;
+            return -1;
 
         double returnedMoney = retTr.getReturnedValue();
 
         if(!recordBalanceUpdateCashierAllowed(-returnedMoney))
-            return defaultID; // return -1 if DB connection problems occur
+            return -1; // return -1 if DB connection problems occur
 
         if(!updateCreditInTXTbyCardNumber(creditCard, +(retTr.getReturnedValue())))
-            return defaultID;
+            return -1;
+
+        if(!shopDB.updateReturnTransaction(retTr.getReturnId(), retTr.getReturnedValue(), RTPayed))
+            return -1;
 
         return returnedMoney;
     }
@@ -1569,6 +1557,9 @@ public class EZShop implements EZShopInterface {
         if (ezSaleTransactions == null)
             ezSaleTransactions = shopDB.selectAllSaleTransactions();
 
+        if (ezReturnTransactions == null)
+            ezReturnTransactions = shopDB.selectAllReturnTransactions();
+
         if (ezUsers == null)
             ezUsers = shopDB.selectAllUsers();
     }
@@ -1626,10 +1617,6 @@ public class EZShop implements EZShopInterface {
             return false;
 
         return ( card.isEmpty() || card.matches("\\b[0-9]{10}\\b") );
-    }
-
-    public BalanceOperation getBalanceOpById(Integer balanceId) {
-        return ezBalanceOperations.get(balanceId);
     }
 
     public EZSaleTransaction getSaleTransactionById(Integer saleNumber) {
@@ -1740,6 +1727,12 @@ public class EZShop implements EZShopInterface {
                 if(line.matches(cardNumber+";[0-9]*.[0-9]*")) {
                     String creditAsString = line.split(";")[1];
                     cardBalance = Double.parseDouble(creditAsString);
+
+                    if(cardBalance < 0)
+                        return false;
+
+                    if(toBeAdded < 0 && cardBalance < Math.abs(toBeAdded))
+                        return false;
 
                     cardBalance += toBeAdded;
                     newValue = Double.toString(cardBalance);

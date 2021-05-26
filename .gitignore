@@ -68,9 +68,6 @@ data/*
 **/.idea
 **/*.iml
 
-# Ignore DB
-# **/EZShopDB.db
-
 # Ignore structure101-settings.java.hsw
 **/structure101-settings.java.hsw
 

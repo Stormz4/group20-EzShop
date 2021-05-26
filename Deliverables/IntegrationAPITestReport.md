@@ -6,11 +6,14 @@ Authors:
 - Leonardo Palmucci s288126
 - Dario Lanfranco s287524
 
-Date: 24/05/2021
+Date: 26/05/2021
 
 | Version | Changes |
 | ------- |---------|
 | 1 | Added first version of IntegrationAPITestReport.md |
+| 2 | Added some additional scenarios |
+| 3 | FR and NFR tables completed |
+| 4 | Final version of IntegrationAPITestReport.md |
 
 # Contents
 
@@ -143,12 +146,6 @@ package "data" as data             {
 ```
 
 # Integration approach
-
-    <Write here the integration sequence you adopted, in general terms (top down, bottom up, mixed) and as sequence
-    (ex: step1: class A, step 2: class A+B, step 3: class A+B+C, etc)> 
-    <Some steps may  correspond to unit testing (ex step1 in ex above), presented in other document UnitTestReport.md>
-    <One step will  correspond to API testing>
-
 The integration sequence we adopted is bottom-up. We started with unit-testing, where we tested all the leaf classes and their methods (EZCustomer, EZProductType...), including the DB class (SQLiteDB).
 These test are documented in UnitTestReport.md.
 Then, we proceeded to test AccountBook which is the only intermediate class, followed by the API testing (Which consist in testing the class EZShop)
@@ -156,11 +153,7 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 
 #  Tests
 
-   <define below a table for each integration step. For each integration step report the group of classes under test, and the names of
-     JUnit test cases applied to them> JUnit test classes should be here src/test/java/it/polito/ezshop
-
 ## Step 1
-
 | Classes             | JUnit test cases             |
 |---------------------|------------------------------|
 | EZBalanceOperation  | TestEZShop_BalanceOperation  |
@@ -187,102 +180,54 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 
 
 ## Step 3
-| Classes  | JUnit test cases |
-|----------|------------------|
-|EZShop    | TestEZShopFR1    |
-|          | TestEZShopFR3    |
-|          | TestEZShopFR4    |
-|          | TestEZShopFR5    |
-|          | TestEZShopFR6    |
-|          | TestEZShopFR7    |
-|          | TestEZShopFR8    |
-
+| Classes  | JUnit test cases            |
+|----------|-----------------------------|
+|EZShop    | TestEZShopFR1               |
+|          | TestEZShopFR1_DeleteUser    |
+|          | TestEZShopFR3               |
+|          | TestEZShopFR4               |
+|          | TestEZShopFR5               |
+|          | TestEZShopFR6               |
+|          | TestEZShopFR7               |
+|          | TestEZShopFR8               |
+<br/>
 
 # Scenarios
 
+## Scenario UC1.4
 
-<If needed, define here additional scenarios for the application. Scenarios should be named
- referring the UC in the OfficialRequirements that they detail>
+| Scenario       |  Modify product type quantity      |
+| -------------- | :--------------------------------: |
+| Precondition   | Employee C exists and is logged in |
+|                | Product type X exists              |
+| Post condition | X.quantity = newQuantity           |
+| Step#          | Description                        |
+|  1             | C searches X via bar code          |
+|  2             | C selects X's record               |
+|  3             | C sets a new product quantity      |
 
-## Scenario UC2.1
+## Scenario UC4.5
 
-| Scenario |  Create user and define rights |
-| ------------- |:-------------:|
-|  Precondition     | Admin A exists and is logged in |
-|  Post condition     | Account X is created |
-| Step#        | Description  |
-|  1    |  A defines the credentials of the new Account X |
-|  2    |  A selects the access rights for the new account X |
-|  3    |  C confirms the inserted data |
-
-## Scenario UC2.2
-
-| Scenario |  Delete user |
-| ------------- |:-------------:|
-|  Precondition     | Admin A exists and is logged in |
-|  | Account X exists |
-|  Post condition     | Account X deleted |
-| Step#        | Description  |
-|  1    |  A selects account X  |
-|  2    |  X deleted from the system |
-
-## Scenario UC2.3
-
-| Scenario |  Modify user rights |
-| ------------- |:-------------:|
-|  Precondition     | Admin A exists and is logged in |
-|  | Account X exists |
-|  Post condition     | X's rights updated |
-| Step#        | Description  |
-|  1    |  A selects account X  |
-|  2    |  A selects the access rights for X |
-|  3    |  A confirms the inserted data |
-
-
-## Scenario UC4.1
-
-| Scenario |  Create customer record |
-| ------------- |:-------------:|
-|  Precondition     | Account U for Customer Cu not existing  |
-|  Post condition     | U is  into the system  |
-| Step#        | Description  |
-|  1    |  User asks Cu personal data |
-|  2    |  USer fills U's fields with Cu's personal data |
-|  3    |  User confirms  |
-
-
-## Scenario UC4.2
-
-| Scenario |  Attach Loyalty card to customer record |
-| ------------- |:-------------:|
+| Scenario |  Delete customer record |
+| ------------- |:-------------:| 
 |  Precondition     | Account U for Customer Cu existing  |
-|  Post condition     | Loyalty card L attached to U |
-| Step#        | Description  |
-|  1    |  User creates a new L with a unique serial number |
-|  2    |  User attaches L to U  |
-
-
-## Scenario UC4.3
-
-| Scenario |  Detach Loyalty card from customer record |
-| ------------- |:-------------:|
-|  Precondition     | Account U for Customer Cu existing  |
-| | Loyalty card L attached to U |
-|  Post condition     | Loyalty card L detached from U |
+|  Post condition     | Account U is deleted |
 | Step#        | Description  |
 |  1    |  User selects customer record U |
-|  2    |  User  detaches L from U  |
-|  3    |  U is updated |
+|  2    |  U deleted from the system | 
 
-## Scenario UC4.4
+## Scenario UC6.7
 
-| Scenario |  Update customer record |
-| ------------- |:-------------:|
-|  Precondition     | Account U for Customer Cu existing  |
-|  Post condition     | U updated |
+| Scenario |  Product type X removed from Sale transaction S |
+| ------------- |:-------------:| 
+|  Precondition     | Cashier C exists and is logged in |
+| | Sale transaction S exists and has been started |
+| | Product type X exists and it has been added to S (with quantity = Q)|
+|  Post condition     | Quantity N of X is removed from S  |
+| | X.quantity += N in catalogue |
 | Step#        | Description  |
-|  1    |  User selects customer record U |
-|  2    |  User modifies personal data of Cu  |
+|  1    |  Product X is selected among S products |  
+|  2    |  Quantity N of product type X (N <= Q) is removed from S |
 
 ## Scenario UC8.3
 
@@ -353,55 +298,55 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 
 
 # Coverage of Scenarios and FR
-
-<Report in the following table the coverage of  scenarios (from official requirements and from above) vs FR. 
-Report also for each of the scenarios the (one or more) API JUnit tests that cover it. >
-
-
 For Scenario 4.3 - Detach Loyalty card from customer record, there isn't a method in the API regarding this.
 
-| Scenario ID  | Functional Requirements covered | JUnit  Test(s)        |
-| ------------ | ------------------------------- | --------------------- |
-|  2.1         | FR1                             | TestEZShopFR1         |
-|  2.2         | FR1                             | TestEZShopFR1         |
-|  2.3         | FR1                             | TestEZShopFR1         |
-|  4.1         | FR5                             | TestEZShopFR5         |
-|  4.2         | FR5                             | TestEZShopFR5         |
-|  4.4         | FR5                             | TestEZShopFR5         |
-| 6.1         |  FR6      |     TestEZShopFR6         |
-| 6.2         |  FR6      |     TestEZShopFR6        |
-| 6.3         |  FR6      |     TestEZShopFR6         |
-| 6.4         |  FR6      |     TestEZShopFR6        |
-| 6.5         |  FR6      |     TestEZShopFR6         |
-| 6.6         |  FR6      |     TestEZShopFR6        |
-| 7.1   | FR7.2 | TestEZShopFR7.testReceiveCreditCardPayment |
-| 7.2       | FR7.2 | TestEZShopFR7.testInvalidCardPayment |
-| 7.3      | FR7.2 | TestEZShopFR7.testInsufficientCreditPayment |
-| 7.4      | FR7.1 | TestEZShopFR7.testReceiveCashPayment |
-| 8.1         |  FR6      |     TestEZShopFR6         |
-| 8.2         |  FR6      |     TestEZShopFR6        |
-| 8.3         |  FR6      |     TestEZShopFR6         |
-| 9.1       | FR8.3 | TestEZShopFR8.testGetAllCreditsAndDebits |
-| 9.2       | FR8.1 | TestEZShopFR8.testRecordDebit |
-| 9.3       | FR8.2 | TestEZShopFR8.testRecordCredit |
-| 9.4       | FR8.4 | TestEZShopFR8.testComputeBalance |
-| 10.1 | FR7.4 | TestEZShopFR7.testReturnCreditCardPayment |
-| 10.2 | FR7.3 | TestEZShopFR7.testReturnCashPayment |
-| 10.3 | FR7.4 | TestEZShopFR7.testReturnInvalidCardPayment |
+| Scenario ID  | Functional Requirements covered | JUnit  Test(s)                              |
+| ------------ | ------------------------------- | ------------------------------------------- |
+| 1.1          | FR3                             | TestEZShopFR3.testCreateProductType         |
+| 1.2          | FR4                             | TestEZShopFR4.testUpdatePosition            |
+| 1.3          | FR3                             | TestEZShopFR3.testUpdateProduct             |
+| 1.4          | FR4                             | TestEZShopFR3.testUpdateQuantity            |
+| 2.1          | FR1                             | TestEZShopFR1.testCreateUser                |  
+| 2.2          | FR1                             | TestEZShopFR1_DeleteUser.testDeleteUser     |
+| 2.3          | FR1                             | TestEZShopFR1.testUpdateUserRight           |
+| 3.1          | FR4                             | TestEZShopFR4.testIssueOrder                |
+| 3.2          | FR4                             | TestEZShopFR4.testPayOrder                  |
+| 3.3          | FR4                             | TestEZShopFR4.testRecordOrderArrival        |
+| 4.1          | FR5                             | TestEZShopFR5.testCustomerEZShop            |
+| 4.2          | FR5                             | TestEZShopFR5 testCardEZShop                |
+| 4.4          | FR5                             | TestEZShopFR5.testCustomerEZShop            |
+| 4.5          | FR5                             | TestEZShopFR5.testCustomerEZShop            |
+| 5.1          | FR1                             | TestEZShopFR1.testLogin                     |
+| 5.2          | FR1                             | TestEZShopFR1.testLogin                     |
+| 6.1          | FR6                             | TestEZShopFR6, methods testStartSaleTransaction, testAddProductToSale, testEndSaleTransaction |
+| 6.2          | FR6                             | TestEZShopFR6.testApplyDiscountRateToProduct                               |
+| 6.3          | FR6                             | TestEZShopFR6.testApplyDiscountRateToSale                               |
+| 6.5          | FR6                             | TestEZShopFR6.testDeleteSaleTransaction                               |
+| 6.6          | FR6                             | TestEZShopFR6, methods testStartSaleTransaction, testAddProductToSale, testEndSaleTransaction                               |
+| 6.7          | FR6                             | TestEZShopFR6.testDeleteProductFromSale                               |
+| 7.1          | FR7                             | TestEZShopFR7.testReceiveCreditCardPayment  |
+| 7.2          | FR7                             | TestEZShopFR7.testInvalidCardPayment        |
+| 7.3          | FR7                             | TestEZShopFR7.testInsufficientCreditPayment |
+| 7.4          | FR7                             | TestEZShopFR7.testReceiveCashPayment        |
+| 8.1          | FR6                             | TestEZShopFR6, methods testStartReturnTransaction, testReturnProduct, testEndReturnTransaction                              |
+| 8.2          | FR6                             | TestEZShopFR6, methods testStartReturnTransaction, testReturnProduct, testEndReturnTransaction                               |
+| 8.3          | FR6                             | TestEZShopFR6.testDeleteReturnTransaction                               |
+| 9.1          | FR8                             | TestEZShopFR8.testGetAllCreditsAndDebits    |
+| 9.2          | FR8                             | TestEZShopFR8.testRecordDebit               |
+| 9.3          | FR8                             | TestEZShopFR8.testRecordCredit              |
+| 9.4          | FR8                             | TestEZShopFR8.testComputeBalance            |
+| 10.1         | FR7                             | TestEZShopFR7.testReturnCreditCardPayment   |
+| 10.2         | FR7                             | TestEZShopFR7.testReturnCashPayment         |
+| 10.3         | FR7                             | TestEZShopFR7.testReturnInvalidCardPayment  |
 
 
 # Coverage of Non Functional Requirements
 
-<Report in the following table the coverage of the Non Functional Requirements of the application - only those that can be tested with automated testing frameworks.>
-
-
-### 
-
 | Non Functional Requirement | Test name |
 | -------------------------- | --------- |
-| NFR2                       | Every test case. Test that involve the DB take a bit longer than 0.5sec, but they involve multiple DB methods.          |
-| NFR3                       | TestEZShop_User     |
-| NFR4                       | TestEZShop_VerifyBarCode |
-| NFR5                       | TestEZShop_IsValidCreditCard |
-| NFR6                       | TestEZShop_IsValidCardT |
+| NFR2                       | Every test case. Some tests may take a bit longer than 0.5sec, depending on the CPU.   |
+| NFR3                       | TestEZShop_User                                                                        |
+| NFR4                       | TestEZShop_VerifyBarCode                                                               |
+| NFR5                       | TestEZShop_IsValidCreditCard                                                           |
+| NFR6                       | TestEZShop_IsValidCard                                                                 |
 

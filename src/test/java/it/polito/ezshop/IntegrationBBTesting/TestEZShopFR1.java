@@ -82,6 +82,12 @@ public class TestEZShopFR1 {
         }
 
         User u =ez.login("deleteTest", "pwd"); //Administrator
+        User u2 = ez.login("deleteTest", "pwd");
+        assertNull(u2);
+        boolean logout = ez.logout();
+        assertTrue(logout);
+        logout = ez.logout();
+        assertFalse(logout);
         assertNotNull(u);
     }
 
