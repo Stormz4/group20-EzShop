@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.HashMap;
 import java.util.List;
 import java.lang.Math;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static it.polito.ezshop.data.EZReturnTransaction.*;
@@ -53,7 +54,7 @@ public class EZShop implements EZShopInterface {
     //================================================================================================================//
     @Override
     public void reset() {
-        if ( !this.shopDB.isConnected() )
+        if (!this.shopDB.isConnected())
             this.shopDB.connect();
 
         if (this.shopDB.clearDatabase())
@@ -345,27 +346,23 @@ public class EZShop implements EZShopInterface {
     //================================================================================================================//
     @Override
     public boolean updateQuantity(Integer productId, int toBeAdded) throws InvalidProductIdException, UnauthorizedException {
-        if (productId == null || productId<=0){
-            throw new InvalidProductIdException();
-        }
-        if (!ezProducts.containsKey(productId)) {
-            return false;
-        }
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
+        if (this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
             throw new UnauthorizedException();
-        }
+
+        if (productId == null || productId <= 0)
+            throw new InvalidProductIdException();
+
+        if (!ezProducts.containsKey(productId))
+            return false;
 
         EZProductType prodType = ezProducts.get(productId);
-        if ((toBeAdded > 0) || (toBeAdded < 0 && prodType.getQuantity() > Math.abs(toBeAdded))){
-                    // If i need to remove 50 quantity (oBeAdded = -50), i must have quanity > abs(50).
-            int q = prodType.getQuantity();
+        if ((toBeAdded > 0) || (toBeAdded < 0 && prodType.getQuantity() >= Math.abs(toBeAdded))) {
+            int newQuantity = prodType.getQuantity() + toBeAdded;
 
-
-            boolean success = shopDB.updateProductType(productId, q+toBeAdded, prodType.getLocation(), prodType.getNote(), prodType.getProductDescription(), prodType.getBarCode(), prodType.getPricePerUnit());
-            if (!success)
+            if (!shopDB.updateProductType(productId, newQuantity, prodType.getLocation(), prodType.getNote(), prodType.getProductDescription(), prodType.getBarCode(), prodType.getPricePerUnit()))
                 return false;
 
-            prodType.setQuantity(toBeAdded+q);
+            prodType.setQuantity(newQuantity);
             ezProducts.replace(productId, prodType);
 
             return true;
@@ -376,22 +373,22 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean updatePosition(Integer productId, String newPos) throws InvalidProductIdException, InvalidLocationException, UnauthorizedException {
-        if (productId == null || productId<=0){
-            throw new InvalidProductIdException();
-        }
-        if (!ezProducts.containsKey(productId)) {
-            return false;
-        }
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
             throw new UnauthorizedException();
-        }
 
-        if (newPos == null || newPos.isEmpty()){
+        if (productId == null || productId <= 0)
+            throw new InvalidProductIdException();
+
+        if (!ezProducts.containsKey(productId))
+            return false;
+
+        EZProductType prodType = ezProducts.get(productId);
+        if (newPos == null || newPos.isEmpty()) {
             // Reset the location if null or empty
-            EZProductType prodType = ezProducts.get(productId);
-            boolean success = shopDB.updateProductType(productId, prodType.getQuantity(), "", prodType.getNote(), prodType.getProductDescription(), prodType.getBarCode(), prodType.getPricePerUnit());
-            if (!success)
+            boolean updated = shopDB.updateProductType(productId, prodType.getQuantity(), "", prodType.getNote(), prodType.getProductDescription(), prodType.getBarCode(), prodType.getPricePerUnit());
+            if (!updated)
                 return false;
+
             prodType.setLocation("");
             ezProducts.replace(productId, prodType);
             return true;
@@ -399,90 +396,83 @@ public class EZShop implements EZShopInterface {
         else {
             // position has to be unique: check if it is
             for (ProductType product : ezProducts.values()) {
-                if (product.getLocation().equals(newPos)) {
+                if (product.getLocation().equals(newPos))
                     return false;
-                }
             }
         }
 
-        //The position has the following format :
-        //<aisleNumber>-<rackAlphabeticIdentifier>-<levelNumber>
-        if (!(isValidPosition(newPos))){
-            // If it doens't match:
+        // The position has the following format :
+        // <aisleNumber>-<rackAlphabeticIdentifier>-<levelNumber>
+        if (!(isValidPosition(newPos)))
             throw new InvalidLocationException();
-        }
 
-        EZProductType prodType = ezProducts.get(productId);
-        boolean success = shopDB.updateProductType(productId, prodType.getQuantity(), newPos, prodType.getNote(), prodType.getProductDescription(), prodType.getBarCode(), prodType.getPricePerUnit());
-        if (!success)
+        boolean updated = shopDB.updateProductType(productId, prodType.getQuantity(), newPos, prodType.getNote(), prodType.getProductDescription(), prodType.getBarCode(), prodType.getPricePerUnit());
+        if (!updated)
             return false;
+
         prodType.setLocation(newPos);
         ezProducts.replace(productId, prodType);
+
         return true;
     }
 
     @Override
     public Integer issueOrder(String productCode, int quantity, double pricePerUnit) throws InvalidProductCodeException, InvalidQuantityException, InvalidPricePerUnitException, UnauthorizedException {
-        if (productCode == null || productCode.isEmpty() || !isValidBarCode(productCode)) {
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
+            throw new UnauthorizedException();
+
+        if (productCode == null || productCode.isEmpty() || !isValidBarCode(productCode))
             throw new InvalidProductCodeException();
-        }
 
         if (quantity <= 0)
             throw new InvalidQuantityException();
 
-        if (pricePerUnit <=0)
+        if (pricePerUnit <= 0)
             throw new InvalidPricePerUnitException();
-
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
-            throw new UnauthorizedException();
-        }
-
-        List<ProductType> pl = getAllProductTypes().stream().filter(p -> p.getBarCode().equals(productCode)).collect(Collectors.toList());
-        if(pl.size() != 1)
-            return -1;
 
         if (this.ezOrders == null)
             this.ezOrders = this.shopDB.selectAllOrders();
 
-        int orderID = shopDB.insertOrder(defaultID, productCode, pricePerUnit, quantity, EZOrder.OSIssued);
-        if (orderID == defaultID)
-            return orderID;
+        Optional<ProductType> prod = this.getAllProductTypes().stream().filter(p -> p.getBarCode().equals(productCode)).findAny();
+        if (!prod.isPresent())
+            return defaultID;
 
-        EZOrder newOrder = new EZOrder(orderID, -1, productCode, pricePerUnit, quantity, EZOrder.OSIssued);
-        this.ezOrders.put(orderID, newOrder);
+        int orderID = shopDB.insertOrder(defaultID, productCode, pricePerUnit, quantity, EZOrder.OSIssued);
+        if (orderID != defaultID) {
+            EZOrder newOrder = new EZOrder(orderID, defaultID, productCode, pricePerUnit, quantity, EZOrder.OSIssued);
+            this.ezOrders.put(orderID, newOrder);
+        }
 
         return orderID;
     }
 
     @Override
     public Integer payOrderFor(String productCode, int quantity, double pricePerUnit) throws InvalidProductCodeException, InvalidQuantityException, InvalidPricePerUnitException, UnauthorizedException {
-        if (productCode == null || productCode.isEmpty() || !isValidBarCode(productCode)) {
+        if (this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
+            throw new UnauthorizedException();
+
+        if (productCode == null || productCode.isEmpty() || !isValidBarCode(productCode))
             throw new InvalidProductCodeException();
-        }
 
         if (quantity <= 0)
             throw new InvalidQuantityException();
 
-        if (pricePerUnit <=0)
+        if (pricePerUnit <= 0)
             throw new InvalidPricePerUnitException();
 
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
-            throw new UnauthorizedException();
-        }
+        Optional<ProductType> prod = this.getAllProductTypes().stream().filter(p -> p.getBarCode().equals(productCode)).findAny();
+        if (!prod.isPresent())
+            return defaultID;
 
-        List<ProductType> pl = getAllProductTypes().stream().filter(p -> p.getBarCode().equals(productCode)).collect(Collectors.toList());
-        if(pl.size() != 1)
-            return -1;
-
-        if(pricePerUnit*quantity > accountingBook.currentBalance)
-            return -1;
+        if (pricePerUnit * quantity > accountingBook.currentBalance)
+            return defaultID;
 
         // issue new order:
         int id = issueOrder(productCode, quantity, pricePerUnit);
         EZOrder order = ezOrders.get(id);
 
-        if(!recordBalanceUpdate(-pricePerUnit*quantity))
-            return -1;
+        if (!this.recordBalanceUpdate(-pricePerUnit * quantity))
+            return defaultID;
 
         shopDB.updateOrder(order.getOrderId(), accountingBook.nextBalanceId, productCode, pricePerUnit, quantity, OSPayed);
         order.setBalanceId(accountingBook.nextBalanceId);
@@ -493,20 +483,18 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean payOrder(Integer orderId) throws InvalidOrderIdException, UnauthorizedException {
-        if (orderId == null || orderId <=0)
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
+            throw new UnauthorizedException();
+
+        if (orderId == null || orderId <= 0)
             throw new InvalidOrderIdException();
 
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
-            throw new UnauthorizedException();
-        }
-
         EZOrder order = ezOrders.get(orderId);
-
         if(order == null || !(order.getStatus().equals(OSIssued)))
             return false;
 
         // Additional check on balance current value (even if it is not requested by API):
-        if(order.getPricePerUnit()*order.getQuantity() > accountingBook.currentBalance)
+        if(order.getPricePerUnit() * order.getQuantity() > accountingBook.currentBalance)
             return false;
 
         if(!order.getStatus().equals(OSPayed)) {
@@ -523,44 +511,35 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean recordOrderArrival(Integer orderId) throws InvalidOrderIdException, UnauthorizedException, InvalidLocationException {
-        if (orderId == null || orderId <=0)
+        if (this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
+            throw new UnauthorizedException();
+
+        if (orderId == null || orderId <= 0)
             throw new InvalidOrderIdException();
 
         EZOrder order = ezOrders.get(orderId);
-
-//        if(order == null || !(order.getStatus().equals(OSIssued) || order.getStatus().equals(OSCompleted)))
-//            return false;
-
-        if(order == null || !(order.getStatus().equals(OSPayed) || order.getStatus().equals(OSCompleted)))
+        if (order == null || !(order.getStatus().equals(OSPayed) || order.getStatus().equals(OSCompleted)))
             return false;
 
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
-            throw new UnauthorizedException();
-        }
-
-        EZProductType prod = null;
-        for(EZProductType product : ezProducts.values()) {
-            if(product.getBarCode().equals(order.getProductCode())) {
-                prod = product;
-                break;
-            }
-        }
-
+        EZProductType prod = ezProducts.values().stream()
+                                                .filter(p -> p.getBarCode().equals(order.getProductCode()))
+                                                .findAny().orElse(null);
         if (prod == null)
             return false;
 
-        if( !isValidPosition(prod.getLocation()) )
+        if ( !isValidPosition(prod.getLocation()) )
             throw new InvalidLocationException();
 
-        if(!order.getStatus().equals(OSCompleted)) {
-           if(!shopDB.updateOrder(order.getOrderId(), order.getBalanceId(), order.getProductCode(), order.getPricePerUnit(),
+        if (!order.getStatus().equals(OSCompleted)) {
+           if (!shopDB.updateOrder(order.getOrderId(), order.getBalanceId(), order.getProductCode(), order.getPricePerUnit(),
                    order.getQuantity(), OSCompleted))
                return false;
            order.setStatus(OSCompleted);
 
-           if(!shopDB.updateProductType(prod.getId(), prod.getQuantity()+order.getQuantity(), prod.getLocation(),
-                   prod.getNote(), prod.getProductDescription(), prod.getBarCode(), prod.getPricePerUnit()))
+           Integer newQuantity = prod.getQuantity() + order.getQuantity();
+           if (!shopDB.updateProductType(prod.getId(), newQuantity, prod.getLocation(), prod.getNote(), prod.getProductDescription(), prod.getBarCode(), prod.getPricePerUnit()))
                return false;
+
            prod.editQuantity(order.getQuantity());
         }
 
@@ -569,16 +548,13 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public List<Order> getAllOrders() throws UnauthorizedException {
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
             throw new UnauthorizedException();
-        }
 
         if (this.ezOrders == null)
             return new LinkedList<>();
 
-        List<Order> orders = new LinkedList<>(this.ezOrders.values());
-
-        return orders;
+        return new LinkedList<>(this.ezOrders.values());
     }
 
 

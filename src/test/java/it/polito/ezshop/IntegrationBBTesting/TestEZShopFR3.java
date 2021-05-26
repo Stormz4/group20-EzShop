@@ -17,7 +17,7 @@ public class TestEZShopFR3 {
     private Integer productID;
 
     @Before
-    public void init() throws InvalidPasswordException, InvalidRoleException, InvalidUsernameException {
+    public void initTest() throws InvalidPasswordException, InvalidRoleException, InvalidUsernameException {
         shopDB = new SQLiteDB();
         shopDB.connect();
 
@@ -28,15 +28,9 @@ public class TestEZShopFR3 {
         shopDB.initDatabase();
 
         // CLear every DB table
-        boolean cleared = shopDB.clearTable(SQLiteDB.tBalanceOperations);
-        cleared &= shopDB.clearTable(SQLiteDB.tCards);
-        cleared &= shopDB.clearTable(SQLiteDB.tCustomers);
-        cleared &= shopDB.clearTable(SQLiteDB.tOrders);
-        cleared &= shopDB.clearTable(SQLiteDB.tProductTypes);
-        cleared &= shopDB.clearTable(SQLiteDB.tProductsPerSale);
-        cleared &= shopDB.clearTable(SQLiteDB.tTransactions);
-        cleared &= shopDB.clearTable(SQLiteDB.tUsers);
-        assertTrue(cleared);
+        // Init DB and clear all tables
+        shopDB.initDatabase();
+        shopDB.clearAllTables();
 
         ezShop = new EZShop();
 
@@ -345,13 +339,13 @@ public class TestEZShopFR3 {
         ezShop.logout();
         ezShop.login("cashier", "cashier");
         assertThrows(UnauthorizedException.class, () -> {
-            assertEquals(2, ezShop.getProductTypesByDescription("Description").size());
+            ezShop.getProductTypesByDescription("Description");
         });
 
         // Check authorization when no user is logged in
         ezShop.logout();
         assertThrows(UnauthorizedException.class, () -> {
-            assertEquals(2, ezShop.getProductTypesByDescription("Description").size());
+            ezShop.getProductTypesByDescription("Description");
         });
     }
 }
