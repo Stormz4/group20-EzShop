@@ -1703,6 +1703,12 @@ public class EZShop implements EZShopInterface {
                     String creditAsString = line.split(";")[1];
                     cardBalance = Double.parseDouble(creditAsString);
 
+                    if(cardBalance < 0)
+                        return false;
+
+                    if(toBeAdded < 0 && cardBalance < Math.abs(toBeAdded))
+                        return false;
+
                     cardBalance += toBeAdded;
                     newValue = Double.toString(cardBalance);
 
