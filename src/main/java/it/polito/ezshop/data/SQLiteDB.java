@@ -457,7 +457,6 @@ public class SQLiteDB {
         if (dbConnection == null)
             return defaultValue;
 
-        //double startingBalance = 0;
         double totalBalance = 0;
 
         try{
@@ -470,7 +469,6 @@ public class SQLiteDB {
             System.out.println(e.getMessage());
         }
 
-        //return totalBalance + startingBalance;
         return totalBalance;
     }
 
