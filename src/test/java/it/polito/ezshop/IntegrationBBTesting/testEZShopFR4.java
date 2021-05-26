@@ -457,4 +457,45 @@ public class testEZShopFR4 {
             ezShop.recordOrderArrival(orders.get(3));
         });
     }
+
+    @Test
+    public void testGetAllOrders() throws UnauthorizedException, InvalidQuantityException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidPasswordException, InvalidUsernameException {
+        // Test empty DB case
+        assertNotNull(ezShop.getAllOrders());
+
+        // Get products in EZShop
+        List<ProductType> prods = ezShop.getAllProductTypes();
+
+        // Add some order to pay
+        ezShop.issueOrder(prods.get(0).getBarCode(), 120,1.20);
+        ezShop.issueOrder(prods.get(1).getBarCode(), 30,3.50);
+        ezShop.issueOrder(prods.get(2).getBarCode(), 40,9.99);
+        ezShop.issueOrder(prods.get(3).getBarCode(), 20,2.50);
+
+        // Test standard case
+        assertTrue(ezShop.getAllOrders().size() > 0);
+
+        // Test authorization for ShopManager
+        ezShop.logout();
+        ezShop.login("manager", "manager");
+        assertTrue(ezShop.getAllOrders().size() > 0);
+
+        // Test authorization for Cashier
+        ezShop.logout();
+        ezShop.login("cashier", "cashier");
+        assertThrows(UnauthorizedException.class, () -> {
+            ezShop.getAllOrders();
+        });
+
+        // Test authorization when no user is logged in
+        ezShop.logout();
+        assertThrows(UnauthorizedException.class, () -> {
+            ezShop.getAllOrders();
+        });
+
+        // Test after ezShop's reset
+        ezShop.reset();
+        ezShop.login("manager", "manager");
+        assertNotNull(ezShop.getAllOrders());
+    }
 }

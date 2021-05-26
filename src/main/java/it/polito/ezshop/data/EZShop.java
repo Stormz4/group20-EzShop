@@ -548,16 +548,13 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public List<Order> getAllOrders() throws UnauthorizedException {
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
             throw new UnauthorizedException();
-        }
 
         if (this.ezOrders == null)
             return new LinkedList<>();
 
-        List<Order> orders = new LinkedList<>(this.ezOrders.values());
-
-        return orders;
+        return new LinkedList<>(this.ezOrders.values());
     }
 
 
