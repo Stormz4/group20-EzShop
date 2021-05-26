@@ -150,6 +150,7 @@ The model contains the following classes, which are persistent:
 
 ```plantuml
 @startuml
+set PLANTUML_LIMIT_SIZE=8192
 package it.polito.ezshop.model{
 class Shop{
     +shopDB: SQLiteDB
