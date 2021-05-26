@@ -1485,7 +1485,7 @@ public class EZShop implements EZShopInterface {
         LinkedList<BalanceOperation> balanceOperations = new LinkedList<>(ezBalanceOperations.values());
         List<BalanceOperation> filteredBalanceOperations = new LinkedList<>();
 
-        if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier) )
+        if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
             throw new UnauthorizedException();
 
         LocalDate startingDate;
@@ -1519,7 +1519,7 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public double computeBalance() throws UnauthorizedException {
-        if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier) )
+        if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
             throw new UnauthorizedException();
 
         if (accountingBook != null)
