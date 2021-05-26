@@ -95,7 +95,7 @@ public class TestEZShopFR8 {
         sale1.setStatus(EZSaleTransaction.STClosed);
 
         EZBalanceOperation bo1 = new EZBalanceOperation(defaultID, LocalDate.of(2019, 4, 22), 35, Debit);
-        int id_bo1 = shopDB.insertBalanceOperation(LocalDate.of(2019, 4, 22), 35, Debit);
+        int id_bo1 = shopDB.insertBalanceOperation(LocalDate.of(2019, 4, 22), -35, Debit);
         bo1.setBalanceId(id_bo1);
 
         EZBalanceOperation bo2 = new EZBalanceOperation(defaultID, LocalDate.of(2020, 2, 13), 110, Credit);
