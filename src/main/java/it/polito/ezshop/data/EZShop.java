@@ -1020,11 +1020,14 @@ public class EZShop implements EZShopInterface {
         EZSaleTransaction saleTransaction;
         if (this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier))
             throw new UnauthorizedException();
+
         if (transactionId == null || transactionId <= 0)
             throw new InvalidTransactionIdException();
+
         saleTransaction = this.ezSaleTransactions.values().stream()
-                .filter(sale -> sale.getTicketNumber().equals(transactionId) && sale.hasRequiredStatus(EZSaleTransaction.STClosed))
+                .filter(sale -> sale.getTicketNumber().equals(transactionId) && sale.hasRequiredStatus(EZSaleTransaction.STClosed, EZSaleTransaction.STPayed))
                 .findFirst().orElse(null);
+
         return saleTransaction;
     }
 
@@ -1376,6 +1379,9 @@ public class EZShop implements EZShopInterface {
         if(!recordBalanceUpdateCashierAllowed(-returnedMoney))
             return -1; // return -1 if DB connection problems occur
 
+        if(!shopDB.updateReturnTransaction(retTr.getReturnId(), retTr.getReturnedValue(), RTPayed))
+            return -1;
+
         return returnedMoney;
 
     }
@@ -1394,18 +1400,21 @@ public class EZShop implements EZShopInterface {
         EZReturnTransaction retTr = getReturnTransactionById(returnId);
 
         if(retTr == null || !retTr.getStatus().equals(RTClosed))
-            return defaultID;
+            return -1;
 
         if(getCreditInTXTbyCardNumber(creditCard) == -1 || !isValidCreditCard(creditCard))
-            return defaultID;
+            return -1;
 
         double returnedMoney = retTr.getReturnedValue();
 
         if(!recordBalanceUpdateCashierAllowed(-returnedMoney))
-            return defaultID; // return -1 if DB connection problems occur
+            return -1; // return -1 if DB connection problems occur
 
         if(!updateCreditInTXTbyCardNumber(creditCard, +(retTr.getReturnedValue())))
-            return defaultID;
+            return -1;
+
+        if(!shopDB.updateReturnTransaction(retTr.getReturnId(), retTr.getReturnedValue(), RTPayed))
+            return -1;
 
         return returnedMoney;
     }
