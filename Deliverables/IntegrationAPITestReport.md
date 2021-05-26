@@ -143,12 +143,6 @@ package "data" as data             {
 ```
 
 # Integration approach
-
-    <Write here the integration sequence you adopted, in general terms (top down, bottom up, mixed) and as sequence
-    (ex: step1: class A, step 2: class A+B, step 3: class A+B+C, etc)> 
-    <Some steps may  correspond to unit testing (ex step1 in ex above), presented in other document UnitTestReport.md>
-    <One step will  correspond to API testing>
-
 The integration sequence we adopted is bottom-up. We started with unit-testing, where we tested all the leaf classes and their methods (EZCustomer, EZProductType...), including the DB class (SQLiteDB).
 These test are documented in UnitTestReport.md.
 Then, we proceeded to test AccountBook which is the only intermediate class, followed by the API testing (Which consist in testing the class EZShop)
@@ -156,11 +150,7 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 
 #  Tests
 
-   <define below a table for each integration step. For each integration step report the group of classes under test, and the names of
-     JUnit test cases applied to them> JUnit test classes should be here src/test/java/it/polito/ezshop
-
 ## Step 1
-
 | Classes             | JUnit test cases             |
 |---------------------|------------------------------|
 | EZBalanceOperation  | TestEZShop_BalanceOperation  |
@@ -187,22 +177,31 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 
 
 ## Step 3
-| Classes  | JUnit test cases |
-|----------|------------------|
-|EZShop    | TestEZShopFR1    |
-|          | TestEZShopFR3    |
-|          | TestEZShopFR4    |
-|          | TestEZShopFR5    |
-|          | TestEZShopFR6    |
-|          | TestEZShopFR7    |
-|          | TestEZShopFR8    |
-
+| Classes  | JUnit test cases            |
+|----------|-----------------------------|
+|EZShop    | TestEZShopFR1               |
+|          | TestEZShopFR1_DeleteUser    |
+|          | TestEZShopFR3               |
+|          | TestEZShopFR4               |
+|          | TestEZShopFR5               |
+|          | TestEZShopFR6               |
+|          | TestEZShopFR7               |
+|          | TestEZShopFR8               |
+<br/>
 
 # Scenarios
 
+## Scenario UC1.4
 
-<If needed, define here additional scenarios for the application. Scenarios should be named
- referring the UC in the OfficialRequirements that they detail>
+| Scenario       |  Modify product type quantity      |
+| -------------- | :--------------------------------: |
+| Precondition   | Employee C exists and is logged in |
+|                | Product type X exists              |
+| Post condition | X.quantity = newQuantity           |
+| Step#          | Description                        |
+|  1             | C searches X via bar code          |
+|  2             | C selects X's record               |
+|  3             | C sets a new product quantity      |
 
 ## Scenario UC4.5
 
@@ -283,11 +282,6 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 
 
 # Coverage of Scenarios and FR
-
-<Report in the following table the coverage of  scenarios (from official requirements and from above) vs FR. 
-Report also for each of the scenarios the (one or more) API JUnit tests that cover it. >
-
-
 For Scenario 4.3 - Detach Loyalty card from customer record, there isn't a method in the API regarding this.
 
 | Scenario ID  | Functional Requirements covered | JUnit  Test(s)                              |
@@ -295,6 +289,7 @@ For Scenario 4.3 - Detach Loyalty card from customer record, there isn't a metho
 | 1.1          | FR3                             | TestEZShopFR3.testCreateProductType         |
 | 1.2          | FR4                             | TestEZShopFR4.testUpdatePosition            |
 | 1.3          | FR3                             | TestEZShopFR3.testUpdateProduct             |
+| 1.4          | FR4                             | TestEZShopFR3.testUpdateQuantity            |
 | 2.1          | FR1                             | TestEZShopFR1.testCreateUser                |  
 | 2.2          | FR1                             | TestEZShopFR1_DeleteUser.testDeleteUser     |
 | 2.3          | FR1                             | TestEZShopFR1.testUpdateUserRight           |
@@ -329,11 +324,6 @@ For Scenario 4.3 - Detach Loyalty card from customer record, there isn't a metho
 
 
 # Coverage of Non Functional Requirements
-
-<Report in the following table the coverage of the Non Functional Requirements of the application - only those that can be tested with automated testing frameworks.>
-
-
-### 
 
 | Non Functional Requirement | Test name |
 | -------------------------- | --------- |
