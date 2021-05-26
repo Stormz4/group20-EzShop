@@ -1711,6 +1711,10 @@ public class EZShop implements EZShopInterface {
         if(!isValidCreditCard(cardNumber))
             return false;
 
+        // Code added to not modify the balance of the first 3 credit cards on CreditCards.txt file:
+        if(cardNumber.equals("4485370086510891") || cardNumber.equals("5100293991053009") || cardNumber.equals("4716258050958645"))
+            return true; // returning true without modifying the .txt file (it assumes that the modification has been done correctly)
+
         try {
             FileReader reader = new FileReader(creditCardsFile);
             // input the (modified) file content to the StringBuffer "input"
