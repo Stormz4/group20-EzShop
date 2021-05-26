@@ -216,12 +216,12 @@ public class TestEZShopFR8 {
         assertThrows(UnauthorizedException.class, () -> ez.getCreditsAndDebits(null, null));
         assertThrows(UnauthorizedException.class, () -> ez.computeBalance());
 
-        // login with a Cashier, recordBalanceUpdate should not work
+        // login with a Cashier, no method should work
         ez.login("cashier", "cashier");
         assertThrows(UnauthorizedException.class, () -> ez.recordBalanceUpdate(45));
-        assertNotNull(ez.getCreditsAndDebits(null, null));
-        assertEquals(3575, ez.computeBalance(), 0.1);
-
+        assertThrows(UnauthorizedException.class, () -> ez.getCreditsAndDebits(null, null));
+        assertThrows(UnauthorizedException.class, () -> ez.computeBalance());
+        ez.logout();
 
         // login with a ShopManager, all methods should work
         ez.login("aldo", "pwd");
