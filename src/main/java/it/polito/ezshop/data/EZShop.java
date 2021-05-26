@@ -45,6 +45,9 @@ public class EZShop implements EZShopInterface {
 
         accountingBook = new EZAccountBook(0);
         accountingBook.setCurrentBalance(shopDB.selectTotalBalance()); // starting balance
+
+        // Populate returns list for every sale transaction
+        this.setReturnTransactionsForSaleTransactions();
     }
 
 
@@ -1127,11 +1130,11 @@ public class EZShop implements EZShopInterface {
 
             // add ReturnTransaction to SaleTransaction's list of returns
             List<EZReturnTransaction> returns = sale.getReturns();
-            if(returns == null)
+            if(returns == null) {
                 returns = new LinkedList<EZReturnTransaction>();
-
+                sale.setReturns(returns);
+            }
             returns.add(retToBeStored);
-            sale.setReturns(returns);
 
             EZTicketEntry ezticket;
             for ( TicketEntry ticket: tmpRetTr.getEntries() ) {
@@ -1720,6 +1723,19 @@ public class EZShop implements EZShopInterface {
         }
 
         return true;
+    }
+
+    private void setReturnTransactionsForSaleTransactions() {
+        if (ezSaleTransactions == null)
+            return;
+
+        for (EZSaleTransaction sale : ezSaleTransactions.values()) {
+            List<EZReturnTransaction> returns;
+            returns = ezReturnTransactions.values().stream()
+                                                   .filter(s -> s.getSaleTransactionId().equals(sale.getTicketNumber()))
+                                                   .collect(Collectors.toList());
+            sale.setReturns(returns);
+        }
     }
 
 
