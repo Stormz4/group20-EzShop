@@ -149,6 +149,93 @@ public class testEZShopFR6 {
     }
 
     @Test
+    public void testDeleteProductFromSale() throws InvalidPasswordException, InvalidUsernameException, UnauthorizedException, InvalidQuantityException, InvalidTransactionIdException, InvalidProductCodeException, InvalidPaymentException {
+        EZShop ez = new EZShop();
+
+        try {
+            ez.endSaleTransaction(1);
+            fail("UnauthorizedException incoming");
+        } catch (UnauthorizedException e){
+            assertNotNull(e);
+        }
+
+        ez.login("TransactionsTest", "pwd"); // Administrator logged-in
+
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.deleteProductFromSale(0, "2345344543423", 2);
+        });
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.deleteProductFromSale(-1, "2345344543423", 2);
+        });
+        assertThrows(InvalidTransactionIdException.class, () -> {
+            ez.deleteProductFromSale(null, "2345344543423", 2);
+        });
+
+        assertThrows(InvalidProductCodeException.class, () -> {
+            ez.deleteProductFromSale(1, "", 2);   // empty barCode
+        });
+        assertThrows(InvalidProductCodeException.class, () -> {
+            ez.deleteProductFromSale(1, null, 2);   // null barCode
+        });
+        assertThrows(InvalidProductCodeException.class, () -> {
+            ez.deleteProductFromSale(1, "4544334643418", 2);   // random number: invalid barCode
+        });
+
+        assertThrows(InvalidQuantityException.class, () -> {
+            ez.deleteProductFromSale(1, "2345344543423", -1);
+        });
+
+        int q_beforeAinCatalogue = ez.getProductTypeByBarCode("2345344543423").getQuantity();
+        int q_beforeBinCatalogue = ez.getProductTypeByBarCode("1155678522411").getQuantity();
+
+        int sid = ez.startSaleTransaction();
+        ez.addProductToSale(sid, "2345344543423", 10);
+        ez.addProductToSale(sid, "1155678522411", 2);
+        ez.addProductToSale(sid, "2177878523417", 6);
+
+        int q_beforeA = 10;
+        int q_beforeB = 2;
+
+        boolean ok = ez.deleteProductFromSale(sid, "71756985291145", 2); // product code does not exist in catalogue
+        assertFalse(ok);
+
+        ok = ez.deleteProductFromSale(sid, "3155678522419", 2); // product code does not exist in sale transaction but it exists in catalogue
+        assertFalse(ok);
+
+        ok = ez.deleteProductFromSale(sid, "2345344543423", 9000);
+        assertFalse(ok);
+
+
+        // correct deleting of a product from sale transaction: 2 over 10 items
+        ok = ez.deleteProductFromSale(sid, "2345344543423", 2);
+        assertTrue(ok);
+        List<TicketEntry> entries = ez.getSaleTransactionById(sid).getEntries().stream()
+                .filter(e -> e.getBarCode().equals("2345344543423")).collect(Collectors.toList());
+        assertEquals(q_beforeA-2, entries.get(0).getAmount(), 0);
+        int q_afterAinCatalogue = ez.getProductTypeByBarCode("2345344543423").getQuantity();
+        assertEquals(q_beforeAinCatalogue-q_beforeA+2, q_afterAinCatalogue);
+
+        // correct deleting of a product from sale transaction: exactly 2 over 2 items
+        ok = ez.deleteProductFromSale(sid, "1155678522411", 2);
+        assertTrue(ok);
+        entries = ez.getSaleTransactionById(sid).getEntries().stream()
+                .filter(e -> e.getBarCode().equals("1155678522411")).collect(Collectors.toList());
+        boolean empty = entries.isEmpty();
+        assertTrue(empty);
+        int q_afterBinCatalogue = ez.getProductTypeByBarCode("1155678522411").getQuantity();
+        assertEquals(q_beforeBinCatalogue-q_beforeB+2, q_afterBinCatalogue);
+
+
+        ez.endSaleTransaction(sid); // Sale Transaction status: CLOSED
+        ok = ez.deleteProductFromSale(sid, "2345344543423", 2);
+        assertFalse(ok);
+
+        ez.receiveCashPayment(sid, 500); // Sale Transaction status: PAYED
+        ok = ez.deleteProductFromSale(sid, "2345344543423", 2);
+        assertFalse(ok);
+    }
+
+    @Test
     public void testApplyDiscountRateToProduct() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidTransactionIdException, InvalidDiscountRateException, InvalidProductCodeException, InvalidQuantityException, InvalidPaymentException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidOrderIdException, InvalidLocationException, InvalidProductIdException {
         EZShop ez = new EZShop();
         try {
