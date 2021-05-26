@@ -807,12 +807,13 @@ public class SQLiteDB {
         if (!counted || cardsN >= MAX_CARDS)
             return "";
 
-        String sql = "INSERT INTO Cards(points) VALUES(?)";
+        String sql = "INSERT INTO Cards(id, points) VALUES(?,?)";
         String cardCode = "";
 
         try{
             PreparedStatement pstmt = dbConnection.prepareStatement(sql);
-            pstmt.setInt(1, points);
+            pstmt.setLong(1, cardsN + 1);
+            pstmt.setInt(2, points);
             pstmt.executeUpdate();
 
             Long cardId = this.lastInsertRowId();
