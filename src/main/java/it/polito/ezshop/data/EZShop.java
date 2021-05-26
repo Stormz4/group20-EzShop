@@ -1585,17 +1585,8 @@ public class EZShop implements EZShopInterface {
     }
 
     public EZSaleTransaction getSaleTransactionById(Integer saleNumber) {
-        /*
-        EZSaleTransaction saleTransaction;
-        if (this.tmpSaleTransaction.getTicketNumber().equals(saleNumber)) {
 
-            saleTransaction = tmpSaleTransaction;
-        }
-        else
-            saleTransaction = ezSaleTransactions.get(saleNumber);
-         */
-        EZSaleTransaction saleTransaction = this.ezSaleTransactions.get(saleNumber);
-        return saleTransaction;
+        return this.ezSaleTransactions.get(saleNumber);
     }
 
     public EZReturnTransaction getReturnTransactionById(Integer returnId) {
