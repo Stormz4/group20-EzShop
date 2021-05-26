@@ -204,86 +204,6 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 <If needed, define here additional scenarios for the application. Scenarios should be named
  referring the UC in the OfficialRequirements that they detail>
 
-## Scenario UC2.1
-
-| Scenario |  Create user and define rights |
-| ------------- |:-------------:|
-|  Precondition     | Admin A exists and is logged in |
-|  Post condition     | Account X is created |
-| Step#        | Description  |
-|  1    |  A defines the credentials of the new Account X |
-|  2    |  A selects the access rights for the new account X |
-|  3    |  C confirms the inserted data |
-
-## Scenario UC2.2
-
-| Scenario |  Delete user |
-| ------------- |:-------------:|
-|  Precondition     | Admin A exists and is logged in |
-|  | Account X exists |
-|  Post condition     | Account X deleted |
-| Step#        | Description  |
-|  1    |  A selects account X  |
-|  2    |  X deleted from the system |
-
-## Scenario UC2.3
-
-| Scenario |  Modify user rights |
-| ------------- |:-------------:|
-|  Precondition     | Admin A exists and is logged in |
-|  | Account X exists |
-|  Post condition     | X's rights updated |
-| Step#        | Description  |
-|  1    |  A selects account X  |
-|  2    |  A selects the access rights for X |
-|  3    |  A confirms the inserted data |
-
-
-## Scenario UC4.1
-
-| Scenario |  Create customer record |
-| ------------- |:-------------:|
-|  Precondition     | Account U for Customer Cu not existing  |
-|  Post condition     | U is  into the system  |
-| Step#        | Description  |
-|  1    |  User asks Cu personal data |
-|  2    |  USer fills U's fields with Cu's personal data |
-|  3    |  User confirms  |
-
-
-## Scenario UC4.2
-
-| Scenario |  Attach Loyalty card to customer record |
-| ------------- |:-------------:|
-|  Precondition     | Account U for Customer Cu existing  |
-|  Post condition     | Loyalty card L attached to U |
-| Step#        | Description  |
-|  1    |  User creates a new L with a unique serial number |
-|  2    |  User attaches L to U  |
-
-
-## Scenario UC4.3
-
-| Scenario |  Detach Loyalty card from customer record |
-| ------------- |:-------------:|
-|  Precondition     | Account U for Customer Cu existing  |
-| | Loyalty card L attached to U |
-|  Post condition     | Loyalty card L detached from U |
-| Step#        | Description  |
-|  1    |  User selects customer record U |
-|  2    |  User  detaches L from U  |
-|  3    |  U is updated |
-
-## Scenario UC4.4
-
-| Scenario |  Update customer record |
-| ------------- |:-------------:|
-|  Precondition     | Account U for Customer Cu existing  |
-|  Post condition     | U updated |
-| Step#        | Description  |
-|  1    |  User selects customer record U |
-|  2    |  User modifies personal data of Cu  |
-
 ## Scenario UC8.3
 
 | Scenario |  Return of all the sold products of a product type, cash |
@@ -365,15 +285,17 @@ For Scenario 4.3 - Detach Loyalty card from customer record, there isn't a metho
 | 1.1          | FR3                             | TestEZShopFR3                               |
 | 1.2          | FR3                             | TestEZShopFR3                               |
 | 1.3          | FR3                             | TestEZShopFR3                               |
-| 2.1          | FR1                             | TestEZShopFR1                               |  
-| 2.2          | FR1                             | TestEZShopFR1                               |
-| 2.3          | FR1                             | TestEZShopFR1                               |
+| 2.1          | FR1                             | TestEZShopFR1.testCreateUser                |  
+| 2.2          | FR1                             | TestEZShopFR1_DeleteUser.testDeleteUser     |
+| 2.3          | FR1                             | TestEZShopFR1.testUpdateUserRight           |
 | 3.1          | FR4                             | TestEZShopFR4                               |
 | 3.2          | FR4                             | TestEZShopFR4                               |
 | 3.3          | FR4                             | TestEZShopFR4                               |
-| 4.1          | FR5                             | TestEZShopFR5                               |
-| 4.2          | FR5                             | TestEZShopFR5                               |
-| 4.4          | FR5                             | TestEZShopFR5                               |
+| 4.1          | FR5                             | TestEZShopFR5.testCustomerEZShop            |
+| 4.2          | FR5                             | TestEZShopFR5 testCardEZShop                |
+| 4.4          | FR5                             | TestEZShopFR5.testCustomerEZShop            |
+| 5.1          | FR1                             | TestEZShopFR1.testLogin                     |
+| 5.2          | FR1                             | TestEZShopFR1.testLogin                     |
 | 6.1          | FR6                             | TestEZShopFR6                               |
 | 6.2          | FR6                             | TestEZShopFR6                               |
 | 6.3          | FR6                             | TestEZShopFR6                               |
