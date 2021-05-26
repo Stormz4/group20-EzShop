@@ -61,7 +61,7 @@ public class TestEZShopFR3 {
     }
 
     @Test
-    public void testAddProduct() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException {
+    public void testCreateProductType() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException {
         final String prodDescription = "Test product's description";
         final  String prodCode = "5839274928315";
         final double pricePerUnit = 4.50;
@@ -202,7 +202,7 @@ public class TestEZShopFR3 {
     }
 
     @Test
-    public void testDeleteProduct() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidProductIdException, InvalidPasswordException, InvalidUsernameException {
+    public void testDeleteProductType() throws UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidProductIdException, InvalidPasswordException, InvalidUsernameException {
         // Check proper deletion as admin
         productID = ezShop.createProductType("Product description", "3738456849238", 2.50, "Prod note");
         assertTrue(ezShop.deleteProductType(productID));
