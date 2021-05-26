@@ -1,6 +1,5 @@
 package it.polito.ezshop.IntegrationBBTesting;
 
-import it.polito.ezshop.data.EZProductType;
 import it.polito.ezshop.data.EZShop;
 import it.polito.ezshop.data.ProductType;
 import it.polito.ezshop.data.SQLiteDB;
