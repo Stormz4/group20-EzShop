@@ -26,7 +26,7 @@ public class testEZShopFR4 {
         shopDB = new SQLiteDB();
         shopDB.connect();
 
-        // Check connection
+        // Test connection
         assertTrue(shopDB.isConnected());
 
         // Init DB and clear all tables
@@ -92,7 +92,7 @@ public class testEZShopFR4 {
         // Test insufficient quantity
         assertFalse(ezShop.updateQuantity(this.products.get(2), -25));
 
-        // Check authorization for ShopManager
+        // Test authorization for ShopManager
         ezShop.logout();
         ezShop.login("manager", "manager");
         assertTrue(ezShop.updateQuantity(this.products.get(1), 5));
@@ -101,14 +101,14 @@ public class testEZShopFR4 {
         this.shopDB.closeConnection();
         assertFalse(ezShop.updateQuantity(this.products.get(0), 5));
 
-        // Check authorization for Cashier
+        // Test authorization for Cashier
         ezShop.logout();
         ezShop.login("cashier", "cashier");
         assertThrows(UnauthorizedException.class, () -> {
             ezShop.updateQuantity(this.products.get(1), 5);
         });
 
-        // Check authorization when no user is logged in
+        // Test authorization when no user is logged in
         ezShop.logout();
         assertThrows(UnauthorizedException.class, () -> {
             ezShop.updateQuantity(this.products.get(1), 5);
@@ -145,7 +145,7 @@ public class testEZShopFR4 {
         // Test uniqueness of position
         assertFalse(ezShop.updatePosition(this.products.get(3), "15-GH-50"));
 
-        // Check authorization for ShopManager
+        // Test authorization for ShopManager
         ezShop.logout();
         ezShop.login("manager", "manager");
         assertTrue(ezShop.updatePosition(this.products.get(1), "15-JK-50"));
@@ -160,14 +160,14 @@ public class testEZShopFR4 {
             ezShop.updatePosition(this.products.get(2), "N3WP0S");
         });
 
-        // Check authorization for Cashier
+        // Test authorization for Cashier
         ezShop.logout();
         ezShop.login("cashier", "cashier");
         assertThrows(UnauthorizedException.class, () -> {
             ezShop.updatePosition(this.products.get(1), "15-JK-50");
         });
 
-        // Check authorization when no user is logged in
+        // Test authorization when no user is logged in
         ezShop.logout();
         assertThrows(UnauthorizedException.class, () -> {
             ezShop.updateQuantity(this.products.get(1), 5);
@@ -220,7 +220,7 @@ public class testEZShopFR4 {
             ezShop.issueOrder(prods.get(1).getBarCode(), 25, -1.20);
         });
 
-        // Check authorization for ShopManager
+        // Test authorization for ShopManager
         ezShop.logout();
         ezShop.login("manager", "manager");
         assertTrue(ezShop.issueOrder(prods.get(1).getBarCode(), 120,1.20) > 0);
@@ -229,22 +229,94 @@ public class testEZShopFR4 {
         shopDB.closeConnection();
         assertEquals(defaultID, ezShop.issueOrder(prods.get(1).getBarCode(), 120,1.20).longValue());
 
-        // Check authorization for Cashier
+        // Test authorization for Cashier
         ezShop.logout();
         ezShop.login("cashier", "cashier");
         assertThrows(UnauthorizedException.class, () -> {
             ezShop.issueOrder("C0D3", -25, -1.20);
         });
 
-        // Check authorization when no user is logged in
+        // Test authorization when no user is logged in
         ezShop.logout();
         assertThrows(UnauthorizedException.class, () -> {
             ezShop.issueOrder("C0D3", -25, -1.20);
         });
 
-        // Check after ezShop's reset
+        // Test after ezShop's reset
         ezShop.reset();
         ezShop.login("manager", "manager");
         assertEquals(defaultID, ezShop.issueOrder(prods.get(1).getBarCode(), 120,1.20).longValue());
+    }
+
+    @Test
+    public void testPayOrderFor() throws UnauthorizedException, InvalidQuantityException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidPasswordException, InvalidUsernameException {
+        // Get products in EZShop
+        List<ProductType> prods = ezShop.getAllProductTypes();
+
+        // Test successful case
+        assertTrue(ezShop.payOrderFor(prods.get(1).getBarCode(), 20, 1.50) > 0);
+
+        // Test valid but inexistent barCode
+        assertEquals(defaultID, ezShop.payOrderFor("4627828478338", 20, 1.50).longValue());
+
+        // Test insufficient balance
+        assertEquals(defaultID, ezShop.payOrderFor(prods.get(1).getBarCode(), 9000, 999).longValue());
+
+        // Test null barCode
+        assertThrows(InvalidProductCodeException.class, () -> {
+            ezShop.payOrderFor(null, 25, 1.20);
+        });
+
+        // Test empty barCode
+        assertThrows(InvalidProductCodeException.class, () -> {
+            ezShop.payOrderFor("", 25, 1.20);
+        });
+
+        // Test invalid barCode
+        assertThrows(InvalidProductCodeException.class, () -> {
+            ezShop.payOrderFor("C0D3", 25, 1.20);
+        });
+
+        // Test invalid quantity (== 0)
+        assertThrows(InvalidQuantityException.class, () -> {
+            ezShop.payOrderFor(prods.get(1).getBarCode(), 0, 1.20);
+        });
+
+        // Test invalid quantity (< 0)
+        assertThrows(InvalidQuantityException.class, () -> {
+            ezShop.payOrderFor(prods.get(1).getBarCode(), -10, 1.20);
+        });
+
+        // Test invalid pricePerUnit (== 0)
+        assertThrows(InvalidPricePerUnitException.class, () -> {
+            ezShop.payOrderFor(prods.get(1).getBarCode(), 10, 0);
+        });
+
+        // Test invalid pricePerUnit (< 0)
+        assertThrows(InvalidPricePerUnitException.class, () -> {
+            ezShop.payOrderFor(prods.get(1).getBarCode(), 10, -1.20);
+        });
+
+        // Test authorization for ShopManager
+        ezShop.logout();
+        ezShop.login("manager", "manager");
+        assertTrue(ezShop.payOrderFor(prods.get(1).getBarCode(), 20, 1.50) > 0);
+
+        // Test missing DB's connection
+        shopDB.closeConnection();
+        assertEquals(defaultID, ezShop.payOrderFor(prods.get(1).getBarCode(), 20, 1.50).longValue());
+
+        // Test authorization for Cashier
+        ezShop.logout();
+        ezShop.login("cashier", "cashier");
+        assertThrows(UnauthorizedException.class, () -> {
+            ezShop.payOrderFor("4627828478338", 20, 1.50);
+        });
+
+        // Test authorization when no user is logged in
+        ezShop.logout();
+        assertThrows(UnauthorizedException.class, () -> {
+            ezShop.payOrderFor("4627828478338", -20, -1.50);
+        });
     }
 }

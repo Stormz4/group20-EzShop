@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.HashMap;
 import java.util.List;
 import java.lang.Math;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static it.polito.ezshop.data.EZReturnTransaction.*;
@@ -432,8 +433,8 @@ public class EZShop implements EZShopInterface {
         if (this.ezOrders == null)
             this.ezOrders = this.shopDB.selectAllOrders();
 
-        List<ProductType> pl = getAllProductTypes().stream().filter(p -> p.getBarCode().equals(productCode)).collect(Collectors.toList());
-        if(pl.size() != 1)
+        Optional<ProductType> prod = this.getAllProductTypes().stream().filter(p -> p.getBarCode().equals(productCode)).findAny();
+        if (!prod.isPresent())
             return defaultID;
 
         int orderID = shopDB.insertOrder(defaultID, productCode, pricePerUnit, quantity, EZOrder.OSIssued);
@@ -447,33 +448,31 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public Integer payOrderFor(String productCode, int quantity, double pricePerUnit) throws InvalidProductCodeException, InvalidQuantityException, InvalidPricePerUnitException, UnauthorizedException {
-        if (productCode == null || productCode.isEmpty() || !isValidBarCode(productCode)) {
+        if (this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
+            throw new UnauthorizedException();
+
+        if (productCode == null || productCode.isEmpty() || !isValidBarCode(productCode))
             throw new InvalidProductCodeException();
-        }
 
         if (quantity <= 0)
             throw new InvalidQuantityException();
 
-        if (pricePerUnit <=0)
+        if (pricePerUnit <= 0)
             throw new InvalidPricePerUnitException();
 
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
-            throw new UnauthorizedException();
-        }
+        Optional<ProductType> prod = this.getAllProductTypes().stream().filter(p -> p.getBarCode().equals(productCode)).findAny();
+        if (!prod.isPresent())
+            return defaultID;
 
-        List<ProductType> pl = getAllProductTypes().stream().filter(p -> p.getBarCode().equals(productCode)).collect(Collectors.toList());
-        if(pl.size() != 1)
-            return -1;
-
-        if(pricePerUnit*quantity > accountingBook.currentBalance)
-            return -1;
+        if (pricePerUnit * quantity > accountingBook.currentBalance)
+            return defaultID;
 
         // issue new order:
         int id = issueOrder(productCode, quantity, pricePerUnit);
         EZOrder order = ezOrders.get(id);
 
-        if(!recordBalanceUpdate(-pricePerUnit*quantity))
-            return -1;
+        if (!this.recordBalanceUpdate(-pricePerUnit * quantity))
+            return defaultID;
 
         shopDB.updateOrder(order.getOrderId(), accountingBook.nextBalanceId, productCode, pricePerUnit, quantity, OSPayed);
         order.setBalanceId(accountingBook.nextBalanceId);
