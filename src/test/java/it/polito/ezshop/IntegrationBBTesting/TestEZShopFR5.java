@@ -1,9 +1,6 @@
 package it.polito.ezshop.IntegrationBBTesting;
 
-import it.polito.ezshop.data.Customer;
-import it.polito.ezshop.data.EZCustomer;
-import it.polito.ezshop.data.EZShop;
-import it.polito.ezshop.data.SQLiteDB;
+import it.polito.ezshop.data.*;
 import it.polito.ezshop.exceptions.*;
 import org.junit.After;
 import org.junit.Before;
@@ -21,10 +18,11 @@ public class TestEZShopFR5 {
     Integer cId2;
     Integer cId3;
     Integer cId4;
+    Integer cTest;
     private final SQLiteDB shopDB2 = new SQLiteDB();
 
     @Before
-    public void init() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
+    public void init() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidCustomerNameException, UnauthorizedException {
         ez = new EZShop();
         shopDB2.connect();
         shopDB2.initDatabase();
@@ -145,38 +143,38 @@ public class TestEZShopFR5 {
     @Test
     public void testCardEZShop() throws InvalidCustomerIdException, InvalidCustomerCardException, UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidCustomerNameException {
         assertThrows(UnauthorizedException.class, () -> {
-            ez.attachCardToCustomer("000000099", 1);
+            ez.attachCardToCustomer("10000000009", 1);
         });
         assertThrows(UnauthorizedException.class, () -> {
-            ez.modifyPointsOnCard("000000099", 1);
+            ez.modifyPointsOnCard("1000000000", 1);
         });
 
         // ---- ATTACH CARD TO CUSTOMER ----
 
         ez.login("testFR5", "pwd");
 
+
         // Null or negative ID
         assertThrows(InvalidCustomerIdException.class, () -> {
-            ez.attachCardToCustomer("000000099", -1);
+            ez.attachCardToCustomer("1000000000", -1);
         });
         assertThrows(InvalidCustomerIdException.class, () -> {
-            ez.attachCardToCustomer("000000099", null);
+            ez.attachCardToCustomer("1000000000", null);
         });
-
-        // Empty, null or non valid string
-        assertThrows(InvalidCustomerCardException.class, () -> {
-            ez.attachCardToCustomer("", 1);
-        });
-        assertThrows(InvalidCustomerCardException.class, () -> {
-            ez.attachCardToCustomer(null, 1);
-        });
-        assertThrows(InvalidCustomerCardException.class, () -> {
-            ez.attachCardToCustomer("22", 1);
-        });
-
 
         String card = ez.createCard();
         cId3 = ez.defineCustomer("TestWithCards");
+
+        // Empty, null or non valid string
+        assertThrows(InvalidCustomerCardException.class, () -> {
+            ez.attachCardToCustomer("", cId3);
+        });
+        assertThrows(InvalidCustomerCardException.class, () -> {
+            ez.attachCardToCustomer(null, cId3);
+        });
+        assertThrows(InvalidCustomerCardException.class, () -> {
+            ez.attachCardToCustomer("22", cId3);
+        });
 
         // false if customer with given id doesn't exist
         boolean attachFailure = ez.attachCardToCustomer(card, 100000000);

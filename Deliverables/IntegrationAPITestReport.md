@@ -358,6 +358,7 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 Report also for each of the scenarios the (one or more) API JUnit tests that cover it. >
 
 
+For Scenario 4.3 - Detach Loyalty card from customer record, there isn't a method in the API regarding this.
 
 | Scenario ID  | Functional Requirements covered | JUnit  Test(s)        |
 | ------------ | ------------------------------- | --------------------- |
@@ -366,7 +367,6 @@ Report also for each of the scenarios the (one or more) API JUnit tests that cov
 |  2.3         | FR1                             | TestEZShopFR1         |
 |  4.1         | FR5                             | TestEZShopFR5         |
 |  4.2         | FR5                             | TestEZShopFR5         |
-|  4.3         | FR5                             | TestEZShopFR5         |
 |  4.4         | FR5                             | TestEZShopFR5         |
 | 6.1         |  FR6      |     TestEZShopFR6         |
 | 6.2         |  FR6      |     TestEZShopFR6        |
