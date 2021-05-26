@@ -36,7 +36,6 @@ public class EZShop implements EZShopInterface {
     private HashMap<Integer, EZBalanceOperation> ezBalanceOperations;
     private HashMap<Integer, EZSaleTransaction> ezSaleTransactions;
     private HashMap<Integer, EZReturnTransaction> ezReturnTransactions;
-    private EZSaleTransaction tmpSaleTransaction;
 
     //================================================================================================================//
     //                                                  Constructor                                                   //

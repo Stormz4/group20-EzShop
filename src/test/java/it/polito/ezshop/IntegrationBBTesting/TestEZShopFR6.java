@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.*;
 
 
-public class testEZShopFR6 {
+public class TestEZShopFR6 {
     EZShop ez;
     Integer uId;
     private final SQLiteDB shopDB2 = new SQLiteDB();

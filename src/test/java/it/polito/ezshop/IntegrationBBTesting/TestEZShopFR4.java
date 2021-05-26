@@ -15,7 +15,7 @@ import static it.polito.ezshop.data.EZUser.*;
 import static org.junit.Assert.*;
 import static it.polito.ezshop.data.SQLiteDB.defaultID;
 
-public class testEZShopFR4 {
+public class TestEZShopFR4 {
     private EZShop ezShop;
     private SQLiteDB shopDB;
     private LinkedList<Integer> products;
