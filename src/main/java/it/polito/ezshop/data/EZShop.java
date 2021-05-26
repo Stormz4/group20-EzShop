@@ -1510,6 +1510,9 @@ public class EZShop implements EZShopInterface {
         if (ezSaleTransactions == null)
             ezSaleTransactions = shopDB.selectAllSaleTransactions();
 
+        if (ezReturnTransactions == null)
+            ezReturnTransactions = shopDB.selectAllReturnTransactions();
+
         if (ezUsers == null)
             ezUsers = shopDB.selectAllUsers();
     }
