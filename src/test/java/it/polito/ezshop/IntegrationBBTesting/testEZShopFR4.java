@@ -43,6 +43,9 @@ public class testEZShopFR4 {
         // Login as admin
         ezShop.login("admin", "admin");
 
+        // Add some money to the balance
+        ezShop.recordBalanceUpdate(50000);
+
         // Add some product for tests
         this.products = new LinkedList<>();
         this.addSomeProductToTest();
