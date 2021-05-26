@@ -46,6 +46,44 @@ public class EZShop implements EZShopInterface {
 
         accountingBook = new EZAccountBook(0);
         accountingBook.setCurrentBalance(shopDB.selectTotalBalance()); // starting balance
+
+        try {
+            this.testDB();
+        } catch (InvalidQuantityException e) {
+            e.printStackTrace();
+        } catch (InvalidLocationException e) {
+            e.printStackTrace();
+        } catch (InvalidPricePerUnitException e) {
+            e.printStackTrace();
+        } catch (InvalidOrderIdException e) {
+            e.printStackTrace();
+        } catch (InvalidDiscountRateException e) {
+            e.printStackTrace();
+        } catch (InvalidProductIdException e) {
+            e.printStackTrace();
+        } catch (InvalidCustomerCardException e) {
+            e.printStackTrace();
+        } catch (InvalidCustomerIdException e) {
+            e.printStackTrace();
+        } catch (InvalidCustomerNameException e) {
+            e.printStackTrace();
+        } catch (InvalidTransactionIdException e) {
+            e.printStackTrace();
+        } catch (UnauthorizedException e) {
+            e.printStackTrace();
+        } catch (InvalidPasswordException e) {
+            e.printStackTrace();
+        } catch (InvalidProductDescriptionException e) {
+            e.printStackTrace();
+        } catch (InvalidRoleException e) {
+            e.printStackTrace();
+        } catch (InvalidPaymentException e) {
+            e.printStackTrace();
+        } catch (InvalidUsernameException e) {
+            e.printStackTrace();
+        } catch (InvalidProductCodeException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -1727,6 +1765,395 @@ public class EZShop implements EZShopInterface {
         }
 
         return true;
+    }
+
+    private void testDB() throws InvalidPasswordException, InvalidRoleException, InvalidUsernameException, UnauthorizedException, InvalidCustomerNameException, InvalidCustomerIdException, InvalidCustomerCardException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidQuantityException, InvalidOrderIdException, InvalidLocationException, InvalidTransactionIdException, InvalidDiscountRateException, InvalidPaymentException, InvalidProductIdException {
+
+        /*if (!USE_TEST_DB)
+            return;*/
+
+        currUser = new EZUser(999, "CURR_USER", "pwd", URAdministrator);
+
+        // Starting balance of the shop:
+        this.accountingBook = new EZAccountBook(0);
+        int startingBalanceValue = 50000;
+        this.accountingBook.setCurrentBalance(startingBalanceValue); //starting balance is then added by using a first Credit operation
+
+        // Users:
+        this.createUser("admin", "admin", URAdministrator);
+        this.createUser("sheldon", "pwd", URAdministrator);
+        this.createUser("manager", "manager", URShopManager);
+        this.createUser("aldo", "pwd", URShopManager);
+        this.createUser("cashier", "cashier", URCashier);
+        this.createUser("giovanni", "pwd", URCashier);
+        this.createUser("giacomo", "pwd", URCashier);
+
+        // Customers:
+        Integer c1 = this.defineCustomer("Leonard");
+        Integer c2 = this.defineCustomer("Penny");
+        Integer c3 = this.defineCustomer("Raj");
+        Integer c4 = this.defineCustomer("Cheerios");
+        Integer c5 = this.defineCustomer("Amy");
+        Integer c6 = this.defineCustomer("Bernadette");
+        Integer c7 = this.defineCustomer("Stuart");
+        Integer c8 = this.defineCustomer("Kripke");
+
+        // Customer cards:
+        String card1 = this.createCard();
+        String card2 = this.createCard();
+        String card3 = this.createCard();
+        String card4 = this.createCard();
+        String card5 = this.createCard();
+
+        this.attachCardToCustomer(card1, c1);
+        this.attachCardToCustomer(card2, c3);
+        this.attachCardToCustomer(card3, c4);
+        this.attachCardToCustomer(card4, c7);
+        this.attachCardToCustomer(card5, c8);
+
+        this.modifyPointsOnCard(card1, 120);
+        this.modifyPointsOnCard(card2, 380);
+        this.modifyPointsOnCard(card3, 410);
+        this.modifyPointsOnCard(card4, 9000);
+
+        // Products:
+        Integer p1 = this.createProductType("First product", "1345334543427", 12.50, "Sample note");
+        Integer p2 = this.createProductType("Second product", "4532344529689", 4.56, "Sample note");
+        Integer p3 = this.createProductType("Third product", "5839274928315", 7.60, "Sample note");
+        Integer p4 = this.createProductType("Fourth product", "6748397429434", 2.50, "Sample note");
+        Integer p5 = this.createProductType("Fifth product", "4778293942845", 32.67, "Sample note");
+        Integer p6 = this.createProductType("Sixth product", "8397489193845", 101.12, "Sample note");
+        Integer p7 = this.createProductType("Seventh product", "1627482847283", 10.10, "Sample note");
+        Integer p8 = this.createProductType("Eighth product", "3738456849238", 0.50, "Sample note");
+        Integer p9 = this.createProductType("Ninth product", "4482847392351", 1.50, "Sample note");
+        Integer p10 = this.createProductType("Tenth product", "7293829484929", 33.49, "Sample note");
+        Integer p11 = this.createProductType("Eleventh product", "4738294729395", 36.99, "Sample note");
+        Integer p12 = this.createProductType("Twelfth product", "4627828478338", 6.99, "Sample note");
+        Integer p13 = this.createProductType("Thirteenth product", "4892937849335", 4.21, "Sample note");
+        Integer p14 = this.createProductType("Fourteenth product", "4839947221225", 7.12, "Sample note");
+        Integer p15 = this.createProductType("Fifteenth product", "1881930382935", 12.10, "Sample note");
+        Integer p16 = this.createProductType("Sixteenth product", "4908382312833", 11.20, "Sample note");
+        Integer p17 = this.createProductType("Seventeenth product", "2141513141144", 77.00, "Sample note");
+
+        this.updatePosition(p1, "12-AB-34");
+        this.updatePosition(p2, "22-AB-35");
+        this.updatePosition(p3, "12-AB-36");
+        this.updatePosition(p4, "42-TB-34");
+        this.updatePosition(p5, "12-AB-37");
+        this.updatePosition(p6, "12-AB-38");
+        this.updatePosition(p7, "23-AB-39");
+        this.updatePosition(p8, "12-AB-40");
+        this.updatePosition(p9, "12-AB-41");
+        this.updatePosition(p10, "12-CB-34");
+        this.updatePosition(p11, "72-DB-34");
+        this.updatePosition(p12, "12-EB-34");
+        this.updatePosition(p13, "62-FB-36");
+        this.updatePosition(p14, "11-GB-38");
+        this.updatePosition(p15, "12-HB-39");
+        this.updatePosition(p16, "32-IB-35");
+        this.updatePosition(p17, "56-LB-34");
+
+
+        /// HISTORY:
+
+        // First Credit balance operation used to set the starting value of the balance of the shop:
+        shopDB.insertBalanceOperation(LocalDate.now(), startingBalanceValue, "CREDIT");
+
+        // Orders:
+        Integer o1 = this.issueOrder("1345334543427", 245, 5.33);
+        Integer o2 = this.issueOrder("4532344529689", 138, 2.12); // Couldn't be sold, since it is not arrived yet
+        Integer o3 = this.issueOrder("5839274928315", 100, 4.67);
+        Integer o4 = this.issueOrder("4778293942845", 159, 24.55); // Couldn't be sold, since it is not paid yet
+        Integer o5 = this.issueOrder("8397489193845", 120, 69.00);
+        Integer o6 = this.issueOrder("1627482847283", 200, 7.40);
+        Integer o7 = this.issueOrder("5839274928315", 480, 3.60); // Couldn't be sold, since it is not paid yet
+        Integer o8 = this.issueOrder("3738456849238", 300, 0.30);
+        Integer o9 = this.issueOrder("1345334543427", 150, 8.90);
+        Integer o10 = this.issueOrder("4482847392351", 215, 2.20); // Couldn't be sold, since it is not paid yet
+        Integer o11 = this.issueOrder("7293829484929", 112, 6.99); // Couldn't be sold, since it is not paid yet
+        Integer o12 = this.issueOrder("4738294729395", 78, 31.00); // Couldn't be sold, since it is not paid yet
+        Integer o13 = this.issueOrder("4627828478338", 30, 66.88); // Couldn't be sold, since it is not paid yet
+        Integer o14 = this.issueOrder("4908382312833", 400, 0.27); // Couldn't be sold, since it is not paid yet
+        Integer o15 = this.issueOrder("2141513141144", 25, 52.26); // Couldn't be sold, since it is not paid yet
+        this.payOrder(o1);
+        this.payOrder(o2);
+        this.payOrder(o3);
+        this.payOrder(o5);
+        this.payOrder(o6);
+        this.payOrder(o8);
+        this.payOrder(o9);
+        this.payOrder(o10);
+        this.payOrder(o11);
+        this.payOrder(o12);
+        this.payOrder(o14);
+        this.payOrder(o15);
+        this.recordOrderArrival(o1);
+        this.recordOrderArrival(o3);
+        this.recordOrderArrival(o5);
+        this.recordOrderArrival(o6);
+        this.recordOrderArrival(o8);
+        this.recordOrderArrival(o9);
+        this.recordOrderArrival(o11);
+        this.recordOrderArrival(o14);
+
+
+        // SaleTransactions:
+        // #1
+        Integer s1 = this.startSaleTransaction();
+        this.addProductToSale(s1, "1345334543427", 3);
+        this.addProductToSale(s1, "5839274928315", 1);
+        this.addProductToSale(s1, "8397489193845", 6);
+        this.addProductToSale(s1, "1627482847283", 2);
+        this.applyDiscountRateToProduct(s1, "1627482847283", 0.30);
+        this.applyDiscountRateToProduct(s1, "1345334543427", 0.12);
+        this.applyDiscountRateToSale(s1, 0.1);
+        this.endSaleTransaction(s1);
+        this.receiveCashPayment(s1, 500);
+
+        // #2
+        Integer s2 = this.startSaleTransaction();
+        this.addProductToSale(s2, "8397489193845", 8);
+        this.addProductToSale(s2, "1627482847283", 3);
+        this.applyDiscountRateToProduct(s2, "1627482847283", 0.10);
+        this.applyDiscountRateToProduct(s2, "8397489193845", 0.20);
+        this.endSaleTransaction(s2);
+        this.receiveCashPayment(s2, 500);
+
+        // #3
+        Integer s3 = this.startSaleTransaction();
+        this.addProductToSale(s3, "1345334543427", 1);
+        this.addProductToSale(s3, "5839274928315", 2);
+        this.addProductToSale(s3, "8397489193845", 4);
+        this.addProductToSale(s3, "1627482847283", 1);
+        this.applyDiscountRateToProduct(s3, "1627482847283", 0.30);
+        this.applyDiscountRateToProduct(s3, "1345334543427", 0.12);
+        this.applyDiscountRateToSale(s3, 0.3);
+        this.endSaleTransaction(s3);
+        this.receiveCashPayment(s3, 500);
+
+        // #4
+        Integer s4 = this.startSaleTransaction();
+        this.addProductToSale(s4, "3738456849238", 1);
+        this.endSaleTransaction(s4);
+        this.receiveCashPayment(s4, 500);
+
+        // #5
+        Integer s5 = this.startSaleTransaction();
+        this.addProductToSale(s5, "1345334543427", 9);
+        this.addProductToSale(s5, "5839274928315", 2);
+        this.addProductToSale(s5, "1627482847283", 1);
+        this.applyDiscountRateToProduct(s5, "5839274928315", 0.47);
+        this.applyDiscountRateToProduct(s5, "1345334543427", 0.30);
+        this.applyDiscountRateToSale(s5, 0.2);
+        this.endSaleTransaction(s5);
+        this.receiveCashPayment(s5, 500);
+
+        // #6
+        Integer s6 = this.startSaleTransaction();
+        this.addProductToSale(s6, "1345334543427", 4);
+        this.addProductToSale(s6, "1627482847283", 2);
+        this.applyDiscountRateToProduct(s6, "1627482847283", 0.30);
+        this.applyDiscountRateToProduct(s6, "1345334543427", 0.12);
+        this.applyDiscountRateToSale(s6, 0.1);
+        this.endSaleTransaction(s6);
+        this.receiveCashPayment(s6, 500);
+
+        // #7
+        Integer s7 = this.startSaleTransaction();
+        this.addProductToSale(s7, "1345334543427", 3);
+        this.addProductToSale(s7, "3738456849238", 1);
+        this.applyDiscountRateToProduct(s7, "1345334543427", 0.12);
+        this.endSaleTransaction(s7);
+        this.receiveCashPayment(s7, 1000);
+
+        // #8
+        Integer s8 = this.startSaleTransaction();
+        this.addProductToSale(s8, "1627482847283", 10);
+        this.applyDiscountRateToProduct(s8, "1627482847283", 0.70);
+        this.endSaleTransaction(s8);
+        this.receiveCashPayment(s8, 500);
+
+        // #9
+        Integer s9 = this.startSaleTransaction();
+        this.addProductToSale(s9, "1345334543427", 10);
+        this.addProductToSale(s9, "5839274928315", 9);
+        this.addProductToSale(s9, "8397489193845", 9);
+        this.addProductToSale(s9, "1627482847283", 2);
+        this.applyDiscountRateToProduct(s9, "1627482847283", 0.70);
+        this.applyDiscountRateToProduct(s9, "1345334543427", 0.22);
+        this.applyDiscountRateToSale(s9, 0.4);
+        this.endSaleTransaction(s9);
+        this.receiveCashPayment(s9, 500);
+
+        // #10
+        Integer s10 = this.startSaleTransaction();
+        this.addProductToSale(s10, "5839274928315", 1);
+        this.addProductToSale(s10, "8397489193845", 6);
+        this.addProductToSale(s10, "1627482847283", 2);
+        this.applyDiscountRateToProduct(s10, "1627482847283", 0.10);
+        this.applyDiscountRateToSale(s10, 0.3);
+        this.endSaleTransaction(s10);
+        this.receiveCashPayment(s10, 500);
+
+        // #11
+        Integer s11 = this.startSaleTransaction();
+        this.addProductToSale(s11, "1627482847283", 20);
+        this.applyDiscountRateToProduct(s11, "1627482847283", 0.30);
+        this.applyDiscountRateToSale(s11, 0.1);
+        this.endSaleTransaction(s11);
+        this.receiveCashPayment(s11, 500);
+
+        // #12
+        Integer s12 = this.startSaleTransaction();
+        this.addProductToSale(s12, "5839274928315", 4);
+        this.addProductToSale(s12, "8397489193845", 6);
+        this.endSaleTransaction(s12);
+        this.receiveCashPayment(s12, 500);
+
+        // #13
+        Integer s13 = this.startSaleTransaction();
+        this.addProductToSale(s13, "1345334543427", 12);
+        this.addProductToSale(s13, "5839274928315", 12);
+        this.addProductToSale(s13, "1627482847283", 2);
+        this.applyDiscountRateToProduct(s13, "1627482847283", 0.30);
+        this.applyDiscountRateToProduct(s13, "1345334543427", 0.12);
+        this.applyDiscountRateToSale(s13, 0.1);
+        this.endSaleTransaction(s13);
+        this.receiveCashPayment(s13, 500);
+
+        // #14
+        Integer s14 = this.startSaleTransaction();
+        this.addProductToSale(s14, "1345334543427", 10);
+        this.addProductToSale(s14, "1627482847283", 4);
+        this.applyDiscountRateToProduct(s14, "1627482847283", 0.30);
+        this.applyDiscountRateToProduct(s14, "1345334543427", 0.12);
+        this.applyDiscountRateToSale(s14, 0.6);
+        this.endSaleTransaction(s14);
+        this.receiveCashPayment(s14, 500);
+
+        // #15
+        Integer s15 = this.startSaleTransaction();
+        this.addProductToSale(s15, "1345334543427", 3);
+        this.addProductToSale(s15, "5839274928315", 3);
+        this.applyDiscountRateToProduct(s15, "1345334543427", 0.12);
+        this.applyDiscountRateToSale(s15, 0.23);
+        this.endSaleTransaction(s15);
+        this.receiveCashPayment(s15, 500);
+
+        // #16
+        Integer s16 = this.startSaleTransaction();
+        this.addProductToSale(s16, "1345334543427", 1);
+        this.addProductToSale(s16, "5839274928315", 1);
+        this.addProductToSale(s16, "8397489193845", 3);
+        this.addProductToSale(s16, "1627482847283", 4);
+        this.applyDiscountRateToProduct(s16, "1627482847283", 0.30);
+        this.applyDiscountRateToProduct(s16, "1345334543427", 0.12);
+        this.applyDiscountRateToSale(s16, 0.1);
+        this.endSaleTransaction(s16);
+        this.receiveCashPayment(s16, 500);
+
+        // #17
+        Integer s17 = this.startSaleTransaction();
+        this.addProductToSale(s17, "1345334543427", 3);
+        this.addProductToSale(s17, "5839274928315", 1);
+        this.addProductToSale(s17, "8397489193845", 6);
+        this.applyDiscountRateToProduct(s17, "1345334543427", 0.62);
+        this.applyDiscountRateToSale(s17, 0.3);
+        this.endSaleTransaction(s17);
+        this.receiveCashPayment(s17, 500);
+
+        // #18
+        Integer s18 = this.startSaleTransaction();
+        this.addProductToSale(s18, "1627482847283", 5);
+        this.applyDiscountRateToProduct(s18, "1627482847283", 0.40);
+        this.applyDiscountRateToSale(s18, 0.12);
+        this.endSaleTransaction(s18);
+        this.receiveCashPayment(s18, 500);
+
+        // #19
+        Integer s19 = this.startSaleTransaction();
+        this.addProductToSale(s19, "5839274928315", 10);
+        this.addProductToSale(s19, "1627482847283", 22);
+        this.applyDiscountRateToProduct(s19, "1627482847283", 0.30);
+        this.endSaleTransaction(s19);
+        this.receiveCashPayment(s19, 500);
+
+        // #20
+        Integer s20 = this.startSaleTransaction();
+        this.addProductToSale(s20, "1345334543427", 4);
+        this.addProductToSale(s20, "5839274928315", 3);
+        this.addProductToSale(s20, "1627482847283", 2);
+        this.applyDiscountRateToProduct(s20, "1627482847283", 0.50);
+        this.applyDiscountRateToProduct(s20, "1345334543427", 0.40);
+        this.applyDiscountRateToSale(s20, 0.1);
+        this.endSaleTransaction(s20);
+        this.receiveCashPayment(s20, 500);
+
+        // #21
+        Integer s21 = this.startSaleTransaction();
+        this.addProductToSale(s21, "1345334543427", 4);
+        this.addProductToSale(s21, "8397489193845", 6);
+        this.addProductToSale(s21, "1627482847283", 3);
+        this.applyDiscountRateToProduct(s21, "1627482847283", 0.30);
+        this.applyDiscountRateToProduct(s21, "1345334543427", 0.50);
+        this.endSaleTransaction(s21);
+        this.receiveCashPayment(s21, 1000);
+
+        // #22
+        Integer s22 = this.startSaleTransaction();
+        this.addProductToSale(s22, "5839274928315", 1);
+        this.addProductToSale(s22, "8397489193845", 6);
+        this.applyDiscountRateToSale(s22, 0.5);
+        this.endSaleTransaction(s22);
+        this.receiveCashPayment(s22, 500);
+
+
+        // ReturnTransactions:
+        // #1
+        Integer r1 = this.startReturnTransaction(s3);
+        this.returnProduct(r1, "8397489193845", 2);
+        this.returnProduct(r1, "5839274928315", 2);
+        this.endReturnTransaction(r1, true);
+        this.returnCashPayment(r1);
+
+        // #2
+        Integer r2 = this.startReturnTransaction(s4);
+        this.returnProduct(r2, "3738456849238", 1);
+        this.endReturnTransaction(r2, true);
+        this.returnCashPayment(r2);
+
+        // #3
+        Integer r3 = this.startReturnTransaction(s11);
+        this.returnProduct(r3, "1627482847283", 20);
+        this.endReturnTransaction(r3, true);
+        this.returnCashPayment(r3);
+
+        // #4
+        Integer r4 = this.startReturnTransaction(s15);
+        this.returnProduct(r4, "1345334543427", 3);
+        this.returnProduct(r4, "5839274928315", 2);
+        this.endReturnTransaction(r4, true);
+        this.returnCashPayment(r4);
+
+        // #5
+        Integer r5 = this.startReturnTransaction(s18);
+        this.returnProduct(r5, "1627482847283", 5);
+        this.endReturnTransaction(r5, true);
+        this.returnCashPayment(r5);
+
+        // #6
+        Integer r6 = this.startReturnTransaction(s7);
+        this.returnProduct(r6, "1345334543427", 3);
+        this.returnProduct(r6, "3738456849238", 1);
+        this.endReturnTransaction(r6, true);
+        this.returnCashPayment(r6);
+
+        // #7
+        Integer r7 = this.startReturnTransaction(s21);
+        this.returnProduct(r7, "8397489193845", 1);
+        this.endReturnTransaction(r7, true);
+        this.returnCashPayment(r7);
+
     }
 
 
