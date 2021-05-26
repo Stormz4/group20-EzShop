@@ -1128,13 +1128,13 @@ public class EZShop implements EZShopInterface {
             // add ReturnTransaction to SaleTransaction's list of returns
             List<EZReturnTransaction> returns = sale.getReturns();
             if(returns == null)
-                 returns = new LinkedList<EZReturnTransaction>();
+                returns = new LinkedList<EZReturnTransaction>();
+
+            returns.add(retToBeStored);
             sale.setReturns(returns);
-            sale.getReturns().add(retToBeStored);
 
             EZTicketEntry ezticket;
-
-            for ( TicketEntry ticket: tmpRetTr.getEntries()) {
+            for ( TicketEntry ticket: tmpRetTr.getEntries() ) {
                 ezticket = (EZTicketEntry) ticket;
                 EZProductType product = null;
                 for (EZProductType p : ezProducts.values()) {
