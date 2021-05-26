@@ -483,20 +483,18 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean payOrder(Integer orderId) throws InvalidOrderIdException, UnauthorizedException {
-        if (orderId == null || orderId <=0)
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
+            throw new UnauthorizedException();
+
+        if (orderId == null || orderId <= 0)
             throw new InvalidOrderIdException();
 
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
-            throw new UnauthorizedException();
-        }
-
         EZOrder order = ezOrders.get(orderId);
-
         if(order == null || !(order.getStatus().equals(OSIssued)))
             return false;
 
         // Additional check on balance current value (even if it is not requested by API):
-        if(order.getPricePerUnit()*order.getQuantity() > accountingBook.currentBalance)
+        if(order.getPricePerUnit() * order.getQuantity() > accountingBook.currentBalance)
             return false;
 
         if(!order.getStatus().equals(OSPayed)) {
