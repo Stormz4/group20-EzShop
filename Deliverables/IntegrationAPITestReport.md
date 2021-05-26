@@ -344,9 +344,9 @@ For Scenario 4.3 - Detach Loyalty card from customer record, there isn't a metho
 
 | Non Functional Requirement | Test name |
 | -------------------------- | --------- |
-| NFR2                       | Every test case. Test that involve the DB take a bit longer than 0.5sec, but they involve multiple DB methods.          |
-| NFR3                       | TestEZShop_User     |
-| NFR4                       | TestEZShop_VerifyBarCode |
-| NFR5                       | TestEZShop_IsValidCreditCard |
-| NFR6                       | TestEZShop_IsValidCardT |
+| NFR2                       | Every test case. Some tests may take a bit longer than 0.5sec, depending on the CPU.   |
+| NFR3                       | TestEZShop_User                                                                        |
+| NFR4                       | TestEZShop_VerifyBarCode                                                               |
+| NFR5                       | TestEZShop_IsValidCreditCard                                                           |
+| NFR6                       | TestEZShop_IsValidCard                                                                 |
 
