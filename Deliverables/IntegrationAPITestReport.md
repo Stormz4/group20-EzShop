@@ -204,6 +204,16 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 <If needed, define here additional scenarios for the application. Scenarios should be named
  referring the UC in the OfficialRequirements that they detail>
 
+## Scenario UC4.5
+
+| Scenario |  Delete customer record |
+| ------------- |:-------------:| 
+|  Precondition     | Account U for Customer Cu existing  |
+|  Post condition     | Account U is deleted |
+| Step#        | Description  |
+|  1    |  User selects customer record U |
+|  2    |  U deleted from the system | 
+
 ## Scenario UC8.3
 
 | Scenario |  Return of all the sold products of a product type, cash |
@@ -294,6 +304,7 @@ For Scenario 4.3 - Detach Loyalty card from customer record, there isn't a metho
 | 4.1          | FR5                             | TestEZShopFR5.testCustomerEZShop            |
 | 4.2          | FR5                             | TestEZShopFR5 testCardEZShop                |
 | 4.4          | FR5                             | TestEZShopFR5.testCustomerEZShop            |
+| 4.5          | FR5                             | TestEZShopFR5.testCustomerEZShop            |
 | 5.1          | FR1                             | TestEZShopFR1.testLogin                     |
 | 5.2          | FR1                             | TestEZShopFR1.testLogin                     |
 | 6.1          | FR6                             | TestEZShopFR6                               |
