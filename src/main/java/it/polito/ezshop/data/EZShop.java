@@ -53,7 +53,7 @@ public class EZShop implements EZShopInterface {
     //================================================================================================================//
     @Override
     public void reset() {
-        if ( !this.shopDB.isConnected() )
+        if (!this.shopDB.isConnected())
             this.shopDB.connect();
 
         if (this.shopDB.clearDatabase())
@@ -417,33 +417,30 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public Integer issueOrder(String productCode, int quantity, double pricePerUnit) throws InvalidProductCodeException, InvalidQuantityException, InvalidPricePerUnitException, UnauthorizedException {
-        if (productCode == null || productCode.isEmpty() || !isValidBarCode(productCode)) {
+        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
+            throw new UnauthorizedException();
+
+        if (productCode == null || productCode.isEmpty() || !isValidBarCode(productCode))
             throw new InvalidProductCodeException();
-        }
 
         if (quantity <= 0)
             throw new InvalidQuantityException();
 
-        if (pricePerUnit <=0)
+        if (pricePerUnit <= 0)
             throw new InvalidPricePerUnitException();
-
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
-            throw new UnauthorizedException();
-        }
-
-        List<ProductType> pl = getAllProductTypes().stream().filter(p -> p.getBarCode().equals(productCode)).collect(Collectors.toList());
-        if(pl.size() != 1)
-            return -1;
 
         if (this.ezOrders == null)
             this.ezOrders = this.shopDB.selectAllOrders();
 
-        int orderID = shopDB.insertOrder(defaultID, productCode, pricePerUnit, quantity, EZOrder.OSIssued);
-        if (orderID == defaultID)
-            return orderID;
+        List<ProductType> pl = getAllProductTypes().stream().filter(p -> p.getBarCode().equals(productCode)).collect(Collectors.toList());
+        if(pl.size() != 1)
+            return defaultID;
 
-        EZOrder newOrder = new EZOrder(orderID, -1, productCode, pricePerUnit, quantity, EZOrder.OSIssued);
-        this.ezOrders.put(orderID, newOrder);
+        int orderID = shopDB.insertOrder(defaultID, productCode, pricePerUnit, quantity, EZOrder.OSIssued);
+        if (orderID != defaultID) {
+            EZOrder newOrder = new EZOrder(orderID, defaultID, productCode, pricePerUnit, quantity, EZOrder.OSIssued);
+            this.ezOrders.put(orderID, newOrder);
+        }
 
         return orderID;
     }

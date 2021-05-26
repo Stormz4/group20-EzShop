@@ -1,6 +1,8 @@
 package it.polito.ezshop.IntegrationBBTesting;
 
+import it.polito.ezshop.data.EZProductType;
 import it.polito.ezshop.data.EZShop;
+import it.polito.ezshop.data.ProductType;
 import it.polito.ezshop.data.SQLiteDB;
 import it.polito.ezshop.exceptions.*;
 import org.junit.After;
@@ -8,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import static it.polito.ezshop.data.EZUser.*;
 import static org.junit.Assert.*;
@@ -154,7 +157,7 @@ public class testEZShopFR4 {
 
         // Test invalid newPos
         assertThrows(InvalidLocationException.class, () -> {
-            assertFalse(ezShop.updatePosition(this.products.get(2), "N3WP0S"));
+            ezShop.updatePosition(this.products.get(2), "N3WP0S");
         });
 
         // Check authorization for Cashier
@@ -169,5 +172,79 @@ public class testEZShopFR4 {
         assertThrows(UnauthorizedException.class, () -> {
             ezShop.updateQuantity(this.products.get(1), 5);
         });
+    }
+
+    @Test
+    public void testIssueOrder() throws UnauthorizedException, InvalidQuantityException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidPasswordException, InvalidUsernameException {
+        // Get products in EZShop
+        List<ProductType> prods = ezShop.getAllProductTypes();
+
+        // Test successful case
+        assertTrue(ezShop.issueOrder(prods.get(1).getBarCode(), 120,1.20) > 0);
+
+        // Test invalid quantity (== 0)
+        assertThrows(InvalidQuantityException.class, () -> {
+            ezShop.issueOrder(prods.get(1).getBarCode(), 0, 1.20);
+        });
+
+        // Test invalid quantity (< 0)
+        assertThrows(InvalidQuantityException.class, () -> {
+            ezShop.issueOrder(prods.get(1).getBarCode(), -15, 1.20);
+        });
+
+        // Test inexistent productCode
+        assertEquals(defaultID, ezShop.issueOrder("4892937849335", 10, 1.20).longValue());
+
+        // Test null productCode
+        assertThrows(InvalidProductCodeException.class, () -> {
+            ezShop.issueOrder(null, 25, 1.20);
+        });
+
+        // Test empty productCode
+        assertThrows(InvalidProductCodeException.class, () -> {
+            ezShop.issueOrder("", 25, 1.20);
+        });
+
+        // Test invalid productCode
+        assertThrows(InvalidProductCodeException.class, () -> {
+            ezShop.issueOrder("C0D3", 25, 1.20);
+        });
+
+        // Test invalid pricePerUnit (== 0)
+        assertThrows(InvalidPricePerUnitException.class, () -> {
+            ezShop.issueOrder(prods.get(1).getBarCode(), 25, 0);
+        });
+
+        // Test invalid pricePerUnit (< 0)
+        assertThrows(InvalidPricePerUnitException.class, () -> {
+            ezShop.issueOrder(prods.get(1).getBarCode(), 25, -1.20);
+        });
+
+        // Check authorization for ShopManager
+        ezShop.logout();
+        ezShop.login("manager", "manager");
+        assertTrue(ezShop.issueOrder(prods.get(1).getBarCode(), 120,1.20) > 0);
+
+        // Test missing DB's connection
+        shopDB.closeConnection();
+        assertEquals(defaultID, ezShop.issueOrder(prods.get(1).getBarCode(), 120,1.20).longValue());
+
+        // Check authorization for Cashier
+        ezShop.logout();
+        ezShop.login("cashier", "cashier");
+        assertThrows(UnauthorizedException.class, () -> {
+            ezShop.issueOrder("C0D3", -25, -1.20);
+        });
+
+        // Check authorization when no user is logged in
+        ezShop.logout();
+        assertThrows(UnauthorizedException.class, () -> {
+            ezShop.issueOrder("C0D3", -25, -1.20);
+        });
+
+        // Check after ezShop's reset
+        ezShop.reset();
+        ezShop.login("manager", "manager");
+        assertEquals(defaultID, ezShop.issueOrder(prods.get(1).getBarCode(), 120,1.20).longValue());
     }
 }
