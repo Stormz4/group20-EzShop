@@ -360,34 +360,39 @@ Report also for each of the scenarios the (one or more) API JUnit tests that cov
 
 For Scenario 4.3 - Detach Loyalty card from customer record, there isn't a method in the API regarding this.
 
-| Scenario ID  | Functional Requirements covered | JUnit  Test(s)        |
-| ------------ | ------------------------------- | --------------------- |
-|  2.1         | FR1                             | TestEZShopFR1         |
-|  2.2         | FR1                             | TestEZShopFR1         |
-|  2.3         | FR1                             | TestEZShopFR1         |
-|  4.1         | FR5                             | TestEZShopFR5         |
-|  4.2         | FR5                             | TestEZShopFR5         |
-|  4.4         | FR5                             | TestEZShopFR5         |
-| 6.1         |  FR6      |     TestEZShopFR6         |
-| 6.2         |  FR6      |     TestEZShopFR6        |
-| 6.3         |  FR6      |     TestEZShopFR6         |
-| 6.4         |  FR6      |     TestEZShopFR6        |
-| 6.5         |  FR6      |     TestEZShopFR6         |
-| 6.6         |  FR6      |     TestEZShopFR6        |
-| 7.1   | FR7.2 | TestEZShopFR7.testReceiveCreditCardPayment |
-| 7.2       | FR7.2 | TestEZShopFR7.testInvalidCardPayment |
-| 7.3      | FR7.2 | TestEZShopFR7.testInsufficientCreditPayment |
-| 7.4      | FR7.1 | TestEZShopFR7.testReceiveCashPayment |
-| 8.1         |  FR6      |     TestEZShopFR6         |
-| 8.2         |  FR6      |     TestEZShopFR6        |
-| 8.3         |  FR6      |     TestEZShopFR6         |
-| 9.1       | FR8.3 | TestEZShopFR8.testGetAllCreditsAndDebits |
-| 9.2       | FR8.1 | TestEZShopFR8.testRecordDebit |
-| 9.3       | FR8.2 | TestEZShopFR8.testRecordCredit |
-| 9.4       | FR8.4 | TestEZShopFR8.testComputeBalance |
-| 10.1 | FR7.4 | TestEZShopFR7.testReturnCreditCardPayment |
-| 10.2 | FR7.3 | TestEZShopFR7.testReturnCashPayment |
-| 10.3 | FR7.4 | TestEZShopFR7.testReturnInvalidCardPayment |
+| Scenario ID  | Functional Requirements covered | JUnit  Test(s)                              |
+| ------------ | ------------------------------- | ------------------------------------------- |
+| 1.1          | FR3                             | TestEZShopFR3                               |
+| 1.2          | FR3                             | TestEZShopFR3                               |
+| 1.3          | FR3                             | TestEZShopFR3                               |
+| 2.1          | FR1                             | TestEZShopFR1                               |  
+| 2.2          | FR1                             | TestEZShopFR1                               |
+| 2.3          | FR1                             | TestEZShopFR1                               |
+| 3.1          | FR4                             | TestEZShopFR4                               |
+| 3.2          | FR4                             | TestEZShopFR4                               |
+| 3.3          | FR4                             | TestEZShopFR4                               |
+| 4.1          | FR5                             | TestEZShopFR5                               |
+| 4.2          | FR5                             | TestEZShopFR5                               |
+| 4.4          | FR5                             | TestEZShopFR5                               |
+| 6.1          | FR6                             | TestEZShopFR6                               |
+| 6.2          | FR6                             | TestEZShopFR6                               |
+| 6.3          | FR6                             | TestEZShopFR6                               |
+| 6.5          | FR6                             | TestEZShopFR6                               |
+| 6.6          | FR6                             | TestEZShopFR6                               |
+| 7.1          | FR7                             | TestEZShopFR7.testReceiveCreditCardPayment  |
+| 7.2          | FR7                             | TestEZShopFR7.testInvalidCardPayment        |
+| 7.3          | FR7                             | TestEZShopFR7.testInsufficientCreditPayment |
+| 7.4          | FR7                             | TestEZShopFR7.testReceiveCashPayment        |
+| 8.1          | FR6                             | TestEZShopFR6                               |
+| 8.2          | FR6                             | TestEZShopFR6                               |
+| 8.3          | FR6                             | TestEZShopFR6                               |
+| 9.1          | FR8                             | TestEZShopFR8.testGetAllCreditsAndDebits    |
+| 9.2          | FR8                             | TestEZShopFR8.testRecordDebit               |
+| 9.3          | FR8                             | TestEZShopFR8.testRecordCredit              |
+| 9.4          | FR8                             | TestEZShopFR8.testComputeBalance            |
+| 10.1         | FR7                             | TestEZShopFR7.testReturnCreditCardPayment   |
+| 10.2         | FR7                             | TestEZShopFR7.testReturnCashPayment         |
+| 10.3         | FR7                             | TestEZShopFR7.testReturnInvalidCardPayment  |
 
 
 # Coverage of Non Functional Requirements
