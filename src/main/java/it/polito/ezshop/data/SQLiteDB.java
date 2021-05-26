@@ -543,7 +543,11 @@ public class SQLiteDB {
 
         try{
             PreparedStatement pstmt = dbConnection.prepareStatement(sql);
-            pstmt.setInt(1, balanceId);
+            if (balanceId > 0)
+                pstmt.setInt(1, balanceId);
+            else
+                pstmt.setNull(1, INTEGER);
+
             pstmt.setString(2, productCode);
             pstmt.setDouble(3, pricePerUnit);
             pstmt.setInt(4, quantity);
