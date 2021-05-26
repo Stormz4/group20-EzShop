@@ -853,27 +853,7 @@ public class EZShop implements EZShopInterface {
         if (productCode == null || productCode.isEmpty() || !isValidBarCode(productCode)) {
             throw new InvalidProductCodeException();
         }
-        /*
-        try {
-            saleTransaction = (EZSaleTransaction) this.getSaleTransactionById(transactionId);
-            if (saleTransaction != null) {
-                ticketToUpdate = saleTransaction.getEntries().stream().filter(product -> product.getBarCode().equals(productCode))
-                        .findFirst().orElse(null);
-                productToRemove = this.getProductTypeByBarCode(productCode);
-                if (ticketToUpdate != null && ticketToUpdate.getAmount() >= amount && saleTransaction.hasRequiredStatus(EZSaleTransaction.STOpened)) {
-                    if (ticketToUpdate.getAmount() == amount) { // we have to remove all the products of this type
-                        saleTransaction.getEntries().remove(ticketToUpdate);
-                    }
-                    if (ticketToUpdate.getAmount() > amount) {
-                        ticketToUpdate.setAmount(ticketToUpdate.getAmount() - amount);
-                    }
-                    saleTransaction.setPrice(saleTransaction.getPrice() - productToRemove.getPricePerUnit()*amount); // update total price
-                    this.updateQuantity(productToRemove.getId(), amount);
-                    result = true;
-                }
-            }
-        }
-         */
+
         try {
             saleTransaction = this.getSaleTransactionById(transactionId);
             for (ProductType product : ezProducts.values()) {
@@ -1588,10 +1568,6 @@ public class EZShop implements EZShopInterface {
             return false;
 
         return ( card.isEmpty() || card.matches("\\b[0-9]{10}\\b") );
-    }
-
-    public BalanceOperation getBalanceOpById(Integer balanceId) {
-        return ezBalanceOperations.get(balanceId);
     }
 
     public EZSaleTransaction getSaleTransactionById(Integer saleNumber) {
