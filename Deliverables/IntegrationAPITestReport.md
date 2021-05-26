@@ -282,15 +282,15 @@ For Scenario 4.3 - Detach Loyalty card from customer record, there isn't a metho
 
 | Scenario ID  | Functional Requirements covered | JUnit  Test(s)                              |
 | ------------ | ------------------------------- | ------------------------------------------- |
-| 1.1          | FR3                             | TestEZShopFR3                               |
-| 1.2          | FR3                             | TestEZShopFR3                               |
-| 1.3          | FR3                             | TestEZShopFR3                               |
+| 1.1          | FR3                             | TestEZShopFR3.testCreateProductType         |
+| 1.2          | FR4                             | TestEZShopFR4.testUpdatePosition            |
+| 1.3          | FR3                             | TestEZShopFR3.testUpdateProduct             |
 | 2.1          | FR1                             | TestEZShopFR1.testCreateUser                |  
 | 2.2          | FR1                             | TestEZShopFR1_DeleteUser.testDeleteUser     |
 | 2.3          | FR1                             | TestEZShopFR1.testUpdateUserRight           |
-| 3.1          | FR4                             | TestEZShopFR4                               |
-| 3.2          | FR4                             | TestEZShopFR4                               |
-| 3.3          | FR4                             | TestEZShopFR4                               |
+| 3.1          | FR4                             | TestEZShopFR4.testIssueOrder                |
+| 3.2          | FR4                             | TestEZShopFR4.testPayOrder                  |
+| 3.3          | FR4                             | TestEZShopFR4.testRecordOrderArrival        |
 | 4.1          | FR5                             | TestEZShopFR5.testCustomerEZShop            |
 | 4.2          | FR5                             | TestEZShopFR5 testCardEZShop                |
 | 4.4          | FR5                             | TestEZShopFR5.testCustomerEZShop            |
