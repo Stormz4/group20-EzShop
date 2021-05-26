@@ -30,7 +30,7 @@ public class testEZShopFR4 {
 
         // Init DB and clear all tables
         shopDB.initDatabase();
-        shopDB.clearAllTables();
+        shopDB.clearDatabase();
 
         ezShop = new EZShop();
 
