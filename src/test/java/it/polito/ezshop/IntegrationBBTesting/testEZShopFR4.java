@@ -324,9 +324,9 @@ public class testEZShopFR4 {
     public void testPayOrder() throws UnauthorizedException, InvalidQuantityException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidOrderIdException, InvalidPasswordException, InvalidUsernameException {
         // Get products in EZShop
         List<ProductType> prods = ezShop.getAllProductTypes();
-        List<Integer> orders = new LinkedList<>();
 
         // Add some order to pay
+        List<Integer> orders = new LinkedList<>();
         orders.add(ezShop.issueOrder(prods.get(0).getBarCode(), 120,1.20));
         orders.add(ezShop.issueOrder(prods.get(1).getBarCode(), 30,3.50));
         orders.add(ezShop.issueOrder(prods.get(2).getBarCode(), 9000,999));
@@ -379,6 +379,82 @@ public class testEZShopFR4 {
         ezShop.logout();
         assertThrows(UnauthorizedException.class, () -> {
             ezShop.payOrder(null);
+        });
+    }
+
+    @Test
+    public void testRecordOrderArrival() throws UnauthorizedException, InvalidQuantityException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidLocationException, InvalidOrderIdException, InvalidProductIdException, InvalidPasswordException, InvalidUsernameException {
+        // Get products in EZShop
+        List<ProductType> prods = ezShop.getAllProductTypes();
+
+        // Add some order to pay
+        List<Integer> orders = new LinkedList<>();
+        orders.add(ezShop.issueOrder(prods.get(0).getBarCode(), 120,1.20));
+        orders.add(ezShop.issueOrder(prods.get(1).getBarCode(), 30,3.50));
+        orders.add(ezShop.issueOrder(prods.get(2).getBarCode(), 40,9.99));
+        orders.add(ezShop.issueOrder(prods.get(3).getBarCode(), 20,2.50));
+
+        // Test order with status != PAYED and != COMPLETED
+        assertFalse(ezShop.recordOrderArrival(orders.get(1)));
+
+        // Test successful case
+        ezShop.payOrder(orders.get(0));
+        ezShop.updatePosition(this.products.get(0), "15-GH-50");
+        assertTrue(ezShop.recordOrderArrival(orders.get(0)));
+
+        // Test null orderID
+        assertThrows(InvalidOrderIdException.class, () -> {
+            ezShop.recordOrderArrival(null);
+        });
+
+        // Test invalid orderID (== 0)
+        assertThrows(InvalidOrderIdException.class, () -> {
+            ezShop.recordOrderArrival(0);
+        });
+
+        // Test invalid orderID (< 0)
+        assertThrows(InvalidOrderIdException.class, () -> {
+            ezShop.recordOrderArrival(-10);
+        });
+
+        // Test valid but inexistent orderID
+        assertFalse(ezShop.recordOrderArrival(30));
+
+        // Test inexistent productType
+        ezShop.payOrder(orders.get(1));
+        ezShop.deleteProductType(prods.get(1).getId());
+        assertFalse(ezShop.recordOrderArrival(orders.get(1)));
+
+        // Test invalid location
+        ezShop.payOrder(orders.get(3));
+        assertThrows(InvalidLocationException.class, () -> {
+            ezShop.recordOrderArrival(orders.get(3));
+        });
+
+        // Test authorization for ShopManager
+        ezShop.logout();
+        ezShop.login("manager", "manager");
+        ezShop.updatePosition(this.products.get(3), "15-KK-50");
+        assertTrue(ezShop.recordOrderArrival(orders.get(3)));
+
+        // Test missing DB's connection
+        ezShop.updatePosition(this.products.get(2), "15-YY-50");
+        ezShop.payOrder(orders.get(2));
+        shopDB.closeConnection();
+        ezShop.payOrder(orders.get(2));
+        assertFalse(ezShop.recordOrderArrival(orders.get(2)));
+
+        // Test authorization for Cashier
+        ezShop.logout();
+        ezShop.login("cashier", "cashier");
+        assertThrows(UnauthorizedException.class, () -> {
+            ezShop.recordOrderArrival(orders.get(3));
+        });
+
+        // Test authorization when no user is logged in
+        ezShop.logout();
+        assertThrows(UnauthorizedException.class, () -> {
+            ezShop.recordOrderArrival(orders.get(3));
         });
     }
 }

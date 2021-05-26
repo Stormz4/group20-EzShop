@@ -511,44 +511,35 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean recordOrderArrival(Integer orderId) throws InvalidOrderIdException, UnauthorizedException, InvalidLocationException {
-        if (orderId == null || orderId <=0)
+        if (this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
+            throw new UnauthorizedException();
+
+        if (orderId == null || orderId <= 0)
             throw new InvalidOrderIdException();
 
         EZOrder order = ezOrders.get(orderId);
-
-//        if(order == null || !(order.getStatus().equals(OSIssued) || order.getStatus().equals(OSCompleted)))
-//            return false;
-
-        if(order == null || !(order.getStatus().equals(OSPayed) || order.getStatus().equals(OSCompleted)))
+        if (order == null || !(order.getStatus().equals(OSPayed) || order.getStatus().equals(OSCompleted)))
             return false;
 
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager)){
-            throw new UnauthorizedException();
-        }
-
-        EZProductType prod = null;
-        for(EZProductType product : ezProducts.values()) {
-            if(product.getBarCode().equals(order.getProductCode())) {
-                prod = product;
-                break;
-            }
-        }
-
+        EZProductType prod = ezProducts.values().stream()
+                                                .filter(p -> p.getBarCode().equals(order.getProductCode()))
+                                                .findAny().orElse(null);
         if (prod == null)
             return false;
 
-        if( !isValidPosition(prod.getLocation()) )
+        if ( !isValidPosition(prod.getLocation()) )
             throw new InvalidLocationException();
 
-        if(!order.getStatus().equals(OSCompleted)) {
-           if(!shopDB.updateOrder(order.getOrderId(), order.getBalanceId(), order.getProductCode(), order.getPricePerUnit(),
+        if (!order.getStatus().equals(OSCompleted)) {
+           if (!shopDB.updateOrder(order.getOrderId(), order.getBalanceId(), order.getProductCode(), order.getPricePerUnit(),
                    order.getQuantity(), OSCompleted))
                return false;
            order.setStatus(OSCompleted);
 
-           if(!shopDB.updateProductType(prod.getId(), prod.getQuantity()+order.getQuantity(), prod.getLocation(),
-                   prod.getNote(), prod.getProductDescription(), prod.getBarCode(), prod.getPricePerUnit()))
+           Integer newQuantity = prod.getQuantity() + order.getQuantity();
+           if (!shopDB.updateProductType(prod.getId(), newQuantity, prod.getLocation(), prod.getNote(), prod.getProductDescription(), prod.getBarCode(), prod.getPricePerUnit()))
                return false;
+
            prod.editQuantity(order.getQuantity());
         }
 
