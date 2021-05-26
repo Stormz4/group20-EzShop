@@ -6,11 +6,14 @@ Authors:
 - Leonardo Palmucci s288126
 - Dario Lanfranco s287524
 
-Date: 24/05/2021
+Date: 26/05/2021
 
 | Version | Changes |
 | ------- |---------|
 | 1 | Added first version of IntegrationAPITestReport.md |
+| 2 | Added some additional scenarios |
+| 3 | FR and NFR tables completed |
+| 4 | Final version of IntegrationAPITestReport.md |
 
 # Contents
 
@@ -213,6 +216,19 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 |  1    |  User selects customer record U |
 |  2    |  U deleted from the system | 
 
+## Scenario UC6.7
+
+| Scenario |  Product type X removed from Sale transaction S |
+| ------------- |:-------------:| 
+|  Precondition     | Cashier C exists and is logged in |
+| | Sale transaction S exists and has been started |
+| | Product type X exists and it has been added to S (with quantity = Q)|
+|  Post condition     | Quantity N of X is removed from S  |
+| | X.quantity += N in catalogue |
+| Step#        | Description  |
+|  1    |  Product X is selected among S products |  
+|  2    |  Quantity N of product type X (N <= Q) is removed from S |
+
 ## Scenario UC8.3
 
 | Scenario |  Return of all the sold products of a product type, cash |
@@ -302,18 +318,19 @@ For Scenario 4.3 - Detach Loyalty card from customer record, there isn't a metho
 | 4.5          | FR5                             | TestEZShopFR5.testCustomerEZShop            |
 | 5.1          | FR1                             | TestEZShopFR1.testLogin                     |
 | 5.2          | FR1                             | TestEZShopFR1.testLogin                     |
-| 6.1          | FR6                             | TestEZShopFR6                               |
-| 6.2          | FR6                             | TestEZShopFR6                               |
-| 6.3          | FR6                             | TestEZShopFR6                               |
-| 6.5          | FR6                             | TestEZShopFR6                               |
-| 6.6          | FR6                             | TestEZShopFR6                               |
+| 6.1          | FR6                             | TestEZShopFR6, methods testStartSaleTransaction, testAddProductToSale, testEndSaleTransaction |
+| 6.2          | FR6                             | TestEZShopFR6.testApplyDiscountRateToProduct                               |
+| 6.3          | FR6                             | TestEZShopFR6.testApplyDiscountRateToSale                               |
+| 6.5          | FR6                             | TestEZShopFR6.testDeleteSaleTransaction                               |
+| 6.6          | FR6                             | TestEZShopFR6, methods testStartSaleTransaction, testAddProductToSale, testEndSaleTransaction                               |
+| 6.7          | FR6                             | TestEZShopFR6.testDeleteProductFromSale                               |
 | 7.1          | FR7                             | TestEZShopFR7.testReceiveCreditCardPayment  |
 | 7.2          | FR7                             | TestEZShopFR7.testInvalidCardPayment        |
 | 7.3          | FR7                             | TestEZShopFR7.testInsufficientCreditPayment |
 | 7.4          | FR7                             | TestEZShopFR7.testReceiveCashPayment        |
-| 8.1          | FR6                             | TestEZShopFR6                               |
-| 8.2          | FR6                             | TestEZShopFR6                               |
-| 8.3          | FR6                             | TestEZShopFR6                               |
+| 8.1          | FR6                             | TestEZShopFR6, methods testStartReturnTransaction, testReturnProduct, testEndReturnTransaction                              |
+| 8.2          | FR6                             | TestEZShopFR6, methods testStartReturnTransaction, testReturnProduct, testEndReturnTransaction                               |
+| 8.3          | FR6                             | TestEZShopFR6.testDeleteReturnTransaction                               |
 | 9.1          | FR8                             | TestEZShopFR8.testGetAllCreditsAndDebits    |
 | 9.2          | FR8                             | TestEZShopFR8.testRecordDebit               |
 | 9.3          | FR8                             | TestEZShopFR8.testRecordCredit              |
