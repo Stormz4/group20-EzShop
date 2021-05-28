@@ -10,14 +10,14 @@ These figures will not be used to evaluate neither the project nor the team, the
 
 | Week | requirement engineering | design | coding | unit testing | integration testing | acceptance testing | management | git maven |
 |:-----------:|:--------:|:-----------:|:-----------:|:----------:|:------------:|:---------------:|:-------------:|:--------------:|
-| apr 5 - 11 | 60 person hours | | | | | | | |
-| apr 12 - 18| 30 person hours| | | | | | | | 
-| apr 19 - 25| 15 person hours| 20 person hours | | | | | | | 
-| apr 26 - 2 | | 40 person hours| | | | | | | 
+| apr 5 - 11 | 60  | | | | | | | |
+| apr 12 - 18| 30 | | | | | | | | 
+| apr 19 - 25| 15| 20 | | | | | | | 
+| apr 26 - 2 | | 40 | | | | | | | 
 | may 3 - 9  | | |50 |5 | | | | | 
-| may 10 - 16| | |30 |25| | | | | 
-| may 17 - 23| | 2 | | | | | | | 
-| may 24 - 30| | | | | | | | | 
+| may 10 - 16| | |30 |35| | | | | 
+| may 17 - 23| | 2 | 20 | 60|40| | | | 
+| may 24 - 30| | 2 | 10| | 35| | | | 
 | jun 31 - 6 | | | | | | | | | 
 | jun 7 - 13 | | | | | | | | | 
 | jun 14 -20 | | | | | | | | | 
@@ -27,3 +27,4 @@ These figures will not be used to evaluate neither the project nor the team, the
 | jul 12 -18 | | | | | | | | |
 | jul 19 -25 | | | | | | | | |
 
+All measures are in person hours.

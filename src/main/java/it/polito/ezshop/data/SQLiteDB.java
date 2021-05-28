@@ -18,7 +18,7 @@ public class SQLiteDB {
     static final String JDBC_DB_NAME = "EZShopDB.db";
     static final String JDBC_DB_URL = "jdbc:sqlite:src/" + JDBC_DB_NAME;
     static final long MAX_CARDS = 9999999999L;
-    static final int defaultID = -1;
+    public static final int defaultID = -1;
     static final int defaultValue = 0;
     private static final int INTEGER = 4; // see https://docs.oracle.com/javase/8/docs/api/constant-values.html#java.sql.Types.INTEGER
 
@@ -34,27 +34,30 @@ public class SQLiteDB {
     public static final String[] tables =  new String [] {tBalanceOperations, tCards, tCustomers, tOrders, tProductsPerSale,
                                                             tProductsPerSale, tProductTypes, tTransactions, tUsers};
 
-    private Connection dbConnection = null;
+    static private Connection dbConnection = null;
 
     /**
      ** Connect to the DB
      */
     public boolean connect() {
+        if (dbConnection != null)
+            return true;
+
         try {
             // create a connection to the database
-            this.dbConnection = DriverManager.getConnection(JDBC_DB_URL);
+            dbConnection = DriverManager.getConnection(JDBC_DB_URL);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
             this.createNewDatabase();
         }
 
-        return this.dbConnection != null;
+        return dbConnection != null;
     }
 
     public boolean isConnected() {
-        if (this.dbConnection != null) {
+        if (dbConnection != null) {
             try {
-                return this.dbConnection.isValid(1);
+                return dbConnection.isValid(1);
             }
             catch (SQLException e) {
                 return false;
@@ -66,8 +69,9 @@ public class SQLiteDB {
 
     public void closeConnection() {
         try {
-            if (this.dbConnection != null) {
-                this.dbConnection.close();
+            if (dbConnection != null) {
+                dbConnection.close();
+                dbConnection = null;
             }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
@@ -78,13 +82,13 @@ public class SQLiteDB {
      ** Create the DB
      */
     private void createNewDatabase() {
-        if (this.dbConnection == null)
+        if (dbConnection == null)
             return;
 
         try {
-            this.dbConnection = DriverManager.getConnection(JDBC_DB_URL);
-            if (this.dbConnection != null) {
-                DatabaseMetaData meta = this.dbConnection.getMetaData();
+            dbConnection = DriverManager.getConnection(JDBC_DB_URL);
+            if (dbConnection != null) {
+                DatabaseMetaData meta = dbConnection.getMetaData();
                 System.out.println("The driver name is " + meta.getDriverName());
                 System.out.println("A new database has been created.");
             }
@@ -109,14 +113,17 @@ public class SQLiteDB {
     }
 
     public boolean clearDatabase() {
-        if (this.dbConnection == null)
+        if (!this.isConnected())
             return false;
 
-        boolean cleared = this.clearTable(tBalanceOperations);
-        cleared &= this.clearTable(tOrders);
-        cleared &= this.clearTable(tProductsPerSale);
-        cleared &= this.clearTable(tProductTypes);
-        cleared &= this.clearTable(tTransactions);
+        boolean cleared = this.clearTable(SQLiteDB.tBalanceOperations);
+        cleared &= this.clearTable(SQLiteDB.tCards);
+        cleared &= this.clearTable(SQLiteDB.tCustomers);
+        cleared &= this.clearTable(SQLiteDB.tOrders);
+        cleared &= this.clearTable(SQLiteDB.tProductTypes);
+        cleared &= this.clearTable(SQLiteDB.tProductsPerSale);
+        cleared &= this.clearTable(SQLiteDB.tTransactions);
+        cleared &= this.clearTable(SQLiteDB.tUsers);
 
         return cleared;
   }
@@ -134,7 +141,7 @@ public class SQLiteDB {
         String sql =  "DELETE FROM " + tableName + " ;";
 
         try{
-            Statement stmt = this.dbConnection.createStatement();
+            Statement stmt = dbConnection.createStatement();
             stmt.execute(sql);
             return true;
         } catch (SQLException e) {
@@ -148,14 +155,14 @@ public class SQLiteDB {
      ** Returns the id of the last inserted row, no matter the table
      */
     private long lastInsertRowId() {
-        if (this.dbConnection == null)
+        if (dbConnection == null)
             return defaultID;
 
         String sql = "SELECT last_insert_rowid() AS id;";
         long lastId = defaultID;
 
         try{
-            Statement stmt  = this.dbConnection.createStatement();
+            Statement stmt  = dbConnection.createStatement();
             ResultSet rs    = stmt.executeQuery(sql);
 
             if (rs.next())
@@ -173,7 +180,7 @@ public class SQLiteDB {
      ** EZCustomer(Integer id, String customerName, String customerCard)
      */
     private void createCustomersTable() {
-        if (this.dbConnection == null)
+        if (dbConnection == null)
             return;
 
         // SQL statement for creating a new Customer table
@@ -185,7 +192,7 @@ public class SQLiteDB {
                    + ");";
 
         try{
-            Statement stmt = this.dbConnection.createStatement();
+            Statement stmt = dbConnection.createStatement();
             stmt.execute(sql);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -202,7 +209,7 @@ public class SQLiteDB {
                    + "LEFT JOIN Cards ON Customers.card = Cards.id;";
 
         try {
-            Statement stmt  = this.dbConnection.createStatement();
+            Statement stmt  = dbConnection.createStatement();
             ResultSet rs    = stmt.executeQuery(sql);
 
             // loop through the result set
@@ -225,14 +232,14 @@ public class SQLiteDB {
      ** Insert new Customer record
      */
     public Integer insertCustomer(String customerName, String customerCard) {
-        if (this.dbConnection == null || customerName == null || customerCard == null)
+        if (dbConnection == null || customerName == null || customerCard == null)
             return defaultID;
 
         String sql = "INSERT INTO Customers(name, card) VALUES(?,?)";
         int customerId = defaultID;
 
         try{
-            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
             pstmt.setString(1, customerName);
             if (customerCard.isEmpty())
                 pstmt.setNull(2, INTEGER);
@@ -252,14 +259,14 @@ public class SQLiteDB {
      ** Delete Customer record with given id
      */
     public boolean deleteCustomer(Integer id) {
-        if (this.dbConnection == null || id == null)
+        if (dbConnection == null || id == null)
             return false;
 
         String sql = "DELETE FROM Customers WHERE id=?";
         boolean deleted = false;
 
         try{
-            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
             deleted = true;
@@ -274,7 +281,7 @@ public class SQLiteDB {
      ** Update Customer record
      */
     public boolean updateCustomer(Integer customerId, String customerName, String customerCard) {
-        if (this.dbConnection == null || customerId == null || customerName == null || customerCard == null)
+        if (dbConnection == null || customerId == null || customerName == null || customerCard == null)
             return false;
 
         if (customerName.isEmpty())
@@ -286,7 +293,7 @@ public class SQLiteDB {
                    + "WHERE id = ?;";
 
         try{
-            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
             pstmt.setString(1, customerName);
             if (customerCard.isEmpty())
                 pstmt.setNull(2, INTEGER);
@@ -307,7 +314,7 @@ public class SQLiteDB {
      ** EZBalanceOperation (int balanceId, LocalDate date, double money, String type)
      */
     private void createBalanceOperationsTable() {
-        if (this.dbConnection == null)
+        if (dbConnection == null)
             return;
 
         // SQL statement for creating a new BalanceOperations table
@@ -319,7 +326,7 @@ public class SQLiteDB {
                 + ");";
 
         try{
-            Statement stmt = this.dbConnection.createStatement();
+            Statement stmt = dbConnection.createStatement();
             stmt.execute(sql);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -334,7 +341,7 @@ public class SQLiteDB {
         String sql = "SELECT * FROM BalanceOperations";
 
         try {
-            Statement stmt  = this.dbConnection.createStatement();
+            Statement stmt  = dbConnection.createStatement();
             ResultSet rs    = stmt.executeQuery(sql);
 
             // loop through the result set
@@ -357,14 +364,14 @@ public class SQLiteDB {
      ** Insert new BalanceOperation record
      */
     public Integer insertBalanceOperation(LocalDate date, double money, String type) {
-        if (this.dbConnection == null || date == null || type == null)
+        if (dbConnection == null || date == null || type == null)
             return defaultID;
 
         String sql = "INSERT INTO BalanceOperations(date, money, type) VALUES(?,?,?)";
         int balanceOperationId = defaultID;
 
         try{
-            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
             pstmt.setString(1, date.toString());
             pstmt.setDouble(2, money);
             pstmt.setString(3, type);
@@ -382,14 +389,14 @@ public class SQLiteDB {
      ** Delete BalanceOperation record with given id
      */
     public boolean deleteBalanceOperation(Integer id) {
-        if (this.dbConnection == null || id == null)
+        if (dbConnection == null || id == null)
             return false;
 
         boolean deleted = false;
         String sql = "DELETE FROM BalanceOperations WHERE id=?";
 
         try{
-            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
             deleted = true;
@@ -404,7 +411,7 @@ public class SQLiteDB {
      ** Update BalanceOperation record
      */
     public boolean updateBalanceOperation(Integer id, LocalDate date, double money, String type) {
-        if (this.dbConnection == null || id == null || date == null || type == null)
+        if (dbConnection == null || id == null || date == null || type == null)
             return false;
 
         boolean updated = false;
@@ -413,7 +420,7 @@ public class SQLiteDB {
                      "WHERE id = ?;";
 
         try{
-            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
             pstmt.setString(1, date.toString());
             pstmt.setDouble(2, money);
             pstmt.setString(3, type);
@@ -434,14 +441,13 @@ public class SQLiteDB {
         String sql = "SELECT SUM(money) as totalBalance\n" +
                      "FROM BalanceOperations;";
 
-        if (this.dbConnection == null)
+        if (dbConnection == null)
             return defaultValue;
 
-        double startingBalance = 50000;
         double totalBalance = 0;
 
         try{
-            Statement stmt  = this.dbConnection.createStatement();
+            Statement stmt  = dbConnection.createStatement();
             ResultSet rs    = stmt.executeQuery(sql);
 
             if (rs.next())
@@ -450,7 +456,7 @@ public class SQLiteDB {
             System.out.println(e.getMessage());
         }
 
-        return totalBalance + startingBalance;
+        return totalBalance;
     }
 
 
@@ -459,7 +465,7 @@ public class SQLiteDB {
      ** EZOrder (Integer orderId, Integer balanceId, String productCode, double pricePerUnit, int quantity, String status)
      */
     private void createOrdersTable() {
-        if (this.dbConnection == null)
+        if (dbConnection == null)
             return;
 
         // SQL statement for creating a new Orders table
@@ -475,7 +481,7 @@ public class SQLiteDB {
                 + ");";
 
         try{
-            Statement stmt = this.dbConnection.createStatement();
+            Statement stmt = dbConnection.createStatement();
             stmt.execute(sql);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -490,7 +496,7 @@ public class SQLiteDB {
         String sql = "SELECT * FROM Orders";
 
         try {
-            Statement stmt  = this.dbConnection.createStatement();
+            Statement stmt  = dbConnection.createStatement();
             ResultSet rs    = stmt.executeQuery(sql);
 
             // loop through the result set
@@ -514,15 +520,19 @@ public class SQLiteDB {
      ** Insert new Order record
      */
     public Integer insertOrder(Integer balanceId, String productCode, double pricePerUnit, int quantity, String status) {
-        if (this.dbConnection == null || balanceId == null || productCode == null || status == null)
+        if (dbConnection == null || balanceId == null || productCode == null || status == null)
             return defaultID;
 
         String sql = "INSERT INTO Orders(balanceId, productCode, pricePerUnit, quantity, status) VALUES(?,?,?,?,?)";
         int orderId = defaultID;
 
         try{
-            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
-            pstmt.setInt(1, balanceId);
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
+            if (balanceId > 0)
+                pstmt.setInt(1, balanceId);
+            else
+                pstmt.setNull(1, INTEGER);
+
             pstmt.setString(2, productCode);
             pstmt.setDouble(3, pricePerUnit);
             pstmt.setInt(4, quantity);
@@ -541,14 +551,14 @@ public class SQLiteDB {
      ** Delete Order record with given id
      */
     public boolean deleteOrder(Integer id) {
-        if (this.dbConnection == null || id == null)
+        if (dbConnection == null || id == null)
             return false;
 
         boolean deleted = false;
         String sql = "DELETE FROM Orders WHERE id=?";
 
         try{
-            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
             deleted = true;
@@ -563,7 +573,7 @@ public class SQLiteDB {
      ** Update Order record
      */
     public boolean updateOrder(Integer id, Integer balanceId, String productCode, double pricePerUnit, int quantity, String status) {
-        if (this.dbConnection == null || id == null || balanceId == null || productCode == null || status == null)
+        if (dbConnection == null || id == null || balanceId == null || productCode == null || status == null)
             return false;
 
         boolean updated = false;
@@ -572,7 +582,7 @@ public class SQLiteDB {
                      "WHERE id = ?;";
 
         try{
-            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
             pstmt.setInt(1, balanceId);
             pstmt.setString(2, productCode);
             pstmt.setDouble(3, pricePerUnit);
@@ -594,7 +604,7 @@ public class SQLiteDB {
      ** EZUser (Integer id, String userName, String password, String role)
      */
     private void createUsersTable() {
-        if (this.dbConnection == null)
+        if (dbConnection == null)
             return;
 
         // SQL statement for creating a new Orders table
@@ -606,7 +616,7 @@ public class SQLiteDB {
                 + ");";
 
         try{
-            Statement stmt = this.dbConnection.createStatement();
+            Statement stmt = dbConnection.createStatement();
             stmt.execute(sql);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -621,7 +631,7 @@ public class SQLiteDB {
         String sql = "SELECT * FROM Users";
 
         try {
-            Statement stmt  = this.dbConnection.createStatement();
+            Statement stmt  = dbConnection.createStatement();
             ResultSet rs    = stmt.executeQuery(sql);
 
             // loop through the result set
@@ -643,14 +653,14 @@ public class SQLiteDB {
      ** Insert new User record
      */
     public Integer insertUser(String userName, String password, String role) {
-        if (this.dbConnection == null || userName == null || password == null || role == null)
+        if (dbConnection == null || userName == null || password == null || role == null)
             return defaultID;
 
         int userId = defaultID;
         String sql = "INSERT INTO Users(userName, password, role) VALUES(?,?,?)";
 
         try{
-            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
             pstmt.setString(1, userName);
             pstmt.setString(2, password);
             pstmt.setString(3, role);
@@ -668,14 +678,14 @@ public class SQLiteDB {
      ** Delete User record with given id
      */
     public boolean deleteUser(Integer id) {
-        if (this.dbConnection == null || id == null)
+        if (dbConnection == null || id == null)
             return false;
 
         boolean deleted = false;
         String sql = "DELETE FROM Users WHERE id=?";
 
         try{
-            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
             deleted = true;
@@ -690,7 +700,7 @@ public class SQLiteDB {
      ** Update User record
      */
     public boolean updateUser(Integer id, String userName, String password, String role) {
-        if (this.dbConnection == null || id == null || userName == null || password == null || role == null)
+        if (dbConnection == null || id == null || userName == null || password == null || role == null)
             return false;
 
         boolean updated = false;
@@ -699,7 +709,7 @@ public class SQLiteDB {
                      "WHERE id = ?;";
 
         try{
-            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
             pstmt.setString(1, userName);
             pstmt.setString(2, password);
             pstmt.setString(3, role);
@@ -719,7 +729,7 @@ public class SQLiteDB {
      ** Card (String cardCode, Integer customerId, Integer points)
      */
     private void createCardsTable() {
-        if (this.dbConnection == null)
+        if (dbConnection == null)
             return;
 
         // SQL statement for creating a new Cards table
@@ -729,7 +739,7 @@ public class SQLiteDB {
                 + ");";
 
         try{
-            Statement stmt = this.dbConnection.createStatement();
+            Statement stmt = dbConnection.createStatement();
             stmt.execute(sql);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -744,7 +754,7 @@ public class SQLiteDB {
         String sql = "SELECT * FROM Cards";
 
         try {
-            Statement stmt  = this.dbConnection.createStatement();
+            Statement stmt  = dbConnection.createStatement();
             ResultSet rs    = stmt.executeQuery(sql);
 
             // loop through the result set
@@ -765,14 +775,14 @@ public class SQLiteDB {
      ** Insert new Card record
      */
     public String insertCard(Integer points) {
-        if (this.dbConnection == null || points == null)
+        if (dbConnection == null || points == null)
             return "";
 
         String sqlCount = "SELECT COUNT(*) AS cardsN FROM Cards;";
         long cardsN = 0;
         boolean counted = false;
         try {
-            Statement stmt  = this.dbConnection.createStatement();
+            Statement stmt  = dbConnection.createStatement();
             ResultSet rs    = stmt.executeQuery(sqlCount);
 
             if (rs.next())
@@ -786,12 +796,13 @@ public class SQLiteDB {
         if (!counted || cardsN >= MAX_CARDS)
             return "";
 
-        String sql = "INSERT INTO Cards(points) VALUES(?)";
+        String sql = "INSERT INTO Cards(id, points) VALUES(?,?)";
         String cardCode = "";
 
         try{
-            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
-            pstmt.setInt(1, points);
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
+            pstmt.setLong(1, cardsN + 1);
+            pstmt.setInt(2, points);
             pstmt.executeUpdate();
 
             Long cardId = this.lastInsertRowId();
@@ -807,14 +818,14 @@ public class SQLiteDB {
      ** Delete Card record with given cardCode
      */
     public boolean deleteCard(String cardCode) {
-        if (this.dbConnection == null || cardCode == null || cardCode.isEmpty())
+        if (dbConnection == null || cardCode == null || cardCode.isEmpty())
             return false;
 
         boolean deleted = false;
         String sql = "DELETE FROM Cards WHERE id=?";
 
         try{
-            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
             pstmt.setInt(1, Integer.parseInt(cardCode));
             pstmt.executeUpdate();
             deleted = true;
@@ -829,7 +840,7 @@ public class SQLiteDB {
      ** Update Card record
      */
     public boolean updateCard(String cardCode, Integer points) {
-        if (this.dbConnection == null || cardCode == null || points == null)
+        if (dbConnection == null || cardCode == null || points == null)
             return false;
 
         if (cardCode.isEmpty())
@@ -842,7 +853,7 @@ public class SQLiteDB {
                 "WHERE id = ?;";
 
         try{
-            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
             pstmt.setInt(1, points);
             pstmt.setInt(2, cardId);
             pstmt.executeUpdate();
@@ -871,11 +882,11 @@ public class SQLiteDB {
                 + " pricePerUnit real\n"
                 + ");";
 
-        if (this.dbConnection == null)
+        if (dbConnection == null)
             return;
 
         try{
-            Statement stmt = this.dbConnection.createStatement();
+            Statement stmt = dbConnection.createStatement();
             stmt.execute(sql);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -890,7 +901,7 @@ public class SQLiteDB {
         String sql = "SELECT * FROM ProductTypes";
 
         try {
-            Statement stmt  = this.dbConnection.createStatement();
+            Statement stmt  = dbConnection.createStatement();
             ResultSet rs    = stmt.executeQuery(sql);
 
             // loop through the result set
@@ -916,7 +927,7 @@ public class SQLiteDB {
      ** Insert new ProductType record
      */
     public Integer insertProductType(Integer quantity, String location, String note, String productDescription, String barCode, double pricePerUnit) {
-        if (this.dbConnection == null)
+        if (dbConnection == null)
             return defaultID;
 
         if (quantity == null || location == null || note == null || productDescription == null || barCode == null)
@@ -927,7 +938,7 @@ public class SQLiteDB {
                    + "VALUES(?,?,?,?,?,?);";
 
         try{
-            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
             pstmt.setInt(1, quantity);
             pstmt.setString(2, location);
             pstmt.setString(3, note);
@@ -948,14 +959,14 @@ public class SQLiteDB {
      ** Delete ProductType record with given id
      */
     public boolean deleteProductType(Integer id) {
-        if (this.dbConnection == null || id == null)
+        if (dbConnection == null || id == null)
             return false;
 
         boolean deleted = false;
         String sql = "DELETE FROM ProductTypes WHERE id=?";
 
         try{
-            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
             deleted = true;
@@ -970,7 +981,7 @@ public class SQLiteDB {
      ** Update ProductType record
      */
     public boolean updateProductType(Integer id, Integer quantity, String location, String note, String productDescription, String barCode, double pricePerUnit) {
-        if (this.dbConnection == null)
+        if (dbConnection == null)
             return false;
 
         if (id == null || quantity == null || location == null || note == null || productDescription == null || barCode == null)
@@ -982,7 +993,7 @@ public class SQLiteDB {
                      "WHERE id = ?;";
 
         try{
-            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
             pstmt.setInt(1, quantity);
             pstmt.setString(2, location);
             pstmt.setString(3, note);
@@ -1005,7 +1016,7 @@ public class SQLiteDB {
      ** EZSaleTransaction (Integer ticketNumber, List<TicketEntry> entries, double discountRate, double price)
      */
     private void createTransactionsTable() {
-        if (this.dbConnection == null)
+        if (dbConnection == null)
             return;
 
         // SQL statement for creating a new Transactions table
@@ -1018,7 +1029,7 @@ public class SQLiteDB {
                 + ");";
 
         try{
-            Statement stmt = this.dbConnection.createStatement();
+            Statement stmt = dbConnection.createStatement();
             stmt.execute(sql);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -1036,7 +1047,7 @@ public class SQLiteDB {
                    + "  AND status <> \"OPENED\";";
 
         try {
-            Statement stmt  = this.dbConnection.createStatement();
+            Statement stmt  = dbConnection.createStatement();
             ResultSet rs1    = stmt.executeQuery(sql);
 
             // loop through the result set
@@ -1053,7 +1064,7 @@ public class SQLiteDB {
                             + "INNER JOIN ProductTypes ON ProductsPerSale.barCode = ProductTypes.barCode \n"
                             + "WHERE ProductsPerSale.transactionID = ? ;";
 
-                PreparedStatement pstmt = this.dbConnection.prepareStatement(sql2);
+                PreparedStatement pstmt = dbConnection.prepareStatement(sql2);
                 pstmt.setInt(1, transactionID);
                 ResultSet rs2 = pstmt.executeQuery();
 
@@ -1088,7 +1099,7 @@ public class SQLiteDB {
                    + "  AND status <> \"OPENED\";";
 
         try {
-            Statement stmt  = this.dbConnection.createStatement();
+            Statement stmt  = dbConnection.createStatement();
             ResultSet rs1    = stmt.executeQuery(sql);
 
             // loop through the result set
@@ -1105,7 +1116,7 @@ public class SQLiteDB {
                         + "INNER JOIN ProductTypes ON ProductsPerSale.barCode = ProductTypes.barCode \n"
                         + "WHERE ProductsPerSale.transactionID = ? ;";
 
-                PreparedStatement pstmt = this.dbConnection.prepareStatement(sql2);
+                PreparedStatement pstmt = dbConnection.prepareStatement(sql2);
                 pstmt.setInt(1, transactionID);
                 ResultSet rs2 = pstmt.executeQuery();
 
@@ -1133,7 +1144,7 @@ public class SQLiteDB {
      ** Insert new SaleTransaction record
      */
     public Integer insertSaleTransaction(List<TicketEntry> entries, double discountRate, double price, String status) {
-        if (this.dbConnection == null || status == null)
+        if (dbConnection == null || status == null)
             return defaultID;
 
         int transactionID = defaultID;
@@ -1141,7 +1152,7 @@ public class SQLiteDB {
                    + "VALUES(?,?,?);";
 
         try{
-            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
             pstmt.setDouble(1, discountRate);
             pstmt.setDouble(2, price);
             pstmt.setString(3, status);
@@ -1165,7 +1176,7 @@ public class SQLiteDB {
      ** Insert new SaleTransaction record
      */
     public Integer insertReturnTransaction(List<TicketEntry> entries, int saleID, double price, String status) {
-        if (this.dbConnection == null || status == null)
+        if (dbConnection == null || status == null)
             return defaultID;
 
         int transactionID = defaultID;
@@ -1173,7 +1184,7 @@ public class SQLiteDB {
                    + "VALUES(?,?,?);";
 
         try{
-            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
             pstmt.setInt(1, saleID);
             pstmt.setDouble(2, price);
             pstmt.setString(3, status);
@@ -1197,14 +1208,14 @@ public class SQLiteDB {
      ** Delete Transaction record with given id
      */
     public boolean deleteTransaction(Integer transactionID) {
-        if (this.dbConnection == null || transactionID == null)
+        if (dbConnection == null || transactionID == null)
             return false;
 
         boolean deleted = false;
         String sql = "DELETE FROM Transactions WHERE id=?";
 
         try{
-            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
             pstmt.setInt(1, transactionID);
             pstmt.executeUpdate();
             deleted = true;
@@ -1222,7 +1233,7 @@ public class SQLiteDB {
      ** Update SaleTransaction record
      */
     public boolean updateSaleTransaction(Integer transactionID, double discountRate, double price, String status) {
-        if (this.dbConnection == null || transactionID == null || status == null)
+        if (dbConnection == null || transactionID == null || status == null)
             return false;
 
         boolean updated = false;
@@ -1231,7 +1242,7 @@ public class SQLiteDB {
                      "WHERE id = ?;";
 
         try{
-            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
             pstmt.setDouble(1, discountRate);
             pstmt.setDouble(2, price);
             pstmt.setString(3, status);
@@ -1249,7 +1260,7 @@ public class SQLiteDB {
      ** Update SaleTransaction record
      */
     public boolean updateReturnTransaction(Integer transactionID, double price, String status) {
-        if (this.dbConnection == null || transactionID == null || status == null)
+        if (dbConnection == null || transactionID == null || status == null)
             return false;
 
         boolean updated = false;
@@ -1258,7 +1269,7 @@ public class SQLiteDB {
                      "WHERE id = ?;";
 
         try{
-            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
             pstmt.setDouble(1, price);
             pstmt.setString(2, status);
             pstmt.setInt(3, transactionID);
@@ -1277,7 +1288,7 @@ public class SQLiteDB {
      ** EZTicketEntry (String barCode, String productDescription, int amount, double pricePerUnit, double discountRate)
      */
     private void createProductsPerSaleTable() {
-        if (this.dbConnection == null)
+        if (dbConnection == null)
             return;
 
         // SQL statement for creating a new ProductsPerSale table
@@ -1292,7 +1303,7 @@ public class SQLiteDB {
                    + ");";
 
         try{
-            Statement stmt = this.dbConnection.createStatement();
+            Statement stmt = dbConnection.createStatement();
             stmt.execute(sql);
         } catch (SQLException e) {
             System.out.println("createProductsPerSaleTable" + e.getMessage());
@@ -1303,7 +1314,7 @@ public class SQLiteDB {
      ** Insert new ProductPerSale record
      */
     public boolean insertProductPerSale(String barCode, Integer transactionID, int amount, double discountRate) {
-        if (this.dbConnection == null || barCode == null || transactionID == null)
+        if (dbConnection == null || barCode == null || transactionID == null)
             return false;
 
         boolean inserted = false;
@@ -1311,7 +1322,7 @@ public class SQLiteDB {
                    + "VALUES(?,?,?,?);";
 
         try{
-            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
             pstmt.setString(1, barCode);
             pstmt.setInt(2, transactionID);
             pstmt.setInt(3, amount);
@@ -1330,14 +1341,14 @@ public class SQLiteDB {
      ** Delete ProductPerSale record with given id
      */
     public boolean deleteProductPerSale(String barCode, Integer transactionID) {
-        if (this.dbConnection == null || barCode == null || transactionID == null)
+        if (dbConnection == null || barCode == null || transactionID == null)
             return false;
 
         boolean deleted = false;
         String sql = "DELETE FROM ProductsPerSale WHERE barCode=? AND transactionID=?";
 
         try{
-            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
             pstmt.setString(1, barCode);
             pstmt.setInt(2, transactionID);
             pstmt.executeUpdate();
@@ -1353,14 +1364,14 @@ public class SQLiteDB {
      ** Delete all ProductsPerSale records related to the sale with given transactionID
      */
     public boolean deleteAllProductsPerSale(Integer transactionID) {
-        if (this.dbConnection == null || transactionID == null)
+        if (dbConnection == null || transactionID == null)
             return false;
 
         boolean deleted = false;
         String sql = "DELETE FROM ProductsPerSale WHERE transactionID=?";
 
         try{
-            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
             pstmt.setInt(1, transactionID);
             pstmt.executeUpdate();
             deleted = true;
@@ -1375,7 +1386,7 @@ public class SQLiteDB {
      ** Update ProductPerSale record
      */
     public boolean updateProductPerSale(String barCode, Integer transactionID, int amount, double discountRate) {
-        if (this.dbConnection == null || transactionID == null || barCode == null)
+        if (dbConnection == null || transactionID == null || barCode == null)
             return false;
 
         boolean updated = false;
@@ -1384,7 +1395,7 @@ public class SQLiteDB {
                      "WHERE barCode = ? AND transactionID = ?;";
 
         try{
-            PreparedStatement pstmt = this.dbConnection.prepareStatement(sql);
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
             pstmt.setInt(1, amount);
             pstmt.setDouble(2, discountRate);
             pstmt.setString(3, barCode);

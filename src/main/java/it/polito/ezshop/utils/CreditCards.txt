@@ -3,6 +3,10 @@
 #The lines preceded by an "#" must be ignored.
 #Here you can add all the credit card numbers you need with their balance. The format MUST be :
 #<creditCardNumber>;<balance>
-4485370086510891;150.0
+4485370086510891;150.00
 5100293991053009;10.00
 4716258050958645;0.00
+1476020159328823;300.0
+6980065025767850;35.00
+8177206401238186;0.00
+8566857764830909;1088.64

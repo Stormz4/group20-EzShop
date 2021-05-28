@@ -32,19 +32,17 @@ public class TestEZShopFR1_DeleteUser {
 
     @Test
     public void testDeleteUser() throws InvalidUserIdException, InvalidUsernameException, InvalidPasswordException, UnauthorizedException{
-        try {
-            ez.deleteUser(-1);
-            fail("InvalidUserIdException incoming");
-        } catch (InvalidUserIdException e){
-            assertNotNull(e);
-        }
-        try {
+
+        assertThrows(UnauthorizedException.class, () -> {
             ez.deleteUser(7);
-            fail("UnauthorizedException incoming");
-        } catch (UnauthorizedException e){
-            assertNotNull(e);
-        }
+        });
+
+        // Must login before trying to delete a user
         User u = ez.login("deleteTest", "pwd"); //Administrator
+        assertThrows(InvalidUserIdException.class, () -> {
+            ez.deleteUser(-1);
+        });
+
         boolean del1 = ez.deleteUser(u.getId());
         boolean del2 = ez.deleteUser(u.getId());
         assertTrue(del1);

@@ -68,8 +68,8 @@ data/*
 **/.idea
 **/*.iml
 
-# Ignore DB
-**/EZShopDB.db
+# Ignore structure101-settings.java.hsw
+**/structure101-settings.java.hsw
 
 # Uncomment this line if you wish to ignore the project description file.
 # Typically, this file would be tracked if it contains build/dependency configurations:
