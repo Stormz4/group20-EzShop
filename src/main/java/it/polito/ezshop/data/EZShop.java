@@ -62,6 +62,8 @@ public class EZShop implements EZShopInterface {
 
         if (this.shopDB.clearDatabase())
             this.clearData();
+
+        this.accountingBook.setCurrentBalance(0); // reset the current balance (since the DB is empty now)
     }
 
 
@@ -1109,18 +1111,44 @@ public class EZShop implements EZShopInterface {
         if(saleTicket.getAmount() < amount)
             return false;
 
-        EZTicketEntry returnTicket = new EZTicketEntry(productCode, product.getProductDescription(), amount, saleTicket.getPricePerUnit(), saleTicket.getDiscountRate());
-        if(!shopDB.insertProductPerSale(productCode, tmpRetTr.getReturnId(), amount, saleTicket.getDiscountRate()))
-            return false;
-
-        List<TicketEntry> entries = tmpRetTr.getEntries();
-        if(entries == null) {
-            entries = new LinkedList<TicketEntry>();
-            tmpRetTr.setEntries(entries);
+        boolean alreadyReturned = false;
+        EZTicketEntry returnTicket = null;
+        int old_amount = 0;
+        EZTicketEntry old_returnTicket = null;
+        List<TicketEntry> RetEntries = tmpRetTr.getEntries();
+        if(RetEntries == null) {
+            RetEntries = new LinkedList<TicketEntry>();
+            tmpRetTr.setEntries(RetEntries);
         }
-        tmpRetTr.getEntries().add(returnTicket);
-        tmpRetTr.updateReturnedValue(returnTicket.getTotal());
 
+        if(RetEntries.size() != 0) {
+            for (TicketEntry t : RetEntries) {
+                if (t.getBarCode().equals(productCode)) {
+                    alreadyReturned = true;
+                    returnTicket = (EZTicketEntry) t;
+                    old_returnTicket = (EZTicketEntry) t;
+                    old_amount = t.getAmount();
+                    break;
+                }
+            }
+        }
+
+        if(!alreadyReturned) {
+            returnTicket = new EZTicketEntry(productCode, product.getProductDescription(), amount, saleTicket.getPricePerUnit(), saleTicket.getDiscountRate());
+            if (!shopDB.insertProductPerSale(productCode, tmpRetTr.getReturnId(), amount, saleTicket.getDiscountRate()))
+                return false;
+
+            tmpRetTr.getEntries().add(returnTicket);
+            tmpRetTr.updateReturnedValue(returnTicket.getTotal());
+        } else {
+            if(!shopDB.updateProductPerSale(productCode, tmpRetTr.getReturnId(), old_amount+amount, old_returnTicket.getDiscountRate()))
+                return false;
+            tmpRetTr.getEntries().remove(old_returnTicket); // remove old ticket
+            returnTicket.setAmount(old_amount + amount); // update the amount of the old ticket
+            tmpRetTr.getEntries().add(returnTicket); // add the updated ticket to Return Transaction
+            // update the returned value considering ONLY the newly added products:
+            tmpRetTr.updateReturnedValue(+amount * returnTicket.getPricePerUnit());
+        }
         return true;
     }
 
@@ -1383,7 +1411,7 @@ public class EZShop implements EZShopInterface {
         if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier) )
             throw new UnauthorizedException();
 
-        if(returnId <= 0)
+        if(returnId == null || returnId <= 0)
             throw new InvalidTransactionIdException();
 
         EZReturnTransaction retTr = getReturnTransactionById(returnId);
@@ -1411,7 +1439,7 @@ public class EZShop implements EZShopInterface {
         if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier) )
             throw new UnauthorizedException();
 
-        if(returnId <= 0)
+        if(returnId == null || returnId <= 0)
             throw new InvalidTransactionIdException();
 
         if(creditCard == null || !isValidCreditCard(creditCard) || creditCard.equals(""))
