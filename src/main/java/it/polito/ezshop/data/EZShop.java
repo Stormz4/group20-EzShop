@@ -62,6 +62,8 @@ public class EZShop implements EZShopInterface {
 
         if (this.shopDB.clearDatabase())
             this.clearData();
+
+        this.accountingBook.setCurrentBalance(0); // reset the current balance (since the DB is empty now)
     }
 
 
