@@ -83,6 +83,9 @@ public class EZShop implements EZShopInterface {
         } catch (InvalidProductCodeException e) {
             e.printStackTrace();
         }
+        
+	// Populate returns list for every sale transaction
+        this.setReturnTransactionsForSaleTransactions();
     }
 
 
@@ -1165,11 +1168,11 @@ public class EZShop implements EZShopInterface {
 
             // add ReturnTransaction to SaleTransaction's list of returns
             List<EZReturnTransaction> returns = sale.getReturns();
-            if(returns == null)
+            if(returns == null) {
                 returns = new LinkedList<EZReturnTransaction>();
-
+                sale.setReturns(returns);
+            }
             returns.add(retToBeStored);
-            sale.setReturns(returns);
 
             EZTicketEntry ezticket;
             for ( TicketEntry ticket: tmpRetTr.getEntries() ) {
@@ -1620,17 +1623,8 @@ public class EZShop implements EZShopInterface {
     }
 
     public EZSaleTransaction getSaleTransactionById(Integer saleNumber) {
-        /*
-        EZSaleTransaction saleTransaction;
-        if (this.tmpSaleTransaction.getTicketNumber().equals(saleNumber)) {
 
-            saleTransaction = tmpSaleTransaction;
-        }
-        else
-            saleTransaction = ezSaleTransactions.get(saleNumber);
-         */
-        EZSaleTransaction saleTransaction = this.ezSaleTransactions.get(saleNumber);
-        return saleTransaction;
+        return this.ezSaleTransactions.get(saleNumber);
     }
 
     public EZReturnTransaction getReturnTransactionById(Integer returnId) {
@@ -2147,6 +2141,17 @@ public class EZShop implements EZShopInterface {
         this.endReturnTransaction(r7, true);
         this.returnCashPayment(r7);
 
+    private void setReturnTransactionsForSaleTransactions() {
+        if (ezSaleTransactions == null)
+            return;
+
+        for (EZSaleTransaction sale : ezSaleTransactions.values()) {
+            List<EZReturnTransaction> returns;
+            returns = ezReturnTransactions.values().stream()
+                                                   .filter(s -> s.getSaleTransactionId().equals(sale.getTicketNumber()))
+                                                   .collect(Collectors.toList());
+            sale.setReturns(returns);
+        }
     }
 
 
