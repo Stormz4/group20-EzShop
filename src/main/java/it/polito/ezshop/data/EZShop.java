@@ -284,7 +284,7 @@ public class EZShop implements EZShopInterface {
         prodType.setBarCode(newCode);
         prodType.setPricePerUnit(newPrice);
         prodType.setNote(newNote);
-        ezProducts.replace(id, prodType);
+        // ezProducts.replace(id, prodType);
 
         return true;
     }
@@ -341,7 +341,7 @@ public class EZShop implements EZShopInterface {
 
         List<ProductType> filteredList = getAllProductTypes();
         // If product doesn't match the description, remove it from the list.
-        filteredList.removeIf(product -> !(product.getProductDescription().equals(desc)));
+        filteredList.removeIf(product -> !(product.getProductDescription().contains(desc)));
 
         return filteredList;
     }
@@ -385,9 +385,8 @@ public class EZShop implements EZShopInterface {
         if (productId == null || productId <= 0)
             throw new InvalidProductIdException();
 
-        if (!isValidPosition(newPos)){
+        if (newPos != null && !newPos.isEmpty() && !isValidPosition(newPos))
             throw new InvalidLocationException();
-        }
 
         if (!ezProducts.containsKey(productId))
             return false;
