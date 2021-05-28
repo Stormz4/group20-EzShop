@@ -56,6 +56,7 @@ public class EZShop implements EZShopInterface {
     //================================================================================================================//
     @Override
     public void reset() {
+        this.currUser = null;
         if (!this.shopDB.isConnected())
             this.shopDB.connect();
 
@@ -76,16 +77,15 @@ public class EZShop implements EZShopInterface {
             throw new InvalidPasswordException();
         }
 
-        if (role.isEmpty() || !(role.equals(URAdministrator) || role.equals(URCashier) || role.equals(URShopManager))) {
+        if (role == null || role.isEmpty() || !(role.equals(URAdministrator) || role.equals(URCashier) || role.equals(URShopManager))) {
             throw new InvalidRoleException();
         }
 
-        if (this.ezUsers == null)
-            return defaultID;
-
-        for (EZUser user : ezUsers.values()) {
-            if (user.getUsername().equals(username))
-                return defaultID;
+        if (!ezUsers.isEmpty()) {
+            for (EZUser user : ezUsers.values()) {
+                if (user.getUsername().equals(username))
+                    return defaultID;
+            }
         }
         Integer id = shopDB.insertUser(username, password, role);
         // Get the highest ID from the DB
@@ -148,17 +148,19 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean updateUserRights(Integer id, String role) throws InvalidUserIdException, InvalidRoleException, UnauthorizedException {
-        if (id==null || id <=0)
-            throw new InvalidUserIdException();
-
-        if (!ezUsers.containsKey(id))
-            return false;
-
-        if (role.isEmpty() || !(role.equals(URAdministrator) || role.equals(URCashier) || role.equals(URShopManager)))
-            throw new InvalidRoleException();
 
         if((this.currUser == null) || (!this.currUser.hasRequiredRole(URAdministrator)))
             throw new UnauthorizedException();
+
+        if (id==null || id <=0)
+            throw new InvalidUserIdException();
+
+        if (role == null || role.isEmpty() || !(role.equals(URAdministrator) || role.equals(URCashier) || role.equals(URShopManager)))
+            throw new InvalidRoleException();
+
+
+        if (!ezUsers.containsKey(id))
+            return false;
 
         EZUser user = ezUsers.get(id);
 
@@ -381,6 +383,10 @@ public class EZShop implements EZShopInterface {
         if (productId == null || productId <= 0)
             throw new InvalidProductIdException();
 
+        if (!isValidPosition(newPos)){
+            throw new InvalidLocationException();
+        }
+
         if (!ezProducts.containsKey(productId))
             return false;
 
@@ -519,6 +525,7 @@ public class EZShop implements EZShopInterface {
         if (orderId == null || orderId <= 0)
             throw new InvalidOrderIdException();
 
+
         EZOrder order = ezOrders.get(orderId);
         if (order == null || !(order.getStatus().equals(OSPayed) || order.getStatus().equals(OSCompleted)))
             return false;
@@ -589,10 +596,16 @@ public class EZShop implements EZShopInterface {
     }
 
     @Override
-    public boolean modifyCustomer(Integer id, String newCustomerName, String newCustomerCard) throws InvalidCustomerNameException, InvalidCustomerCardException, InvalidCustomerIdException, UnauthorizedException {
+    public boolean modifyCustomer(Integer id, String newCustomerName, String newCustomerCard) throws InvalidCustomerIdException, InvalidCustomerNameException, InvalidCustomerCardException, InvalidCustomerIdException, UnauthorizedException {
+
 
         if (this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URCashier, URShopManager))
             throw new UnauthorizedException();
+
+        if (id == null || id<=0){
+            throw new InvalidCustomerIdException();
+        }
+
 
         if ( newCustomerName == null || newCustomerName.isEmpty() )
             throw new InvalidCustomerNameException();
@@ -601,6 +614,9 @@ public class EZShop implements EZShopInterface {
             throw new InvalidCustomerCardException();
 
         EZCustomer customer = ezCustomers.get(id);
+        if (customer == null){
+            return false;
+        }
         String customerCard = customer.getCustomerCard();
 
         if (newCustomerCard != null) {
@@ -711,14 +727,15 @@ public class EZShop implements EZShopInterface {
             throw new InvalidCustomerIdException();
         }
 
-        if (!ezCustomers.containsKey(customerId)) {
-            return false;
-        }
-
         //verify if it's string with 10 digits!
         if (customerCard == null || customerCard.isEmpty() || !isValidCard(customerCard)){
             throw new InvalidCustomerCardException();
         }
+
+        if (!ezCustomers.containsKey(customerId)) {
+            return false;
+        }
+
 
 
         EZCustomer customer = ezCustomers.get(customerId); // This functions checks if the customers map contains the ID.
@@ -1504,36 +1521,40 @@ public class EZShop implements EZShopInterface {
             shopDB.connect();
         shopDB.initDatabase();
 
-        if (ezBalanceOperations == null)
+        if (ezBalanceOperations == null || ezBalanceOperations.isEmpty())
             ezBalanceOperations = shopDB.selectAllBalanceOperations();
 
-        if (ezCards == null)
+        if (ezCards == null || ezCards.isEmpty())
             ezCards = shopDB.selectAllCards();
 
-        if (ezCustomers == null)
+        if (ezCustomers == null || ezCustomers.isEmpty())
             ezCustomers = shopDB.selectAllCustomers();
 
-        if (ezOrders == null)
+        if (ezOrders == null || ezOrders.isEmpty())
             ezOrders = shopDB.selectAllOrders();
 
-        if (ezProducts == null)
+        if (ezProducts == null || ezProducts.isEmpty())
             ezProducts = shopDB.selectAllProductTypes();
 
-        if (ezSaleTransactions == null)
+        if (ezSaleTransactions == null || ezSaleTransactions.isEmpty())
             ezSaleTransactions = shopDB.selectAllSaleTransactions();
 
-        if (ezReturnTransactions == null)
+        if (ezReturnTransactions == null || ezReturnTransactions.isEmpty())
             ezReturnTransactions = shopDB.selectAllReturnTransactions();
 
-        if (ezUsers == null)
+        if (ezUsers == null || ezUsers.isEmpty())
             ezUsers = shopDB.selectAllUsers();
     }
 
     private void clearData() {
-        ezBalanceOperations = null;
-        ezOrders = null;
-        ezProducts = null;
-        ezSaleTransactions = null;
+        ezBalanceOperations.clear();
+        ezUsers.clear();
+        ezReturnTransactions.clear();
+        ezCustomers.clear();
+        ezCards.clear();
+        ezOrders.clear();
+        ezProducts.clear();
+        ezSaleTransactions.clear();
     }
 
     static public boolean isValidBarCode(String barCode){
