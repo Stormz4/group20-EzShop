@@ -944,6 +944,7 @@ public class EZShop implements EZShopInterface {
         EZSaleTransaction saleTransaction;
         TicketEntry ticketToUpdate;
         boolean result = false;
+        double newSalePrice = 0;
         if (this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier))
             throw new UnauthorizedException();
         if (discountRate < 0 || discountRate >= 1)
@@ -959,7 +960,11 @@ public class EZShop implements EZShopInterface {
                     .findFirst().orElse(null);
             if (ticketToUpdate != null && this.shopDB.updateProductPerSale(productCode, transactionId, ticketToUpdate.getAmount(), discountRate)) {
                 ticketToUpdate.setDiscountRate(discountRate);
-                result = true;
+                newSalePrice = saleTransaction.getPrice() - ticketToUpdate.getAmount() * ticketToUpdate.getPricePerUnit() * discountRate;
+                if (this.shopDB.updateSaleTransaction(transactionId, saleTransaction.getDiscountRate(), newSalePrice, saleTransaction.getStatus())) {
+                    saleTransaction.setPrice(newSalePrice);
+                    result = true;
+                } // Rollback should be handled
             }
         }
         return result;
