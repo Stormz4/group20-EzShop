@@ -11,12 +11,13 @@ on April 30, discuss whether the design could be improved>
 <Applying Structure 101 to your project, version to be delivered on june 4, produce the Levelized structure map,
 with all elements explosed, all dependencies, NO tangles; and report it here as a picture>
 ```
+![](Structure101_images/Dependency_Graph_LSM.png)
 
 # Structural over complexity chart
 ```
 <Applying Structure 101 to your project, version to be delivered on june 4, produce the structural over complexity chart; and report it here as a picture>
 ```
-
+![](Structure101_images/Structural_over_complexity_Chart.png)
 
 
 # Size metrics
@@ -27,13 +28,13 @@ with all elements explosed, all dependencies, NO tangles; and report it here as 
 
 
 
-| Metric                                    | Measure |
-| ----------------------------------------- | ------- |
-| Packages                                  |         |
-| Classes (outer)                           |         |
-| Classes (all)                             |         |
-| NI (number of bytecode instructions)      |         |
-| LOC (non comment non blank lines of code) |         |
+| Metric                                    | Measure     |
+| ----------------------------------------- | ----------- |
+| Packages                                  |    5        |
+| Classes (outer)                           |    39       |
+| Classes (all)                             |    39       |
+| NI (number of bytecode instructions)      |    8986     |
+| LOC (non comment non blank lines of code) |   ~ 3864    |
 
 
 
@@ -45,9 +46,10 @@ with all elements explosed, all dependencies, NO tangles; and report it here as 
 
 | Item | Tangled | Fat  | Size | XS   |
 | ---- | ------- | ---- | ---- | ---- |
-|      |         |      |      |      |
-|      |         |      |      |      |
-
+|  ezshop.it.polito.ezshop.data.EZShop                                                                          |-|223|5289|2442|
+|  ezshop.it.polito.ezshop.data.EZShop.endReturnTransaction(java.lang.Integer, boolean):boolean                 |-|21 |304 |86  |
+|  ezshop.it.polito.ezshop.data.EZShop.deleteProductFromSale(java.lang.Integer, java.lang.String, int):boolean  |-|18 |307 |51  |
+|  ezshop.it.polito.ezshop.data.EZShop.deleteReturnTransaction(java.lang.Integer):boolean                       |-|17 |229 |26  |
 
 
 # Package level tangles
@@ -56,9 +58,13 @@ with all elements explosed, all dependencies, NO tangles; and report it here as 
 <Report screen captures of the package-level tangles by opening the items in the "composition perspective" 
 (double click on the tangle from the Views->Complexity page)>
 ```
+// todo: screenshot???
+
+No items exceed the threshold for Tangled at the design level.
 
 # Summary analysis
 ```
 <Discuss here main differences of the current structure of your project vs the design delivered on April 30>
 <Discuss if the current structure shows weaknesses that should be fixed>
 ```
+// todo
