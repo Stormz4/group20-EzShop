@@ -67,7 +67,6 @@ public class EZUser implements User {
         if (requiredRoles == null)
             return false;
 
-
         for (String role : requiredRoles ) {
             if (role.equals(this.role))
                 return true;

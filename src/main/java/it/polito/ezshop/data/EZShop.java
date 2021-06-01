@@ -284,7 +284,7 @@ public class EZShop implements EZShopInterface {
         prodType.setBarCode(newCode);
         prodType.setPricePerUnit(newPrice);
         prodType.setNote(newNote);
-        // ezProducts.replace(id, prodType);
+        ezProducts.replace(id, prodType);
 
         return true;
     }
@@ -526,7 +526,6 @@ public class EZShop implements EZShopInterface {
         if (orderId == null || orderId <= 0)
             throw new InvalidOrderIdException();
 
-
         EZOrder order = ezOrders.get(orderId);
         if (order == null || !(order.getStatus().equals(OSPayed) || order.getStatus().equals(OSCompleted)))
             return false;
@@ -599,15 +598,12 @@ public class EZShop implements EZShopInterface {
     @Override
     public boolean modifyCustomer(Integer id, String newCustomerName, String newCustomerCard) throws InvalidCustomerIdException, InvalidCustomerNameException, InvalidCustomerCardException, InvalidCustomerIdException, UnauthorizedException {
 
-
         if (this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URCashier, URShopManager))
             throw new UnauthorizedException();
 
         if (id == null || id<=0){
             throw new InvalidCustomerIdException();
         }
-
-
         if ( newCustomerName == null || newCustomerName.isEmpty() )
             throw new InvalidCustomerNameException();
 
@@ -736,8 +732,6 @@ public class EZShop implements EZShopInterface {
         if (!ezCustomers.containsKey(customerId)) {
             return false;
         }
-
-
 
         EZCustomer customer = ezCustomers.get(customerId); // This functions checks if the customers map contains the ID.
 
@@ -1124,7 +1118,6 @@ public class EZShop implements EZShopInterface {
             RetEntries = new LinkedList<TicketEntry>();
             tmpRetTr.setEntries(RetEntries);
         }
-
         if(RetEntries.size() != 0) {
             for (TicketEntry t : RetEntries) {
                 if (t.getBarCode().equals(productCode)) {
@@ -1149,8 +1142,7 @@ public class EZShop implements EZShopInterface {
                 return false;
             tmpRetTr.getEntries().remove(old_returnTicket); // remove old ticket
             returnTicket.setAmount(old_amount + amount); // update the amount of the old ticket
-            tmpRetTr.getEntries().add(returnTicket); // add the updated ticket to Return Transaction
-            // update the returned value considering ONLY the newly added products:
+            tmpRetTr.getEntries().add(returnTicket); // add the updated ticket to Return Transaction and update the returned value considering ONLY the newly added products
             tmpRetTr.updateReturnedValue(+amount * returnTicket.getPricePerUnit());
         }
         return true;
