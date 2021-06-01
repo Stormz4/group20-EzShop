@@ -67,4 +67,9 @@ No items exceed the threshold for Tangled at the design level.
 <Discuss here main differences of the current structure of your project vs the design delivered on April 30>
 <Discuss if the current structure shows weaknesses that should be fixed>
 ```
-// todo
+
+Weaknesses:
+* Code readability
+* Complex code maintainability
+
+These weaknesses are due to the fatness of EZShop class and the methods endReturnTransaction, deleteProductFromSale and deleteReturnTransaction. 
