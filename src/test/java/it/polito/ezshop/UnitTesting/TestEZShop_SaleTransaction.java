@@ -15,7 +15,7 @@ public class TestEZShop_SaleTransaction {
         assertEquals(2, sale.getTicketNumber(), 0);
         assertTrue(sale.getEntries().isEmpty());
         assertEquals(0.30, sale.getDiscountRate(), 0.001);
-        assertEquals(15.60, sale.getPrice(), 0.001);
+        assertEquals(15.60*0.7, sale.getPrice(), 0.001);
         assertEquals("CLOSED", sale.getStatus());
         assertTrue(sale.getReturns().isEmpty());
         assertNull(sale.getAttachedCard());
@@ -44,7 +44,7 @@ public class TestEZShop_SaleTransaction {
         assertEquals(0.90, sale.getDiscountRate(), 0.001);
 
         sale.setPrice(400.12);
-        assertEquals(400.12, sale.getPrice(), 0.001);
+        assertEquals(400.12*0.1, sale.getPrice(), 0.001);
 
         sale.setStatus(EZSaleTransaction.STPayed);
         assertEquals("PAYED", sale.getStatus());
@@ -67,9 +67,9 @@ public class TestEZShop_SaleTransaction {
         assertEquals(t2, gt);
 
         sale.updatePrice(30.20);
-        assertEquals(430.32, sale.getPrice(), 0.001);
+        assertEquals(430.32*0.1, sale.getPrice(), 0.001);
         sale.updatePrice(-30.20);
-        assertEquals(400.12, sale.getPrice(), 0.001);
+        assertEquals(400.12*0.1, sale.getPrice(), 0.001);
 
         assertFalse(sale.hasRequiredStatus(null));
         assertFalse(sale.hasRequiredStatus(EZSaleTransaction.STClosed));

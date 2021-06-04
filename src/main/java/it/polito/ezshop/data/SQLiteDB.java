@@ -984,7 +984,7 @@ public class SQLiteDB {
         if (dbConnection == null)
             return false;
 
-        if (id == null || quantity == null || location == null || note == null || productDescription == null || barCode == null)
+        if (id == null || quantity == null || location == null || productDescription == null || barCode == null)
             return false;
 
         boolean updated = false;

@@ -440,7 +440,7 @@ public class TestEZShop_SQLiteDB {
         assertFalse(shopDB.updateProductType(null, 2, "abc", "abc", "niceProd", "6291041500213", 1.0));
         assertFalse(shopDB.updateProductType(id, null, "abc", "abc", "niceProd", "6291041500213", 1.0));
         assertFalse(shopDB.updateProductType(id, 2, null, "abc", "niceProd", "6291041500213", 1.0));
-        assertFalse(shopDB.updateProductType(id, 2, "abc", null, "niceProd", "6291041500213", 1.0));
+        assertTrue(shopDB.updateProductType(id, 2, "abc", null, "niceProd", "6291041500213", 1.0));
         assertFalse(shopDB.updateProductType(id, 0, "abc", "abc", null, "6291041500213", 1.0));
         assertFalse(shopDB.updateProductType(id, -1, "abc", "abc", "niceProd", null, 1.0));
     }
