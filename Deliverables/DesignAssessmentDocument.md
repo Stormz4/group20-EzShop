@@ -35,12 +35,12 @@ Since classes and interfaces are in the same package, there are no package-level
 # Summary analysis
 The main differences between the two designs are regarding the 0-1 relationships and regarding the hierarchy of Balance Operations:
 - We thought that having two different classes for Position and LoyaltyCard was not useful, and for that reason we included them respectively 
-    into ProductType and Customer.
-- In order to follow the API, we have decided to not extend BalanceOperations anymore in the following classes: Order, 
-    SaleTransaction, ReturnTransaction.
+    into EZProductType and EZCustomer.
+- In order to follow the API, we have decided to not extend EZBalanceOperations anymore in the following classes: EZOrder, 
+    EZSaleTransaction, EZReturnTransaction.
 
-Also, in the design delivered on April 30th we didn't include the SQLiteDB class and we did not plan to implement interfaces 
-in every leaf class, which is now the class. We didn't plan to add TicketEntry neither, which is now present in order to implement the associated interface.<br/>
+Also, in the design delivered on April 30th we didn't include the SQLiteDB class, and we did not plan to implement interfaces 
+in every leaf class, which is now the class. We didn't plan to add EZTicketEntry neither, which is now present in order to implement the associated interface.<br/>
 For simplicity, we replaced Enums with constants.
 
 Weaknesses:
