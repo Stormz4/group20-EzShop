@@ -58,9 +58,10 @@ with all elements explosed, all dependencies, NO tangles; and report it here as 
 <Report screen captures of the package-level tangles by opening the items in the "composition perspective" 
 (double click on the tangle from the Views->Complexity page)>
 ```
-// todo: screenshot???
+![](Structure101_images/Structural_over_complexity_Chart_ZeroTangle.png)
+![](Structure101_images/XS_Sources_PieChart.png)
 
-No items exceed the threshold for Tangled at the design level.
+Since classes and interfaces are in the same package, there are no package-level tangles.
 
 # Summary analysis
 ```
@@ -68,8 +69,14 @@ No items exceed the threshold for Tangled at the design level.
 <Discuss if the current structure shows weaknesses that should be fixed>
 ```
 
+Differences:
+* Removed BalanceOpType Enum
+* Removed LoyaltyCard class
+* We did not consider DB's class in first design
+
 Weaknesses:
 * Code readability
 * Complex code maintainability
 
-These weaknesses are due to the fatness of EZShop class and the methods endReturnTransaction, deleteProductFromSale and deleteReturnTransaction. 
+These weaknesses are due to the fatness of EZShop class and the methods endReturnTransaction, deleteProductFromSale and deleteReturnTransaction.
+
