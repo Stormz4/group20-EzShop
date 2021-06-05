@@ -556,6 +556,11 @@ public class EZShop implements EZShopInterface {
     }
 
     @Override
+    public boolean recordOrderArrivalRFID(Integer orderId, String RFIDfrom) throws InvalidOrderIdException, UnauthorizedException, 
+InvalidLocationException, InvalidRFIDException {
+        return false;
+    }
+    @Override
     public List<Order> getAllOrders() throws UnauthorizedException {
         if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
             throw new UnauthorizedException();
@@ -853,6 +858,11 @@ public class EZShop implements EZShopInterface {
     }
 
     @Override
+    public boolean addProductToSaleRFID(Integer transactionId, String RFID) throws InvalidTransactionIdException, InvalidRFIDException, InvalidQuantityException, UnauthorizedException{
+        return false;
+    }
+    
+    @Override
     public boolean deleteProductFromSale(Integer transactionId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
         EZSaleTransaction saleTransaction;
         ProductType productToRemove = null;
@@ -931,6 +941,11 @@ public class EZShop implements EZShopInterface {
         catch (InvalidProductIdException e) { // if the Product Code is correct, the Product Id is correct too
         }
         return result;
+    }
+
+    @Override
+    public boolean deleteProductFromSaleRFID(Integer transactionId, String RFID) throws InvalidTransactionIdException, InvalidRFIDException, InvalidQuantityException, UnauthorizedException{
+        return false;
     }
 
     @Override
@@ -1147,6 +1162,13 @@ public class EZShop implements EZShopInterface {
         }
         return true;
     }
+
+    @Override
+    public boolean returnProductRFID(Integer returnId, String RFID) throws InvalidTransactionIdException, InvalidRFIDException, UnauthorizedException 
+    {
+        return false;
+    }
+
 
     @Override
     public boolean endReturnTransaction(Integer returnId, boolean commit) throws InvalidTransactionIdException, UnauthorizedException {
