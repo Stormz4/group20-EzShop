@@ -36,6 +36,7 @@ public class EZShop implements EZShopInterface {
     private HashMap<Integer, EZBalanceOperation> ezBalanceOperations;
     private HashMap<Integer, EZSaleTransaction> ezSaleTransactions;
     private HashMap<Integer, EZReturnTransaction> ezReturnTransactions;
+    private HashMap<Long, EZProduct> ezProductsRFID; // RFID -
 
     //================================================================================================================//
     //                                                  Constructor                                                   //
@@ -857,9 +858,33 @@ InvalidLocationException, InvalidRFIDException {
         return result;
     }
 
+
     @Override
     public boolean addProductToSaleRFID(Integer transactionId, String RFID) throws InvalidTransactionIdException, InvalidRFIDException, InvalidQuantityException, UnauthorizedException{
-        return false;
+        if (this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier))
+            throw new UnauthorizedException();
+
+        if (transactionId == null || transactionId <= 0)
+            throw new InvalidTransactionIdException();
+
+        if (RFID == null || RFID.isEmpty() || !RFID.matches("\\b[0-9]{10}\\b"))
+            throw new InvalidRFIDException();
+
+        EZProduct prod = ezProductsRFID.get(Long.parseLong(RFID));
+        if (prod == null){
+            return false;
+        }
+        EZProductType prodType = ezProducts.get(prod.getProdTypeID());
+        if (prodType == null){
+            return false;
+        }
+        boolean add = false;
+        try {
+            add = this.addProductToSale(transactionId, prodType.getBarCode(), 1);
+        }catch(InvalidProductCodeException e){
+            e.printStackTrace();
+        }
+        return add;
     }
     
     @Override
@@ -945,7 +970,30 @@ InvalidLocationException, InvalidRFIDException {
 
     @Override
     public boolean deleteProductFromSaleRFID(Integer transactionId, String RFID) throws InvalidTransactionIdException, InvalidRFIDException, InvalidQuantityException, UnauthorizedException{
-        return false;
+        if (this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier))
+            throw new UnauthorizedException();
+
+        if (transactionId == null || transactionId <= 0)
+            throw new InvalidTransactionIdException();
+
+        if (RFID == null || RFID.isEmpty() || !RFID.matches("\\b[0-9]{10}\\b"))
+            throw new InvalidRFIDException();
+
+        EZProduct prod = ezProductsRFID.get(Long.parseLong(RFID));
+        if (prod == null){
+            return false;
+        }
+        EZProductType prodType = ezProducts.get(prod.getProdTypeID());
+        if (prodType == null){
+            return false;
+        }
+        boolean remove = false;
+        try {
+            remove = this.deleteProductFromSale(transactionId, prodType.getBarCode(), 1);
+        }catch(InvalidProductCodeException e){
+            e.printStackTrace();
+        }
+        return remove;
     }
 
     @Override
@@ -1590,6 +1638,9 @@ InvalidLocationException, InvalidRFIDException {
 
         if (ezUsers == null || ezUsers.isEmpty())
             ezUsers = shopDB.selectAllUsers();
+
+        if (ezProductsRFID == null || ezProductsRFID.isEmpty())
+            ezProductsRFID = shopDB.selectAllProducts();
     }
 
     private void clearData() {

@@ -30,9 +30,12 @@ public class TestEZShop_Change {
 
     @Before
     public void init() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, UnauthorizedException {
-        ez = new EZShop();
+        shopDB = new SQLiteDB();
         shopDB.connect();
         shopDB.initDatabase();
+        shopDB.clearDatabase();
+
+        ez = new EZShop();
         uId=ez.createUser("RFIDTest", "pwd", "Administrator");
 
         prodTypeId1 = shopDB.insertProductType(2, "89-XY-98", "Test note 1", "Test product 1", "2345344543423", 11.90);
@@ -41,14 +44,16 @@ public class TestEZShop_Change {
         prodTypeId4 = shopDB.insertProductType(10, "69-TT-54", "Test note 4", "Test product 4", "3155678522419", 5.00);
         prodTypeId5 = shopDB.insertProductType(10, "", "Test note 5", "Test product 5", "2141513141144", 5.00);
 
-        shopDB.insertProduct(Long.parseLong("RFID1"), 1);
-        shopDB.insertProduct(Long.parseLong("RFID2"), 1);
-        shopDB.insertProduct(Long.parseLong("RFID3"), 2);
-        shopDB.insertProduct(Long.parseLong("RFID4"), 3);
-        shopDB.insertProduct(Long.parseLong("RFID5"), 4);
+        shopDB.insertProduct(Long.parseLong(RFID1), 1);
+        shopDB.insertProduct(Long.parseLong(RFID2), 1);
+        shopDB.insertProduct(Long.parseLong(RFID3), 2);
+        shopDB.insertProduct(Long.parseLong(RFID4), 3);
+        shopDB.insertProduct(Long.parseLong(RFID5), 4);
 
         // Add some money to the balance
+        ez.login("RFIDTest", "pwd");
         ez.recordBalanceUpdate(50000);
+        ez.logout();
     }
 
     @After
@@ -62,11 +67,11 @@ public class TestEZShop_Change {
         shopDB.deleteProductType(prodTypeId4);
         shopDB.deleteProductType(prodTypeId5);
 
-        shopDB.deleteProduct(Long.parseLong("RFID1"));
-        shopDB.deleteProduct(Long.parseLong("RFID2"));
-        shopDB.deleteProduct(Long.parseLong("RFID3"));
-        shopDB.deleteProduct(Long.parseLong("RFID4"));
-        shopDB.deleteProduct(Long.parseLong("RFID5"));
+        shopDB.deleteProduct(Long.parseLong(RFID1));
+        shopDB.deleteProduct(Long.parseLong(RFID2));
+        shopDB.deleteProduct(Long.parseLong(RFID3));
+        shopDB.deleteProduct(Long.parseLong(RFID4));
+        shopDB.deleteProduct(Long.parseLong(RFID5));
 
         shopDB.closeConnection();
     }
@@ -115,7 +120,7 @@ public class TestEZShop_Change {
 
         // TODO check what to do with invalidquantityexception, when it should be thrown. API doesn't list it
         try {
-            ez.addProductToSaleRFID(1, "0000000001");
+            ez.addProductToSaleRFID(1, RFID1);
             fail("UnauthorizedException incoming");
         } catch (UnauthorizedException e){
             assertNotNull(e);
@@ -215,6 +220,7 @@ public class TestEZShop_Change {
         Integer s = ez.startSaleTransaction();
 
         // ************* TEST ADD PRODUCT TO SALE RFID ******************
+        ez.loadDataFromDB();
         int quantityProd1 = ez.getProductTypeByBarCode("2345344543423").getQuantity();
         int quantityAfter1 = quantityProd1-1;
         int quantityNoChange = quantityProd1;
