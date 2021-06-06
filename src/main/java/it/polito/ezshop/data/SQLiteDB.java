@@ -31,8 +31,9 @@ public class SQLiteDB {
     public static final String tProductTypes = "ProductTypes";
     public static final String tTransactions = "Transactions";
     public static final String tUsers = "Users";
+    public static final String tProducts = "Products";
     public static final String[] tables =  new String [] {tBalanceOperations, tCards, tCustomers, tOrders, tProductsPerSale,
-                                                            tProductsPerSale, tProductTypes, tTransactions, tUsers};
+                                                          tProductsPerSale, tProductTypes, tTransactions, tUsers, tProducts};
 
     static private Connection dbConnection = null;
 
@@ -110,6 +111,7 @@ public class SQLiteDB {
         this.createProductTypesTable();
         this.createTransactionsTable();
         this.createUsersTable();
+        this.createProductsTable();
     }
 
     public boolean clearDatabase() {
@@ -124,6 +126,7 @@ public class SQLiteDB {
         cleared &= this.clearTable(SQLiteDB.tProductsPerSale);
         cleared &= this.clearTable(SQLiteDB.tTransactions);
         cleared &= this.clearTable(SQLiteDB.tUsers);
+        cleared &= this.clearTable(SQLiteDB.tProducts);
 
         return cleared;
   }
@@ -1407,5 +1410,102 @@ public class SQLiteDB {
         }
 
         return updated;
+    }
+
+
+    /** ---------------------------------------------------------------------------------------------------------------
+     ** Create a new Products table
+     ** EZProduct (String RFID, Integer prodTypeID)
+     */
+    private void createProductsTable() {
+        if (dbConnection == null)
+            return;
+
+        // SQL statement for creating a new Orders table
+        String sql = "CREATE TABLE IF NOT EXISTS Products (\n"
+                + " rfid BIGINT PRIMARY KEY,\n"
+                + " prodTypeID integer NOT NULL\n"
+                + ");";
+
+        try{
+            Statement stmt = dbConnection.createStatement();
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     ** Insert new Product record
+     */
+    public boolean insertProduct(Long RFID, Integer prodTypeID) {
+        if (dbConnection == null || RFID == null || prodTypeID == null)
+            return false;
+
+        boolean inserted = false;
+        String sql = "INSERT INTO Products(rfid, prodTypeID) \n"
+                   + "VALUES(?,?);";
+
+        try{
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
+            pstmt.setLong(1, RFID);
+            pstmt.setInt(2, prodTypeID);
+            pstmt.executeUpdate();
+
+            inserted = true;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return inserted;
+    }
+
+    /**
+     ** Delete Product record with given RFID
+     */
+    public boolean deleteProduct(Long RFID) {
+        if (dbConnection == null || RFID == null)
+            return false;
+
+        boolean deleted = false;
+        String sql = "DELETE FROM Products WHERE rfid=? ;";
+
+        try{
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
+            pstmt.setLong(1, RFID);
+            pstmt.executeUpdate();
+            deleted = true;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return deleted;
+    }
+
+    /**
+     ** Select all Customers records
+     */
+    public HashMap<Long, EZProduct> selectAllProducts() {
+        HashMap<Long, EZProduct> products = new HashMap<>();
+        String sql = "SELECT rfid, prodTypeID \n"
+                   + "FROM Products ;";
+
+        try {
+            Statement stmt  = dbConnection.createStatement();
+            ResultSet rs    = stmt.executeQuery(sql);
+
+            // loop through the result set
+            while (rs.next()) {
+                Long rfid = rs.getLong("rfid");
+                Integer prodTypeID = rs.getInt("prodTypeID");
+
+                String strRFID = String.format("%10d", rfid).replace(' ', '0');
+                products.put(rfid, new EZProduct(strRFID, prodTypeID));
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return products;
     }
 }
