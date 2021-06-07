@@ -1491,7 +1491,7 @@ public class SQLiteDB {
      */
     public HashMap<Long, EZProduct> selectAllProducts() {
         HashMap<Long, EZProduct> products = new HashMap<>();
-        String sql = "SELECT rfid, prodTypeID \n"
+        String sql = "SELECT rfid, prodTypeID, saleID, returnID \n"
                    + "FROM Products ;";
 
         try {
@@ -1502,9 +1502,11 @@ public class SQLiteDB {
             while (rs.next()) {
                 Long rfid = rs.getLong("rfid");
                 Integer prodTypeID = rs.getInt("prodTypeID");
+                Integer saleID = rs.getInt("saleID");
+                Integer returnID = rs.getInt("returnID");
 
                 String strRFID = String.format("%10d", rfid).replace(' ', '0');
-                products.put(rfid, new EZProduct(strRFID, prodTypeID));
+                products.put(rfid, new EZProduct(strRFID, prodTypeID, saleID, returnID));
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -1528,8 +1530,8 @@ public class SQLiteDB {
         try{
             PreparedStatement pstmt = dbConnection.prepareStatement(sql);
             pstmt.setInt(1, prodTypeID);
-            pstmt.setInt(2, saleID);
-            pstmt.setInt(3, returnID);
+            pstmt.setInt(2, (saleID != null) ? saleID : defaultID);
+            pstmt.setInt(3, (returnID != null) ? returnID : defaultID);
             pstmt.setLong(4, RFID);
             pstmt.executeUpdate();
             updated = true;

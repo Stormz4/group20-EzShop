@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import static it.polito.ezshop.data.SQLiteDB.defaultID;
 import static org.junit.Assert.*;
 
 public class TestEZShop_Change {
@@ -44,11 +45,11 @@ public class TestEZShop_Change {
         prodTypeId4 = shopDB.insertProductType(10, "69-TT-54", "Test note 4", "Test product 4", "3155678522419", 5.00);
         prodTypeId5 = shopDB.insertProductType(10, "", "Test note 5", "Test product 5", "2141513141144", 5.00);
 
-        shopDB.insertProduct(Long.parseLong(RFID1), 1);
-        shopDB.insertProduct(Long.parseLong(RFID2), 1);
-        shopDB.insertProduct(Long.parseLong(RFID3), 2);
-        shopDB.insertProduct(Long.parseLong(RFID4), 3);
-        shopDB.insertProduct(Long.parseLong(RFID5), 4);
+        shopDB.insertProduct(Long.parseLong(RFID1), 1, defaultID, defaultID);
+        shopDB.insertProduct(Long.parseLong(RFID2), 1, defaultID, defaultID);
+        shopDB.insertProduct(Long.parseLong(RFID3), 2, defaultID, defaultID);
+        shopDB.insertProduct(Long.parseLong(RFID4), 3, defaultID, defaultID);
+        shopDB.insertProduct(Long.parseLong(RFID5), 4, defaultID, defaultID);
 
         // Add some money to the balance
         ez.login("RFIDTest", "pwd");

@@ -604,10 +604,10 @@ public class EZShop implements EZShopInterface {
             while (this.ezProductsRFID.containsKey(rfid))
                 rfid++;
 
-            recorded = this.shopDB.insertProduct(rfid, prodTypeID);
+            recorded = this.shopDB.insertProduct(rfid, prodTypeID, defaultID, defaultID);
             if (recorded) {
                 rfids[i] = rfid;
-                this.ezProductsRFID.put(rfid, new EZProduct(String.format("%10d", rfid).replace(' ', '0'), prodTypeID));
+                this.ezProductsRFID.put(rfid, new EZProduct(String.format("%10d", rfid).replace(' ', '0'), prodTypeID, defaultID, defaultID));
             }
             else {
                 // Remove the already added
@@ -1193,7 +1193,7 @@ public class EZShop implements EZShopInterface {
             ezReturnTransactions = new HashMap<Integer, EZReturnTransaction>();
 
         List<TicketEntry> entries = new LinkedList<TicketEntry>();
-        EZReturnTransaction retTr = new EZReturnTransaction(defaultID, saleNumber, entries, defaultValue, RTOpened, null);
+        EZReturnTransaction retTr = new EZReturnTransaction(defaultID, saleNumber, entries, defaultValue, RTOpened);
         int id = shopDB.insertReturnTransaction(entries, saleNumber, defaultValue, RTOpened);
         if(id == -1) return -1;
         retTr.setReturnId(id);

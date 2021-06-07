@@ -15,7 +15,7 @@ public class EZReturnTransaction{
     private String status;
     private List<String> rfids;
 
-    public EZReturnTransaction(Integer returnId, Integer saleTransactionId, List<TicketEntry> entries, double returnedValue, String status, List<String> rfids) {
+    public EZReturnTransaction(Integer returnId, Integer saleTransactionId, List<TicketEntry> entries, double returnedValue, String status) {
         this.returnId = returnId;
         this.saleTransactionId = saleTransactionId;
         this.returnedValue = returnedValue;

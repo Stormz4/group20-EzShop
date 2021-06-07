@@ -9,8 +9,8 @@ public class EZProduct {
     public EZProduct (String RFID, Integer prodTypeID, Integer saleID, Integer returnID) {
         this.RFID = RFID;
         this.prodTypeID = prodTypeID;
-        this.saleID = -1;
-        this.returnID = -1;
+        this.saleID = saleID;
+        this.returnID = returnID;
     }
 
     public String getRFID() {
