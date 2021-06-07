@@ -946,7 +946,6 @@ public class EZShop implements EZShopInterface {
         boolean add = false;
         try {
             add = this.addProductToSale(transactionId, prodType.getBarCode(), 1);
-            prod.setSaleID(transactionId);
         }catch(InvalidProductCodeException e){
             e.printStackTrace();
         }

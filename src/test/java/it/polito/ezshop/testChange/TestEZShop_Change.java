@@ -326,9 +326,10 @@ public class TestEZShop_Change {
 
         int quantityOrdered = 10;
         // Create an order for product 5, which doesn't have a location yet
-        Integer order = ez.issueOrder("2141513141144", quantityOrdered,1.20);
+        Integer orderID = ez.issueOrder("2141513141144", quantityOrdered,1.20);
+        ez.payOrder(orderID);
         try {
-            ez.recordOrderArrivalRFID(order, RFID5);
+            ez.recordOrderArrivalRFID(orderID, RFID5);
             fail("InvalidLocationException incoming");
         } catch (InvalidLocationException e) {
             assertNotNull(e);
@@ -374,7 +375,7 @@ public class TestEZShop_Change {
             assertNotNull(e);
         }
         try {
-            ez.recordOrderArrivalRFID(1, "1000000000");
+            ez.recordOrderArrivalRFID(1, RFID3);
             fail("InvalidRFIDException incoming");
         } catch (InvalidRFIDException e) {
             assertNotNull(e);
@@ -385,8 +386,8 @@ public class TestEZShop_Change {
         // Check if the quantity is updated after the record order
         HashMap<Long, EZProduct> products = shopDB.selectAllProducts();
         int sizeBefore = products.size();
-        ez.payOrder(order); // order is now payed
-        boolean trueArrival = ez.recordOrderArrivalRFID(order, RFID5);
+        ez.payOrder(orderID); // order is now payed
+        boolean trueArrival = ez.recordOrderArrivalRFID(orderID, RFID5);
         // now the order should be in state COMPLETED
         int sizeAfter= products.size();
         LinkedList<Order> orders = (LinkedList<Order>) ez.getAllOrders();
