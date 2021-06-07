@@ -1224,7 +1224,7 @@ InvalidLocationException, InvalidRFIDException {
 
         final int amount = 1; // just one item is considered (RFID is unique)
 
-        EZProduct product = getProductByRFID(RFID);
+        EZProduct product = ezProductsRFID.get(Long.parseLong(RFID));
 
         if(product == null)
             return false;
@@ -1314,8 +1314,10 @@ InvalidLocationException, InvalidRFIDException {
                 for(String s : retToBeStored.getRFIDs())
                 {
                     Long rfid = Long.parseLong(s);
-                    ezProductsRFID.get(rfid).setSaleID(defaultID);
-                    // todo: reset saleID also in DB
+                    EZProduct p = ezProductsRFID.get(rfid);
+                    p.setSaleID(defaultID);
+                    p.setReturnID(returnId);
+                    // todo: reset saleID also in DB + set also returnId in DB
                 }
 
                 // update (decrease) number of sold products (in related sale transaction)
@@ -1420,10 +1422,12 @@ InvalidLocationException, InvalidRFIDException {
             getSaleTransactionById(retTr.getSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode()).updateAmount(+ezticket.getAmount()) ;
 
             // re-set the products (with RFID) in the related sale transaction:
-            for(String s: retTr.getRFIDs())    //possiamo salvare la lista di rfid della return anche nel db???
+            for(String s: retTr.getRFIDs())
             {
                 Long rfid = Long.parseLong(s);
-                ezProductsRFID.get(rfid).setSaleID(sale.getTicketNumber());
+                EZProduct p = ezProductsRFID.get(rfid);
+                p.setSaleID(sale.getTicketNumber());
+                p.setReturnID(defaultID);
                 // todo: do it also in the db
             }
 
