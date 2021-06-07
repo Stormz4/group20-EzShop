@@ -909,11 +909,12 @@ public class EZShop implements EZShopInterface {
                 added = this.shopDB.updateSaleTransaction(saleT.getTicketNumber(), 0, newPrice, saleT.getStatus());
             }
         }
-        catch (InvalidProductIdException e) { // the method returns false (does not modify result)
-        }
+        catch (InvalidProductIdException ignored) { }
 
-        if (added)
-            saleT.setPrice(saleT.getPrice() + pType.getPricePerUnit() * amount); // update total price
+        if (added) {
+            saleT.setPrice(saleT.getPrice() + pType.getPricePerUnit() * amount);
+            tEntry.ifPresent(ticketEntry -> ticketEntry.setAmount(ticketEntry.getAmount() + amount));
+        }
         else {
             try { this.updateQuantity(pType.getId(), amount); }
             catch (InvalidProductIdException ignored) { }
