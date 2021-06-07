@@ -465,7 +465,7 @@ public class TestEZShop_Change {
         int quantityBefore = shopDB.selectAllProductTypes().get(prodTypeId1).getQuantity();
         HashMap<Long, EZProduct> products = shopDB.selectAllProducts();
         EZProduct p = products.get(Long.parseLong("0000000001"));
-        assertNull(p);
+        assertNotNull(p);
         boolean ok = ez.returnProductRFID(rid, "0000000001");
         assertTrue(ok);
         products = shopDB.selectAllProducts();
