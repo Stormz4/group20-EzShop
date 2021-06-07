@@ -1780,6 +1780,10 @@ public class EZShop implements EZShopInterface {
         ezSaleTransactions.clear();
     }
 
+    public  HashMap<Long, EZProduct> getAllProducts() {
+        return ezProductsRFID;
+    }
+
     static public boolean isValidBarCode(String barCode){
         if (barCode == null)
             return false;
