@@ -379,5 +379,33 @@ public class TestEZShop_Change {
 
         // TODO Missing test "false it was not in an ORDERED/COMPLETED state"
     }
+
+    @Test
+    public void testReturnRFID() throws UnauthorizedException, InvalidTransactionIdException {
+        int s1 = ez.startSaleTransaction();
+
+
+        // ************* Testing startReturnTransaction ******************
+        int r1 = ez.startReturnTransaction(s1);
+
+
+
+        // *************   Testing returnProductRFID    ******************
+
+
+
+
+        // *************  Testing endReturnTransaction  ******************
+
+
+
+
+        // ************* Testing deleteReturnTransaction ******************
+
+
+
+
+
+    }
 }
 

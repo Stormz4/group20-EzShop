@@ -928,7 +928,7 @@ public class EZShop implements EZShopInterface {
         if (transactionId == null || transactionId <= 0)
             throw new InvalidTransactionIdException();
 
-        if (RFID == null || RFID.isEmpty() || !RFID.matches("\\b[0-9]{10}\\b"))
+        if (RFID == null || RFID.isEmpty() || !isValidRFID(RFID))
             throw new InvalidRFIDException();
 
         EZProduct prod = ezProductsRFID.get(Long.parseLong(RFID));
@@ -942,6 +942,7 @@ public class EZShop implements EZShopInterface {
         boolean add = false;
         try {
             add = this.addProductToSale(transactionId, prodType.getBarCode(), 1);
+            prod.setSaleID(transactionId);
         }catch(InvalidProductCodeException e){
             e.printStackTrace();
         }
@@ -1192,7 +1193,7 @@ public class EZShop implements EZShopInterface {
             ezReturnTransactions = new HashMap<Integer, EZReturnTransaction>();
 
         List<TicketEntry> entries = new LinkedList<TicketEntry>();
-        EZReturnTransaction retTr = new EZReturnTransaction(defaultID, saleNumber, entries, defaultValue, RTOpened);
+        EZReturnTransaction retTr = new EZReturnTransaction(defaultID, saleNumber, entries, defaultValue, RTOpened, null);
         int id = shopDB.insertReturnTransaction(entries, saleNumber, defaultValue, RTOpened);
         if(id == -1) return -1;
         retTr.setReturnId(id);
@@ -1275,7 +1276,50 @@ public class EZShop implements EZShopInterface {
     @Override
     public boolean returnProductRFID(Integer returnId, String RFID) throws InvalidTransactionIdException, InvalidRFIDException, UnauthorizedException 
     {
-        return false;
+        if( this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier) )
+            throw new UnauthorizedException();
+
+        if(returnId == null || returnId <= 0) throw new InvalidTransactionIdException();
+
+        if(RFID == null || RFID.length() == 0  || !isValidRFID(RFID)) throw new InvalidRFIDException();
+
+        final int amount = 1; // just one item is considered (RFID is unique)
+
+        EZProduct product = ezProductsRFID.get(Long.parseLong(RFID));
+
+        if(product == null)
+            return false;
+
+        Integer productTypeID = product.getProdTypeID();
+        if(ezProducts == null)
+            return false;
+        EZProductType prodType = ezProducts.get(productTypeID);
+        if(prodType == null)
+            return false;
+        String productBarCode = prodType.getBarCode();
+
+        if(tmpRetTr == null)
+            return false;
+
+        EZSaleTransaction sale = getSaleTransactionById(tmpRetTr.getSaleTransactionId());
+        if(sale == null)
+            return false;
+
+        EZTicketEntry saleTicket = sale.getTicketEntryByBarCode(productBarCode);
+        if(saleTicket == null)
+            return false;
+
+        if(product.getSaleID() == null || (product.getSaleID() == -1) || !(product.getSaleID().equals(sale.getTicketNumber())))
+            return false;
+
+        boolean ok = false;
+        try {
+            ok = this.returnProduct(returnId, productBarCode, amount);
+            tmpRetTr.getRFIDs().add(RFID);
+        }catch(InvalidProductCodeException | InvalidQuantityException e){
+            e.printStackTrace();
+        }
+        return ok;
     }
 
 
@@ -1327,6 +1371,16 @@ public class EZShop implements EZShopInterface {
                     return false;
                 product.editQuantity(+ezticket.getAmount());//re-place products on shelves
 
+                // reset products (with RFID) of that productType in this sale ticket:
+                for(String s : retToBeStored.getRFIDs())
+                {
+                    Long rfid = Long.parseLong(s);
+                    EZProduct p = ezProductsRFID.get(rfid);
+                    p.setSaleID(defaultID);
+                    p.setReturnID(returnId);
+                    // todo: reset saleID also in DB + set also returnId in DB
+                }
+
                 // update (decrease) number of sold products (in related sale transaction)
                 EZTicketEntry oldSaleTicket = getSaleTransactionById(tmpRetTr.getSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode());
                 if(!shopDB.updateProductPerSale(product.getBarCode(), sale.getTicketNumber(), oldSaleTicket.getAmount()-ezticket.getAmount(), oldSaleTicket.getDiscountRate()))
@@ -1346,7 +1400,7 @@ public class EZShop implements EZShopInterface {
             retToBeStored.setReturnedValue(oldReturnedValue * (1-saleDiscount));
             retToBeStored.setStatus(RTClosed);
             // update ReturnTransaction in DB:
-            if(!shopDB.updateReturnTransaction(retToBeStored.getReturnId(), retToBeStored.getReturnedValue(), RTClosed))
+            if(!shopDB.updateReturnTransaction(retToBeStored.getReturnId(), retToBeStored.getReturnedValue(), RTClosed)) //todo: update also return's RFID list in db
                 return false;
             // clear the temporary transaction:
             tmpRetTr = null;
@@ -1427,6 +1481,16 @@ public class EZShop implements EZShopInterface {
             if(!shopDB.updateProductPerSale(product.getBarCode(), sale.getTicketNumber(), oldSaleTicket.getAmount()+ezticket.getAmount(), oldSaleTicket.getDiscountRate()))
                 return false;
             getSaleTransactionById(retTr.getSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode()).updateAmount(+ezticket.getAmount()) ;
+
+            // re-set the products (with RFID) in the related sale transaction:
+            for(String s: retTr.getRFIDs())
+            {
+                Long rfid = Long.parseLong(s);
+                EZProduct p = ezProductsRFID.get(rfid);
+                p.setSaleID(sale.getTicketNumber());
+                p.setReturnID(defaultID);
+                // todo: do it also in the db
+            }
 
             // re-update (increase) final price of related sale transaction
             double newPrice = sale.getPrice()+ezticket.getTotal();
