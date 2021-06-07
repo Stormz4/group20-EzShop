@@ -935,6 +935,7 @@ public class EZShop implements EZShopInterface {
         if (prod == null){
             return false;
         }
+        prod.setReturnID(defaultID); // reset returnID (in case this product has already been returned in the past)
         EZProductType prodType = ezProducts.get(prod.getProdTypeID());
         if (prodType == null){
             return false;
