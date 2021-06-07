@@ -46,9 +46,6 @@ public class TestEZShop_Change {
         shopDB.initDatabase();
         shopDB.clearDatabase();
 
-        ez = new EZShop();
-        uId=ez.createUser("RFIDTest", "pwd", "Administrator");
-
         prodTypeId1 = shopDB.insertProductType(8, "89-XY-98", "Test note 1", "Test product 1", "2345344543423", 11.90);
         prodTypeId2 = shopDB.insertProductType(3, "67-TT-54", "Test note 2", "Test product 2", "1155678522411", 5.00);
         prodTypeId3 = shopDB.insertProductType(2, "68-TT-54", "Test note 3", "Test product 3", "2177878523417", 5.00);
@@ -70,6 +67,9 @@ public class TestEZShop_Change {
         shopDB.insertProduct(Long.parseLong(RFID13), 2, defaultID, defaultID);
         shopDB.insertProduct(Long.parseLong(RFID14), 3, defaultID, defaultID);
         shopDB.insertProduct(Long.parseLong(RFID15), 5, defaultID, defaultID);
+
+        ez = new EZShop();
+        uId=ez.createUser("RFIDTest", "pwd", "Administrator");
 
         // Add some money to the balance
         ez.login("RFIDTest", "pwd");

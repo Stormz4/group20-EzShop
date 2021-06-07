@@ -583,10 +583,15 @@ public class EZShop implements EZShopInterface {
         if (!recorded)
             return false;
 
+        EZOrder order = this.ezOrders.get(orderId);
+
         if (!isValidRFID(RFIDfrom))
             throw new InvalidRFIDException();
 
-        EZOrder order = this.ezOrders.get(orderId);
+        for (long i = Long.parseLong(RFIDfrom); i < Long.parseLong(RFIDfrom) + order.getQuantity(); i++) {
+            if (this.ezProductsRFID.containsKey(i))
+                throw new InvalidRFIDException(); // RFID is not unique
+        }
 
         // Find productType's ID
         Integer prodTypeID = null;
@@ -601,13 +606,11 @@ public class EZShop implements EZShopInterface {
         long rfid = Long.parseLong(RFIDfrom);
         long[] rfids = new long[order.getQuantity()];
         for (int i = 0; i < order.getQuantity(); i++) {
-            while (this.ezProductsRFID.containsKey(rfid))
-                rfid++;
-
             recorded = this.shopDB.insertProduct(rfid, prodTypeID, defaultID, defaultID);
             if (recorded) {
                 rfids[i] = rfid;
                 this.ezProductsRFID.put(rfid, new EZProduct(String.format("%10d", rfid).replace(' ', '0'), prodTypeID, defaultID, defaultID));
+                rfid++;
             }
             else {
                 // Remove the already added
@@ -932,7 +935,7 @@ public class EZShop implements EZShopInterface {
             throw new InvalidRFIDException();
 
         EZProduct prod = ezProductsRFID.get(Long.parseLong(RFID));
-        if (prod == null){
+        if (prod == null || prod.getSaleID() != -1){
             return false;
         }
         prod.setReturnID(defaultID); // reset returnID (in case this product has already been returned in the past)
@@ -946,6 +949,10 @@ public class EZShop implements EZShopInterface {
             prod.setSaleID(transactionId);
         }catch(InvalidProductCodeException e){
             e.printStackTrace();
+        }
+
+        if (add){
+            prod.setSaleID(transactionId);
         }
         return add;
     }
@@ -1043,7 +1050,7 @@ public class EZShop implements EZShopInterface {
             throw new InvalidRFIDException();
 
         EZProduct prod = ezProductsRFID.get(Long.parseLong(RFID));
-        if (prod == null){
+        if (prod == null || prod.getSaleID() == -1 ){
             return false;
         }
         EZProductType prodType = ezProducts.get(prod.getProdTypeID());
@@ -1055,6 +1062,9 @@ public class EZShop implements EZShopInterface {
             remove = this.deleteProductFromSale(transactionId, prodType.getBarCode(), 1);
         }catch(InvalidProductCodeException e){
             e.printStackTrace();
+        }
+        if (remove){
+            prod.setSaleID(-1);
         }
         return remove;
     }
