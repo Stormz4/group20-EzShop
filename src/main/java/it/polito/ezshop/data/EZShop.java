@@ -583,10 +583,15 @@ public class EZShop implements EZShopInterface {
         if (!recorded)
             return false;
 
+        EZOrder order = this.ezOrders.get(orderId);
+
         if (!isValidRFID(RFIDfrom))
             throw new InvalidRFIDException();
 
-        EZOrder order = this.ezOrders.get(orderId);
+        for (long i = Long.parseLong(RFIDfrom); i < Long.parseLong(RFIDfrom) + order.getQuantity(); i++) {
+            if (this.ezProductsRFID.containsKey(i))
+                throw new InvalidRFIDException(); // RFID is not unique
+        }
 
         // Find productType's ID
         Integer prodTypeID = null;
@@ -601,13 +606,11 @@ public class EZShop implements EZShopInterface {
         long rfid = Long.parseLong(RFIDfrom);
         long[] rfids = new long[order.getQuantity()];
         for (int i = 0; i < order.getQuantity(); i++) {
-            while (this.ezProductsRFID.containsKey(rfid))
-                rfid++;
-
             recorded = this.shopDB.insertProduct(rfid, prodTypeID, defaultID, defaultID);
             if (recorded) {
                 rfids[i] = rfid;
                 this.ezProductsRFID.put(rfid, new EZProduct(String.format("%10d", rfid).replace(' ', '0'), prodTypeID, defaultID, defaultID));
+                rfid++;
             }
             else {
                 // Remove the already added
