@@ -36,20 +36,20 @@ public class TestEZShop_Change {
         shopDB.initDatabase();
         shopDB.clearDatabase();
 
-        ez = new EZShop();
-        uId=ez.createUser("RFIDTest", "pwd", "Administrator");
-
         prodTypeId1 = shopDB.insertProductType(2, "89-XY-98", "Test note 1", "Test product 1", "2345344543423", 11.90);
         prodTypeId2 = shopDB.insertProductType(1, "67-TT-54", "Test note 2", "Test product 2", "1155678522411", 5.00);
         prodTypeId3 = shopDB.insertProductType(1, "68-TT-54", "Test note 3", "Test product 3", "2177878523417", 5.00);
         prodTypeId4 = shopDB.insertProductType(10, "69-TT-54", "Test note 4", "Test product 4", "3155678522419", 5.00);
         prodTypeId5 = shopDB.insertProductType(10, "", "Test note 5", "Test product 5", "2141513141144", 5.00);
 
-        shopDB.insertProduct(Long.parseLong(RFID1), 1, defaultID, defaultID);
-        shopDB.insertProduct(Long.parseLong(RFID2), 1, defaultID, defaultID);
-        shopDB.insertProduct(Long.parseLong(RFID3), 2, defaultID, defaultID);
-        shopDB.insertProduct(Long.parseLong(RFID4), 3, defaultID, defaultID);
-        shopDB.insertProduct(Long.parseLong(RFID5), 4, defaultID, defaultID);
+        shopDB.insertProduct(Long.parseLong(RFID1), prodTypeId1, defaultID, defaultID);
+        shopDB.insertProduct(Long.parseLong(RFID2), prodTypeId2, defaultID, defaultID);
+        shopDB.insertProduct(Long.parseLong(RFID3), prodTypeId3, defaultID, defaultID);
+        shopDB.insertProduct(Long.parseLong(RFID4), prodTypeId4, defaultID, defaultID);
+        shopDB.insertProduct(Long.parseLong(RFID5), prodTypeId5, defaultID, defaultID);
+
+        ez = new EZShop();
+        uId = ez.createUser("RFIDTest", "pwd", "Administrator");
 
         // Add some money to the balance
         ez.login("RFIDTest", "pwd");
@@ -306,9 +306,10 @@ public class TestEZShop_Change {
 
         int quantityOrdered = 10;
         // Create an order for product 5, which doesn't have a location yet
-        Integer order = ez.issueOrder("2141513141144", quantityOrdered,1.20);
+        Integer orderID = ez.issueOrder("2141513141144", quantityOrdered,1.20);
+        ez.payOrder(orderID);
         try {
-            ez.recordOrderArrivalRFID(order, RFID5);
+            ez.recordOrderArrivalRFID(orderID, RFID5);
             fail("InvalidLocationException incoming");
         } catch (InvalidLocationException e) {
             assertNotNull(e);
@@ -354,7 +355,7 @@ public class TestEZShop_Change {
             assertNotNull(e);
         }
         try {
-            ez.recordOrderArrivalRFID(1, "1000000000");
+            ez.recordOrderArrivalRFID(1, RFID3);
             fail("InvalidRFIDException incoming");
         } catch (InvalidRFIDException e) {
             assertNotNull(e);
@@ -365,8 +366,8 @@ public class TestEZShop_Change {
         // Check if the quantity is updated after the record order
         HashMap<Long, EZProduct> products = shopDB.selectAllProducts();
         int sizeBefore = products.size();
-        ez.payOrder(order); // order is now payed
-        boolean trueArrival = ez.recordOrderArrivalRFID(order, RFID5);
+        ez.payOrder(orderID); // order is now payed
+        boolean trueArrival = ez.recordOrderArrivalRFID(orderID, RFID5);
         // now the order should be in state COMPLETED
         int sizeAfter= products.size();
         LinkedList<Order> orders = (LinkedList<Order>) ez.getAllOrders();
