@@ -263,6 +263,7 @@ public class TestEZShop_Change {
         // The quantity for the Product type should decrease
         quantityProd1 = ez.getProductTypeByBarCode("2345344543423").getQuantity();
         assertEquals(quantityAfter1, quantityProd1);
+        assertEquals(ez.getAllProducts().get(Long.parseLong(RFID1)).getSaleID(), s);
 
         // ************* TEST DELETE PRODUCT FROM SALE RFID ******************
 
@@ -282,6 +283,7 @@ public class TestEZShop_Change {
         boolean deleteTrue = ez.deleteProductFromSaleRFID(s, "0000000001");
         quantityProd1 = ez.getProductTypeByBarCode("2345344543423").getQuantity();
         assertEquals(quantityNoChange, quantityProd1);
+        assertEquals(ez.getAllProducts().get(Long.parseLong(RFID1)).getSaleID(), Integer.valueOf(defaultID));
 
         ez.endSaleTransaction(s);
 
