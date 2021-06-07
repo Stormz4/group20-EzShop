@@ -556,14 +556,75 @@ public class EZShop implements EZShopInterface {
         return true;
     }
 
+
+    /**
+     * This method records the arrival of an order with given <orderId>. This method changes the quantity of available product.
+     * This method records each product received, with its RFID. RFIDs are recorded starting from RFIDfrom, in increments of 1
+     * ex recordOrderArrivalRFID(10, "000000001000")  where order 10 ordered 10 quantities of an item, this method records
+     * products with RFID 1000, 1001, 1002, 1003 etc until 1009
+     * The product type affected must have a location registered. The order should be either in the PAYED state (in this
+     * case the state will change to the COMPLETED one and the quantity of product type will be updated) or in the
+     * COMPLETED one (in this case this method will have no effect at all).
+     * It can be invoked only after a user with role "Administrator" or "ShopManager" is logged in.
+     *
+     * @param orderId the id of the order that has arrived
+     *
+     * @return  true if the operation was successful
+     *          false if the order does not exist or if it was not in an ORDERED/COMPLETED state
+     *
+     * @throws InvalidOrderIdException if the order id is less than or equal to 0 or if it is null.
+     * @throws InvalidLocationException if the ordered product type has not an assigned location.
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     * @throws InvalidRFIDException if the RFID has invalid format or is not unique
+     */
     @Override
-    public boolean recordOrderArrivalRFID(Integer orderId, String RFIDfrom) throws InvalidOrderIdException, UnauthorizedException, 
-InvalidLocationException, InvalidRFIDException {
-        return false;
+    public boolean recordOrderArrivalRFID(Integer orderId, String RFIDfrom) throws InvalidOrderIdException, UnauthorizedException, InvalidLocationException, InvalidRFIDException {
+        boolean recorded = this.recordOrderArrival(orderId);
+        if (!recorded)
+            return false;
+
+        if (!isValidRFID(RFIDfrom))
+            throw new InvalidRFIDException();
+
+        EZOrder order = this.ezOrders.get(orderId);
+
+        // Find productType's ID
+        Integer prodTypeID = null;
+        for (EZProductType pType : this.ezProducts.values()) {
+            if (pType.getBarCode().equals(order.getProductCode()))
+                prodTypeID = pType.getId();
+        }
+
+        if (prodTypeID == null)
+            return false;
+
+        long rfid = Long.parseLong(RFIDfrom);
+        long[] rfids = new long[order.getQuantity()];
+        for (int i = 0; i < order.getQuantity(); i++) {
+            while (this.ezProductsRFID.containsKey(rfid))
+                rfid++;
+
+            recorded = this.shopDB.insertProduct(rfid, prodTypeID);
+            if (recorded) {
+                rfids[i] = rfid;
+                this.ezProductsRFID.put(rfid, new EZProduct(String.format("%10d", rfid).replace(' ', '0'), prodTypeID));
+            }
+            else {
+                // Remove the already added
+                for (int j = 0; j < i; j++) {
+                    this.shopDB.deleteProduct(rfids[j]);
+                    this.ezProductsRFID.remove(rfids[j]);
+                }
+                return false;
+            }
+        }
+
+        return recorded;
     }
+
     @Override
     public List<Order> getAllOrders() throws UnauthorizedException {
-        if(this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
+        if (this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager))
             throw new UnauthorizedException();
 
         if (this.ezOrders == null)
@@ -1845,6 +1906,13 @@ InvalidLocationException, InvalidRFIDException {
                                                    .collect(Collectors.toList());
             sale.setReturns(returns);
         }
+    }
+
+    public boolean isValidRFID(String rfid) {
+        if (rfid == null)
+            return false;
+
+        return ( rfid.matches("\\b[0-9]{10}\\b") );
     }
 
 

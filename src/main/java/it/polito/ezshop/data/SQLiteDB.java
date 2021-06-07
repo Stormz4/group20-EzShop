@@ -1424,7 +1424,9 @@ public class SQLiteDB {
         // SQL statement for creating a new Orders table
         String sql = "CREATE TABLE IF NOT EXISTS Products (\n"
                 + " rfid BIGINT PRIMARY KEY,\n"
-                + " prodTypeID integer NOT NULL\n"
+                + " prodTypeID integer NOT NULL,\n"
+                + " saleID integer,\n"
+                + " returnID integer\n"
                 + ");";
 
         try{
@@ -1438,18 +1440,20 @@ public class SQLiteDB {
     /**
      ** Insert new Product record
      */
-    public boolean insertProduct(Long RFID, Integer prodTypeID) {
+    public boolean insertProduct(Long RFID, Integer prodTypeID, Integer saleID, Integer returnID) {
         if (dbConnection == null || RFID == null || prodTypeID == null)
             return false;
 
         boolean inserted = false;
-        String sql = "INSERT INTO Products(rfid, prodTypeID) \n"
-                   + "VALUES(?,?);";
+        String sql = "INSERT INTO Products(rfid, prodTypeID, saleID, returnID) \n"
+                   + "VALUES(?,?,?,?);";
 
         try{
             PreparedStatement pstmt = dbConnection.prepareStatement(sql);
             pstmt.setLong(1, RFID);
             pstmt.setInt(2, prodTypeID);
+            pstmt.setInt(3, (saleID != null) ? saleID : defaultID);
+            pstmt.setInt(4, (returnID != null) ? returnID : defaultID);
             pstmt.executeUpdate();
 
             inserted = true;
@@ -1507,5 +1511,32 @@ public class SQLiteDB {
         }
 
         return products;
+    }
+
+    /**
+     ** Update Product record
+     */
+    public boolean updateProduct(Long RFID, Integer prodTypeID, Integer saleID, Integer returnID) {
+        if (dbConnection == null || RFID == null || prodTypeID == null)
+            return false;
+
+        boolean updated = false;
+        String sql = "UPDATE Products\n" +
+                "SET prodTypeID = ?, saleID = ?, returnID = ?\n" +
+                "WHERE rfid = ?;";
+
+        try{
+            PreparedStatement pstmt = dbConnection.prepareStatement(sql);
+            pstmt.setInt(1, prodTypeID);
+            pstmt.setInt(2, saleID);
+            pstmt.setInt(3, returnID);
+            pstmt.setLong(4, RFID);
+            pstmt.executeUpdate();
+            updated = true;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return updated;
     }
 }
