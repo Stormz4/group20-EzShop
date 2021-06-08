@@ -1332,6 +1332,9 @@ public class EZShop implements EZShopInterface {
         try {
             ok = this.returnProduct(returnId, productBarCode, amount);
             tmpRetTr.getRFIDs().add(RFID);
+            product.setReturnID(returnId);
+            product.setSaleID(defaultID);
+            shopDB.updateProduct(Long.parseLong(RFID), productTypeID, defaultID, returnId);
         }catch(InvalidProductCodeException | InvalidQuantityException e){
             e.printStackTrace();
         }
@@ -1387,16 +1390,6 @@ public class EZShop implements EZShopInterface {
                     return false;
                 product.editQuantity(+ezticket.getAmount());//re-place products on shelves
 
-                // reset products (with RFID) of that productType in this sale ticket:
-                for(String s : retToBeStored.getRFIDs())
-                {
-                    Long rfid = Long.parseLong(s);
-                    EZProduct p = ezProductsRFID.get(rfid);
-                    p.setSaleID(defaultID);
-                    p.setReturnID(returnId);
-                    // todo: reset saleID also in DB + set also returnId in DB
-                }
-
                 // update (decrease) number of sold products (in related sale transaction)
                 EZTicketEntry oldSaleTicket = getSaleTransactionById(tmpRetTr.getSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode());
                 if(!shopDB.updateProductPerSale(product.getBarCode(), sale.getTicketNumber(), oldSaleTicket.getAmount()-ezticket.getAmount(), oldSaleTicket.getDiscountRate()))
@@ -1416,7 +1409,7 @@ public class EZShop implements EZShopInterface {
             retToBeStored.setReturnedValue(oldReturnedValue * (1-saleDiscount));
             retToBeStored.setStatus(RTClosed);
             // update ReturnTransaction in DB:
-            if(!shopDB.updateReturnTransaction(retToBeStored.getReturnId(), retToBeStored.getReturnedValue(), RTClosed)) //todo: update also return's RFID list in db
+            if(!shopDB.updateReturnTransaction(retToBeStored.getReturnId(), retToBeStored.getReturnedValue(), RTClosed))
                 return false;
             // clear the temporary transaction:
             tmpRetTr = null;
@@ -1428,15 +1421,16 @@ public class EZShop implements EZShopInterface {
                 // Delete the return tickets from DB
                 if(!shopDB.deleteProductPerSale(ticket.getBarCode(), tmpRetTr.getReturnId()))
                     return false;
+            }
 
-                /*
-                List<TicketEntry> saleEntries = sale.getEntries();
-                for (TicketEntry saleEntry : saleEntries) {
-                    if (saleEntry.getBarCode().equals(ticket.getBarCode())) {
-                        int amount = saleEntry.getAmount() + ticket.getAmount();
-                        saleEntry.setAmount(amount);
-                    }
-                }*/
+            // Rollback of RFID products:
+            for(String s : tmpRetTr.getRFIDs())
+            {
+                Long rfid = Long.parseLong(s);
+                EZProduct p = ezProductsRFID.get(rfid);
+                p.setSaleID(sale.getTicketNumber());
+                p.setReturnID(defaultID);
+                shopDB.updateProduct(rfid, p.getProdTypeID(), sale.getTicketNumber(), defaultID);
             }
 
             // Delete the transaction from DB
@@ -1505,7 +1499,7 @@ public class EZShop implements EZShopInterface {
                 EZProduct p = ezProductsRFID.get(rfid);
                 p.setSaleID(sale.getTicketNumber());
                 p.setReturnID(defaultID);
-                // todo: do it also in the db
+                shopDB.updateProduct(rfid, p.getProdTypeID(), sale.getTicketNumber(), defaultID);
             }
 
             // re-update (increase) final price of related sale transaction

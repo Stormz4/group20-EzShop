@@ -427,14 +427,13 @@ public class TestEZShop_Change {
 
         int sid2 = ez.startSaleTransaction();
         ez.addProductToSaleRFID(sid2, "0000000011");
-
+        ez.endSaleTransaction(sid2);
+        ez.receiveCashPayment(sid2, 1000);
 
 
         // ************* Testing startReturnTransaction ******************
         int rid = ez.startReturnTransaction(sid);
         assertNotEquals(rid, -1, 0);
-
-        int rid2 = ez.startReturnTransaction(sid2);
 
 
         // *************   Testing returnProductRFID    ******************
@@ -465,17 +464,25 @@ public class TestEZShop_Change {
         });
 
         int quantityBefore = shopDB.selectAllProductTypes().get(prodTypeId1).getQuantity();
-        HashMap<Long, EZProduct> products = shopDB.selectAllProducts();
-        EZProduct p = products.get(Long.parseLong("0000000001"));
+        HashMap<Long, EZProduct> productsDB = shopDB.selectAllProducts();
+        EZProduct p = productsDB.get(Long.parseLong("0000000001"));
+        assertNotNull(p);
+        HashMap<Long, EZProduct> products = ez.getAllProducts();
+        p = products.get(Long.parseLong("0000000001"));
         assertNotNull(p);
         boolean ok = ez.returnProductRFID(rid, "0000000001");
         assertTrue(ok);
-        products = shopDB.selectAllProducts();
-        p = products.get(Long.parseLong("0000000001"));
-        assertEquals("0000000001", p.getRFID());
+        productsDB = shopDB.selectAllProducts();
+        p = productsDB.get(Long.parseLong("0000000001"));
         assertEquals(rid, p.getReturnID(), 0);
-        assertEquals(sid, p.getSaleID(), 0);
+        assertEquals(defaultID, p.getSaleID(), 0);
+        assertEquals("0000000001", p.getRFID());
         assertEquals(1, ez.getReturnTransactionById(rid).getEntries().size(), 0);
+        products = ez.getAllProducts();
+        p = products.get(Long.parseLong("0000000001"));
+        assertEquals(rid, p.getReturnID(), 0);
+        assertEquals(defaultID, p.getSaleID(), 0);
+        assertEquals("0000000001", p.getRFID());
         int quantityAfter = shopDB.selectAllProductTypes().get(prodTypeId1).getQuantity();
         assertEquals(quantityBefore, quantityAfter, 0); // "This method DOES NOT update the product quantity"
 
@@ -489,11 +496,8 @@ public class TestEZShop_Change {
         assertFalse(ok);
         ok = ez.returnProductRFID(rid, "0000099999"); // item not present in catalogue
         assertFalse(ok);
-        ok = ez.returnProductRFID(9999, "000000001");
+        ok = ez.returnProductRFID(9999, "0000000001");
         assertFalse(ok);
-
-        ez.returnProductRFID(rid2, "0000000011");
-
 
         // *************  Testing endReturnTransaction  ******************
         ok = ez.endReturnTransaction(rid, true);
@@ -504,6 +508,9 @@ public class TestEZShop_Change {
         assertEquals(rid, p.getReturnID(), 0);
         assertEquals(defaultID, p.getSaleID(), 0);
 
+        // Another test for testing rollback:
+        int rid2 = ez.startReturnTransaction(sid2);
+        ez.returnProductRFID(rid2, "0000000011");
         ok = ez.endReturnTransaction(rid2, false); // testing rollback
         assertTrue(ok);
         products = shopDB.selectAllProducts();
@@ -512,16 +519,19 @@ public class TestEZShop_Change {
         assertEquals(defaultID, p.getReturnID(), 0);
         assertEquals(sid2, p.getSaleID(), 0);
 
-
         // ************* Testing deleteReturnTransaction ******************
         ok = ez.deleteReturnTransaction(rid);
         assertTrue(ok);
-        products = shopDB.selectAllProducts();
+        productsDB = shopDB.selectAllProducts();
+        p = productsDB.get(Long.parseLong("0000000002"));
+        assertEquals("0000000002", p.getRFID());
+        assertEquals(defaultID, p.getReturnID(), 0);
+        assertEquals(sid, p.getSaleID(), 0);
+        products = ez.getAllProducts();
         p = products.get(Long.parseLong("0000000002"));
         assertEquals("0000000002", p.getRFID());
         assertEquals(defaultID, p.getReturnID(), 0);
         assertEquals(sid, p.getSaleID(), 0);
-
     }
 }
 
