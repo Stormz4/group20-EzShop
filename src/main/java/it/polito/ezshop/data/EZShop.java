@@ -1331,7 +1331,7 @@ public class EZShop implements EZShopInterface {
         boolean ok = false;
         try {
             ok = this.returnProduct(returnId, productBarCode, amount);
-            tmpRetTr.getRFIDs().add(RFID);
+            //tmpRetTr.getRFIDs().add(RFID);
             product.setReturnID(returnId);
             product.setSaleID(defaultID);
             shopDB.updateProduct(Long.parseLong(RFID), productTypeID, defaultID, returnId);
@@ -1424,13 +1424,14 @@ public class EZShop implements EZShopInterface {
             }
 
             // Rollback of RFID products:
-            for(String s : tmpRetTr.getRFIDs())
+            for(EZProduct p : ezProductsRFID.values())
             {
-                Long rfid = Long.parseLong(s);
-                EZProduct p = ezProductsRFID.get(rfid);
-                p.setSaleID(sale.getTicketNumber());
-                p.setReturnID(defaultID);
-                shopDB.updateProduct(rfid, p.getProdTypeID(), sale.getTicketNumber(), defaultID);
+                if(p.getReturnID().equals(tmpRetTr.getReturnId()))
+                {
+                    p.setSaleID(sale.getTicketNumber());
+                    p.setReturnID(defaultID);
+                    shopDB.updateProduct(Long.parseLong(p.getRFID()), p.getProdTypeID(), sale.getTicketNumber(), defaultID);
+                }
             }
 
             // Delete the transaction from DB
@@ -1493,13 +1494,14 @@ public class EZShop implements EZShopInterface {
             getSaleTransactionById(retTr.getSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode()).updateAmount(+ezticket.getAmount()) ;
 
             // re-set the products (with RFID) in the related sale transaction:
-            for(String s: retTr.getRFIDs())
+            for(EZProduct p : ezProductsRFID.values())
             {
-                Long rfid = Long.parseLong(s);
-                EZProduct p = ezProductsRFID.get(rfid);
-                p.setSaleID(sale.getTicketNumber());
-                p.setReturnID(defaultID);
-                shopDB.updateProduct(rfid, p.getProdTypeID(), sale.getTicketNumber(), defaultID);
+                if(p.getReturnID().equals(retTr.getReturnId()))
+                {
+                    p.setSaleID(sale.getTicketNumber());
+                    p.setReturnID(defaultID);
+                    shopDB.updateProduct(Long.parseLong(p.getRFID()), p.getProdTypeID(), sale.getTicketNumber(), defaultID);
+                }
             }
 
             // re-update (increase) final price of related sale transaction
