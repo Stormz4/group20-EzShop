@@ -998,6 +998,7 @@ public class EZShop implements EZShopInterface {
 
         if (add){
             prod.setSaleID(transactionId);
+            shopDB.updateProduct(Long.parseLong(prod.getRFID()), prod.getProdTypeID(), transactionId, defaultID);
         }
         return add;
     }
@@ -1110,6 +1111,7 @@ public class EZShop implements EZShopInterface {
         }
         if (remove){
             prod.setSaleID(-1);
+            shopDB.updateProduct(Long.parseLong(prod.getRFID()), prod.getProdTypeID(), defaultID, prod.getReturnID());
         }
         return remove;
     }
