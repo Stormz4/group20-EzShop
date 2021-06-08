@@ -944,7 +944,7 @@ public class EZShop implements EZShopInterface {
                 newTicketEntry = new EZTicketEntry(productCode, pType.getProductDescription(), amount, pType.getPricePerUnit(), 0);
                 saleT.getEntries().add(newTicketEntry);
 
-                added = this.shopDB.updateSaleTransaction(saleT.getTicketNumber(), 0, newPrice, saleT.getStatus());
+                added = this.shopDB.updateSaleTransaction(saleT.getTicketNumber(), saleT.getDiscountRate(), newPrice, saleT.getStatus());
             }
         }
         catch (InvalidProductIdException ignored) { }
@@ -1040,16 +1040,16 @@ public class EZShop implements EZShopInterface {
                         }
                     }
                     if (result) {
-                        double newPrice = saleTransaction.getPrice() - productToRemove.getPricePerUnit()*amount;
+                        double newPrice = saleTransaction.getPrice() - productToRemove.getPricePerUnit()*amount*(1- ticketToUpdate.getDiscountRate());
                         if (this.shopDB.updateSaleTransaction(transactionId, saleTransaction.getDiscountRate(), newPrice, saleTransaction.getStatus())){
-                            saleTransaction.setPrice(saleTransaction.getPrice() - productToRemove.getPricePerUnit()*amount); // update total price
+                            saleTransaction.setPrice(newPrice); // update total price
                             if (this.updateQuantity(productToRemove.getId(), amount)) {
                                 result = true;
                             }
                             else { // rollback
-                                double oldPrice = saleTransaction.getPrice() + productToRemove.getPricePerUnit()*amount;
+                                double oldPrice = saleTransaction.getPrice() + productToRemove.getPricePerUnit()*amount*(1-ticketToUpdate.getDiscountRate());
                                 this.shopDB.updateSaleTransaction(transactionId, saleTransaction.getDiscountRate(), oldPrice, saleTransaction.getStatus());
-                                saleTransaction.setPrice(saleTransaction.getPrice() + productToRemove.getPricePerUnit()*amount);
+                                saleTransaction.setPrice(oldPrice);
                                 if (ticketToUpdate.getAmount() == amount) {
                                     this.shopDB.insertProductPerSale(productCode, transactionId, amount, ticketToUpdate.getDiscountRate());
                                     saleTransaction.getEntries().add(ticketToUpdate);
@@ -1117,7 +1117,7 @@ public class EZShop implements EZShopInterface {
         EZSaleTransaction saleTransaction;
         TicketEntry ticketToUpdate;
         boolean result = false;
-        double newSalePrice = 0;
+        double oldDiscountRate, newSalePrice = 0;
         if (this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier))
             throw new UnauthorizedException();
         if (discountRate < 0 || discountRate >= 1)
@@ -1132,8 +1132,9 @@ public class EZShop implements EZShopInterface {
             ticketToUpdate = saleTransaction.getEntries().stream().filter(product -> product.getBarCode().equals(productCode))
                     .findFirst().orElse(null);
             if (ticketToUpdate != null && this.shopDB.updateProductPerSale(productCode, transactionId, ticketToUpdate.getAmount(), discountRate)) {
-                ticketToUpdate.setDiscountRate(discountRate);
-                newSalePrice = saleTransaction.getPrice() - ticketToUpdate.getAmount() * ticketToUpdate.getPricePerUnit() * discountRate;
+                oldDiscountRate = ticketToUpdate.getDiscountRate(); // retrieve old Discount Rate for that TicketEntry
+                ticketToUpdate.setDiscountRate(discountRate); // now set the new Discount Rate
+                newSalePrice = saleTransaction.getPrice() - ticketToUpdate.getAmount() * ticketToUpdate.getPricePerUnit() * (discountRate-oldDiscountRate);
                 if (this.shopDB.updateSaleTransaction(transactionId, saleTransaction.getDiscountRate(), newSalePrice, saleTransaction.getStatus())) {
                     saleTransaction.setPrice(newSalePrice);
                     result = true;
@@ -1205,12 +1206,20 @@ public class EZShop implements EZShopInterface {
         if (saleNumber == null || saleNumber <= 0)
             throw new InvalidTransactionIdException();
         saleTransaction = this.getSaleTransactionById(saleNumber);
-        if (saleTransaction != null && saleTransaction.hasRequiredStatus(EZSaleTransaction.STClosed)){
-            if (this.shopDB.deleteTransaction(saleNumber)){ // try to remove the SaleTransaction from the DB
-                this.ezSaleTransactions.remove(saleNumber); // delete the SaleTransaction in the local collection
-                result = true;
+        try {
+            if (saleTransaction != null && saleTransaction.hasRequiredStatus(EZSaleTransaction.STClosed)) {
+                for (TicketEntry entry : saleTransaction.getEntries()) {
+                    ProductType pType = this.ezProducts.values().stream().filter(p -> p.getBarCode().equals(entry.getBarCode())).findFirst().orElse(null);
+                    if (pType == null || !this.updateQuantity(pType.getId(), entry.getAmount()))
+                        return false; // update qty of the product
+                }
+                if (this.shopDB.deleteTransaction(saleNumber)) { // try to remove the SaleTransaction from the DB
+                    this.ezSaleTransactions.remove(saleNumber); // delete the SaleTransaction in the local collection
+                    result = true;
+                }
             }
         }
+        catch (InvalidProductIdException ignored) {} // should not happen
         return result;
     }
 
@@ -1369,7 +1378,7 @@ public class EZShop implements EZShopInterface {
         boolean ok = false;
         try {
             ok = this.returnProduct(returnId, productBarCode, amount);
-            tmpRetTr.getRFIDs().add(RFID);
+            //tmpRetTr.getRFIDs().add(RFID);
             product.setReturnID(returnId);
             product.setSaleID(defaultID);
             shopDB.updateProduct(Long.parseLong(RFID), productTypeID, defaultID, returnId);
@@ -1462,13 +1471,14 @@ public class EZShop implements EZShopInterface {
             }
 
             // Rollback of RFID products:
-            for(String s : tmpRetTr.getRFIDs())
+            for(EZProduct p : ezProductsRFID.values())
             {
-                Long rfid = Long.parseLong(s);
-                EZProduct p = ezProductsRFID.get(rfid);
-                p.setSaleID(sale.getTicketNumber());
-                p.setReturnID(defaultID);
-                shopDB.updateProduct(rfid, p.getProdTypeID(), sale.getTicketNumber(), defaultID);
+                if(p.getReturnID().equals(tmpRetTr.getReturnId()))
+                {
+                    p.setSaleID(sale.getTicketNumber());
+                    p.setReturnID(defaultID);
+                    shopDB.updateProduct(Long.parseLong(p.getRFID()), p.getProdTypeID(), sale.getTicketNumber(), defaultID);
+                }
             }
 
             // Delete the transaction from DB
@@ -1531,13 +1541,14 @@ public class EZShop implements EZShopInterface {
             getSaleTransactionById(retTr.getSaleTransactionId()).getTicketEntryByBarCode(ezticket.getBarCode()).updateAmount(+ezticket.getAmount()) ;
 
             // re-set the products (with RFID) in the related sale transaction:
-            for(String s: retTr.getRFIDs())
+            for(EZProduct p : ezProductsRFID.values())
             {
-                Long rfid = Long.parseLong(s);
-                EZProduct p = ezProductsRFID.get(rfid);
-                p.setSaleID(sale.getTicketNumber());
-                p.setReturnID(defaultID);
-                shopDB.updateProduct(rfid, p.getProdTypeID(), sale.getTicketNumber(), defaultID);
+                if(p.getReturnID().equals(retTr.getReturnId()))
+                {
+                    p.setSaleID(sale.getTicketNumber());
+                    p.setReturnID(defaultID);
+                    shopDB.updateProduct(Long.parseLong(p.getRFID()), p.getProdTypeID(), sale.getTicketNumber(), defaultID);
+                }
             }
 
             // re-update (increase) final price of related sale transaction
