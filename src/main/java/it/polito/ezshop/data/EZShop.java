@@ -2398,6 +2398,8 @@ public class EZShop implements EZShopInterface {
         this.endReturnTransaction(r7, true);
         this.returnCashPayment(r7);
 
+    }
+
     private void setReturnTransactionsForSaleTransactions() {
         if (ezSaleTransactions == null)
             return;
