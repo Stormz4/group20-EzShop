@@ -13,6 +13,7 @@ public class EZReturnTransaction{
     private Integer saleTransactionId;
     private List<TicketEntry> entries;
     private String status;
+    private List<String> rfids;
 
     public EZReturnTransaction(Integer returnId, Integer saleTransactionId, List<TicketEntry> entries, double returnedValue, String status) {
         this.returnId = returnId;
@@ -20,6 +21,7 @@ public class EZReturnTransaction{
         this.returnedValue = returnedValue;
         this.status = status;
         this.entries = entries != null ? entries : new LinkedList<>();
+        this.rfids = rfids != null ? rfids : new LinkedList<>();
     }
 
     public EZReturnTransaction(EZReturnTransaction tmpRetTr) {
@@ -28,6 +30,7 @@ public class EZReturnTransaction{
         this.returnedValue = tmpRetTr.returnedValue;
         this.entries = tmpRetTr.entries != null ? tmpRetTr.entries : new LinkedList<>();
         this.status = tmpRetTr.status;
+        this.rfids = tmpRetTr.rfids;
     }
 
     public Integer getReturnId() { return returnId; }
@@ -69,4 +72,8 @@ public class EZReturnTransaction{
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public List<String> getRFIDs() { return rfids; }
+
+    public void setRFIDs(List<String> rfids) { this.rfids = rfids; }
 }
