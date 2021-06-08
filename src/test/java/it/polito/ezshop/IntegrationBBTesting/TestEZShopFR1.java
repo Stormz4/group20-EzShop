@@ -95,20 +95,22 @@ public class TestEZShopFR1 {
     public void testUpdateUserRight() throws  InvalidUsernameException, InvalidPasswordException, InvalidUserIdException, InvalidRoleException, UnauthorizedException{
         EZShop ez = new EZShop();
         try {
+            ez.updateUserRights(1, "ShopManager");
+            fail("UnauthorizedException incoming");
+        } catch (UnauthorizedException e){
+            assertNotNull(e);
+        }
+        try {
+            ez.login("deleteTest", "pwd"); //Administrato
             ez.updateUserRights(-5, "Administrator");
         } catch (InvalidUserIdException e){
             assertNotNull(e);
         }
         try {
+            ez.login("deleteTest", "pwd"); //Administrato
             ez.updateUserRights(1, "Leader");
             fail("InvalidRoleException incoming");
         } catch (InvalidRoleException e){
-            assertNotNull(e);
-        }
-        try {
-            ez.updateUserRights(1, "ShopManager");
-            fail("UnauthorizedException incoming");
-        } catch (UnauthorizedException e){
             assertNotNull(e);
         }
 
