@@ -280,10 +280,21 @@ public class TestEZShop_Change {
         quantityProd1 = ez.getProductTypeByBarCode("2345344543423").getQuantity();
         assertEquals(quantityAfter1, quantityProd1);
 
+        boolean addTrue2 = ez.addProductToSaleRFID(s,RFID2);
+        quantityProd1 = ez.getProductTypeByBarCode("2345344543423").getQuantity();
+        assertTrue(addTrue2);
+        assertEquals(quantityAfter1-1, quantityProd1);
+
         boolean deleteTrue = ez.deleteProductFromSaleRFID(s, "0000000001");
+        quantityProd1 = ez.getProductTypeByBarCode("2345344543423").getQuantity();
+        assertEquals(quantityAfter1, quantityProd1);
+
+        boolean deleteTrue2 = ez.deleteProductFromSaleRFID(s, RFID2);
+        assertTrue(deleteTrue2);
         quantityProd1 = ez.getProductTypeByBarCode("2345344543423").getQuantity();
         assertEquals(quantityNoChange, quantityProd1);
         assertEquals(ez.getAllProducts().get(Long.parseLong(RFID1)).getSaleID(), Integer.valueOf(defaultID));
+
 
         ez.endSaleTransaction(s);
 
