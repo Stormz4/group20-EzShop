@@ -339,8 +339,8 @@ public class TestEZShop_Change {
 
         int quantityOrdered = 10;
         // Create an order for product 5, which doesn't have a location yet
-        Integer orderID = ez.issueOrder("2141513141144", quantityOrdered,1.20);
-        ez.payOrder(orderID);
+        Integer orderID = ez.payOrderFor("2141513141144", quantityOrdered,1.20);
+
         try {
             ez.recordOrderArrivalRFID(orderID, RFID5);
             fail("InvalidLocationException incoming");
@@ -348,10 +348,8 @@ public class TestEZShop_Change {
             assertNotNull(e);
         }
 
-
         // Registering a position
         ez.updatePosition(prodTypeId5, "15-ZZ-50");
-
 
         // Invalid Order ID
         try {
@@ -374,7 +372,6 @@ public class TestEZShop_Change {
         }
 
         // Invalid RFID
-        // Invalid Order ID
         try {
             ez.recordOrderArrivalRFID(1, null);
             fail("InvalidRFIDException incoming");
@@ -394,25 +391,30 @@ public class TestEZShop_Change {
             assertNotNull(e);
         }
 
-        // TODO missing "or is not unique"
+        // Test proper recordOrderArrival
+        int sizeBefore = shopDB.selectAllProducts().size();
+        assertTrue( ez.recordOrderArrivalRFID(orderID, "0000000020") );
 
         // Check if the quantity is updated after the record order
-        HashMap<Long, EZProduct> products = shopDB.selectAllProducts();
-        int sizeBefore = products.size();
-        ez.payOrder(orderID); // order is now payed
-        boolean trueArrival = ez.recordOrderArrivalRFID(orderID, RFID5);
-        // now the order should be in state COMPLETED
-        int sizeAfter= products.size();
-        LinkedList<Order> orders = (LinkedList<Order>) ez.getAllOrders();
-        assertTrue(orders.getLast().getStatus().equals("COMPLETED"));
-
+        int sizeAfter = shopDB.selectAllProducts().size();
         assertEquals(sizeAfter, sizeBefore + quantityOrdered);
-        assertTrue(trueArrival);
+
+        // Check that order's status was updated as expected
+        LinkedList<Order> orders = (LinkedList<Order>) ez.getAllOrders();
+        assertEquals("COMPLETED", orders.getLast().getStatus());
+
+        // Issue and pay a new order, than record its arrival passing already used RFID
+        Integer newOrderID = ez.payOrderFor("2141513141144", 5, 1.50);
+        assertThrows(InvalidRFIDException.class, () -> {
+            ez.recordOrderArrivalRFID(newOrderID, RFID5);
+        });
 
         boolean falseArrival = ez.recordOrderArrivalRFID(20000, RFID5);
         assertFalse(falseArrival);
 
-        // TODO Missing test "false it was not in an ORDERED/COMPLETED state"
+        // Test "false it was not in an ORDERED/COMPLETED state"
+        Integer unpayedOrderID = ez.issueOrder("2141513141144", 3,1.20);
+        assertFalse(ez.recordOrderArrival(unpayedOrderID));
     }
 
     @Test
