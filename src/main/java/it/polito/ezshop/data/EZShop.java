@@ -874,52 +874,58 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean addProductToSale(Integer transactionId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
-        EZTicketEntry ticketEntryToAdd;
-        ProductType scannedProduct = null;
-        EZSaleTransaction currentSaleTransaction;
-        boolean result = false;
-
         if (this.currUser == null || !this.currUser.hasRequiredRole(URAdministrator, URShopManager, URCashier))
             throw new UnauthorizedException();
         if (amount < 0)
             throw new InvalidQuantityException();
         if (transactionId == null || transactionId <= 0)
             throw new InvalidTransactionIdException();
-        if (productCode == null || productCode.isEmpty() || !isValidBarCode(productCode)) {
+        if (productCode == null || productCode.isEmpty() || !isValidBarCode(productCode))
             throw new InvalidProductCodeException();
-        }
+
+        boolean added = false;
+        EZSaleTransaction saleT = this.getSaleTransactionById(transactionId);
+        ProductType pType = this.ezProducts.values().stream().filter(p -> p.getBarCode().equals(productCode)).findFirst().orElse(null);
+
+        if (pType == null || saleT == null || !saleT.hasRequiredStatus(EZSaleTransaction.STOpened))
+            return false;
+
+        EZTicketEntry newTicketEntry = null;
+        Optional<TicketEntry> tEntry = saleT.getEntries().stream().filter(e -> e.getBarCode().equals(productCode)).findFirst();
+        double newPrice = saleT.getPrice() + pType.getPricePerUnit() * amount;
+
         try {
-            for (ProductType product : ezProducts.values()) {
-                if (product.getBarCode().equals(productCode)) {
-                    scannedProduct = product;
-                }
+            if (!this.updateQuantity(pType.getId(), -amount))
+                return false;
+
+            if (tEntry.isPresent()) {
+                if (this.shopDB.updateProductPerSale(productCode, transactionId, tEntry.get().getAmount() + amount, tEntry.get().getDiscountRate()))
+                    added = this.shopDB.updateSaleTransaction(saleT.getTicketNumber(), saleT.getDiscountRate(), newPrice, saleT.getStatus());
             }
-            currentSaleTransaction = this.getSaleTransactionById(transactionId);
-            if (scannedProduct != null && currentSaleTransaction != null && currentSaleTransaction.hasRequiredStatus(EZSaleTransaction.STOpened)) {
-                if(this.updateQuantity(scannedProduct.getId(), -amount)) {
-                    ticketEntryToAdd = new EZTicketEntry(productCode, scannedProduct.getProductDescription(), amount, scannedProduct.getPricePerUnit(), 0);
-                    if(this.shopDB.insertProductPerSale(productCode, currentSaleTransaction.getTicketNumber(), amount, 0)) {
-                        currentSaleTransaction.getEntries().add(ticketEntryToAdd);
-                        double newPrice = currentSaleTransaction.getPrice() + scannedProduct.getPricePerUnit() * amount;
-                        if(this.shopDB.updateSaleTransaction(currentSaleTransaction.getTicketNumber(), 0, newPrice, currentSaleTransaction.getStatus())) {
-                            currentSaleTransaction.setPrice(currentSaleTransaction.getPrice() + scannedProduct.getPricePerUnit() * amount); // update total price
-                            result = true;
-                        }
-                        else { // rollback
-                            currentSaleTransaction.getEntries().remove(ticketEntryToAdd);
-                            this.shopDB.deleteProductPerSale(productCode, currentSaleTransaction.getTicketNumber());
-                            this.updateQuantity(scannedProduct.getId(), amount);
-                        }
-                    }
-                    else { // rollback
-                        this.updateQuantity(scannedProduct.getId(), amount);
-                    }
-                }
+            else if (this.shopDB.insertProductPerSale(productCode, saleT.getTicketNumber(), amount, 0)) {
+                newTicketEntry = new EZTicketEntry(productCode, pType.getProductDescription(), amount, pType.getPricePerUnit(), 0);
+                saleT.getEntries().add(newTicketEntry);
+
+                added = this.shopDB.updateSaleTransaction(saleT.getTicketNumber(), 0, newPrice, saleT.getStatus());
             }
         }
-        catch (InvalidProductIdException e) { // the method returns false (does not modify result)
+        catch (InvalidProductIdException ignored) { }
+
+        if (added) {
+            saleT.setPrice(saleT.getPrice() + pType.getPricePerUnit() * amount);
+            tEntry.ifPresent(ticketEntry -> ticketEntry.setAmount(ticketEntry.getAmount() + amount));
         }
-        return result;
+        else {
+            try { this.updateQuantity(pType.getId(), amount); }
+            catch (InvalidProductIdException ignored) { }
+
+            if (!tEntry.isPresent() && newTicketEntry != null) {
+                saleT.getEntries().remove(newTicketEntry);
+                this.shopDB.deleteProductPerSale(productCode, saleT.getTicketNumber());
+            }
+        }
+
+        return added;
     }
 
 
