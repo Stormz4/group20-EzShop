@@ -16,7 +16,7 @@ Date: 19/05/2021
 | 4 | Added BB tests for EZOrder and EZReturnTransaction |
 | 5 | Added BB tests for DB (User and SaleTransaction) |
 | 6 | Added BB tests for DB (ProductType and ReturnTransaction) |
-| 7 | Added last missing BB tests | 
+| 7 | Added last missing BB tests |
 
 Leaf classes (TestEZShop_Customer, User and so on) and DB methods don't include involve a lot of controls and checks on the
 data since they're checked at a higher level in EZShop.<br/>
@@ -223,8 +223,30 @@ Boundaries tables are not reported in most cases because they were empty.
 |Valid|Correct|Valid|boolean isCorrect = ez.updateCreditInTXTbyCardNumber("4485370086510891", 50.0);<br/>or:<br/>boolean isCorrect = ez.updateCreditInTXTbyCardNumber("4485370086510891", -50.0);<br/>or:<br/> boolean isCorrect = ez.updateCreditInTXTbyCardNumber("4485370086510891", Double.MIN_VALUE);<br/>or:<br/>boolean isCorrect = ez.updateCreditInTXTbyCardNumber("4485370086510891", -Double.MIN_VALUE);|Class TestEZShop_updateCreditInTXTbyCreditCard, methods testUpdateCredit1_correct(), testUpdateCredit2_negativeDouble(), testUpdateCredit7_Min(), testUpdateCredit8_Min_Neg()|
 |''|Incorrect|Invalid|''|''|
 
+### **Class *EZShop* - method *isValidRFID***
 
-### **Class *EZCustomer* - method *setCustomerName***
+**Criteria for method *setCustomerName*:**
+- String is a sequence of 12 digits
+
+**Predicates for method *setCustomerName*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+|    String is !null    |     True      |
+|										| False |
+| String is a sequence of 12 digits | True |
+|	| False |
+
+
+**Combination of predicates**:
+
+
+| String is !null | String is a sequence of 12 digits | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|-------|
+|True|True|Valid| isValidRFID("000000000000") -> return true |Class TestEZShop_IsValidRFID, method testValidRFID();|
+||False|Invalid| isValidRFID("1010") -> return false |Class TestEZShop_IsValidRFID, method testInvalidRFID();|
+|False|False (cannot be True)|Invalid| isValidRFID(null) -> return false |Class TestEZShop_IsValidRFID, method testNullRFID();|
+
 **Criteria for method *setCustomerName*:**
 - Validity of customer name string
 
