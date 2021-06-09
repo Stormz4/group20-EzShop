@@ -649,7 +649,7 @@ public class EZShop implements EZShopInterface {
             recorded = this.shopDB.insertProduct(rfid, prodTypeID, defaultID, defaultID);
             if (recorded) {
                 rfids[i] = rfid;
-                this.ezProductsRFID.put(rfid, new EZProduct(String.format("%10d", rfid).replace(' ', '0'), prodTypeID, defaultID, defaultID));
+                this.ezProductsRFID.put(rfid, new EZProduct(String.format("%12d", rfid).replace(' ', '0'), prodTypeID, defaultID, defaultID));
                 rfid++;
             }
             else {
