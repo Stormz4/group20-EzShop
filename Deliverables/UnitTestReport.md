@@ -6,7 +6,7 @@ Authors:
 - Leonardo Palmucci s288126
 - Dario Lanfranco s287524
 
-Date: 19/05/2021
+Date: 09/06/2021
 
 | Version | Changes |
 | ------- |---------|
@@ -17,6 +17,7 @@ Date: 19/05/2021
 | 5 | Added BB tests for DB (User and SaleTransaction) |
 | 6 | Added BB tests for DB (ProductType and ReturnTransaction) |
 | 7 | Added last missing BB tests |
+| 8 | Added BB tests for RFID validity check |
 
 Leaf classes (TestEZShop_Customer, User and so on) and DB methods don't include involve a lot of controls and checks on the
 data since they're checked at a higher level in EZShop.<br/>
@@ -417,7 +418,76 @@ Boundaries tables are not reported in most cases because they were empty.
 |Yes|No|Invalid|user.setRole("ShopManager"); <br> boolean b2 = user.hasRequiredRole("Cashier");|Class TestEZShop_User, method testUser()|
 |No|*|Invalid|user.setRole("ShopManager"); <br> boolean b2 = user.hasRequiredRole(null);|Class TestEZShop_User, method testUser()|
 
+### **Class *EZProduct* - method *setRFID***
+
+**Criteria for method *setRFID*:**
+- Validity of RFID
+
+**Predicates for method *setProductDescription*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Validity of RFID  |      Valid     |
+
+**Combination of predicates**:
+
+| Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid| p.setRFID("000000000000"); |Class TestEZShop_Product, method testProduct()|
+
+### **Class *EZProduct* - method *setProdTypeID***
+
+**Criteria for method *setProdTypeID*:**
+- Validity of Product Type ID
+
+**Predicates for method *setProductDescription*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Validity of Product Type ID  |      Valid     |
+
+**Combination of predicates**:
+
+| Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid| p.setProdTypeID("1"); |Class TestEZShop_Product, method testProduct()|
+
+### **Class *EZProduct* - method *setSaleID***
+
+**Criteria for method *setSaleID*:**
+- Validity of Sale Transaction ID
+
+**Predicates for method *setProductDescription*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Validity of Sale Transaction ID  |      Valid     |
+
+**Combination of predicates**:
+
+| Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid| p.setSaleID("2"); |Class TestEZShop_Product, method testProduct()|
+
+### **Class *EZProduct* - method *setReturnID***
+
+**Criteria for method *setReturnID*:**
+- Validity of Return Transaction ID
+
+**Predicates for method *setProductDescription*:**
+
+| Criteria | Predicate |
+| -------- | --------- |
+| Validity of Return Transaction ID  |      Valid     |
+
+**Combination of predicates**:
+
+| Criteria 1 | Valid / Invalid | Description of the test case | JUnit test case |
+|-------|-------|-------|-------|
+|*|Valid| p.setReturnID("3"); |Class TestEZShop_Product, method testProduct()|
+
 ### **Class *EZProductType* - method *setProductDescription***
+
 **Criteria for method *setProductDescription*:**
 - Validity of product description
 
