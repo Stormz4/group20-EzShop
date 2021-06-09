@@ -2163,10 +2163,10 @@ public class EZShop implements EZShopInterface {
         this.recordOrderArrival(o11);
         this.recordOrderArrival(o14);
 
-        this.recordOrderArrivalRFID(o2, "0200000000");
-        this.recordOrderArrivalRFID(o10, "1000000000");
-        this.recordOrderArrivalRFID(o12, "1200000000");
-        this.recordOrderArrivalRFID(o15, "1500000000");
+        this.recordOrderArrivalRFID(o2, "020000000000");
+        this.recordOrderArrivalRFID(o10, "100000000000");
+        this.recordOrderArrivalRFID(o12, "120000000000");
+        this.recordOrderArrivalRFID(o15, "150000000000");
 
 
         // SaleTransactions:
@@ -2382,40 +2382,40 @@ public class EZShop implements EZShopInterface {
         // With RFIDs:
         // #23
         Integer s23 = this.startSaleTransaction();
-        this.addProductToSaleRFID(s23, "0200000000");
-        this.addProductToSaleRFID(s23, "0200000001");
-        this.addProductToSaleRFID(s23, "1500000000");
-        this.addProductToSaleRFID(s23, "1000000000");
+        this.addProductToSaleRFID(s23, "020000000000");
+        this.addProductToSaleRFID(s23, "020000000001");
+        this.addProductToSaleRFID(s23, "150000000000");
+        this.addProductToSaleRFID(s23, "100000000000");
         this.applyDiscountRateToSale(s23, 0.1);
         this.endSaleTransaction(s23);
         this.receiveCashPayment(s23, 1000);
 
         // #24
         Integer s24 = this.startSaleTransaction();
-        this.addProductToSaleRFID(s24, "0200000002");
-        this.addProductToSaleRFID(s24, "0200000003");
-        this.addProductToSaleRFID(s24, "1500000001");
+        this.addProductToSaleRFID(s24, "020000000002");
+        this.addProductToSaleRFID(s24, "020000000003");
+        this.addProductToSaleRFID(s24, "150000000001");
         this.applyDiscountRateToSale(s24, 0.35);
         this.endSaleTransaction(s24);
         this.receiveCashPayment(s24, 1000);
 
         // #25
         Integer s25 = this.startSaleTransaction();
-        this.addProductToSaleRFID(s25, "0200000004");
-        this.addProductToSaleRFID(s25, "1200000000");
-        this.addProductToSaleRFID(s25, "1200000001");
-        this.addProductToSaleRFID(s25, "1200000002");
-        this.addProductToSaleRFID(s25, "1000000001");
+        this.addProductToSaleRFID(s25, "020000000004");
+        this.addProductToSaleRFID(s25, "120000000000");
+        this.addProductToSaleRFID(s25, "120000000001");
+        this.addProductToSaleRFID(s25, "120000000002");
+        this.addProductToSaleRFID(s25, "100000000001");
         this.endSaleTransaction(s25);
         this.receiveCashPayment(s25, 1000);
 
         // #26
         Integer s26 = this.startSaleTransaction();
-        this.addProductToSaleRFID(s26, "0200000005");
-        this.addProductToSaleRFID(s26, "1000000002");
-        this.addProductToSaleRFID(s26, "1000000003");
-        this.addProductToSaleRFID(s26, "1000000004");
-        this.addProductToSaleRFID(s26, "1000000005");
+        this.addProductToSaleRFID(s26, "020000000005");
+        this.addProductToSaleRFID(s26, "100000000002");
+        this.addProductToSaleRFID(s26, "100000000003");
+        this.addProductToSaleRFID(s26, "100000000004");
+        this.addProductToSaleRFID(s26, "100000000005");
         this.endSaleTransaction(s26);
         this.receiveCashPayment(s26, 1000);
 
@@ -2469,16 +2469,16 @@ public class EZShop implements EZShopInterface {
         // With RFIDs:
         // #8
         Integer r8 = this.startReturnTransaction(s23);
-        this.returnProductRFID(r8, "0200000000");
-        this.returnProductRFID(r8, "0200000001");
-        this.returnProductRFID(r8, "1500000000");
+        this.returnProductRFID(r8, "020000000000");
+        this.returnProductRFID(r8, "020000000001");
+        this.returnProductRFID(r8, "150000000000");
         this.endReturnTransaction(r8, true);
         this.returnCashPayment(r8);
 
         // #9
         Integer r9 = this.startReturnTransaction(s25);
-        this.returnProductRFID(r9, "1200000001");
-        this.returnProductRFID(r9, "1200000002");
+        this.returnProductRFID(r9, "120000000001");
+        this.returnProductRFID(r9, "120000000002");
         this.endReturnTransaction(r9, true);
         this.returnCashPayment(r9);
     }
