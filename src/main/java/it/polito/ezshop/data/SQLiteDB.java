@@ -1505,7 +1505,7 @@ public class SQLiteDB {
                 Integer saleID = rs.getInt("saleID");
                 Integer returnID = rs.getInt("returnID");
 
-                String strRFID = String.format("%10d", rfid).replace(' ', '0');
+                String strRFID = String.format("%12d", rfid).replace(' ', '0');
                 products.put(rfid, new EZProduct(strRFID, prodTypeID, saleID, returnID));
             }
         } catch (SQLException e) {
