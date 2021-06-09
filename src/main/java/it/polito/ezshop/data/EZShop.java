@@ -1092,7 +1092,7 @@ public class EZShop implements EZShopInterface {
         if (transactionId == null || transactionId <= 0)
             throw new InvalidTransactionIdException();
 
-        if (RFID == null || RFID.isEmpty() || !RFID.matches("\\b[0-9]{10}\\b"))
+        if (RFID == null || RFID.isEmpty() || !isValidRFID(RFID))
             throw new InvalidRFIDException();
 
         EZProduct prod = ezProductsRFID.get(Long.parseLong(RFID));
@@ -1216,6 +1216,14 @@ public class EZShop implements EZShopInterface {
                     ProductType pType = this.ezProducts.values().stream().filter(p -> p.getBarCode().equals(entry.getBarCode())).findFirst().orElse(null);
                     if (pType == null || !this.updateQuantity(pType.getId(), entry.getAmount()))
                         return false; // update qty of the product
+                }
+                // retrieve list of all Products related to this saleTransaction
+                List<EZProduct> productList = this.getAllProducts().values().stream()
+                        .filter(p -> p.getSaleID().equals(saleTransaction.getTicketNumber())).collect(Collectors.toList());
+                for (EZProduct prod: productList) {
+                    // reset the saleID and update the DB
+                    prod.setSaleID(defaultID);
+                    shopDB.updateProduct(Long.parseLong(prod.getRFID()), prod.getProdTypeID(), defaultID, prod.getReturnID());
                 }
                 if (this.shopDB.deleteTransaction(saleNumber)) { // try to remove the SaleTransaction from the DB
                     this.ezSaleTransactions.remove(saleNumber); // delete the SaleTransaction in the local collection
@@ -2492,7 +2500,7 @@ public class EZShop implements EZShopInterface {
         if (rfid == null)
             return false;
 
-        return ( rfid.matches("\\b[0-9]{10}\\b") );
+        return ( rfid.matches("\\b[0-9]{12}\\b") );
     }
 
 

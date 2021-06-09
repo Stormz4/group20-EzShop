@@ -23,21 +23,21 @@ public class TestEZShop_Change {
     private Integer uId;
 
     int prodTypeId1, prodTypeId2, prodTypeId3, prodTypeId4, prodTypeId5;
-    String RFID1 = "0000000001";
-    String RFID2 = "0000000002";
-    String RFID3 = "0000000003";
-    String RFID4 = "0000000004";
-    String RFID5 = "0000000005";
-    String RFID6 = "0000000006";
-    String RFID7 = "0000000007";
-    String RFID8 = "0000000008";
-    String RFID9 = "0000000009";
-    String RFID10 = "0000000010";
-    String RFID11 = "0000000011";
-    String RFID12 = "0000000012";
-    String RFID13 = "0000000013";
-    String RFID14 = "0000000014";
-    String RFID15 = "0000000015";
+    String RFID1 = "000000000001";
+    String RFID2 = "000000000002";
+    String RFID3 = "000000000003";
+    String RFID4 = "000000000004";
+    String RFID5 = "000000000005";
+    String RFID6 = "000000000006";
+    String RFID7 = "000000000007";
+    String RFID8 = "000000000008";
+    String RFID9 = "000000000009";
+    String RFID10 = "000000000010";
+    String RFID11 = "000000000011";
+    String RFID12 = "000000000012";
+    String RFID13 = "000000000013";
+    String RFID14 = "000000000014";
+    String RFID15 = "000000000015";
 
     @Before
     public void init() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, UnauthorizedException {
@@ -147,7 +147,7 @@ public class TestEZShop_Change {
             assertNotNull(e);
         }
         try {
-            ez.deleteProductFromSaleRFID(1, "0000000001");
+            ez.deleteProductFromSaleRFID(1, "000000000001");
             fail("UnauthorizedException incoming");
         } catch (UnauthorizedException e){
             assertNotNull(e);
@@ -158,19 +158,19 @@ public class TestEZShop_Change {
 
         // add product to sale
         try {
-            ez.addProductToSaleRFID(-1, "0000000001");
+            ez.addProductToSaleRFID(-1, "000000000001");
             fail("InvalidTransactionIdException incoming");
         } catch (InvalidTransactionIdException e) {
             assertNotNull(e);
         }
         try {
-            ez.addProductToSaleRFID(0, "0000000001");
+            ez.addProductToSaleRFID(0, "000000000001");
             fail("InvalidTransactionIdException incoming");
         } catch (InvalidTransactionIdException e) {
             assertNotNull(e);
         }
         try {
-            ez.addProductToSaleRFID(null, "0000000001");
+            ez.addProductToSaleRFID(null, "000000000001");
             fail("InvalidTransactionIdException incoming");
         } catch (InvalidTransactionIdException e) {
             assertNotNull(e);
@@ -199,19 +199,19 @@ public class TestEZShop_Change {
         // delete product from sale
 
         try {
-            ez.deleteProductFromSaleRFID(-1, "0000000001");
+            ez.deleteProductFromSaleRFID(-1, "000000000001");
             fail("InvalidTransactionIdException incoming");
         } catch (InvalidTransactionIdException e) {
             assertNotNull(e);
         }
         try {
-            ez.deleteProductFromSaleRFID(0, "0000000001");
+            ez.deleteProductFromSaleRFID(0, "000000000001");
             fail("InvalidTransactionIdException incoming");
         } catch (InvalidTransactionIdException e) {
             assertNotNull(e);
         }
         try {
-            ez.deleteProductFromSaleRFID(null, "0000000001");
+            ez.deleteProductFromSaleRFID(null, "000000000001");
             fail("InvalidTransactionIdException incoming");
         } catch (InvalidTransactionIdException e) {
             assertNotNull(e);
@@ -231,7 +231,7 @@ public class TestEZShop_Change {
         }
 
         try {
-            ez.deleteProductFromSaleRFID(1, "000001");
+            ez.deleteProductFromSaleRFID(1, "00000001");
             fail("InvalidRFIDException incoming");
         } catch (InvalidRFIDException e) {
             assertNotNull(e);
@@ -253,7 +253,7 @@ public class TestEZShop_Change {
         // Quantity should not decrease
         assertEquals(quantityNoChange, quantityProd1);
         // RFID not present
-        boolean addFalse2 = ez.addProductToSaleRFID(s, "0011000001");
+        boolean addFalse2 = ez.addProductToSaleRFID(s, "001100000001");
 
         quantityProd1 = ez.getProductTypeByBarCode("2345344543423").getQuantity();
         assertEquals(quantityNoChange, quantityProd1);
@@ -267,16 +267,16 @@ public class TestEZShop_Change {
 
         // ************* TEST DELETE PRODUCT FROM SALE RFID ******************
 
-        boolean deleteFalse1 = ez.deleteProductFromSaleRFID(500000000, "0000000001");
+        boolean deleteFalse1 = ez.deleteProductFromSaleRFID(500000000, "000000000001");
         quantityProd1 = ez.getProductTypeByBarCode("2345344543423").getQuantity();
         assertEquals(quantityAfter1, quantityProd1);
 
-        boolean deleteFalse2 = ez.deleteProductFromSaleRFID(s, "0011000001");
+        boolean deleteFalse2 = ez.deleteProductFromSaleRFID(s, "001100000001");
         quantityProd1 = ez.getProductTypeByBarCode("2345344543423").getQuantity();
         assertEquals(quantityAfter1, quantityProd1);
 
         // product is not in the sale transaction
-        boolean deleteFalse3 = ez.deleteProductFromSaleRFID(s, "0000000003");
+        boolean deleteFalse3 = ez.deleteProductFromSaleRFID(s, "000000000003");
         quantityProd1 = ez.getProductTypeByBarCode("2345344543423").getQuantity();
         assertEquals(quantityAfter1, quantityProd1);
 
@@ -285,7 +285,7 @@ public class TestEZShop_Change {
         assertTrue(addTrue2);
         assertEquals(quantityAfter1-1, quantityProd1);
 
-        boolean deleteTrue = ez.deleteProductFromSaleRFID(s, "0000000001");
+        boolean deleteTrue = ez.deleteProductFromSaleRFID(s, "000000000001");
         quantityProd1 = ez.getProductTypeByBarCode("2345344543423").getQuantity();
         assertEquals(quantityAfter1, quantityProd1);
 
@@ -309,8 +309,8 @@ public class TestEZShop_Change {
         ez.endSaleTransaction(s2);
 
         // Transaction closed
-        boolean addFalse3 = ez.addProductToSaleRFID(s2, "0000000001");
-        boolean closedDelete = ez.deleteProductFromSaleRFID(s2, "0000000001");
+        boolean addFalse3 = ez.addProductToSaleRFID(s2, "000000000001");
+        boolean closedDelete = ez.deleteProductFromSaleRFID(s2, "000000000001");
 
         assertFalse(addFalse3);
         assertFalse(closedDelete);
@@ -339,8 +339,8 @@ public class TestEZShop_Change {
 
         int quantityOrdered = 10;
         // Create an order for product 5, which doesn't have a location yet
-        Integer orderID = ez.issueOrder("2141513141144", quantityOrdered,1.20);
-        ez.payOrder(orderID);
+        Integer orderID = ez.payOrderFor("2141513141144", quantityOrdered,1.20);
+
         try {
             ez.recordOrderArrivalRFID(orderID, RFID5);
             fail("InvalidLocationException incoming");
@@ -348,10 +348,8 @@ public class TestEZShop_Change {
             assertNotNull(e);
         }
 
-
         // Registering a position
         ez.updatePosition(prodTypeId5, "15-ZZ-50");
-
 
         // Invalid Order ID
         try {
@@ -374,7 +372,6 @@ public class TestEZShop_Change {
         }
 
         // Invalid RFID
-        // Invalid Order ID
         try {
             ez.recordOrderArrivalRFID(1, null);
             fail("InvalidRFIDException incoming");
@@ -394,25 +391,30 @@ public class TestEZShop_Change {
             assertNotNull(e);
         }
 
-        // TODO missing "or is not unique"
+        // Test proper recordOrderArrival
+        int sizeBefore = shopDB.selectAllProducts().size();
+        assertTrue( ez.recordOrderArrivalRFID(orderID, "000000000020") );
 
         // Check if the quantity is updated after the record order
-        HashMap<Long, EZProduct> products = shopDB.selectAllProducts();
-        int sizeBefore = products.size();
-        ez.payOrder(orderID); // order is now payed
-        boolean trueArrival = ez.recordOrderArrivalRFID(orderID, RFID5);
-        // now the order should be in state COMPLETED
-        int sizeAfter= products.size();
-        LinkedList<Order> orders = (LinkedList<Order>) ez.getAllOrders();
-        assertTrue(orders.getLast().getStatus().equals("COMPLETED"));
-
+        int sizeAfter = shopDB.selectAllProducts().size();
         assertEquals(sizeAfter, sizeBefore + quantityOrdered);
-        assertTrue(trueArrival);
+
+        // Check that order's status was updated as expected
+        LinkedList<Order> orders = (LinkedList<Order>) ez.getAllOrders();
+        assertEquals("COMPLETED", orders.getLast().getStatus());
+
+        // Issue and pay a new order, than record its arrival passing already used RFID
+        Integer newOrderID = ez.payOrderFor("2141513141144", 5, 1.50);
+        assertThrows(InvalidRFIDException.class, () -> {
+            ez.recordOrderArrivalRFID(newOrderID, RFID5);
+        });
 
         boolean falseArrival = ez.recordOrderArrivalRFID(20000, RFID5);
         assertFalse(falseArrival);
 
-        // TODO Missing test "false it was not in an ORDERED/COMPLETED state"
+        // Test "false it was not in an ORDERED/COMPLETED state"
+        Integer unpayedOrderID = ez.issueOrder("2141513141144", 3,1.20);
+        assertFalse(ez.recordOrderArrival(unpayedOrderID));
     }
 
     @Test
@@ -425,19 +427,19 @@ public class TestEZShop_Change {
 
 
         int sid = ez.startSaleTransaction();
-        ez.addProductToSaleRFID(sid, "0000000001");
-        ez.addProductToSaleRFID(sid, "0000000002");
-        ez.addProductToSaleRFID(sid, "0000000005");
-        ez.addProductToSaleRFID(sid, "0000000006");
-        ez.addProductToSaleRFID(sid, "0000000007");
-        ez.addProductToSaleRFID(sid, "0000000008");
-        ez.addProductToSaleRFID(sid, "0000000009");
-        ez.addProductToSaleRFID(sid, "0000000012");
+        ez.addProductToSaleRFID(sid, "000000000001");
+        ez.addProductToSaleRFID(sid, "000000000002");
+        ez.addProductToSaleRFID(sid, "000000000005");
+        ez.addProductToSaleRFID(sid, "000000000006");
+        ez.addProductToSaleRFID(sid, "000000000007");
+        ez.addProductToSaleRFID(sid, "000000000008");
+        ez.addProductToSaleRFID(sid, "000000000009");
+        ez.addProductToSaleRFID(sid, "000000000012");
         ez.endSaleTransaction(sid);
         ez.receiveCashPayment(sid, 1000);
 
         int sid2 = ez.startSaleTransaction();
-        ez.addProductToSaleRFID(sid2, "0000000011");
+        ez.addProductToSaleRFID(sid2, "000000000011");
         ez.endSaleTransaction(sid2);
         ez.receiveCashPayment(sid2, 1000);
 
@@ -449,13 +451,13 @@ public class TestEZShop_Change {
 
         // *************   Testing returnProductRFID    ******************
         assertThrows(InvalidTransactionIdException.class, () -> {
-            ez.returnProductRFID(0, "0000000001");
+            ez.returnProductRFID(0, "000000000001");
         });
         assertThrows(InvalidTransactionIdException.class, () -> {
-            ez.returnProductRFID(-1, "0000000001");
+            ez.returnProductRFID(-1, "000000000001");
         });
         assertThrows(InvalidTransactionIdException.class, () -> {
-            ez.returnProductRFID(null, "0000000001");
+            ez.returnProductRFID(null, "000000000001");
         });
 
         assertThrows(InvalidRFIDException.class, () -> {
@@ -476,57 +478,57 @@ public class TestEZShop_Change {
 
         int quantityBefore = shopDB.selectAllProductTypes().get(prodTypeId1).getQuantity();
         HashMap<Long, EZProduct> productsDB = shopDB.selectAllProducts();
-        EZProduct p = productsDB.get(Long.parseLong("0000000001"));
+        EZProduct p = productsDB.get(Long.parseLong("000000000001"));
         assertNotNull(p);
         HashMap<Long, EZProduct> products = ez.getAllProducts();
-        p = products.get(Long.parseLong("0000000001"));
+        p = products.get(Long.parseLong("000000000001"));
         assertNotNull(p);
-        boolean ok = ez.returnProductRFID(rid, "0000000001");
+        boolean ok = ez.returnProductRFID(rid, "000000000001");
         assertTrue(ok);
         productsDB = shopDB.selectAllProducts();
-        p = productsDB.get(Long.parseLong("0000000001"));
+        p = productsDB.get(Long.parseLong("000000000001"));
         assertEquals(rid, p.getReturnID(), 0);
         assertEquals(defaultID, p.getSaleID(), 0);
-        assertEquals("0000000001", p.getRFID());
+        assertEquals("000000000001", p.getRFID());
         assertEquals(1, ez.getReturnTransactionById(rid).getEntries().size(), 0);
         products = ez.getAllProducts();
-        p = products.get(Long.parseLong("0000000001"));
+        p = products.get(Long.parseLong("000000000001"));
         assertEquals(rid, p.getReturnID(), 0);
         assertEquals(defaultID, p.getSaleID(), 0);
-        assertEquals("0000000001", p.getRFID());
+        assertEquals("000000000001", p.getRFID());
         int quantityAfter = shopDB.selectAllProductTypes().get(prodTypeId1).getQuantity();
         assertEquals(quantityBefore, quantityAfter, 0); // "This method DOES NOT update the product quantity"
 
-        ok = ez.returnProductRFID(rid, "0000000002");
+        ok = ez.returnProductRFID(rid, "000000000002");
         assertTrue(ok);
-        ok = ez.returnProductRFID(rid, "0000000005");
+        ok = ez.returnProductRFID(rid, "000000000005");
         assertTrue(ok);
-        ok = ez.returnProductRFID(rid, "0000000005"); // returning it second time should not be possible
+        ok = ez.returnProductRFID(rid, "000000000005"); // returning it second time should not be possible
         assertFalse(ok);
-        ok = ez.returnProductRFID(rid, "0000000003"); // item not present in return transaction
+        ok = ez.returnProductRFID(rid, "000000000003"); // item not present in return transaction
         assertFalse(ok);
-        ok = ez.returnProductRFID(rid, "0000099999"); // item not present in catalogue
+        ok = ez.returnProductRFID(rid, "000000099999"); // item not present in catalogue
         assertFalse(ok);
-        ok = ez.returnProductRFID(9999, "0000000001");
+        ok = ez.returnProductRFID(9999, "000000000001");
         assertFalse(ok);
 
         // *************  Testing endReturnTransaction  ******************
         ok = ez.endReturnTransaction(rid, true);
         assertTrue(ok);
         products = shopDB.selectAllProducts();
-        p = products.get(Long.parseLong("0000000002"));
-        assertEquals("0000000002", p.getRFID());
+        p = products.get(Long.parseLong("000000000002"));
+        assertEquals("000000000002", p.getRFID());
         assertEquals(rid, p.getReturnID(), 0);
         assertEquals(defaultID, p.getSaleID(), 0);
 
         // Another test for testing rollback:
         int rid2 = ez.startReturnTransaction(sid2);
-        ez.returnProductRFID(rid2, "0000000011");
+        ez.returnProductRFID(rid2, "000000000011");
         ok = ez.endReturnTransaction(rid2, false); // testing rollback
         assertTrue(ok);
         products = shopDB.selectAllProducts();
-        p = products.get(Long.parseLong("0000000011"));
-        assertEquals("0000000011", p.getRFID());
+        p = products.get(Long.parseLong("000000000011"));
+        assertEquals("000000000011", p.getRFID());
         assertEquals(defaultID, p.getReturnID(), 0);
         assertEquals(sid2, p.getSaleID(), 0);
 
@@ -534,13 +536,13 @@ public class TestEZShop_Change {
         ok = ez.deleteReturnTransaction(rid);
         assertTrue(ok);
         productsDB = shopDB.selectAllProducts();
-        p = productsDB.get(Long.parseLong("0000000002"));
-        assertEquals("0000000002", p.getRFID());
+        p = productsDB.get(Long.parseLong("000000000002"));
+        assertEquals("000000000002", p.getRFID());
         assertEquals(defaultID, p.getReturnID(), 0);
         assertEquals(sid, p.getSaleID(), 0);
         products = ez.getAllProducts();
-        p = products.get(Long.parseLong("0000000002"));
-        assertEquals("0000000002", p.getRFID());
+        p = products.get(Long.parseLong("000000000002"));
+        assertEquals("000000000002", p.getRFID());
         assertEquals(defaultID, p.getReturnID(), 0);
         assertEquals(sid, p.getSaleID(), 0);
     }
