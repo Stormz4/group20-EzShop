@@ -1177,6 +1177,14 @@ public class EZShop implements EZShopInterface {
                     if (pType == null || !this.updateQuantity(pType.getId(), entry.getAmount()))
                         return false; // update qty of the product
                 }
+                // retrieve list of all Products related to this saleTransaction
+                List<EZProduct> productList = this.getAllProducts().values().stream()
+                        .filter(p -> p.getSaleID().equals(saleTransaction.getTicketNumber())).collect(Collectors.toList());
+                for (EZProduct prod: productList) {
+                    // reset the saleID and update the DB
+                    prod.setSaleID(defaultID);
+                    shopDB.updateProduct(Long.parseLong(prod.getRFID()), prod.getProdTypeID(), defaultID, prod.getReturnID());
+                }
                 if (this.shopDB.deleteTransaction(saleNumber)) { // try to remove the SaleTransaction from the DB
                     this.ezSaleTransactions.remove(saleNumber); // delete the SaleTransaction in the local collection
                     result = true;
