@@ -7,7 +7,7 @@ Authors:
 - Palmucci Leonardo s288126
 - Dario Lanfranco s287524
 
-Date: 26/05/2021
+Date: 09/06/2021
 
 | Version | Changes |
 | ------- |---------|
@@ -22,6 +22,7 @@ Date: 26/05/2021
 | 9  | Post-coding fixes |
 | 10 | Post-testing fixes |
 | 11 | Updated according to final design |
+| 12 | Updated according to the Change Request regarding RFIDs |
 
 # Contents
 
@@ -89,6 +90,7 @@ interface EZShopInterface{
     +boolean payOrder(Integer orderId)
     +boolean recordOrderArrival(Integer orderId)
     +List<Order> getAllOrders()
+    +boolean recordOrderArrivalRFID(Integer orderId, String RFIDfrom)
     
     .. UC4 - Manage Customers and Cards ..
     +Integer defineCustomer(String customerName)
@@ -114,7 +116,8 @@ interface EZShopInterface{
     +boolean endSaleTransaction(Integer transactionId)
     +boolean deleteSaleTransaction(transactionId)
     +SaleTransaction getSaleTransaction(Integer transactionId)
-  
+    +boolean addProductToSaleRFID(Integer transactionId, String RFID)
+    +boolean deleteProductFromSaleRFID(Integer transactionId, String RFID)
 
     .. UC7 - Manage payment ..
     +double receiveCashPayment(Integer transactionId, double cash)
@@ -125,7 +128,7 @@ interface EZShopInterface{
     +boolean returnProduct(Integer returnId, String productCode, int amount)
     +boolean endReturnTransaction(Integer returnId, boolean commit)
     +boolean deleteReturnTransaction(Integer returnId)
-    
+    +boolean returnProductRFID(Integer returnId, String RFID)
 
     .. UC9 - Accounting ..
     +boolean recordBalanceUpdate(double toBeAdded)
@@ -166,6 +169,8 @@ class EZShop{
     +isValidCreditCard(String creditCard)
     +getCreditInTXTbyCardNumber(String cardNumber)
     +updateCreditInTXTbyCardNumber(String cardNumber, double toBeAdded)
+    +getAllProducts(void)
+    +isValidRFID(String rfid)
 }
 
 Class SQLiteDB {
@@ -281,6 +286,15 @@ class EZReturnTransaction {
   +status: String
 }
 
+class EZProduct {
+    +RFID: String
+    +ProdTypeID: Integer
+    +SaleID: Integer
+    +returnID: Integer
+}
+
+EZProductType --"*" EZProduct: describes
+
 EZShop -down- "*" EZCustomer
 
 EZReturnTransaction "*" - EZSaleTransaction
@@ -386,6 +400,11 @@ Class SQLiteDB {
     +deleteProductPerSale(String barCode, Integer transactionID)
     +deleteAllProductsPerSale(Integer transactionID)
     +updateProductPerSale(String barCode, Integer transactionID, int amount, double discountRate)
+    +createProductsTable(void)
+    +insertProduct(Long RFID, Integer prodTypeID, Integer saleID, Integer returnID)
+    +deleteProduct(Long RFID)
+    +selectAllProducts(void)
+    +updateProduct(Long RFID, Integer prodTypeID, Integer saleID, Integer returnID)
 }
 @enduml
  ```
@@ -394,15 +413,15 @@ Class SQLiteDB {
 
 # Verification traceability matrix
 
-| FR ID | EZShop | EZUser | Administrator | Order | ProductType | EZSaleTransaction | Customer | EZReturnTransaction | EZAccountBook | Balance Operation |
-|:-------:|:------:|:------:|:---------------:|:-------:|:-------------:|:----------:|:-----------------:|:-------------:|:----------:|:-------------------:|
-| FR1   | X    | X    | X             |       |             |                 |          |                   |             |                   |
-| FR3   | X    | X    | X             |       | X           |                 |          |                   |             |                   |
-| FR4   | X    | X    | X             | X     | X           |                 |          |                   | X           | X                 |
-| FR5   | X    | X    | X             |       |             |                 | X        |                   |             |                   |
-| FR6   | X    | X    | X             |       | X           | X               |          | X                 | X           | X                 |
-| FR7   | X    | X    | X             |       |             | X               |          | X                 | X           | X                 |
-| FR8   | X    | X    | X             |       |             | X               |          |        X          | X           | X                 |
+| FR ID | EZShop | EZUser | Administrator | EZOrder | EZProductType | EZProduct | EZSaleTransaction | EZCustomer | EZReturnTransaction | EZAccountBook | EZBalanceOperation |
+|:-------:|:------:|:------:|:---------------:|:-------:|:------:|:-------:|:----------:|:-----------------:|:-------------:|:----------:|:-------------------:|
+| FR1   | X    | X    | X             |       |           |   |                 |          |                   |             |                   |
+| FR3   | X    | X    | X             |       | X         | X |                 |          |                   |             |                   |
+| FR4   | X    | X    | X             | X     | X         | X |                 |          |                   | X           | X                 |
+| FR5   | X    | X    | X             |       |           |   |                 | X        |                   |             |                   |
+| FR6   | X    | X    | X             |       | X         | X | X               |          | X                 | X           | X                 |
+| FR7   | X    | X    | X             |       |           |   | X               |          | X                 | X           | X                 |
+| FR8   | X    | X    | X             |       |           |   | X               |          |        X          | X           | X                 |
 
 # Verification sequence diagrams 
 
@@ -508,9 +527,9 @@ Actor EZUser
 autonumber
 EZUser -> GUI: Create new order O for product PT
 GUI -> EZShop: issueOrder()
-EZShop -> Order: new Order()
-Order --> EZShop: return Order
-EZShop -> Order: setStatus(Issued)
+EZShop -> EZOrder: new Order()
+EZOrder --> EZShop: return Order
+EZShop -> EZOrder: setStatus(Issued)
 EZShop --> GUI: return orderID
 GUI --> EZUser: show outcome message
 @enduml
@@ -531,8 +550,38 @@ EZShop -> EZShop: recordBalanceUpdate()
 EZShop -> EZAccountBook: addBalanceOperation()
 EZAccountBook -> EZAccountBook: new EZBalanceOperation()
 EZAccountBook --> EZShop: return boolean
-EZShop -> Order: setStatus(Payed)
+EZShop -> EZOrder: setStatus(Payed)
 EZShop --> GUI: return boolean
+GUI --> EZUser: Show outcome message
+@enduml
+```
+
+### Scenario 3-5
+```plantuml
+@startuml
+Actor EZUser
+autonumber
+EZUser -> GUI: Create new order O for product PT
+GUI -> EZShop: getAllOrders()
+EZShop --> GUI: returns List<Order>
+GUI --> EZUser: Show orders
+EZUser -> GUI: Register payment done for O
+GUI -> EZShop: payOrder(orderID)
+EZShop -> EZShop: recordBalanceUpdate()
+EZShop -> EZAccountBook: addBalanceOperation()
+EZAccountBook -> EZAccountBook: new EZBalanceOperation()
+EZAccountBook --> EZShop: return boolean
+EZShop -> EZOrder: setStatus(Payed)
+EZShop --> GUI: return boolean
+GUI --> EZUser: Show outcome message
+EZUser -> GUI: Order O is going to be received
+GUI -> EZShop: Order O as an input
+EZShop -> EZShop: find quantity Q of order O
+EZShop -> EZShop: find PT of order O
+EZUser -> GUI: starting RFID
+GUI -> EZShop: RFIDfrom
+EZShop -> EZProduct: create new Products
+EZShop --> GUI: boolean
 GUI --> EZUser: Show outcome message
 @enduml
 ```
@@ -550,7 +599,7 @@ EZShop --> GUI: return Customer
 EZUser -> GUI: Fills fields with Cu's personal data
 EZUser -> GUI: Confirm
 GUI -> EZShop: modifyCustomer(id, ...)
-EZShop -> Customer: update()
+EZShop -> EZCustomer: update()
 EZShop --> GUI: return boolean
 GUI --> EZUser: Show outcome message
 @enduml
@@ -582,7 +631,7 @@ GUI -> EZShop: getCustomer()
 EZShop --> GUI: return Customer
 EZUser -> GUI: EZUser detaches L from U
 GUI -> EZShop: modifyCustomer()
-EZShop -> Customer: setCard()
+EZShop -> EZCustomer: setCard()
 EZShop --> GUI: return boolean
 GUI --> EZUser: Show outcome message 
 @enduml
@@ -680,6 +729,31 @@ end ref
 @enduml
 ```
 
+### Scenario 6-8
+
+```plantuml
+@startuml
+Actor EZUser
+autonumber
+EZUser -> GUI: start Sale Transaction
+GUI -> EZShop: startSaleTransaction()
+EZShop -> EZSaleTransaction: new EZSaleTransaction()
+EZShop --> GUI: return TransactionID
+EZUser -> GUI: Insert product RFID
+GUI -> EZShop: addProductToSaleRFID()
+EZShop -> EZProduct: reset returnID
+EZShop -> EZProduct: setSaleID()
+EZUser -> GUI: close Sale Transaction
+GUI -> EZShop: endSaleTransaction()
+EZShop --> GUI: return boolean
+GUI --> EZUser: ask Payment Type
+EZUser -> GUI: Select payment type
+ref over GUI, EZUser, EZShop, EZAccountBook
+ manage Payment and update balance (see UC7)
+end ref
+@enduml
+```
+
 ## UC7
 
 ### Scenario 7-1
@@ -740,6 +814,33 @@ GUI -> EZShop: returnProduct()
 EZShop -> EZShop: getProductTypeByBarCode()
 EZShop -> EZTicketEntry: new EZTicketEntry()
 EZTicketEntry --> EZShop: return EZTicketEntry
+EZShop --> GUI: return boolean
+EZUser -> GUI: Close return transaction
+GUI -> EZShop: endReturnTransaction()
+EZShop -> EZShop: update related sale transaction
+EZShop --> GUI: return boolean
+GUI --> EZUser: Successful message
+ref over GUI, EZUser, EZShop, EZAccountBook
+Manage credit card return and update balance (go to UC10)
+end ref
+@enduml
+```
+
+### Scenario 8-4
+
+```plantuml
+@startuml
+Actor EZUser
+autonumber
+EZUser -> GUI: Insert transaction ID
+GUI -> EZShop: startReturnTransaction()
+EZShop -> EZReturnTransaction: new EZReturnTransaction()
+EZReturnTransaction --> EZShop: return EZReturnTransaction
+EZShop --> GUI: return Integer (EZReturnTransaction ID)
+EZUser -> GUI: Insert product RFID
+GUI -> EZShop: returnProductRFID()
+EZShop -> EZProduct: setReturnID()
+EZShop -> EZProduct: reset saleID
 EZShop --> GUI: return boolean
 EZUser -> GUI: Close return transaction
 GUI -> EZShop: endReturnTransaction()
