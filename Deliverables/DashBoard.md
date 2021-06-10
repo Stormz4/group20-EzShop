@@ -13,7 +13,7 @@ Report effort figures from the timesheet or timesheetCR document, compute size f
 |effort E (report here effort in person hours, for New development, from timesheet)  | 450 |
 |size S (report here size in LOC of all code written, excluding test cases)  | 3900|
 |productivity = S/E |8,7|
-|defects before release D_before (number of defects found and fixed before may 28) |120|
+|defects before release D_before (number of defects found and fixed before may 28) |90|
 
 
 
@@ -22,9 +22,9 @@ Report effort figures from the timesheet or timesheetCR document, compute size f
 
 | Measure | Value|
 |---|---|
-| effort for non-quality ENQ (effort for release 1, or effort to fix defects found when running official acceptance tests) |15 |
-| effort for non quality, relative = ENQ / E |0,03|
-|defects after release D (number of defects found running official acceptance tests and  fixed in release 1) |20|
-| defects before release vs defects after release = D/D_before | 0,17|
-|defect density = D/S|0.005|
-|overall productivity = S/(E + ENQ)|8,4|
+| effort for non-quality ENQ (effort for release 1, or effort to fix defects found when running official acceptance tests) |12 |
+| effort for non quality, relative = ENQ / E |0,027|
+|defects after release D (number of defects found running official acceptance tests and  fixed in release 1) |15|
+| defects before release vs defects after release = D/D_before | 0,166|
+|defect density = D/S|0.0038|
+|overall productivity = S/(E + ENQ)|8,44|
