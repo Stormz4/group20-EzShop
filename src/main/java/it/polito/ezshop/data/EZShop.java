@@ -938,6 +938,8 @@ public class EZShop implements EZShopInterface {
                     .findFirst().orElse(null);
             if (ticketToUpdate != null && this.shopDB.updateProductPerSale(productCode, transactionId, ticketToUpdate.getAmount(), discountRate)) {
                 ticketToUpdate.setDiscountRate(discountRate);
+                saleTransaction.updatePrice();
+                this.shopDB.updateSaleTransaction(saleTransaction.getTicketNumber(), saleTransaction.getDiscountRate(), saleTransaction.getPrice(), saleTransaction.getStatus());
                 result = true;
             }
         }

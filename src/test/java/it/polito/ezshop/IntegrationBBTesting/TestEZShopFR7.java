@@ -220,16 +220,17 @@ public class TestEZShopFR7 {
      * This test method covers Scenario 6.1 + Scenario 7.4
      */
     @Test
-    public void testReceiveCashPayment() throws InvalidTransactionIdException, UnauthorizedException, InvalidPaymentException, InvalidQuantityException, InvalidProductCodeException, InvalidProductIdException {
+    public void testReceiveCashPayment() throws InvalidTransactionIdException, UnauthorizedException, InvalidPaymentException, InvalidQuantityException, InvalidProductCodeException, InvalidProductIdException, InvalidDiscountRateException {
 
         // Create a dummy SaleTransaction to pay for
         saleTransactionID = ez.startSaleTransaction();
         assertTrue(saleTransactionID > 0);
         assertTrue(ez.addProductToSale(saleTransactionID, barCode, 1));
+        assertTrue(ez.applyDiscountRateToProduct(saleTransactionID, barCode, 0.5));
         assertTrue(ez.endSaleTransaction(saleTransactionID));
 
         // Handle payment
-        assertTrue(ez.receiveCashPayment(saleTransactionID, 50.0) > 0);
+        assertEquals(43.75, ez.receiveCashPayment(saleTransactionID, 50.0), 0.1);
         ez.logout();
     }
 
