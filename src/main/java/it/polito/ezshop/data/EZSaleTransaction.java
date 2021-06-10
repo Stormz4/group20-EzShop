@@ -68,7 +68,7 @@ public class EZSaleTransaction implements SaleTransaction {
 
     @Override
     public double getPrice() {
-        return this.price;
+        return this.price * (1 - this.discountRate);
     }
 
     @Override

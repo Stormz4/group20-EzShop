@@ -177,7 +177,7 @@ public class TestEZShopFR4 {
     }
 
     @Test
-    public void testIssueOrder() throws UnauthorizedException, InvalidQuantityException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidPasswordException, InvalidUsernameException {
+    public void testIssueOrder() throws UnauthorizedException, InvalidQuantityException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidPasswordException, InvalidUsernameException, InvalidRoleException {
         // Get products in EZShop
         List<ProductType> prods = ezShop.getAllProductTypes();
 
@@ -246,6 +246,7 @@ public class TestEZShopFR4 {
 
         // Test after ezShop's reset
         ezShop.reset();
+        ezShop.createUser("manager", "manager", URShopManager);
         ezShop.login("manager", "manager");
         assertEquals(defaultID, ezShop.issueOrder(prods.get(1).getBarCode(), 120,1.20).longValue());
     }
@@ -461,7 +462,7 @@ public class TestEZShopFR4 {
     }
 
     @Test
-    public void testGetAllOrders() throws UnauthorizedException, InvalidQuantityException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidPasswordException, InvalidUsernameException {
+    public void testGetAllOrders() throws UnauthorizedException, InvalidQuantityException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidPasswordException, InvalidUsernameException, InvalidRoleException {
         // Test empty DB case
         assertNotNull(ezShop.getAllOrders());
 
@@ -497,6 +498,7 @@ public class TestEZShopFR4 {
 
         // Test after ezShop's reset
         ezShop.reset();
+        ezShop.createUser("manager", "manager", URShopManager);
         ezShop.login("manager", "manager");
         assertNotNull(ezShop.getAllOrders());
     }

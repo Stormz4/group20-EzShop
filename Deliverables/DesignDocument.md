@@ -7,20 +7,22 @@ Authors:
 - Palmucci Leonardo s288126
 - Dario Lanfranco s287524
 
-Date: 26/05/2021
+Date: 09/06/2021
 
 | Version | Changes |
 | ------- |---------|
-| 1 | Added first version of design document. |
-| 2 | Added functions in Shop |
-| 3 | Added sequence diagrams |
-| 4 | Added sequence diagrams for UC9, fixed the class diagram along with the new requirements |
-| 5 | Updated class diagram |
-| 6 | Fixed some sequence diagrams, added method to AccountBook |
-| 7 | Modified use case diagrams, class diagram and verification matrix |
-| 8 | Last fixes. Final version |
-| 9 | Post-coding fixes |
+| 1  | Added first version of design document. |
+| 2  | Added functions in EZShop |
+| 3  | Added sequence diagrams |
+| 4  | Added sequence diagrams for UC9, fixed the class diagram along with the new requirements |
+| 5  | Updated class diagram |
+| 6  | Fixed some sequence diagrams, added method to AccountBook |
+| 7  | Modified use case diagrams, class diagram and verification matrix |
+| 8  | Last fixes. Final version |
+| 9  | Post-coding fixes |
 | 10 | Post-testing fixes |
+| 11 | Updated according to final design |
+| 12 | Updated according to the Change Request regarding RFIDs |
 
 # Contents
 
@@ -88,6 +90,7 @@ interface EZShopInterface{
     +boolean payOrder(Integer orderId)
     +boolean recordOrderArrival(Integer orderId)
     +List<Order> getAllOrders()
+    +boolean recordOrderArrivalRFID(Integer orderId, String RFIDfrom)
     
     .. UC4 - Manage Customers and Cards ..
     +Integer defineCustomer(String customerName)
@@ -113,7 +116,8 @@ interface EZShopInterface{
     +boolean endSaleTransaction(Integer transactionId)
     +boolean deleteSaleTransaction(transactionId)
     +SaleTransaction getSaleTransaction(Integer transactionId)
-  
+    +boolean addProductToSaleRFID(Integer transactionId, String RFID)
+    +boolean deleteProductFromSaleRFID(Integer transactionId, String RFID)
 
     .. UC7 - Manage payment ..
     +double receiveCashPayment(Integer transactionId, double cash)
@@ -124,7 +128,7 @@ interface EZShopInterface{
     +boolean returnProduct(Integer returnId, String productCode, int amount)
     +boolean endReturnTransaction(Integer returnId, boolean commit)
     +boolean deleteReturnTransaction(Integer returnId)
-    
+    +boolean returnProductRFID(Integer returnId, String RFID)
 
     .. UC9 - Accounting ..
     +boolean recordBalanceUpdate(double toBeAdded)
@@ -138,24 +142,24 @@ interface EZShopInterface{
 }
 
 package it.polito.ezshop.data{
- class Shop{
+ class EZShop{
 
 }
 }
 
-class Shop implements EZShopInterface
+class EZShop implements EZShopInterface
 @enduml
 ```
-
-The data package contains the following classes, which are persistent:
+<br/><br/>
+The data package contains the following persistent classes.<br/>
 
 ```plantuml
 @startuml
 package it.polito.ezshop.data{
-class Shop{
+class EZShop{
     +shopDB: SQLiteDB
-    +currUser: User
-    +accountingBook: AccountBook
+    +currUser: EZUser
+    +accountingBook: EZAccountBook
     +loadDataFromDB(void)
     +clearData(void)
     +isValidPosition(String position)
@@ -165,14 +169,16 @@ class Shop{
     +isValidCreditCard(String creditCard)
     +getCreditInTXTbyCardNumber(String cardNumber)
     +updateCreditInTXTbyCardNumber(String cardNumber, double toBeAdded)
+    +getAllProducts(void)
+    +isValidRFID(String rfid)
 }
 
 Class SQLiteDB {
     
 }
-Shop -- SQLiteDB
+EZShop -- SQLiteDB
 
-class ProductType{
+class EZProductType{
     +productID: Integer
     +barCode: String
     +location: String
@@ -184,55 +190,48 @@ class ProductType{
     +editQuantity(int toBeAdded)
 }
 
-class User{
+class EZUser{
+    +<u>URNoRole: String = ""
+    +<u>URAdministrator: String = "Administrator"
+    +<u>URShopManager: String = "ShopManager"
+    +<u>URCashier: String = "Cashier"
     +userID: Integer
     +username: String
     +password: String
-    +role: UserRoleEnum
+    +role: String
     +hasRequiredRole(String ...requiredRoles)
 }
 
-Enum UserRoleEnum {
-    Cashier
-    ShopManager
-    Administrator
-}
 
-User -[hidden]-> UserRoleEnum
+EZShop -- "*" EZUser
 
-Shop -- "*" User
-
-class AccountBook {
+class EZAccountBook {
  +currentBalance: double
  +nextBalanceId: int
  +boolean addBalanceOperation(Integer transactionID)
  +boolean updateBalance(double toBeAdded)
  }
-AccountBook -down- Shop
-class BalanceOperation {
+EZAccountBook -down- EZShop
+class EZBalanceOperation {
+ +<u>Credit: String = "CREDIT"
+ +<u>Debit: String = "DEBIT"
  +balanceId: int
  +date: LocalDate 
  +money: double
  +type: String
 }
-AccountBook -up- "*" BalanceOperation
+EZAccountBook -up- "*" EZBalanceOperation
 
-Enum BalanceOpTypeEnum {
-    Credit
-    Debit
-}
+EZOrder -- EZBalanceOperation
+EZSaleTransaction -- EZBalanceOperation
+EZReturnTransaction -- EZBalanceOperation
 
-BalanceOperation -[hidden]-> BalanceOpTypeEnum
+EZShop -down- "*" EZProductType
 
-Order -- BalanceOperation
-SaleTransaction -- BalanceOperation
-ReturnTransaction -- BalanceOperation
-
-
-
-Shop -down- "*" ProductType
-
-class SaleTransaction {
+class EZSaleTransaction {
+    +<u>STOpened: String = "OPENED"
+    +<u>STClosed: String = "CLOSED" 
+    +<u>STPayed: String = "PAYED"
     +ticketNumber: Integer
     +time: LocalDate
     +paymentType: String
@@ -244,47 +243,42 @@ class SaleTransaction {
     +getTicketEntryByBarCode(String barCode)
     +updatePrice(double toBeAdded)
 }
-SaleTransaction - "*" ProductType
 
-class TicketEntry {
+class EZTicketEntry {
     +barCode: String
     +productDescription: String
     +amount: int
     +pricePerUnit: double
     +discountRate: double
 }
-SaleTransaction -up-"*" TicketEntry
-ReturnTransaction -up-"*" TicketEntry
+EZSaleTransaction -up-"*" EZTicketEntry
+EZReturnTransaction -up-"*" EZTicketEntry
 
-class Customer {
+class EZCustomer {
     +id: Integer
     +customerName: String
     +customerCard: String
     +points: Integer
 }
 
-
-class Order {
+class EZOrder {
+  +<u>OSIssued: String = "ISSUED"
+  +<u>OSPayed: String = "PAYED"
+  +<u>OSCompleted: String = "COMPLETED"
   +orderId: Integer  
   +balanceId: Integer
   +productCode: String
   +pricePerUnit: double
   +quantity: int
-  +status: OrderStatusEnum
+  +status: String
 }
 
-Order "*" - ProductType
+EZOrder "*" - EZProductType
 
-Enum OrderStatusEnum {
-    Issued
-    Payed
-    Completed
-}
-
-Order -[hidden]-> OrderStatusEnum
-
-
-class ReturnTransaction {
+class EZReturnTransaction {
+  +<u> RTOpened: String = "OPENED"
+  +<u> RTClosed: String = "CLOSED"
+  +<u> RTPayed: String = "PAYED"
   +returnId: Integer  
   +quantity: int
   +returnedValue: double
@@ -292,15 +286,23 @@ class ReturnTransaction {
   +status: String
 }
 
-Shop -down- "*" Customer
+class EZProduct {
+    +RFID: String
+    +ProdTypeID: Integer
+    +SaleID: Integer
+    +returnID: Integer
+}
 
-ReturnTransaction "*" - SaleTransaction
-ReturnTransaction "*" - ProductType
+EZProductType --"*" EZProduct: describes
+
+EZShop -down- "*" EZCustomer
+
+EZReturnTransaction "*" - EZSaleTransaction
 
 note "bar code is a number on 12 to \n14 digits, compliant to GTIN \nspecifications, see https://www.gs1\n.org/services/how-calculate-check\n-digit-manually " as N2  
-N2 .. ProductType
+N2 .. EZProductType
 note "ID is a unique identifier of a transaction, \nprinted on the receipt (ticket number) " as N3
-N3 .right. SaleTransaction
+N3 .right. EZSaleTransaction
 
 note "Map to \nimplement 1..n" as N6
 note "Map to \nimplement 1..n" as N7
@@ -313,27 +315,36 @@ note "Map to \nimplement 1..n" as N13
 note "Map to \nimplement 1..n" as N14
 
 
-AccountBook .. N6
-N6 .. BalanceOperation
-Shop .. N7
-N7 .. Customer
-N8 .. SaleTransaction
-ProductType .. N9
-N9 .. Shop
-Shop .. N10
-N10 .. User
-Shop .. N11
-SaleTransaction .. N12
-N12 .. ReturnTransaction
-TicketEntry .. N13
-N13 .. SaleTransaction
-TicketEntry .. N14
-N14 .. ReturnTransaction
+EZAccountBook .. N6
+N6 .. EZBalanceOperation
+EZShop .. N7
+N7 .. EZCustomer
+N8 .. EZSaleTransaction
+EZProductType .. N9
+N9 .. EZShop
+EZShop .. N10
+N10 .. EZUser
+EZShop .. N11
+EZSaleTransaction .. N12
+N12 .. EZReturnTransaction
+EZTicketEntry .. N13
+N13 .. EZSaleTransaction
+EZTicketEntry .. N14
+N14 .. EZReturnTransaction
 }
 @enduml
 ```
+In order to have a readable diagram, we chose not to include the following Interfaces:
+* BalanceOperation
+* Customer
+* Order
+* ProductType
+* SaleTransaction
+* TicketEntry
+* User
+<br/><br/>
 
-SQLite DB class has been separated for diagrams readability:
+SQLite DB class has been separated for diagram's readability:
 
 ```plantuml
 @startuml
@@ -389,6 +400,11 @@ Class SQLiteDB {
     +deleteProductPerSale(String barCode, Integer transactionID)
     +deleteAllProductsPerSale(Integer transactionID)
     +updateProductPerSale(String barCode, Integer transactionID, int amount, double discountRate)
+    +createProductsTable(void)
+    +insertProduct(Long RFID, Integer prodTypeID, Integer saleID, Integer returnID)
+    +deleteProduct(Long RFID)
+    +selectAllProducts(void)
+    +updateProduct(Long RFID, Integer prodTypeID, Integer saleID, Integer returnID)
 }
 @enduml
  ```
@@ -397,19 +413,19 @@ Class SQLiteDB {
 
 # Verification traceability matrix
 
-| FR ID | Shop | User | Administrator | Order | ProductType | SaleTransaction | Customer | ReturnTransaction | AccountBook | Balance Operation |
-|:-------:|:------:|:------:|:---------------:|:-------:|:-------------:|:----------:|:-----------------:|:-------------:|:----------:|:-------------------:|
-| FR1   | X    | X    | X             |       |             |                 |          |                   |             |                   |
-| FR3   | X    | X    | X             |       | X           |                 |          |                   |             |                   |
-| FR4   | X    | X    | X             | X     | X           |                 |          |                   | X           | X                 |
-| FR5   | X    | X    | X             |       |             |                 | X        |                   |             |                   |
-| FR6   | X    | X    | X             |       | X           | X               |          | X                 | X           | X                 |
-| FR7   | X    | X    | X             |       |             | X               |          | X                 | X           | X                 |
-| FR8   | X    | X    | X             |       |             | X               |          |        X          | X           | X                 |
+| FR ID | EZShop | EZUser | Administrator | EZOrder | EZProductType | EZProduct | EZSaleTransaction | EZCustomer | EZReturnTransaction | EZAccountBook | EZBalanceOperation |
+|:-------:|:------:|:------:|:---------------:|:-------:|:------:|:-------:|:----------:|:-----------------:|:-------------:|:----------:|:-------------------:|
+| FR1   | X    | X    | X             |       |           |   |                 |          |                   |             |                   |
+| FR3   | X    | X    | X             |       | X         | X |                 |          |                   |             |                   |
+| FR4   | X    | X    | X             | X     | X         | X |                 |          |                   | X           | X                 |
+| FR5   | X    | X    | X             |       |           |   |                 | X        |                   |             |                   |
+| FR6   | X    | X    | X             |       | X         | X | X               |          | X                 | X           | X                 |
+| FR7   | X    | X    | X             |       |           |   | X               |          | X                 | X           | X                 |
+| FR8   | X    | X    | X             |       |           |   | X               |          |        X          | X           | X                 |
 
 # Verification sequence diagrams 
 
-The User will communicate with the GUI, which will invoke Shop's methods (instead of making the User communicate with the Shop directly).
+The User will communicate with the GUI, which will invoke EZShop's methods (instead of making the User communicate with the EZShop directly).
 
 ## UC1 
 
@@ -417,18 +433,18 @@ The User will communicate with the GUI, which will invoke Shop's methods (instea
 
 ```plantuml
 @startuml
-Actor User
+Actor EZUser
 autonumber
-User -> GUI: Insert product descrition
-User -> GUI: Insert new bar code
-User -> GUI: Insert price per unit
-User -> GUI: Insert product notes
-User -> GUI: Insert location
-User -> GUI: Confirms
-GUI -> Shop: createProductType()
-Shop -> ProductType : new ProductType
-ProductType --> Shop : return ID
-Shop --> User : successful message
+EZUser -> GUI: Insert product descrition
+EZUser -> GUI: Insert new bar code
+EZUser -> GUI: Insert price per unit
+EZUser -> GUI: Insert product notes
+EZUser -> GUI: Insert location
+EZUser -> GUI: Confirms
+GUI -> EZShop: createProductType()
+EZShop -> EZProductType : new EZProductType
+EZProductType --> EZShop : return ID
+EZShop --> EZUser : successful message
 @enduml
 ```
 
@@ -436,17 +452,17 @@ Shop --> User : successful message
 
 ```plantuml
 @startuml
-Actor User
+Actor EZUser
 autonumber
-User -> GUI: Searches by bar code
-GUI -> Shop: getProductTypeByBarCode()
-Shop --> GUI: return ProductType
+EZUser -> GUI: Searches by bar code
+GUI -> EZShop: getProductTypeByBarCode()
+EZShop --> GUI: return EZProductType
 
-User -> GUI: Selects record
-User -> GUI: Select a new product location
-GUI -> Shop: updatePosition()
-Shop --> GUI : return boolean
-GUI --> User : successful message
+EZUser -> GUI: Selects record
+EZUser -> GUI: Select a new product location
+GUI -> EZShop: updatePosition()
+EZShop --> GUI : return boolean
+GUI --> EZUser : successful message
 @enduml
 ```
 
@@ -460,13 +476,13 @@ autonumber
 Administrator -> GUI: Insert username
 Administrator -> GUI: Insert password
 Administrator -> GUI: Insert role
-GUI -> Shop: createUser()
-Shop -> User: new User()
-User --> Shop: return User
-Shop --> GUI: return Integer (unique identifier)
-Administrator -> GUI: Selects user rights
-GUI -> Shop: updateUserRights()
-Shop --> GUI: return boolean
+GUI -> EZShop: createUser()
+EZShop -> EZUser: new EZUser()
+EZUser --> EZShop: return EZUser
+EZShop --> GUI: return Integer (unique identifier)
+Administrator -> GUI: Selects EZUser rights
+GUI -> EZShop: updateUserRights()
+EZShop --> GUI: return boolean
 Administrator -> GUI: Confirms
 GUI --> Administrator: Successful message
 @enduml
@@ -476,12 +492,12 @@ GUI --> Administrator: Successful message
 ### Scenario 2-2
 ```plantuml
 @startuml
-Actor User
+Actor EZUser
 autonumber
-User -> GUI: Select an account to be deleted
-GUI -> Shop: deleteUser()
-Shop --> GUI: return boolean
-GUI --> User: Successful message
+EZUser -> GUI: Select an account to be deleted
+GUI -> EZShop: deleteUser()
+EZShop --> GUI: return boolean
+GUI --> EZUser: Successful message
 @enduml
 ```
 
@@ -489,15 +505,15 @@ GUI --> User: Successful message
 ### Scenario 2-3
 ```plantuml
 @startuml
-Actor User
+Actor EZUser
 autonumber
-User -> GUI: Select an account to be updated
-GUI -> Shop: getUser()
-Shop --> GUI: return User
-User -> GUI: Select new rights for the account
-GUI -> Shop: updateUserRights()
-Shop --> GUI: return boolean
-GUI --> User: Successful message
+EZUser -> GUI: Select an account to be updated
+GUI -> EZShop: getUser()
+EZShop --> GUI: return EZUser
+EZUser -> GUI: Select new rights for the account
+GUI -> EZShop: updateUserRights()
+EZShop --> GUI: return boolean
+GUI --> EZUser: Successful message
 @enduml
 ```
 
@@ -507,36 +523,66 @@ GUI --> User: Successful message
 ### Scenario 3-1
 ```plantuml
 @startuml
-Actor User
+Actor EZUser
 autonumber
-User -> GUI: Create new order O for product PT
-GUI -> Shop: issueOrder()
-Shop -> Order: new Order()
-Order --> Shop: return Order
-Shop -> Order: setStatus(Issued)
-Shop --> GUI: return orderID
-GUI --> User: show outcome message
+EZUser -> GUI: Create new order O for product PT
+GUI -> EZShop: issueOrder()
+EZShop -> EZOrder: new Order()
+EZOrder --> EZShop: return Order
+EZShop -> EZOrder: setStatus(Issued)
+EZShop --> GUI: return orderID
+GUI --> EZUser: show outcome message
 @enduml
 ```
 
 ### Scenario 3-2
 ```plantuml
 @startuml
-Actor User
+Actor EZUser
 autonumber
-User -> GUI: Create new order O for product PT
-GUI -> Shop: getAllOrders()
-Shop --> GUI: returns List<Order>
-GUI --> User: Show orders
-User -> GUI: Register payment done for O
-GUI -> Shop: payOrder(orderID)
-Shop -> Shop: recordBalanceUpdate()
-Shop -> AccountBook: addBalanceOperation()
-AccountBook -> AccountBook: new BalanceOperation()
-AccountBook --> Shop: return boolean
-Shop -> Order: setStatus(Payed)
-Shop --> GUI: return boolean
-GUI --> User: Show outcome message
+EZUser -> GUI: Create new order O for product PT
+GUI -> EZShop: getAllOrders()
+EZShop --> GUI: returns List<Order>
+GUI --> EZUser: Show orders
+EZUser -> GUI: Register payment done for O
+GUI -> EZShop: payOrder(orderID)
+EZShop -> EZShop: recordBalanceUpdate()
+EZShop -> EZAccountBook: addBalanceOperation()
+EZAccountBook -> EZAccountBook: new EZBalanceOperation()
+EZAccountBook --> EZShop: return boolean
+EZShop -> EZOrder: setStatus(Payed)
+EZShop --> GUI: return boolean
+GUI --> EZUser: Show outcome message
+@enduml
+```
+
+### Scenario 3-5
+```plantuml
+@startuml
+Actor EZUser
+autonumber
+EZUser -> GUI: Create new order O for product PT
+GUI -> EZShop: getAllOrders()
+EZShop --> GUI: returns List<Order>
+GUI --> EZUser: Show orders
+EZUser -> GUI: Register payment done for O
+GUI -> EZShop: payOrder(orderID)
+EZShop -> EZShop: recordBalanceUpdate()
+EZShop -> EZAccountBook: addBalanceOperation()
+EZAccountBook -> EZAccountBook: new EZBalanceOperation()
+EZAccountBook --> EZShop: return boolean
+EZShop -> EZOrder: setStatus(Payed)
+EZShop --> GUI: return boolean
+GUI --> EZUser: Show outcome message
+EZUser -> GUI: Order O is going to be received
+GUI -> EZShop: Order O as an input
+EZShop -> EZShop: find quantity Q of order O
+EZShop -> EZShop: find PT of order O
+EZUser -> GUI: starting RFID
+GUI -> EZShop: RFIDfrom
+EZShop -> EZProduct: create new Products
+EZShop --> GUI: boolean
+GUI --> EZUser: Show outcome message
 @enduml
 ```
 
@@ -545,49 +591,49 @@ GUI --> User: Show outcome message
 ### Scenario 4-1
 ```plantuml
 @startuml
-Actor User
+Actor EZUser
 autonumber
-User -> GUI: Asks Cu personal data
-GUI -> Shop: getCustomer(id)
-Shop --> GUI: return Customer
-User -> GUI: Fills fields with Cu's personal data
-User -> GUI: Confirm
-GUI -> Shop: modifyCustomer(id, ...)
-Shop -> Customer: update()
-Shop --> GUI: return boolean
-GUI --> User: Show outcome message
+EZUser -> GUI: Asks Cu personal data
+GUI -> EZShop: getCustomer(id)
+EZShop --> GUI: return Customer
+EZUser -> GUI: Fills fields with Cu's personal data
+EZUser -> GUI: Confirm
+GUI -> EZShop: modifyCustomer(id, ...)
+EZShop -> EZCustomer: update()
+EZShop --> GUI: return boolean
+GUI --> EZUser: Show outcome message
 @enduml
 ```
 
 ### Scenario 4-2
 ```plantuml
 @startuml
-Actor User
+Actor EZUser
 autonumber
-User -> GUI: Creates a new Loyalty card L
-GUI -> Shop: createCard()
-Shop --> GUI: return cardCode
-GUI --> User: Show outcome message
-User -> GUI: User attaches L to U
-GUI -> Shop: attachCardToCustomer()
-Shop --> GUI: return boolean
-GUI --> User: Show outcome message
+EZUser -> GUI: Creates a new Loyalty card L
+GUI -> EZShop: createCard()
+EZShop --> GUI: return cardCode
+GUI --> EZUser: Show outcome message
+EZUser -> GUI: EZUser attaches L to U
+GUI -> EZShop: attachCardToCustomer()
+EZShop --> GUI: return boolean
+GUI --> EZUser: Show outcome message
 @enduml
 ```
 
 ### Scenario 4-3
 ```plantuml
 @startuml
-Actor User
+Actor EZUser
 autonumber
-User -> GUI: User selects customer record U
-GUI -> Shop: getCustomer()
-Shop --> GUI: return Customer
-User -> GUI: User detaches L from U
-GUI -> Shop: modifyCustomer()
-Shop -> Customer: setCard()
-Shop --> GUI: return boolean
-GUI --> User: Show outcome message 
+EZUser -> GUI: EZUser selects customer record U
+GUI -> EZShop: getCustomer()
+EZShop --> GUI: return Customer
+EZUser -> GUI: EZUser detaches L from U
+GUI -> EZShop: modifyCustomer()
+EZShop -> EZCustomer: setCard()
+EZShop --> GUI: return boolean
+GUI --> EZUser: Show outcome message 
 @enduml
 ```
 
@@ -598,14 +644,14 @@ GUI --> User: Show outcome message
 
 ```plantuml
 @startuml
-Actor User
+Actor EZUser
 autonumber
-User -> GUI : Insert username
-User -> GUI : Insert password
-User -> GUI : confirm
-GUI -> Shop: login()
-Shop --> GUI : return user
-GUI --> User: Show functionalities
+EZUser -> GUI : Insert username
+EZUser -> GUI : Insert password
+EZUser -> GUI : confirm
+GUI -> EZShop: login()
+EZShop --> GUI : return EZUser
+GUI --> EZUser: Show functionalities
 @enduml
 ```
 
@@ -613,12 +659,12 @@ GUI --> User: Show functionalities
 
 ```plantuml
 @startuml
-Actor User
+Actor EZUser
 autonumber
-User -> GUI: Log out
-GUI -> Shop: logout()
-Shop --> GUI : return boolean
-GUI --> User : Change page
+EZUser -> GUI: Log out
+GUI -> EZShop: logout()
+EZShop --> GUI : return boolean
+GUI --> EZUser : Change page
 @enduml
 ```
 
@@ -628,24 +674,24 @@ GUI --> User : Change page
 
 ```plantuml
 @startuml
-Actor User
+Actor EZUser
 autonumber
-User -> GUI: start Sale Transaction
-GUI -> Shop: startSaleTransaction()
-Shop -> SaleTransaction: new SaleTransaction()
-Shop --> GUI: return TransactionID
-User -> GUI: Insert product BarCode
-GUI -> Shop: addProductToSale()
-Shop -> Shop: getProductByBarCode()
-Shop -> TicketEntry: new TicketEntry()
-TicketEntry --> Shop: return TicketEntry
-Shop -> Shop : updateQuantity()
-User -> GUI: close Sale Transaction
-GUI -> Shop: endSaleTransaction()
-Shop --> GUI: return boolean
-GUI --> User: ask Payment Type
-User -> GUI: Select payment type
-ref over GUI, User, Shop, AccountBook
+EZUser -> GUI: start Sale Transaction
+GUI -> EZShop: startSaleTransaction()
+EZShop -> EZSaleTransaction: new EZSaleTransaction()
+EZShop --> GUI: return TransactionID
+EZUser -> GUI: Insert product BarCode
+GUI -> EZShop: addProductToSale()
+EZShop -> EZShop: getProductByBarCode()
+EZShop -> EZTicketEntry: new EZTicketEntry()
+EZTicketEntry --> EZShop: return EZTicketEntry
+EZShop -> EZShop : updateQuantity()
+EZUser -> GUI: close Sale Transaction
+GUI -> EZShop: endSaleTransaction()
+EZShop --> GUI: return boolean
+GUI --> EZUser: ask Payment Type
+EZUser -> GUI: Select payment type
+ref over GUI, EZUser, EZShop, EZAccountBook
  manage Payment and update balance (see UC7)
 end ref
 @enduml
@@ -655,29 +701,54 @@ end ref
 
 ```plantuml
 @startuml
-Actor User
+Actor EZUser
 autonumber
-User -> GUI: start Sale Transaction
-GUI -> Shop: startSaleTransaction()
-Shop -> SaleTransaction: new SaleTransaction()
-SaleTransaction --> Shop: return TransactionID
-Shop --> GUI: return boolean
-User -> GUI: Insert product BarCode
-GUI -> Shop: addProductToSale()
-Shop -> Shop: getProductByBarCode()
-Shop -> TicketEntry: new TicketEntry()
-TicketEntry --> Shop: return TicketEntry
-Shop -> Shop : updateQuantity()
-Shop --> GUI: return boolean
-User -> GUI: insert discount rate
-GUI -> Shop: applyDiscountRateToSale()
-Shop --> GUI: return boolean
-User -> GUI: close Sale Transaction
-GUI -> Shop: endSaleTransaction()
-Shop --> GUI: return boolean
-GUI --> User: ask Payment Type
-User -> GUI: Select payment type
-ref over GUI, User, Shop, AccountBook
+EZUser -> GUI: start Sale Transaction
+GUI -> EZShop: startSaleTransaction()
+EZShop -> EZSaleTransaction: new EZSaleTransaction()
+EZSaleTransaction --> EZShop: return TransactionID
+EZShop --> GUI: return boolean
+EZUser -> GUI: Insert product BarCode
+GUI -> EZShop: addProductToSale()
+EZShop -> EZShop: getProductByBarCode()
+EZShop -> EZTicketEntry: new EZTicketEntry()
+EZTicketEntry --> EZShop: return EZTicketEntry
+EZShop -> EZShop : updateQuantity()
+EZShop --> GUI: return boolean
+EZUser -> GUI: insert discount rate
+GUI -> EZShop: applyDiscountRateToSale()
+EZShop --> GUI: return boolean
+EZUser -> GUI: close Sale Transaction
+GUI -> EZShop: endSaleTransaction()
+EZShop --> GUI: return boolean
+GUI --> EZUser: ask Payment Type
+EZUser -> GUI: Select payment type
+ref over GUI, EZUser, EZShop, EZAccountBook
+ manage Payment and update balance (see UC7)
+end ref
+@enduml
+```
+
+### Scenario 6-8
+
+```plantuml
+@startuml
+Actor EZUser
+autonumber
+EZUser -> GUI: start Sale Transaction
+GUI -> EZShop: startSaleTransaction()
+EZShop -> EZSaleTransaction: new EZSaleTransaction()
+EZShop --> GUI: return TransactionID
+EZUser -> GUI: Insert product RFID
+GUI -> EZShop: addProductToSaleRFID()
+EZShop -> EZProduct: reset returnID
+EZShop -> EZProduct: setSaleID()
+EZUser -> GUI: close Sale Transaction
+GUI -> EZShop: endSaleTransaction()
+EZShop --> GUI: return boolean
+GUI --> EZUser: ask Payment Type
+EZUser -> GUI: Select payment type
+ref over GUI, EZUser, EZShop, EZAccountBook
  manage Payment and update balance (see UC7)
 end ref
 @enduml
@@ -689,19 +760,19 @@ end ref
 
 ```plantuml
 @startuml
-Actor User
+Actor EZUser
 autonumber
-User -> GUI: Insert credit card number
-GUI -> Shop: receiveCreditCardPayment()
-Shop -> Shop: getCreditInTXTbyCardNumber()
-Shop -> Shop: isValidCreditCard()
-Shop -> Shop: recordBalanceUpdate()
-Shop -> AccountBook: addBalanceOperation()
-AccountBook -> AccountBook: new BalanceOperation()
-AccountBook --> Shop: return boolean
-Shop -> Shop: updateCreditInTXTbyCardNumber()
-Shop --> GUI: return true
-GUI --> User: successful message
+EZUser -> GUI: Insert credit card number
+GUI -> EZShop: receiveCreditCardPayment()
+EZShop -> EZShop: getCreditInTXTbyCardNumber()
+EZShop -> EZShop: isValidCreditCard()
+EZShop -> EZShop: recordBalanceUpdate()
+EZShop -> EZAccountBook: addBalanceOperation()
+EZAccountBook -> EZAccountBook: new EZBalanceOperation()
+EZAccountBook --> EZShop: return boolean
+EZShop -> EZShop: updateCreditInTXTbyCardNumber()
+EZShop --> GUI: return true
+GUI --> EZUser: successful message
 @enduml
 ```
 
@@ -709,18 +780,18 @@ GUI --> User: successful message
 
 ```plantuml
 @startuml
-Actor User
+Actor EZUser
 autonumber
-User -> User: Collect banknotes and coins
-User -> User: Compute cash quantity
-User -> GUI: Record cash payment
-GUI -> Shop: receiveCashPayment()
-Shop -> Shop: recordBalanceUpdate()
-Shop -> AccountBook: addBalanceOperation()
-AccountBook -> AccountBook: new BalanceOperation()
-AccountBook --> Shop: return true
-Shop --> GUI: return double
-GUI --> User: return double
+EZUser -> EZUser: Collect banknotes and coins
+EZUser -> EZUser: Compute cash quantity
+EZUser -> GUI: Record cash payment
+GUI -> EZShop: receiveCashPayment()
+EZShop -> EZShop: recordBalanceUpdate()
+EZShop -> EZAccountBook: addBalanceOperation()
+EZAccountBook -> EZAccountBook: new EZBalanceOperation()
+EZAccountBook --> EZShop: return true
+EZShop --> GUI: return double
+GUI --> EZUser: return double
 @enduml
 ```
 
@@ -730,26 +801,53 @@ GUI --> User: return double
 
 ```plantuml
 @startuml
-Actor User
+Actor EZUser
 autonumber
-User -> GUI: Insert transaction ID
-GUI -> Shop: startReturnTransaction()
-Shop -> ReturnTransaction: new ReturnTransaction()
-ReturnTransaction --> Shop: return ReturnTransaction
-Shop --> GUI: return Integer (ReturnTransaction ID)
-User -> GUI: Insert product BarCode
-User -> GUI: Insert quantity of returned items
-GUI -> Shop: returnProduct()
-Shop -> Shop: getProductTypeByBarCode()
-Shop -> TicketEntry: new TicketEntry()
-TicketEntry --> Shop: return TicketEntry
-Shop --> GUI: return boolean
-User -> GUI: Close return transaction
-GUI -> Shop: endReturnTransaction()
-Shop -> Shop: update related sale transaction
-Shop --> GUI: return boolean
-GUI --> User: Successful message
-ref over GUI, User, Shop, AccountBook
+EZUser -> GUI: Insert transaction ID
+GUI -> EZShop: startReturnTransaction()
+EZShop -> EZReturnTransaction: new EZReturnTransaction()
+EZReturnTransaction --> EZShop: return EZReturnTransaction
+EZShop --> GUI: return Integer (EZReturnTransaction ID)
+EZUser -> GUI: Insert product BarCode
+EZUser -> GUI: Insert quantity of returned items
+GUI -> EZShop: returnProduct()
+EZShop -> EZShop: getProductTypeByBarCode()
+EZShop -> EZTicketEntry: new EZTicketEntry()
+EZTicketEntry --> EZShop: return EZTicketEntry
+EZShop --> GUI: return boolean
+EZUser -> GUI: Close return transaction
+GUI -> EZShop: endReturnTransaction()
+EZShop -> EZShop: update related sale transaction
+EZShop --> GUI: return boolean
+GUI --> EZUser: Successful message
+ref over GUI, EZUser, EZShop, EZAccountBook
+Manage credit card return and update balance (go to UC10)
+end ref
+@enduml
+```
+
+### Scenario 8-4
+
+```plantuml
+@startuml
+Actor EZUser
+autonumber
+EZUser -> GUI: Insert transaction ID
+GUI -> EZShop: startReturnTransaction()
+EZShop -> EZReturnTransaction: new EZReturnTransaction()
+EZReturnTransaction --> EZShop: return EZReturnTransaction
+EZShop --> GUI: return Integer (EZReturnTransaction ID)
+EZUser -> GUI: Insert product RFID
+GUI -> EZShop: returnProductRFID()
+EZShop -> EZProduct: setReturnID()
+EZShop -> EZProduct: reset saleID
+EZShop --> GUI: return boolean
+EZUser -> GUI: Close return transaction
+GUI -> EZShop: endReturnTransaction()
+EZShop -> EZShop: update related sale transaction
+EZShop --> GUI: return boolean
+GUI --> EZUser: Successful message
+ref over GUI, EZUser, EZShop, EZAccountBook
 Manage credit card return and update balance (go to UC10)
 end ref
 @enduml
@@ -761,14 +859,14 @@ end ref
 
 ```plantuml
 @startuml
-Actor User
+Actor EZUser
 autonumber
-User -> GUI: Selects a start date
-User -> GUI: Selects an end date
-User -> GUI: Send transaction list request
-GUI -> Shop: getCreditsAndDebits()
-Shop --> GUI: return transactions list
-GUI --> User: display list
+EZUser -> GUI: Selects a start date
+EZUser -> GUI: Selects an end date
+EZUser -> GUI: Send transaction list request
+GUI -> EZShop: getCreditsAndDebits()
+EZShop --> GUI: return transactions list
+GUI --> EZUser: display list
 @enduml
 ```
 
@@ -778,19 +876,19 @@ GUI --> User: display list
 
 ```plantuml
 @startuml
-Actor User
+Actor EZUser
 autonumber
-User -> GUI: Insert credit card number
-GUI -> Shop: returnCreditCardPayment()
-Shop -> Shop: getCreditInTXTbyCardNumber()
-Shop -> Shop: isValidCreditCard()
-Shop -> Shop: recordBalanceUpdate()
-Shop -> AccountBook: addBalanceOperation()
-AccountBook -> AccountBook: new BalanceOperation()
-AccountBook --> Shop: return boolean
-Shop -> Shop: updateCreditInTXTbyCardNumber()
-Shop --> GUI: Amount returned
-GUI --> User: Successful message
+EZUser -> GUI: Insert credit card number
+GUI -> EZShop: returnCreditCardPayment()
+EZShop -> EZShop: getCreditInTXTbyCardNumber()
+EZShop -> EZShop: isValidCreditCard()
+EZShop -> EZShop: recordBalanceUpdate()
+EZShop -> EZAccountBook: addBalanceOperation()
+EZAccountBook -> EZAccountBook: new EZBalanceOperation()
+EZAccountBook --> EZShop: return boolean
+EZShop -> EZShop: updateCreditInTXTbyCardNumber()
+EZShop --> GUI: Amount returned
+GUI --> EZUser: Successful message
 @enduml
 ```
 
@@ -798,17 +896,17 @@ GUI --> User: Successful message
 
 ```plantuml
 @startuml
-Actor User
+Actor EZUser
 autonumber
-User -> User: Collect banconotes and coins
-User -> GUI: Record cash return
-GUI -> Shop: returnCashPayment()
-Shop -> Shop: recordBalanceUpdate()
-Shop -> AccountBook: addBalanceOperation()
-AccountBook -> AccountBook: new BalanceOperation()
-AccountBook --> Shop: return true
-Shop --> GUI: Amount returned
-GUI --> User: Successful message
+EZUser -> EZUser: Collect banconotes and coins
+EZUser -> GUI: Record cash return
+GUI -> EZShop: returnCashPayment()
+EZShop -> EZShop: recordBalanceUpdate()
+EZShop -> EZAccountBook: addBalanceOperation()
+EZAccountBook -> EZAccountBook: new EZBalanceOperation()
+EZAccountBook --> EZShop: return true
+EZShop --> GUI: Amount returned
+GUI --> EZUser: Successful message
 @enduml
 ```
 
