@@ -407,7 +407,7 @@ Class SQLiteDB {
     +updateProduct(Long RFID, Integer prodTypeID, Integer saleID, Integer returnID)
 }
 @enduml
- ```
+```
 
 
 
@@ -562,9 +562,8 @@ GUI --> EZUser: Show outcome message
 Actor EZUser
 autonumber
 EZUser -> GUI: Create new order O for product PT
-GUI -> EZShop: getAllOrders()
-EZShop --> GUI: returns List<Order>
-GUI --> EZUser: Show orders
+GUI -> EZShop: issueOrder()
+EZShop --> GUI: return orderID
 EZUser -> GUI: Register payment done for O
 GUI -> EZShop: payOrder(orderID)
 EZShop -> EZShop: recordBalanceUpdate()

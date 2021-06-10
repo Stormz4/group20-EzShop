@@ -1,9 +1,6 @@
 package it.polito.ezshop.testChange;
 
-import it.polito.ezshop.data.EZProduct;
-import it.polito.ezshop.data.EZShop;
-import it.polito.ezshop.data.Order;
-import it.polito.ezshop.data.SQLiteDB;
+import it.polito.ezshop.data.*;
 import it.polito.ezshop.exceptions.*;
 import org.junit.After;
 import org.junit.Before;
@@ -317,6 +314,41 @@ public class TestEZShop_Change {
     }
 
     /*
+     * Testing Scenario 6.8 (until point 11)
+     */
+    @Test
+    public void testSaleRFIDScenario() throws UnauthorizedException, InvalidRFIDException, InvalidQuantityException, InvalidTransactionIdException, InvalidPasswordException, InvalidUsernameException {
+
+        boolean result;
+        ez.login("RFIDTest", "pwd"); // Administrator logged-in
+        Integer saleID = ez.startSaleTransaction();
+        result = ez.addProductToSaleRFID(saleID, RFID1);
+        Integer itemProdTypeID = ez.getAllProducts().get(Long.parseLong(RFID1)).getProdTypeID();
+        EZProductType itemProdType = (EZProductType) ez.getAllProductTypes().stream().filter(p -> p.getId().equals(itemProdTypeID)).findFirst().orElse(null);
+        assertNotNull(itemProdType);
+
+        // check saleID, returnID and function result (successful or not)
+        assertTrue(result);
+        assertEquals(saleID, ez.getAllProducts().get(Long.parseLong(RFID1)).getSaleID());
+        assertEquals(Integer.valueOf(defaultID), ez.getAllProducts().get(Long.parseLong(RFID1)).getReturnID());
+
+        result = ez.endSaleTransaction(saleID);
+        assertTrue(result);
+        // check the content of the ticketEntry (barCode, amount and price)
+        List<TicketEntry> entries = ez.getSaleTransaction(saleID).getEntries();
+        assertEquals(1, entries.size());
+        EZTicketEntry itemEntry = (EZTicketEntry) ez.getSaleTransaction(saleID).getEntries().stream().filter(e -> e.getBarCode().equals(itemProdType.getBarCode())).findFirst().orElse(null);
+        assertNotNull(itemEntry);
+        assertEquals(itemProdType.getBarCode(), itemEntry.getBarCode());
+        assertEquals(1, itemEntry.getAmount());
+        assertEquals(itemProdType.getPricePerUnit(), itemEntry.getPricePerUnit(), 0.0);
+
+        // check sale Price
+        double expected_price = itemProdType.getPricePerUnit();
+        assertEquals(expected_price, ez.getSaleTransaction(saleID).getPrice(), 0.0);
+    }
+
+    /*
      * @return  true if the operation was successful
      *          false if the order does not exist or if it was not in an ORDERED/COMPLETED state
      *
@@ -415,6 +447,43 @@ public class TestEZShop_Change {
         // Test "false it was not in an ORDERED/COMPLETED state"
         Integer unpayedOrderID = ez.issueOrder("2141513141144", 3,1.20);
         assertFalse(ez.recordOrderArrival(unpayedOrderID));
+    }
+
+    /*
+     * Testing Scenario 3.5
+     */
+    @Test
+    public void testOrderRFIDScenario() throws UnauthorizedException, InvalidQuantityException, InvalidPricePerUnitException, InvalidProductCodeException, InvalidOrderIdException, InvalidRFIDException, InvalidLocationException, InvalidPasswordException, InvalidUsernameException {
+
+        ez.login("RFIDTest", "pwd"); // Administrator logged-in
+
+        Integer itemProdTypeID = ez.getAllProducts().get(Long.parseLong(RFID1)).getProdTypeID();
+        EZProductType itemProdType = (EZProductType) ez.getAllProductTypes().stream().filter(p -> p.getId().equals(itemProdTypeID)).findFirst().orElse(null);
+        assertNotNull(itemProdType);
+
+        Integer prodQtyBefore = itemProdType.getQuantity();
+        String firstNewRFID = "000000000016";
+        String secondNewRFID = "000000000017";
+        Integer orderID = ez.issueOrder(itemProdType.getBarCode(), 2, 5.0);
+        assertTrue(ez.payOrder(orderID));
+        assertTrue(ez.recordOrderArrivalRFID(orderID, firstNewRFID));
+        Integer prodQtyAfter = itemProdType.getQuantity();
+        // check if both the new Products have been added
+        assertTrue(ez.getAllProducts().containsKey(Long.parseLong(firstNewRFID)));
+        assertTrue(ez.getAllProducts().containsKey(Long.parseLong(secondNewRFID)));
+
+        // check the updated qty of their ProdType
+        assertEquals(prodQtyBefore + 2, (int) prodQtyAfter);
+
+        EZProduct firstNewProduct = ez.getAllProducts().get(Long.parseLong(firstNewRFID));
+        EZProduct secondNewProduct = ez.getAllProducts().get(Long.parseLong(secondNewRFID));
+        // check their saleID, returnID and ProdTypeID
+        assertEquals(Integer.valueOf(defaultID), firstNewProduct.getSaleID());
+        assertEquals(Integer.valueOf(defaultID), firstNewProduct.getReturnID());
+        assertEquals(Integer.valueOf(defaultID), secondNewProduct.getSaleID());
+        assertEquals(Integer.valueOf(defaultID), secondNewProduct.getReturnID());
+        assertEquals(itemProdTypeID, firstNewProduct.getProdTypeID());
+        assertEquals(itemProdTypeID, secondNewProduct.getProdTypeID());
     }
 
     @Test
@@ -545,6 +614,42 @@ public class TestEZShop_Change {
         assertEquals("000000000002", p.getRFID());
         assertEquals(defaultID, p.getReturnID(), 0);
         assertEquals(sid, p.getSaleID(), 0);
+    }
+
+    /*
+     * Testing Scenario 8.4
+     */
+    @Test
+    public void testReturnRFIDScenario() throws InvalidPasswordException, InvalidUsernameException, UnauthorizedException, InvalidRFIDException, InvalidQuantityException, InvalidTransactionIdException, InvalidPaymentException {
+        ez.login("RFIDTest", "pwd"); // Administrator logged-in
+
+        Integer itemProdTypeID = ez.getAllProducts().get(Long.parseLong(RFID1)).getProdTypeID();
+        EZProductType itemProdType = (EZProductType) ez.getAllProductTypes().stream().filter(p -> p.getId().equals(itemProdTypeID)).findFirst().orElse(null);
+        assertNotNull(itemProdType);
+
+        // Create dummy saleTransaction for the returnTransaction to test
+        Integer saleID = ez.startSaleTransaction();
+        // Adding a product with given RFID to the sale
+        assertTrue(ez.addProductToSaleRFID(saleID, RFID1));
+        // closing and paying the transaction
+        assertTrue(ez.endSaleTransaction(saleID));
+        assertTrue(ez.receiveCashPayment(saleID, 50000) > 0);
+        // starting the returnTransaction (the Scenario begins here)
+        Integer returnID = ez.startReturnTransaction(saleID);
+        // inserting product RFID
+        assertTrue(ez.returnProductRFID(returnID, RFID1));
+        assertFalse(ez.returnProductRFID(returnID, RFID2));
+        // closing return transaction (Payment not considered in the Scenario)
+        assertTrue(ez.endReturnTransaction(returnID, true));
+        // check returnID and saleID of item
+        assertEquals(returnID, ez.getAllProducts().get(Long.parseLong(RFID1)).getReturnID());
+        assertEquals(defaultID, (int) ez.getAllProducts().get(Long.parseLong(RFID1)).getSaleID());
+        // check returnTransaction list in saleTransaction
+        assertEquals(1, ez.getSaleTransactionById(saleID).getReturns().size());
+        assertEquals(returnID, ez.getSaleTransactionById(saleID).getReturns().get(0).getReturnId());
+        assertEquals(itemProdType.getPricePerUnit(), ez.getSaleTransactionById(saleID).getReturns().get(0).getReturnedValue(), 0.0);
+        assertEquals(1, ez.getSaleTransactionById(saleID).getReturns().get(0).getEntries().size());
+        assertEquals(saleID, ez.getSaleTransactionById(saleID).getReturns().get(0).getSaleTransactionId());
     }
 }
 
