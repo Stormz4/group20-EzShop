@@ -448,7 +448,7 @@ public class TestEZShopFR6 {
     }
 
     @Test
-    public void testDeleteSaleTransaction() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidTransactionIdException, InvalidPaymentException {
+    public void testDeleteSaleTransaction() throws UnauthorizedException, InvalidPasswordException, InvalidUsernameException, InvalidTransactionIdException, InvalidPaymentException, InvalidProductCodeException, InvalidQuantityException {
         EZShop ez = new EZShop();
         try {
             ez.deleteSaleTransaction(1);
@@ -484,6 +484,17 @@ public class TestEZShopFR6 {
         ez.receiveCashPayment(sid, 500); // Status: PAYED
         ok = ez.deleteSaleTransaction(sid);
         assertFalse(ok);
+
+        // check if qty of products has been updated
+        String barCode = "2345344543423";
+        sid = ez.startSaleTransaction();
+        Integer qtyBeforeSale = ez.getProductTypeByBarCode(barCode).getQuantity();
+        ez.addProductToSale(sid, barCode, 1);
+        ez.endSaleTransaction(sid);
+        ok = ez.deleteSaleTransaction(sid);
+        assertTrue(ok);
+        assertEquals(qtyBeforeSale, ez.getProductTypeByBarCode(barCode).getQuantity());
+
     }
 
     @Test
