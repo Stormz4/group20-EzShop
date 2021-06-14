@@ -76,6 +76,13 @@ public class EZSaleTransaction implements SaleTransaction {
         this.price = price;
     }
 
+    public void updatePrice() {
+        this.price = 0;
+        for (TicketEntry entry: this.entries) {
+            this.price += entry.getPricePerUnit()*entry.getAmount()*(1-entry.getDiscountRate());
+        }
+    }
+
     public String getStatus(){
         return this.status;
     }

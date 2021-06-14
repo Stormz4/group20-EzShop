@@ -6,7 +6,7 @@ Authors:
 - Leonardo Palmucci s288126
 - Dario Lanfranco s287524
 
-Date: 26/05/2021
+Date: 11/06/2021
 
 | Version | Changes |
 | ------- |---------|
@@ -14,6 +14,7 @@ Date: 26/05/2021
 | 2 | Added some additional scenarios |
 | 3 | FR and NFR tables completed |
 | 4 | Final version of IntegrationAPITestReport.md |
+| 5 | Added Testing for RFID feature |
 
 # Contents
 
@@ -50,6 +51,7 @@ package "data" as data             {
      class EZBalanceOperation
      class EZCustomer
      class EZOrder
+     class EZProduct
      class EZProductType
      class EZReturnTransaction
      class EZTicketEntry
@@ -80,6 +82,7 @@ package "data" as data             {
      EZShop .down[dotted].> BalanceOperation
      EZShop .down[dotted].> Customer
      EZShop .down[dotted].> Order 
+     EZShop .down[dotted].> EZProduct
      EZShop .down[dotted].> ProductType
      EZShop .down[dotted].> TicketEntry
      EZShop .down[dotted].> User
@@ -90,6 +93,7 @@ package "data" as data             {
      SQLiteDB .down[dotted].> EZBalanceOperation
      SQLiteDB .down[dotted].> EZCustomer
      SQLiteDB .down[dotted].> EZOrder
+     SQLiteDB .down[dotted].> EZProduct
      SQLiteDB .down[dotted].> EZProductType
      SQLiteDB .down[dotted].> EZBalanceOperation
      SQLiteDB .down[dotted].> EZReturnTransaction
@@ -130,10 +134,12 @@ package "data" as data             {
      class InvalidProductDescriptionException
      class InvalidProductIdException
      class InvalidQuantityException
+     class InvalidRFIDException
      class InvalidRoleException
      class InvalidTransactionIdException
      class InvalidUserIdException
-     class InvalidUnathorizedException
+     class InvalidUsernameException
+     class InvalidUnauthorizedException
 
     }
     TicketEntry -down[hidden]- exceptions
@@ -154,23 +160,25 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 #  Tests
 
 ## Step 1
-| Classes             | JUnit test cases             |
-|---------------------|------------------------------|
-| EZBalanceOperation  | TestEZShop_BalanceOperation  |
-| EZCustomer          | TestEZShop_Customer          |
-| EZOrder             | TestEZShop_Order             |
-| EZProductType       | TestEZShop_ProductType       |
-| EZReturnTransaction | TestEZShop_ReturnTransaction |
-| EZSaleTransaction   | TestEZShop_SaleTransaction   |
-| EZSQLiteDB          | TestEZShop_SQLiteDB          |
-| EZTicketEntry       | TestEZShop_TicketEntry       |
-| EZUser              | TestEZShop_User              |
-| EZShop              | TestEZShop_getCreditInTXTbyCardNumber                |
-| EZShop              | TestEZShop_updateCreditInTXTbyCardNumber             |
-| EZShop              | TestEZShop_isValidCreditCard                               |
-| EZShop              | TestEZShop_isValidCard                               |
-| EZShop              | TestEZShop_isValidPosition                           |
-| EZShop              | TestEZShop_VerifyBarCode                             |
+| Classes             | JUnit test cases                         |
+| ------------------- | ---------------------------------------- |
+| EZBalanceOperation  | TestEZShop_BalanceOperation              |
+| EZCustomer          | TestEZShop_Customer                      |
+| EZOrder             | TestEZShop_Order                         |
+| EZProductType       | TestEZShop_ProductType                   |
+| EZReturnTransaction | TestEZShop_ReturnTransaction             |
+| EZSaleTransaction   | TestEZShop_SaleTransaction               |
+| EZSQLiteDB          | TestEZShop_SQLiteDB                      |
+| EZTicketEntry       | TestEZShop_TicketEntry                   |
+| EZUser              | TestEZShop_User                          |
+| EZShop              | TestEZShop_getCreditInTXTbyCardNumber    |
+| EZShop              | TestEZShop_updateCreditInTXTbyCardNumber |
+| EZShop              | TestEZShop_isValidCreditCard             |
+| EZShop              | TestEZShop_isValidCard                   |
+| EZShop              | TestEZShop_isValidPosition               |
+| EZShop              | TestEZShop_VerifyBarCode                 |
+| EZShop              | TestEZShop_IsValidRFID                   |
+| EZShop              | TestEZShop_Product                       |
 
 
 ## Step 2
@@ -180,16 +188,17 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 
 
 ## Step 3
-| Classes  | JUnit test cases            |
-|----------|-----------------------------|
-|EZShop    | TestEZShopFR1               |
-|          | TestEZShopFR1_DeleteUser    |
-|          | TestEZShopFR3               |
-|          | TestEZShopFR4               |
-|          | TestEZShopFR5               |
-|          | TestEZShopFR6               |
-|          | TestEZShopFR7               |
-|          | TestEZShopFR8               |
+| Classes | JUnit test cases         |
+| ------- | ------------------------ |
+| EZShop  | TestEZShopFR1            |
+|         | TestEZShopFR1_DeleteUser |
+|         | TestEZShopFR3            |
+|         | TestEZShopFR4            |
+|         | TestEZShopFR5            |
+|         | TestEZShopFR6            |
+|         | TestEZShopFR7            |
+|         | TestEZShopFR8            |
+|         | TestEZShop_Change        |
 <br/>
 
 # Scenarios
@@ -209,24 +218,24 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 ## Scenario UC4.5
 
 | Scenario |  Delete customer record |
-| ------------- |:-------------:| 
+| ------------- |:-------------:|
 |  Precondition     | Account U for Customer Cu existing  |
 |  Post condition     | Account U is deleted |
 | Step#        | Description  |
 |  1    |  User selects customer record U |
-|  2    |  U deleted from the system | 
+|  2    |  U deleted from the system |
 
 ## Scenario UC6.7
 
 | Scenario |  Product type X removed from Sale transaction S |
-| ------------- |:-------------:| 
+| ------------- |:-------------:|
 |  Precondition     | Cashier C exists and is logged in |
 | | Sale transaction S exists and has been started |
 | | Product type X exists and it has been added to S (with quantity = Q)|
 |  Post condition     | Quantity N of X is removed from S  |
 | | X.quantity += N in catalogue |
 | Step#        | Description  |
-|  1    |  Product X is selected among S products |  
+|  1    |  Product X is selected among S products |
 |  2    |  Quantity N of product type X (N <= Q) is removed from S |
 
 ## Scenario UC8.3
@@ -250,6 +259,30 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 |  8   |  C confirms the return transaction and closes it  |
 |  9   |  Transaction is updated |
 |  10   |  Balance is updated |
+
+## Scenario UC8.4
+
+| Scenario | Return of a product with invalid RFID |
+| ------------- |:-------------:|
+|  Precondition     | The |
+| | Product Type X exists |
+| | SaleTransaction T exists and has exactly N units of X |
+| | Transaction T was paid cash |
+|  Post condition     | Balance -= N*T.priceForProductX  |
+| | X.quantity += N |
+| Step#        | Description  |
+|  1    |  C inserts T.transactionId |
+|  2    |  Return transaction starts |
+|  3    |  C reads bar code of X |
+|  4    |  C adds N units of X to the return transaction |
+|  5    |  X available quantity is increased by N |
+|  6    |  Manage cash return (go to UC 10) |
+|  7   |  Return  successful |
+|  8   |  C confirms the return transaction and closes it  |
+|  9   |  Transaction is updated |
+|  10   |  Balance is updated |
+
+
 
 ## Scenario UC9.2
 
@@ -300,44 +333,47 @@ Then, we proceeded to test AccountBook which is the only intermediate class, fol
 # Coverage of Scenarios and FR
 For Scenario 4.3 - Detach Loyalty card from customer record, there isn't a method in the API regarding this.
 
-| Scenario ID  | Functional Requirements covered | JUnit  Test(s)                              |
-| ------------ | ------------------------------- | ------------------------------------------- |
-| 1.1          | FR3                             | TestEZShopFR3.testCreateProductType         |
-| 1.2          | FR4                             | TestEZShopFR4.testUpdatePosition            |
-| 1.3          | FR3                             | TestEZShopFR3.testUpdateProduct             |
-| 1.4          | FR4                             | TestEZShopFR3.testUpdateQuantity            |
-| 2.1          | FR1                             | TestEZShopFR1.testCreateUser                |  
-| 2.2          | FR1                             | TestEZShopFR1_DeleteUser.testDeleteUser     |
-| 2.3          | FR1                             | TestEZShopFR1.testUpdateUserRight           |
-| 3.1          | FR4                             | TestEZShopFR4.testIssueOrder                |
-| 3.2          | FR4                             | TestEZShopFR4.testPayOrder                  |
-| 3.3          | FR4                             | TestEZShopFR4.testRecordOrderArrival        |
-| 4.1          | FR5                             | TestEZShopFR5.testCustomerEZShop            |
-| 4.2          | FR5                             | TestEZShopFR5 testCardEZShop                |
-| 4.4          | FR5                             | TestEZShopFR5.testCustomerEZShop            |
-| 4.5          | FR5                             | TestEZShopFR5.testCustomerEZShop            |
-| 5.1          | FR1                             | TestEZShopFR1.testLogin                     |
-| 5.2          | FR1                             | TestEZShopFR1.testLogin                     |
-| 6.1          | FR6                             | TestEZShopFR6, methods testStartSaleTransaction, testAddProductToSale, testEndSaleTransaction |
-| 6.2          | FR6                             | TestEZShopFR6.testApplyDiscountRateToProduct                               |
-| 6.3          | FR6                             | TestEZShopFR6.testApplyDiscountRateToSale                               |
-| 6.5          | FR6                             | TestEZShopFR6.testDeleteSaleTransaction                               |
-| 6.6          | FR6                             | TestEZShopFR6, methods testStartSaleTransaction, testAddProductToSale, testEndSaleTransaction                               |
-| 6.7          | FR6                             | TestEZShopFR6.testDeleteProductFromSale                               |
-| 7.1          | FR7                             | TestEZShopFR7.testReceiveCreditCardPayment  |
-| 7.2          | FR7                             | TestEZShopFR7.testInvalidCardPayment        |
-| 7.3          | FR7                             | TestEZShopFR7.testInsufficientCreditPayment |
-| 7.4          | FR7                             | TestEZShopFR7.testReceiveCashPayment        |
-| 8.1          | FR6                             | TestEZShopFR6, methods testStartReturnTransaction, testReturnProduct, testEndReturnTransaction                              |
-| 8.2          | FR6                             | TestEZShopFR6, methods testStartReturnTransaction, testReturnProduct, testEndReturnTransaction                               |
-| 8.3          | FR6                             | TestEZShopFR6.testDeleteReturnTransaction                               |
-| 9.1          | FR8                             | TestEZShopFR8.testGetAllCreditsAndDebits    |
-| 9.2          | FR8                             | TestEZShopFR8.testRecordDebit               |
-| 9.3          | FR8                             | TestEZShopFR8.testRecordCredit              |
-| 9.4          | FR8                             | TestEZShopFR8.testComputeBalance            |
-| 10.1         | FR7                             | TestEZShopFR7.testReturnCreditCardPayment   |
-| 10.2         | FR7                             | TestEZShopFR7.testReturnCashPayment         |
-| 10.3         | FR7                             | TestEZShopFR7.testReturnInvalidCardPayment  |
+| Scenario ID | Functional Requirements covered | JUnit  Test(s)                                               |
+| ----------- | ------------------------------- | ------------------------------------------------------------ |
+| 1.1         | FR3                             | TestEZShopFR3.testCreateProductType                          |
+| 1.2         | FR4                             | TestEZShopFR4.testUpdatePosition                             |
+| 1.3         | FR3                             | TestEZShopFR3.testUpdateProduct                              |
+| 1.4         | FR4                             | TestEZShopFR3.testUpdateQuantity                             |
+| 2.1         | FR1                             | TestEZShopFR1.testCreateUser                                 |
+| 2.2         | FR1                             | TestEZShopFR1_DeleteUser.testDeleteUser                      |
+| 2.3         | FR1                             | TestEZShopFR1.testUpdateUserRight                            |
+| 3.1         | FR4                             | TestEZShopFR4.testIssueOrder                                 |
+| 3.2         | FR4                             | TestEZShopFR4.testPayOrder                                   |
+| 3.3         | FR4                             | TestEZShopFR4.testRecordOrderArrival                         |
+| 3.5         | Change2 Requirements            | TestEZShop_Change.testOrderRFIDScenario                      |
+| 4.1         | FR5                             | TestEZShopFR5.testCustomerEZShop                             |
+| 4.2         | FR5                             | TestEZShopFR5 testCardEZShop                                 |
+| 4.4         | FR5                             | TestEZShopFR5.testCustomerEZShop                             |
+| 4.5         | FR5                             | TestEZShopFR5.testCustomerEZShop                             |
+| 5.1         | FR1                             | TestEZShopFR1.testLogin                                      |
+| 5.2         | FR1                             | TestEZShopFR1.testLogin                                      |
+| 6.1         | FR6                             | TestEZShopFR6, methods testStartSaleTransaction, testAddProductToSale, testEndSaleTransaction |
+| 6.2         | FR6                             | TestEZShopFR6.testApplyDiscountRateToProduct                 |
+| 6.3         | FR6                             | TestEZShopFR6.testApplyDiscountRateToSale                    |
+| 6.5         | FR6                             | TestEZShopFR6.testDeleteSaleTransaction                      |
+| 6.6         | FR6                             | TestEZShopFR6, methods testStartSaleTransaction, testAddProductToSale, testEndSaleTransaction |
+| 6.7         | FR6                             | TestEZShopFR6.testDeleteProductFromSale                      |
+| 6.8         | Change2 Requirements            | TestEZShop_Change.testSaleRFIDScenario                       |
+| 7.1         | FR7                             | TestEZShopFR7.testReceiveCreditCardPayment                   |
+| 7.2         | FR7                             | TestEZShopFR7.testInvalidCardPayment                         |
+| 7.3         | FR7                             | TestEZShopFR7.testInsufficientCreditPayment                  |
+| 7.4         | FR7                             | TestEZShopFR7.testReceiveCashPayment                         |
+| 8.1         | FR6                             | TestEZShopFR6, methods testStartReturnTransaction, testReturnProduct, testEndReturnTransaction |
+| 8.2         | FR6                             | TestEZShopFR6, methods testStartReturnTransaction, testReturnProduct, testEndReturnTransaction |
+| 8.3         | FR6                             | TestEZShopFR6.testDeleteReturnTransaction                    |
+| 8.4         | Change2 Requirements            | TestEZShop_Change.testReturnRFIDScenario                     |
+| 9.1         | FR8                             | TestEZShopFR8.testGetAllCreditsAndDebits                     |
+| 9.2         | FR8                             | TestEZShopFR8.testRecordDebit                                |
+| 9.3         | FR8                             | TestEZShopFR8.testRecordCredit                               |
+| 9.4         | FR8                             | TestEZShopFR8.testComputeBalance                             |
+| 10.1        | FR7                             | TestEZShopFR7.testReturnCreditCardPayment                    |
+| 10.2        | FR7                             | TestEZShopFR7.testReturnCashPayment                          |
+| 10.3        | FR7                             | TestEZShopFR7.testReturnInvalidCardPayment                   |
 
 
 # Coverage of Non Functional Requirements
